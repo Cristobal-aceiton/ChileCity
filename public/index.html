@@ -1058,6 +1058,13 @@
           <div><div class="card-title">Administrar Tienda</div><div class="card-sub">Panel de administración</div></div>
           <span class="card-arrow">›</span>
         </a>
+        <a href="#" class="nav-card" id="panel-admin-card" style="display:none">
+          <div class="card-icon" style="background:rgba(220,38,38,0.15);border-color:rgba(220,38,38,0.3)">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/><path d="M18 11l2 2 4-4" stroke="#f87171"/></svg>
+          </div>
+          <div><div class="card-title" style="color:#f87171">Panel Admin</div><div class="card-sub">Gestión de administradores</div></div>
+          <span class="card-arrow">›</span>
+        </a>
 
       </div>
     </div>
@@ -1651,22 +1658,66 @@
     </div>
   </section>
 
+  <!-- PANEL ADMIN (solo super admin) -->
+  <section class="screen seccion-screen" id="panel-admin-screen">
+    <div class="seccion-container" style="max-width:700px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title" style="color:#f87171;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
+          Panel Admin
+        </div>
+      </div>
+
+      <div style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+        <p style="color:#fca5a5;font-size:13px;margin:0;line-height:1.6;">
+          Desde aquí puedes gestionar los administradores del sistema. Puedes agregar hasta <strong>4 admins adicionales</strong> aparte de ti. Tendrán acceso completo al Admin Banco, Admin Tienda y este Panel Admin.
+        </p>
+      </div>
+
+      <!-- Lista de admins actuales -->
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0;">Administradores Actuales</h3>
+          <span id="pa-contador" style="font-size:12px;color:#9ca3af;background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:20px;">0/5</span>
+        </div>
+        <div class="rc-loading" id="pa-loading">
+          <div class="spinner"></div>
+          <span>Cargando admins...</span>
+        </div>
+        <div id="pa-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- Formulario agregar admin -->
+      <div id="pa-form-wrap" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0 0 16px 0;">Agregar Admin</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Discord ID</label>
+            <input id="pa-input-id" type="text" placeholder="Ej: 123456789012345678" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Nombre (opcional)</label>
+            <input id="pa-input-nombre" type="text" placeholder="Nombre del admin" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+          </div>
+          <button onclick="paAgregarAdmin()" style="background:rgba(220,38,38,0.8);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;margin-top:4px;">Agregar Admin</button>
+          <div id="pa-msg" style="font-size:13px;text-align:center;min-height:18px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 
   <script>
-    // ── IDs admin (debe coincidir con banco.js) ───────────────────────────────
-    // ⚠️ IDs admin del BANCO — deben coincidir con banco.js
-    const ADMIN_IDS = [
-      "1192236737565577287",  // Admin 1
-      "BANCO_ADMIN_ID_2",     // Admin 2 — reemplaza con el ID real
-      "BANCO_ADMIN_ID_3",     // Admin 3 — reemplaza con el ID real
-    ];
-
-    // ⚠️ IDs admin de la TIENDA — deben coincidir con tienda.js
-    const ADMIN_IDS_TIENDA = [
-      "1192236737565577287",  // Admin 1 (igual que banco)
-      "TIENDA_ADMIN_ID_2",    // Admin 2 — reemplaza con el ID real
-      "TIENDA_ADMIN_ID_3",    // Admin 3 — reemplaza con el ID real
-    ];
+    // ── Super Admin ID (solo para panel admin) ────────────────────────────────
+    const SUPER_ADMIN_ID = "1192236737565577287";
+    // IDs admin dinámicos (cargados desde la BD al hacer login)
+    let ADMIN_IDS = [SUPER_ADMIN_ID];
+    let ADMIN_IDS_TIENDA = [SUPER_ADMIN_ID];
 
     // ── Estado global ─────────────────────────────────────────────────────────
     let currentUser = null;
@@ -1676,7 +1727,7 @@
     let countdownInterval = null;
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen'];
 
     function mostrarPantalla(id) {
       screens.forEach(s => {
@@ -1689,14 +1740,25 @@
 
     function abrirSeccion(id) { mostrarPantalla(id); }
 
-    function goToDashboard(user) {
+    async function goToDashboard(user) {
       currentUser = user;
       document.getElementById('discord-name').textContent = user.name;
       document.getElementById('discord-tag').textContent  = user.tag || '';
       document.getElementById('discord-avatar').src       = user.avatar;
       document.getElementById('welcome-msg').textContent  = `Hola, ${user.name}`;
 
-      // Mostrar card admin si corresponde
+      // Cargar lista dinámica de admins desde la BD
+      try {
+        const r = await fetch(`/api/admin?action=listar&discord_id=${user.id}`);
+        if (r.ok) {
+          const data = await r.json();
+          const ids = data.admins.map(a => a.discord_id);
+          ADMIN_IDS = ids;
+          ADMIN_IDS_TIENDA = ids;
+        }
+      } catch {}
+
+      // Mostrar card admin banco si corresponde
       const adminCard = document.getElementById('admin-card');
       if (ADMIN_IDS.includes(user.id)) {
         adminCard.style.display = 'flex';
@@ -1712,6 +1774,15 @@
         adminTiendaCard.onclick = () => { abrirSeccion('admin-tienda-screen'); cargarAdminProductos(); };
       } else {
         adminTiendaCard.style.display = 'none';
+      }
+
+      // Mostrar card Panel Admin solo al super admin
+      const panelAdminCard = document.getElementById('panel-admin-card');
+      if (user.id === SUPER_ADMIN_ID) {
+        panelAdminCard.style.display = 'flex';
+        panelAdminCard.onclick = () => { abrirSeccion('panel-admin-screen'); paCargarAdmins(); };
+      } else {
+        panelAdminCard.style.display = 'none';
       }
 
       mostrarPantalla('dashboard');
@@ -2887,6 +2958,104 @@
     function toggleBdRow(discordId) {
       const row = document.getElementById(`bdr-${discordId}`);
       if (row) row.classList.toggle('open');
+    }
+
+    // ── PANEL ADMIN: funciones ────────────────────────────────────────────────
+    async function paCargarAdmins() {
+      if (!currentUser || currentUser.id !== SUPER_ADMIN_ID) return;
+      const loading = document.getElementById('pa-loading');
+      const lista   = document.getElementById('pa-lista');
+      const contador = document.getElementById('pa-contador');
+      const formWrap = document.getElementById('pa-form-wrap');
+
+      loading.style.display = 'flex';
+      lista.innerHTML = '';
+
+      try {
+        const r = await fetch(`/api/admin?action=listar&discord_id=${currentUser.id}`);
+        const data = await r.json();
+        loading.style.display = 'none';
+
+        if (!r.ok) { lista.innerHTML = `<p style="color:#f87171;">${data.error}</p>`; return; }
+
+        const admins = data.admins;
+        const extras = admins.filter(a => a.discord_id !== SUPER_ADMIN_ID).length;
+        contador.textContent = `${extras + 1}/5`;
+
+        // Deshabilitar formulario si se llegó al límite
+        formWrap.style.opacity = extras >= 4 ? '0.5' : '1';
+        formWrap.style.pointerEvents = extras >= 4 ? 'none' : 'auto';
+
+        admins.forEach(admin => {
+          const esSuperAdmin = admin.discord_id === SUPER_ADMIN_ID;
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;';
+          div.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:14px;color:#fff;font-weight:500;">${admin.nombre || 'Sin nombre'}</span>
+                ${esSuperAdmin ? '<span style="font-size:10px;background:rgba(220,38,38,0.3);color:#fca5a5;padding:2px 8px;border-radius:20px;font-weight:600;">SUPER ADMIN</span>' : '<span style="font-size:10px;background:rgba(168,85,247,0.25);color:#d8b4fe;padding:2px 8px;border-radius:20px;">ADMIN</span>'}
+              </div>
+              <span style="font-size:11px;color:#6b7280;font-family:monospace;">${admin.discord_id}</span>
+            </div>
+            ${esSuperAdmin ? '' : `<button onclick="paEliminarAdmin('${admin.discord_id}')" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:8px;padding:7px 14px;color:#f87171;font-size:12px;cursor:pointer;">Eliminar</button>`}
+          `;
+          lista.appendChild(div);
+        });
+
+        if (admins.length === 0) {
+          lista.innerHTML = '<p style="color:#6b7280;font-size:13px;">No hay admins registrados.</p>';
+        }
+      } catch {
+        loading.style.display = 'none';
+        lista.innerHTML = '<p style="color:#f87171;">Error al cargar admins.</p>';
+      }
+    }
+
+    async function paAgregarAdmin() {
+      if (!currentUser || currentUser.id !== SUPER_ADMIN_ID) return;
+      const targetId = document.getElementById('pa-input-id').value.trim();
+      const nombre   = document.getElementById('pa-input-nombre').value.trim();
+      const msg      = document.getElementById('pa-msg');
+
+      if (!targetId) { msg.style.color = '#f87171'; msg.textContent = 'Ingresa un Discord ID.'; return; }
+
+      msg.style.color = '#9ca3af'; msg.textContent = 'Agregando...';
+
+      try {
+        const r = await fetch('/api/admin?action=agregar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discord_id: currentUser.id, target_id: targetId, nombre: nombre || null })
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          msg.style.color = '#f87171'; msg.textContent = data.error;
+          return;
+        }
+        msg.style.color = '#4ade80'; msg.textContent = '✓ Admin agregado correctamente.';
+        document.getElementById('pa-input-id').value = '';
+        document.getElementById('pa-input-nombre').value = '';
+        paCargarAdmins();
+      } catch {
+        msg.style.color = '#f87171'; msg.textContent = 'Error de conexión.';
+      }
+    }
+
+    async function paEliminarAdmin(targetId) {
+      if (!currentUser || currentUser.id !== SUPER_ADMIN_ID) return;
+      if (!confirm('¿Eliminar este admin?')) return;
+
+      try {
+        const r = await fetch(`/api/admin?action=eliminar&discord_id=${currentUser.id}&target_id=${targetId}`, {
+          method: 'DELETE'
+        });
+        const data = await r.json();
+        if (!r.ok) { alert(data.error); return; }
+        paCargarAdmins();
+      } catch {
+        alert('Error al eliminar admin.');
+      }
     }
 
   </script>
