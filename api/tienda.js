@@ -246,6 +246,71 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true });
     }
 
+    // ── ADMIN: listar todos los usuarios con inventario (con DNI) ────────────
+    if (req.method === "GET" && action === "admin_inventarios") {
+      const { admin_id } = req.query;
+      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+        return res.status(403).json({ error: "No autorizado" });
+
+      // Obtener todos los usuarios que tienen items en inventario
+      // y que tengan DNI registrado, con su nombre y RUT
+      const rows = await sql`
+        SELECT
+          i.discord_id,
+          COUNT(i.id)::int AS cantidad,
+          d.nombre1,
+          d.apellido1,
+          d.rut
+        FROM inventario i
+        LEFT JOIN dni d ON d.discord_id = i.discord_id
+        WHERE d.discord_id IS NOT NULL
+        GROUP BY i.discord_id, d.nombre1, d.apellido1, d.rut
+        ORDER BY d.apellido1, d.nombre1
+      `;
+
+      return res.status(200).json({
+        usuarios: rows.map(r => ({
+          discord_id: r.discord_id,
+          nombre: `${r.nombre1 || ''} ${r.apellido1 || ''}`.trim() || r.discord_id,
+          rut: r.rut || null,
+          cantidad: r.cantidad,
+        })),
+      });
+    }
+
+    // ── ADMIN: obtener inventario de un usuario específico ─────────────────
+    if (req.method === "GET" && action === "admin_inventario_usuario") {
+      const { admin_id, discord_id } = req.query;
+      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+        return res.status(403).json({ error: "No autorizado" });
+
+      if (!discord_id)
+        return res.status(400).json({ error: "Falta discord_id" });
+
+      const rows = await sql`
+        SELECT * FROM inventario
+        WHERE discord_id = ${discord_id}
+        ORDER BY comprado_at DESC
+      `;
+
+      return res.status(200).json({
+        items: rows.map(i => ({ ...i, precio_pagado: toNumber(i.precio_pagado) })),
+      });
+    }
+
+    // ── ADMIN: eliminar item del inventario de un usuario ──────────────────
+    if (req.method === "DELETE" && action === "admin_eliminar_item_inventario") {
+      const { admin_id, item_id } = req.query;
+      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+        return res.status(403).json({ error: "No autorizado" });
+
+      if (!item_id)
+        return res.status(400).json({ error: "Falta item_id" });
+
+      await sql`DELETE FROM inventario WHERE id = ${item_id}`;
+      return res.status(200).json({ ok: true });
+    }
+
     return res.status(405).json({ error: "Método no permitido" });
   } catch (err) {
     console.error("Error en /api/tienda:", err);
