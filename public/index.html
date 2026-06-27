@@ -585,6 +585,11 @@
     .btn-small.purple:hover { background: rgba(168,85,247,0.35); }
     .btn-small.red { background: rgba(239,68,68,0.15); color: #ff8080; border: 1px solid rgba(239,68,68,0.25); }
     .btn-small.red:hover { background: rgba(239,68,68,0.25); }
+    .btn-small.orange { background: rgba(249,115,22,0.15); color: #fdba74; border: 1px solid rgba(249,115,22,0.3); }
+    .btn-small.orange:hover { background: rgba(249,115,22,0.3); }
+
+    .usuario-row { flex-wrap: wrap; }
+    .ur-acciones { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .admin-modal-overlay {
       position:fixed; inset:0; z-index:50; background: rgba(0,0,0,0.7);
@@ -639,6 +644,17 @@
       .carnet-body { flex-direction: column; align-items: center; }
       .carnet-foto { width: 80px; height: 98px; }
       .bank-actions { flex-direction: column; }
+
+      /* Panel admin en celular */
+      .usuario-row { flex-direction: column; align-items: stretch; gap: 10px; }
+      .ur-saldo { text-align: left; }
+      .ur-acciones { width: 100%; }
+      .ur-acciones .btn-small { flex: 1; text-align: center; }
+      .admin-modal { padding: 22px; width: min(420px, 92vw); }
+      .modal-actions { flex-direction: column; }
+      .modal-actions button { width: 100%; }
+      .admin-tabs { gap: 6px; }
+      .admin-tab { font-size: 11px; padding: 9px 6px; }
     }
   </style>
 </head>
@@ -1084,6 +1100,29 @@
     </div>
   </div>
 
+  <!-- MODAL: resetear cuenta -->
+  <div class="admin-modal-overlay" id="modal-reset">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-reset')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Resetear Cuenta
+      </h3>
+      <p id="modal-reset-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
+      <p style="color:#fdba74; font-size:13px; background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.25); border-radius:10px; padding:12px 14px;">
+        Esto va a dejar el saldo de esta cuenta en $1.000.000 (el monto inicial). No se puede deshacer. Úsalo solo si el saldo quedó corrupto o roto.
+      </p>
+      <div class="rc-error" id="modal-reset-error"></div>
+      <div class="modal-actions">
+        <button class="btn-crear" onclick="adminConfirmarReset()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Sí, resetear
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-reset')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ── IDs admin (debe coincidir con banco.js) ───────────────────────────────
     const ADMIN_IDS = ["1192236737565577287", "ADMIN_DISCORD_ID_2"];
@@ -1504,13 +1543,18 @@
               <div class="ur-rut">${u.rut || u.discord_id}</div>
             </div>
             <div class="ur-saldo">${formatearSaldo(u.saldo)}</div>
-            <button class="btn-small purple" onclick="abrirModalSaldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
-              Ajustar
-            </button>
-            <button class="btn-small" style="background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.25);"
-              onclick="seleccionarParaSueldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
-              Sueldos
-            </button>
+            <div class="ur-acciones">
+              <button class="btn-small purple" onclick="abrirModalSaldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
+                Ajustar
+              </button>
+              <button class="btn-small" style="background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.25);"
+                onclick="seleccionarParaSueldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
+                Sueldos
+              </button>
+              <button class="btn-small orange" onclick="abrirModalReset('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
+                Resetear
+              </button>
+            </div>
           </div>
         `).join('');
       } catch(e) {
@@ -1554,6 +1598,37 @@
         cargarAdminUsuarios();
       } catch(e) {
         errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    function abrirModalReset(discordId, nombre) {
+      adminTargetUser = { discordId, nombre };
+      document.getElementById('modal-reset-label').textContent = `Usuario: ${nombre}`;
+      document.getElementById('modal-reset-error').classList.remove('visible');
+      document.getElementById('modal-reset').classList.add('visible');
+    }
+
+    async function adminConfirmarReset() {
+      const errEl = document.getElementById('modal-reset-error');
+      errEl.classList.remove('visible');
+
+      try {
+        const res = await fetch('/api/banco?action=admin_reset_cuenta', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id: currentUser.id, discord_id_target: adminTargetUser.discordId }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.';
+          errEl.classList.add('visible');
+          return;
+        }
+        cerrarModal('modal-reset');
+        cargarAdminUsuarios();
+      } catch (e) {
+        errEl.textContent = 'Error de conexión.';
+        errEl.classList.add('visible');
       }
     }
 
@@ -1641,6 +1716,9 @@
     // Cerrar modal al hacer click fuera
     document.getElementById('modal-saldo').addEventListener('click', function(e) {
       if (e.target === this) cerrarModal('modal-saldo');
+    });
+    document.getElementById('modal-reset').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal('modal-reset');
     });
   </script>
 </body>
