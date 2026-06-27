@@ -17,6 +17,8 @@
       --discord: #5865F2;
       --discord2: #7289da;
       --discord-glow: rgba(88,101,242,0.5);
+      --gold: #F59E0B;
+      --green: #10B981;
     }
 
     html, body { height: 100%; font-family: 'Inter', sans-serif; overflow: hidden; background: #000; color: #fff; }
@@ -68,6 +70,7 @@
       border-radius: 999px; padding: 6px 18px; font-size: 12px;
       letter-spacing: 2px; text-transform: uppercase; color: var(--neon2);
       animation: fadeUp 0.9s 0.1s var(--ease) both;
+      display: flex; align-items: center; gap: 8px;
     }
 
     .landing-title {
@@ -244,7 +247,7 @@
     .nav-card:hover::before { opacity:1; }
     .nav-card:active { transform: scale(0.97); }
 
-    .card-icon { font-size: 36px; filter: drop-shadow(0 0 16px var(--card-color, var(--neon))); }
+    .card-icon { display:flex; align-items:center; justify-content:center; filter: drop-shadow(0 0 16px var(--card-color, var(--neon))); }
     .card-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
     .card-sub   { font-size: 12px; color: rgba(255,255,255,0.35); }
     .card-arrow {
@@ -256,8 +259,8 @@
     .nav-card:hover .card-arrow { opacity:1; transform: translateY(-50%) translateX(0); }
 
     .nav-card:nth-child(1){--card-glow:rgba(220,30,30,0.12);--card-color:#e02020}
-    .nav-card:nth-child(2){--card-glow:rgba(245,158,11,0.12);--card-color:#F59E0B}
-    .nav-card:nth-child(3){--card-glow:rgba(16,185,129,0.12);--card-color:#10B981}
+    .nav-card:nth-child(2){--card-glow:rgba(16,185,129,0.12);--card-color:#10B981}
+    .nav-card:nth-child(3){--card-glow:rgba(245,158,11,0.12);--card-color:#F59E0B}
     .nav-card:nth-child(4){--card-glow:rgba(239,68,68,0.12); --card-color:#EF4444}
     .nav-card:nth-child(5){--card-glow:rgba(168,85,247,0.12);--card-color:#A855F7}
 
@@ -271,36 +274,35 @@
     @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
     /* ═══════════════════════════════════════
-       REGISTRO CIVIL
+       SECCIÓN GENÉRICA (RC, BANCO, etc.)
     ═══════════════════════════════════════ */
-    #registro-civil {
-      flex-direction: column;
-      overflow-y: auto;
-    }
+    .seccion-screen { flex-direction: column; overflow-y: auto; }
 
-    .rc-container {
-      width: 100%; max-width: 640px;
-      padding: 100px 24px 48px;
+    .seccion-container {
+      width: 100%; max-width: 680px;
+      padding: 100px 24px 60px;
       display: flex; flex-direction: column; align-items: center; gap: 28px;
       animation: fadeUp 0.7s var(--ease) both;
     }
 
-    .rc-header {
+    .seccion-header {
       display: flex; align-items: center; gap: 14px;
       width: 100%;
     }
-    .rc-back {
+    .sec-back {
       background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
       color: #fff; border-radius: 10px; padding: 8px 14px;
       cursor: pointer; font-size: 13px; font-weight: 600;
       transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+      font-family: 'Inter', sans-serif;
     }
-    .rc-back:hover { background: rgba(255,255,255,0.14); }
+    .sec-back:hover { background: rgba(255,255,255,0.14); }
 
-    .rc-title {
+    .seccion-title {
       font-family: 'Bebas Neue', sans-serif; font-size: 32px;
       background: linear-gradient(135deg,#fff,var(--neon2));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip:text;
+      display: flex; align-items: center; gap: 10px;
     }
 
     /* Loading spinner */
@@ -325,123 +327,69 @@
       font-family: 'Inter', sans-serif;
     }
 
-    /* Franja superior azul */
     .carnet-header {
       background: linear-gradient(135deg, #003087 0%, #0052cc 60%, #0066ff 100%);
       padding: 14px 20px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .carnet-pais {
-      display: flex; flex-direction: column;
-    }
-    .carnet-pais-nombre {
-      font-size: 11px; font-weight: 800; letter-spacing: 3px;
-      color: #fff; text-transform: uppercase;
-    }
-    .carnet-pais-nombre2 {
-      font-size: 9px; letter-spacing: 1.5px;
-      color: rgba(255,255,255,0.7); text-transform: uppercase;
-    }
-    .carnet-tipo {
-      font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.85);
-      text-transform: uppercase; font-weight: 600;
-    }
-    .carnet-escudo {
-      font-size: 28px;
-    }
+    .carnet-pais { display: flex; flex-direction: column; }
+    .carnet-pais-nombre { font-size: 11px; font-weight: 800; letter-spacing: 3px; color: #fff; text-transform: uppercase; }
+    .carnet-pais-nombre2 { font-size: 9px; letter-spacing: 1.5px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+    .carnet-tipo { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.85); text-transform: uppercase; font-weight: 600; }
+    .carnet-escudo { display:flex; align-items:center; }
 
-    /* Cuerpo del carnet */
     .carnet-body {
       background: linear-gradient(160deg, #f5f5f0 0%, #e8e8e0 100%);
-      padding: 20px; display: flex; gap: 18px;
-      color: #111;
+      padding: 20px; display: flex; gap: 18px; color: #111;
     }
 
-    /* Foto placeholder */
     .carnet-foto {
       width: 90px; height: 110px; flex-shrink: 0;
       background: linear-gradient(160deg, #c8d8e8 0%, #a0b8cc 100%);
-      border: 2px solid #003087;
-      border-radius: 4px;
+      border: 2px solid #003087; border-radius: 4px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 40px; overflow: hidden;
+      overflow: hidden;
     }
-    .carnet-foto img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
+    .carnet-foto img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Datos */
     .carnet-datos { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-
     .carnet-campo { display: flex; flex-direction: column; gap: 1px; }
-    .carnet-label {
-      font-size: 7px; font-weight: 800; letter-spacing: 1.5px;
-      color: #003087; text-transform: uppercase;
-    }
-    .carnet-valor {
-      font-size: 13px; font-weight: 700; color: #111;
-      letter-spacing: 0.3px;
-    }
-    .carnet-valor.rut {
-      font-size: 15px; font-weight: 800; color: #003087; letter-spacing: 1px;
-    }
+    .carnet-label { font-size: 7px; font-weight: 800; letter-spacing: 1.5px; color: #003087; text-transform: uppercase; }
+    .carnet-valor { font-size: 13px; font-weight: 700; color: #111; letter-spacing: 0.3px; }
+    .carnet-valor.rut { font-size: 15px; font-weight: 800; color: #003087; letter-spacing: 1px; }
 
-    /* Franja inferior con RUT grande */
     .carnet-footer {
       background: linear-gradient(135deg, #003087 0%, #0052cc 100%);
       padding: 10px 20px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .carnet-footer-texto {
-      font-size: 9px; color: rgba(255,255,255,0.6); letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-    .carnet-footer-valido {
-      font-size: 9px; color: rgba(255,255,255,0.5);
-    }
+    .carnet-footer-texto { font-size: 9px; color: rgba(255,255,255,0.6); letter-spacing: 1.5px; text-transform: uppercase; }
+    .carnet-footer-valido { font-size: 9px; color: rgba(255,255,255,0.5); }
+    .carnet-banda { height: 6px; background: repeating-linear-gradient(90deg, #ccc 0px, #ccc 3px, #ddd 3px, #ddd 6px); }
 
-    /* Banda magnética decorativa */
-    .carnet-banda {
-      height: 6px;
-      background: repeating-linear-gradient(
-        90deg,
-        #ccc 0px, #ccc 3px,
-        #ddd 3px, #ddd 6px
-      );
-    }
-
-    /* ── FORMULARIO CREAR DNI ───────────────────── */
+    /* ── FORMULARIO GENÉRICO ──────────────────────── */
     .rc-form {
       width: 100%; background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.09);
       border-radius: 20px; padding: 28px;
       display: flex; flex-direction: column; gap: 20px;
     }
-    .rc-form h2 {
-      font-family: 'Bebas Neue', sans-serif; font-size: 24px;
-      color: #fff; letter-spacing: 1px;
-    }
+    .rc-form h2 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; letter-spacing: 1px; display:flex; align-items:center; gap:10px; }
     .rc-form p { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: -12px; }
 
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label {
-      font-size: 11px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; color: rgba(255,255,255,0.5);
-    }
-    .form-group input {
+    .form-group label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .form-group input, .form-group select {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 10px; padding: 12px 14px;
       color: #fff; font-size: 14px; font-family: 'Inter', sans-serif;
-      transition: border-color 0.2s;
-      outline: none; width: 100%;
+      transition: border-color 0.2s; outline: none; width: 100%;
     }
-    .form-group input:focus {
-      border-color: var(--neon2);
-      background: rgba(255,255,255,0.09);
-    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--neon2); background: rgba(255,255,255,0.09); }
     .form-group input::placeholder { color: rgba(255,255,255,0.2); }
+    .form-group select option { background: #111; }
 
     .btn-crear {
       background: var(--neon); color: #fff;
@@ -449,10 +397,21 @@
       padding: 14px 28px; font-size: 15px; font-weight: 700;
       cursor: pointer; transition: all 0.3s var(--ease);
       box-shadow: 0 0 24px rgba(220,30,30,0.35);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px; justify-content: center;
     }
     .btn-crear:hover { background: #c01818; transform: translateY(-2px); box-shadow: 0 0 36px rgba(220,30,30,0.5); }
     .btn-crear:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-green {
+      background: var(--green); color: #fff;
+      border: none; border-radius: 12px;
+      padding: 14px 28px; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.3s var(--ease);
+      box-shadow: 0 0 24px rgba(16,185,129,0.35);
+      font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px; justify-content: center;
+    }
+    .btn-green:hover { background: #0ea372; transform: translateY(-2px); }
+    .btn-green:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     .rc-error {
       background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
@@ -460,6 +419,202 @@
       color: #ff8080; font-size: 13px; display: none;
     }
     .rc-error.visible { display: block; }
+    .rc-success {
+      background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 10px; padding: 12px 16px;
+      color: #6ee7b7; font-size: 13px; display: none;
+    }
+    .rc-success.visible { display: block; }
+
+    /* ══════════════════════════════════
+       TARJETA BANCARIA
+    ══════════════════════════════════ */
+    .bank-card {
+      width: 100%; max-width: 440px;
+      border-radius: 20px; padding: 28px 32px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative; overflow: hidden;
+      animation: fadeUp 0.5s var(--ease) both;
+    }
+    .bank-card::before {
+      content:''; position:absolute; top:-60px; right:-60px;
+      width:200px; height:200px; border-radius:50%;
+      background: rgba(16,185,129,0.12);
+    }
+    .bank-card::after {
+      content:''; position:absolute; bottom:-40px; left:-40px;
+      width:160px; height:160px; border-radius:50%;
+      background: rgba(88,101,242,0.1);
+    }
+    .bank-card-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 28px; position: relative; z-index: 1;
+    }
+    .bank-logo-text {
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff, var(--green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .bank-chip {
+      width: 42px; height: 32px; border-radius: 6px;
+      background: linear-gradient(135deg, #d4af37 0%, #f5d06b 40%, #b8860b 100%);
+      border: 1px solid rgba(255,255,255,0.3);
+      position: relative; overflow: hidden;
+    }
+    .bank-chip::before {
+      content:''; position:absolute; top:50%; left:0; right:0;
+      height:1px; background: rgba(0,0,0,0.3);
+      transform: translateY(-50%);
+    }
+    .bank-chip::after {
+      content:''; position:absolute; left:50%; top:0; bottom:0;
+      width:1px; background: rgba(0,0,0,0.3);
+      transform: translateX(-50%);
+    }
+    .bank-numero {
+      font-size: 17px; font-weight: 500; letter-spacing: 3px;
+      color: rgba(255,255,255,0.85); margin-bottom: 24px;
+      position: relative; z-index: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .bank-bottom {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      position: relative; z-index: 1;
+    }
+    .bank-titular-label { font-size: 9px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 4px; }
+    .bank-titular-nombre { font-size: 15px; font-weight: 700; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+    .bank-rut-label { font-size: 9px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 4px; text-align:right; }
+    .bank-rut-valor { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); text-align:right; }
+    .bank-saldo-box {
+      width: 100%; max-width: 440px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px; padding: 20px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .bank-saldo-label { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .bank-saldo-valor { font-size: 28px; font-weight: 800; color: var(--green); letter-spacing: -0.5px; }
+    .bank-saldo-moneda { font-size: 14px; color: rgba(255,255,255,0.4); }
+
+    /* Próximo sueldo */
+    .proximo-sueldo {
+      width: 100%; max-width: 440px;
+      background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 16px; padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .ps-icon { color: var(--gold); flex-shrink:0; }
+    .ps-info { flex:1; }
+    .ps-titulo { font-size: 12px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.5px; }
+    .ps-tiempo { font-size: 18px; font-weight: 800; color: #fff; }
+    .ps-nombre { font-size: 12px; color: rgba(255,255,255,0.45); }
+
+    /* Botones de acción banco */
+    .bank-actions {
+      display: flex; gap: 12px; width: 100%; max-width: 440px;
+    }
+    .bank-action-btn {
+      flex:1; display:flex; flex-direction:column; align-items:center; gap:8px;
+      padding: 16px 10px; border-radius: 14px; cursor: pointer; border: none;
+      transition: all 0.25s var(--ease); font-family: 'Inter', sans-serif; color: #fff;
+    }
+    .bank-action-btn span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .bank-action-btn.transfer { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.25); }
+    .bank-action-btn.transfer:hover { background: rgba(16,185,129,0.25); transform: translateY(-2px); }
+    .bank-action-btn.history  { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); }
+    .bank-action-btn.history:hover  { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+
+    /* ── HISTORIAL ──────────────────────────── */
+    .historial-wrap { width:100%; max-width:440px; }
+    .historial-titulo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: rgba(255,255,255,0.7);
+      letter-spacing: 1px; margin-bottom: 12px; display:flex; align-items:center; gap:8px;
+    }
+    .historial-lista { display:flex; flex-direction:column; gap:8px; }
+    .historial-item {
+      display:flex; align-items:center; gap:14px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 12px 16px;
+    }
+    .hi-icono { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .hi-icono.ingreso { background: rgba(16,185,129,0.15); color: var(--green); }
+    .hi-icono.egreso  { background: rgba(239,68,68,0.15);   color: #ff6b6b; }
+    .hi-icono.sueldo  { background: rgba(245,158,11,0.15);  color: var(--gold); }
+    .hi-desc { flex:1; }
+    .hi-desc-titulo { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+    .hi-desc-fecha  { font-size: 11px; color: rgba(255,255,255,0.3); margin-top:2px; }
+    .hi-monto { font-size: 15px; font-weight: 800; }
+    .hi-monto.ingreso { color: var(--green); }
+    .hi-monto.egreso  { color: #ff6b6b; }
+    .hi-monto.sueldo  { color: var(--gold); }
+    .historial-vacio { text-align:center; color: rgba(255,255,255,0.3); font-size: 13px; padding: 32px 0; }
+
+    /* ── PANEL ADMIN ─────────────────────────── */
+    .admin-tabs {
+      display:flex; gap:8px; width:100%; margin-bottom: 4px;
+    }
+    .admin-tab {
+      flex:1; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+      font-size: 12px; font-weight: 700; cursor: pointer; text-align:center;
+      transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .admin-tab.active { background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4); color: #d8b4fe; }
+    .admin-panel { width:100%; }
+    .admin-seccion { display:none; flex-direction:column; gap:14px; }
+    .admin-seccion.visible { display:flex; }
+
+    .usuario-row {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 12px 16px;
+    }
+    .ur-info { flex:1; }
+    .ur-nombre { font-size: 13px; font-weight: 700; }
+    .ur-rut    { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .ur-saldo  { font-size: 14px; font-weight: 800; color: var(--green); }
+
+    .btn-small {
+      padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      cursor: pointer; border: none; font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .btn-small.purple { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+    .btn-small.purple:hover { background: rgba(168,85,247,0.35); }
+    .btn-small.red { background: rgba(239,68,68,0.15); color: #ff8080; border: 1px solid rgba(239,68,68,0.25); }
+    .btn-small.red:hover { background: rgba(239,68,68,0.25); }
+
+    .admin-modal-overlay {
+      position:fixed; inset:0; z-index:50; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px); display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none; transition: opacity 0.25s;
+    }
+    .admin-modal-overlay.visible { opacity:1; pointer-events:all; }
+    .admin-modal {
+      background: rgba(12,12,22,0.98); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 28px; width: min(480px, 90vw);
+      display:flex; flex-direction:column; gap:18px;
+      transform: scale(0.95); transition: transform 0.25s var(--ease);
+    }
+    .admin-modal-overlay.visible .admin-modal { transform: scale(1); }
+    .admin-modal h3 { font-family:'Bebas Neue',sans-serif; font-size:24px; color:#fff; letter-spacing:1px; display:flex; align-items:center; gap:10px; }
+    .admin-modal-close {
+      position:absolute; top:16px; right:20px; background:none; border:none;
+      color: rgba(255,255,255,0.4); font-size:20px; cursor:pointer; font-family:'Inter',sans-serif;
+    }
+    .modal-actions { display:flex; gap:10px; }
+
+    /* Sueldo item */
+    .sueldo-item {
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15);
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .si-info { flex:1; }
+    .si-nombre { font-size: 13px; font-weight: 700; color: var(--gold); }
+    .si-detalle { font-size: 11px; color: rgba(255,255,255,0.4); margin-top:2px; }
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
@@ -483,6 +638,7 @@
       .form-row { grid-template-columns: 1fr; }
       .carnet-body { flex-direction: column; align-items: center; }
       .carnet-foto { width: 80px; height: 98px; }
+      .bank-actions { flex-direction: column; }
     }
   </style>
 </head>
@@ -498,7 +654,10 @@
   <!-- LANDING -->
   <section class="screen active" id="landing">
     <div class="landing-inner">
-      <div class="badge">🇨🇱 Servidor de Roleplay</div>
+      <div class="badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Servidor de Roleplay
+      </div>
       <h1 class="landing-title">Bienvenido a<br>ChileCity RP</h1>
       <p class="landing-desc">
         Sumérgete en la experiencia de roleplay más inmersiva de habla hispana.
@@ -507,26 +666,12 @@
       </p>
       <div class="btn-group">
         <a href="/auth/login" class="btn-discord" id="login-btn">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
-            <ellipse cx="8.5" cy="12.5" rx="1.8" ry="2.1" fill="white"/>
-            <ellipse cx="8.7" cy="12.7" rx="0.9" ry="1.1" fill="#1a1a2e"/>
-            <ellipse cx="15.5" cy="12.5" rx="1.8" ry="2.1" fill="white"/>
-            <ellipse cx="15.7" cy="12.7" rx="0.9" ry="1.1" fill="#1a1a2e"/>
-            <path d="M9.5 16.5 Q12 18.5 14.5 16.5" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round"/>
-          </svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
           Entrar con Discord
         </a>
         <div class="divider">o</div>
         <a href="https://discord.gg/TU-LINK-AQUI" target="_blank" class="btn-outline">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
-            <ellipse cx="8.5" cy="12.5" rx="1.8" ry="2.1" fill="white"/>
-            <ellipse cx="8.7" cy="12.7" rx="0.9" ry="1.1" fill="#1a1a2e"/>
-            <ellipse cx="15.5" cy="12.5" rx="1.8" ry="2.1" fill="white"/>
-            <ellipse cx="15.7" cy="12.7" rx="0.9" ry="1.1" fill="#1a1a2e"/>
-            <path d="M9.5 16.5 Q12 18.5 14.5 16.5" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round"/>
-          </svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
           Ir al Discord
         </a>
       </div>
@@ -548,11 +693,7 @@
         <span class="chevron">▾</span>
         <div class="logout-dropdown">
           <button class="logout-btn" id="logout-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Cerrar sesión
           </button>
         </div>
@@ -566,29 +707,41 @@
       </div>
 
       <div class="nav-grid">
-        <div class="nav-card" onclick="abrirRegistroCivil()">
-          <div class="card-icon">🪪</div>
+        <div class="nav-card" onclick="abrirSeccion('registro-civil'); cargarDNI()">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/><circle cx="6" cy="12" r="1.5" fill="currentColor"/></svg>
+          </div>
           <div><div class="card-title">Registro Civil</div><div class="card-sub">Tu cédula de identidad</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <a href="#" class="nav-card">
-          <div class="card-icon">💰</div>
-          <div><div class="card-title">Botón 2</div><div class="card-sub">Descripción corta</div></div>
+
+        <div class="nav-card" onclick="abrirSeccion('banco-screen'); cargarBanco()">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/><path d="M5 15h2M9 15h6"/></svg>
+          </div>
+          <div><div class="card-title">Banco</div><div class="card-sub">Tu cuenta bancaria</div></div>
           <span class="card-arrow">›</span>
-        </a>
+        </div>
+
         <a href="#" class="nav-card">
-          <div class="card-icon">🚓</div>
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
           <div><div class="card-title">Botón 3</div><div class="card-sub">Descripción corta</div></div>
           <span class="card-arrow">›</span>
         </a>
         <a href="#" class="nav-card">
-          <div class="card-icon">⚖️</div>
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
           <div><div class="card-title">Botón 4</div><div class="card-sub">Descripción corta</div></div>
           <span class="card-arrow">›</span>
         </a>
-        <a href="#" class="nav-card">
-          <div class="card-icon">🗺️</div>
-          <div><div class="card-title">Botón 5</div><div class="card-sub">Descripción corta</div></div>
+        <a href="#" class="nav-card" id="admin-card" style="display:none">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div><div class="card-title">Administrar Banco</div><div class="card-sub">Panel de administración</div></div>
           <span class="card-arrow">›</span>
         </a>
       </div>
@@ -596,22 +749,24 @@
   </section>
 
   <!-- REGISTRO CIVIL -->
-  <section class="screen" id="registro-civil">
-    <div class="rc-container">
-      <div class="rc-header">
-        <button class="rc-back" onclick="cerrarRegistroCivil()">
-          ← Volver
+  <section class="screen seccion-screen" id="registro-civil">
+    <div class="seccion-container">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
         </button>
-        <div class="rc-title">🪪 Registro Civil</div>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/></svg>
+          Registro Civil
+        </div>
       </div>
 
-      <!-- Loading -->
       <div class="rc-loading" id="rc-loading">
         <div class="spinner"></div>
         <span>Consultando base de datos...</span>
       </div>
 
-      <!-- Carnet (se muestra si ya tiene DNI) -->
       <div id="rc-carnet-wrap" style="display:none; width:100%; max-width:540px;">
         <div class="carnet" id="rc-carnet">
           <div class="carnet-header">
@@ -619,14 +774,16 @@
               <div class="carnet-pais-nombre">República de Chile</div>
               <div class="carnet-pais-nombre2">Cédula de Identidad</div>
             </div>
-            <div class="carnet-escudo">🇨🇱</div>
+            <div class="carnet-escudo">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
             <div class="carnet-tipo">IDENTITY CARD</div>
           </div>
           <div class="carnet-banda"></div>
           <div class="carnet-body">
             <div class="carnet-foto" id="carnet-foto-wrap">
               <img id="carnet-avatar" src="" alt="Foto" style="display:none;">
-              <span id="carnet-foto-emoji">👤</span>
+              <svg id="carnet-foto-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             </div>
             <div class="carnet-datos">
               <div class="carnet-campo">
@@ -658,9 +815,11 @@
         </div>
       </div>
 
-      <!-- Formulario crear DNI (si no tiene) -->
       <div class="rc-form" id="rc-form" style="display:none;">
-        <h2>📄 Crear Cédula de Identidad</h2>
+        <h2>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Crear Cédula de Identidad
+        </h2>
         <p>Completa tus datos. El RUT se genera automáticamente.</p>
 
         <div class="form-row">
@@ -691,59 +850,292 @@
         <div class="rc-error" id="rc-error"></div>
 
         <button class="btn-crear" id="btn-crear" onclick="crearDNI()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           Generar Cédula
         </button>
       </div>
     </div>
   </section>
 
+  <!-- BANCO -->
+  <section class="screen seccion-screen" id="banco-screen">
+    <div class="seccion-container">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/></svg>
+          Banco
+        </div>
+      </div>
+
+      <div class="rc-loading" id="banco-loading">
+        <div class="spinner"></div>
+        <span>Cargando cuenta...</span>
+      </div>
+
+      <!-- Vista sin cuenta -->
+      <div class="rc-form" id="banco-crear-form" style="display:none;">
+        <h2>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/></svg>
+          Abrir Cuenta Bancaria
+        </h2>
+        <p>Tu cuenta se crea automáticamente con los datos de tu cédula. Recibirás $1.000.000 de bienvenida.</p>
+        <div class="rc-error" id="banco-crear-error"></div>
+        <button class="btn-green" id="btn-abrir-cuenta" onclick="crearCuenta()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Crear Cuenta Bancaria
+        </button>
+      </div>
+
+      <!-- Vista con cuenta -->
+      <div id="banco-cuenta-wrap" style="display:none; width:100%; display:none; flex-direction:column; align-items:center; gap:20px;">
+
+        <!-- Tarjeta -->
+        <div class="bank-card" id="bank-card">
+          <div class="bank-card-top">
+            <div class="bank-logo-text">ChileCity Bank</div>
+            <div class="bank-chip"></div>
+          </div>
+          <div class="bank-numero" id="bank-numero">0000-0000-0000-0000</div>
+          <div class="bank-bottom">
+            <div>
+              <div class="bank-titular-label">Titular</div>
+              <div class="bank-titular-nombre" id="bank-titular">—</div>
+            </div>
+            <div>
+              <div class="bank-rut-label">RUT</div>
+              <div class="bank-rut-valor" id="bank-rut">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saldo -->
+        <div class="bank-saldo-box">
+          <div>
+            <div class="bank-saldo-label">Saldo disponible</div>
+            <div class="bank-saldo-valor" id="bank-saldo">$0</div>
+          </div>
+          <div class="bank-saldo-moneda">CLP</div>
+        </div>
+
+        <!-- Próximo sueldo -->
+        <div class="proximo-sueldo" id="proximo-sueldo-box" style="display:none;">
+          <div class="ps-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="ps-info">
+            <div class="ps-titulo">Próximo sueldo</div>
+            <div class="ps-tiempo" id="ps-tiempo">—</div>
+            <div class="ps-nombre" id="ps-nombre">—</div>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="bank-actions">
+          <button class="bank-action-btn transfer" onclick="mostrarTransferir()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            <span>Transferir</span>
+          </button>
+          <button class="bank-action-btn history" onclick="mostrarHistorial()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+            <span>Historial</span>
+          </button>
+        </div>
+
+        <!-- Formulario transferencia (oculto) -->
+        <div class="rc-form" id="transfer-form" style="display:none; width:100%; max-width:440px;">
+          <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg>
+            Nueva Transferencia
+          </h2>
+          <div class="form-group">
+            <label>RUT Destinatario</label>
+            <input type="text" id="transfer-rut" placeholder="Ej: 12.345.678-9">
+          </div>
+          <div class="form-group">
+            <label>Monto (CLP)</label>
+            <input type="number" id="transfer-monto" placeholder="Ej: 50000" min="1">
+          </div>
+          <div class="rc-error" id="transfer-error"></div>
+          <div class="rc-success" id="transfer-success"></div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-green" id="btn-transferir" onclick="hacerTransferencia()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Transferir
+            </button>
+            <button class="sec-back" onclick="ocultarTransferir()">Cancelar</button>
+          </div>
+        </div>
+
+        <!-- Historial (oculto) -->
+        <div class="historial-wrap" id="historial-wrap" style="display:none;">
+          <div class="historial-titulo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Historial
+          </div>
+          <div class="historial-lista" id="historial-lista">
+            <div class="historial-vacio">Sin movimientos aún</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN BANCO -->
+  <section class="screen seccion-screen" id="admin-screen">
+    <div class="seccion-container" style="max-width:740px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Administrar Banco
+        </div>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="adminTab('usuarios')">Usuarios</button>
+        <button class="admin-tab" onclick="adminTab('sueldos')">Sueldos</button>
+      </div>
+
+      <div class="admin-panel" style="width:100%;">
+
+        <!-- Tab Usuarios -->
+        <div class="admin-seccion visible" id="admin-tab-usuarios">
+          <div class="rc-loading" id="admin-loading-users">
+            <div class="spinner"></div>
+            <span>Cargando usuarios...</span>
+          </div>
+          <div id="admin-usuarios-lista"></div>
+        </div>
+
+        <!-- Tab Sueldos -->
+        <div class="admin-seccion" id="admin-tab-sueldos">
+          <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+            <p style="color:rgba(255,255,255,0.4); font-size:13px;">Selecciona un usuario en la pestaña Usuarios para gestionar sus sueldos.</p>
+          </div>
+          <div class="rc-error" id="admin-sueldo-info" style="background:rgba(168,85,247,0.1); border-color:rgba(168,85,247,0.25); color:#d8b4fe; display:none;">Selecciona un usuario primero desde la pestaña Usuarios.</div>
+          <div id="admin-sueldo-form-wrap" style="display:none; flex-direction:column; gap:14px;">
+            <p id="admin-sueldo-target-label" style="color: var(--gold); font-weight:700; font-size:14px;"></p>
+            <div class="rc-form" style="gap:14px;">
+              <h2 style="font-size:18px; display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Agregar sueldo
+              </h2>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nombre del sueldo</label>
+                  <input type="text" id="admin-sueldo-nombre" placeholder="Ej: Policia, Mecánico...">
+                </div>
+                <div class="form-group">
+                  <label>Monto ($)</label>
+                  <input type="number" id="admin-sueldo-monto" placeholder="Ej: 150000" min="1">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cada cuántos días se cobra</label>
+                <input type="number" id="admin-sueldo-dias" placeholder="Ej: 7" min="1">
+              </div>
+              <div class="rc-error" id="admin-sueldo-error"></div>
+              <button class="btn-green" onclick="adminCrearSueldo()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Asignar Sueldo
+              </button>
+            </div>
+            <div id="admin-sueldos-lista-target"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL: ajustar saldo -->
+  <div class="admin-modal-overlay" id="modal-saldo">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-saldo')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Ajustar Saldo
+      </h3>
+      <p id="modal-saldo-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
+      <div class="form-group">
+        <label>Monto (puede ser negativo para restar)</label>
+        <input type="number" id="modal-saldo-monto" placeholder="Ej: 50000 o -10000">
+      </div>
+      <div class="form-group">
+        <label>Descripción (opcional)</label>
+        <input type="text" id="modal-saldo-desc" placeholder="Ej: Premio evento, Multa...">
+      </div>
+      <div class="rc-error" id="modal-saldo-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" onclick="adminConfirmarSaldo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-saldo')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ── Estado global ────────────────────────────────────────────────────────
-    let currentUser = null; // { name, tag, avatar, id }
+    // ── IDs admin (debe coincidir con banco.js) ───────────────────────────────
+    const ADMIN_IDS = ["ADMIN_DISCORD_ID_1", "ADMIN_DISCORD_ID_2"];
 
-    const landingScreen  = document.getElementById('landing');
-    const dashboardScreen= document.getElementById('dashboard');
-    const rcScreen       = document.getElementById('registro-civil');
-    const userPill       = document.getElementById('user-pill');
-    const discordName    = document.getElementById('discord-name');
-    const discordTag     = document.getElementById('discord-tag');
-    const discordAvatar  = document.getElementById('discord-avatar');
-    const welcomeMsg     = document.getElementById('welcome-msg');
+    // ── Estado global ─────────────────────────────────────────────────────────
+    let currentUser = null;
+    let currentDNI  = null;
+    let currentCuenta = null;
+    let adminTargetUser = null;
+    let countdownInterval = null;
 
-    // Limitar fecha máx del input a hoy
-    document.getElementById('f-fecha').max = new Date().toISOString().split('T')[0];
+    // ── Pantallas ─────────────────────────────────────────────────────────────
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen'];
 
-    // ── Pantallas ────────────────────────────────────────────────────────────
+    function mostrarPantalla(id) {
+      screens.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.classList.toggle('active', s === id);
+      });
+    }
+
+    function volverDashboard() { mostrarPantalla('dashboard'); }
+
+    function abrirSeccion(id) { mostrarPantalla(id); }
+
     function goToDashboard(user) {
       currentUser = user;
-      discordName.textContent = user.name;
-      discordTag.textContent  = user.tag || '';
-      discordAvatar.src       = user.avatar;
-      welcomeMsg.textContent  = `Hola, ${user.name} 👋`;
-      landingScreen.classList.remove('active');
-      rcScreen.classList.remove('active');
-      dashboardScreen.classList.add('active');
+      document.getElementById('discord-name').textContent = user.name;
+      document.getElementById('discord-tag').textContent  = user.tag || '';
+      document.getElementById('discord-avatar').src       = user.avatar;
+      document.getElementById('welcome-msg').textContent  = `Hola, ${user.name}`;
+
+      // Mostrar card admin si corresponde
+      const adminCard = document.getElementById('admin-card');
+      if (ADMIN_IDS.includes(user.id)) {
+        adminCard.style.display = 'flex';
+        adminCard.onclick = () => { abrirSeccion('admin-screen'); cargarAdminUsuarios(); };
+      } else {
+        adminCard.style.display = 'none';
+      }
+
+      mostrarPantalla('dashboard');
     }
 
     function goToLanding() {
-      currentUser = null;
-      dashboardScreen.classList.remove('active');
-      rcScreen.classList.remove('active');
-      landingScreen.classList.add('active');
+      currentUser = null; currentDNI = null; currentCuenta = null;
+      mostrarPantalla('landing');
     }
 
-    function abrirRegistroCivil() {
-      dashboardScreen.classList.remove('active');
-      rcScreen.classList.add('active');
-      cargarDNI();
-    }
+    // ── Login desde URL params ────────────────────────────────────────────────
+    document.getElementById('f-fecha').max = new Date().toISOString().split('T')[0];
 
-    function cerrarRegistroCivil() {
-      rcScreen.classList.remove('active');
-      dashboardScreen.classList.add('active');
-    }
-
-    // ── Login desde URL params ───────────────────────────────────────────────
     const params = new URLSearchParams(window.location.search);
     if (params.get('name')) {
       window.history.replaceState({}, '', '/');
@@ -755,24 +1147,25 @@
       });
     }
 
-    // ── User pill ────────────────────────────────────────────────────────────
-    userPill.addEventListener('click', (e) => {
+    // ── User pill ─────────────────────────────────────────────────────────────
+    document.getElementById('user-pill').addEventListener('click', (e) => {
       if (e.target.closest('#logout-btn')) return;
-      userPill.classList.toggle('open');
+      document.getElementById('user-pill').classList.toggle('open');
     });
     document.addEventListener('click', (e) => {
-      if (!userPill.contains(e.target)) userPill.classList.remove('open');
+      if (!document.getElementById('user-pill').contains(e.target))
+        document.getElementById('user-pill').classList.remove('open');
     });
     document.getElementById('logout-btn').addEventListener('click', () => {
-      userPill.classList.remove('open');
+      document.getElementById('user-pill').classList.remove('open');
       goToLanding();
     });
 
-    // ── Cargar DNI ───────────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // REGISTRO CIVIL
+    // ══════════════════════════════════════════════════════════════════════════
     async function cargarDNI() {
       if (!currentUser?.id) return;
-
-      // Reset estado
       document.getElementById('rc-loading').style.display = 'flex';
       document.getElementById('rc-carnet-wrap').style.display = 'none';
       document.getElementById('rc-form').style.display = 'none';
@@ -780,10 +1173,10 @@
       try {
         const res = await fetch(`/api/dni?discord_id=${currentUser.id}`);
         const data = await res.json();
-
         document.getElementById('rc-loading').style.display = 'none';
 
         if (data.existe && data.dni) {
+          currentDNI = data.dni;
           mostrarCarnet(data.dni);
         } else {
           document.getElementById('rc-form').style.display = 'flex';
@@ -791,43 +1184,32 @@
       } catch (err) {
         document.getElementById('rc-loading').style.display = 'none';
         document.getElementById('rc-form').style.display = 'flex';
-        mostrarError('Error al conectar con la base de datos.');
       }
     }
 
-    // ── Mostrar carnet ───────────────────────────────────────────────────────
     function mostrarCarnet(dni) {
-      document.getElementById('carnet-apellidos').textContent =
-        `${dni.apellido1} ${dni.apellido2}`;
-      document.getElementById('carnet-nombres').textContent =
-        `${dni.nombre1} ${dni.nombre2}`;
-      document.getElementById('carnet-nac').textContent = dni.nacionalidad || 'Chilena';
-      document.getElementById('carnet-fnac').textContent = formatearFecha(dni.fecha_nac);
-      document.getElementById('carnet-rut').textContent = dni.rut;
+      document.getElementById('carnet-apellidos').textContent = `${dni.apellido1} ${dni.apellido2}`;
+      document.getElementById('carnet-nombres').textContent   = `${dni.nombre1} ${dni.nombre2}`;
+      document.getElementById('carnet-nac').textContent       = dni.nacionalidad || 'Chilena';
+      document.getElementById('carnet-fnac').textContent      = formatearFecha(dni.fecha_nac);
+      document.getElementById('carnet-rut').textContent       = dni.rut;
 
-      // Poner avatar del discord como foto
       if (currentUser?.avatar) {
-        const img = document.getElementById('carnet-avatar');
-        const emoji = document.getElementById('carnet-foto-emoji');
+        const img   = document.getElementById('carnet-avatar');
+        const icono = document.getElementById('carnet-foto-icon');
         img.src = currentUser.avatar;
         img.style.display = 'block';
-        emoji.style.display = 'none';
+        icono.style.display = 'none';
       }
-
       document.getElementById('rc-carnet-wrap').style.display = 'block';
     }
 
-    function formatearFecha(fechaStr) {
-      if (!fechaStr) return '—';
-      // Puede venir como "1995-08-23" o ya formateada
-      const partes = fechaStr.split('-');
-      if (partes.length === 3) {
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-      }
-      return fechaStr;
+    function formatearFecha(f) {
+      if (!f) return '—';
+      const p = f.split('-');
+      return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
     }
 
-    // ── Crear DNI ────────────────────────────────────────────────────────────
     async function crearDNI() {
       const nombre1   = document.getElementById('f-nombre1').value.trim();
       const nombre2   = document.getElementById('f-nombre2').value.trim();
@@ -835,58 +1217,431 @@
       const apellido2 = document.getElementById('f-apellido2').value.trim();
       const fecha_nac = document.getElementById('f-fecha').value;
 
-      // Validación básica
       if (!nombre1 || !nombre2 || !apellido1 || !apellido2 || !fecha_nac) {
-        mostrarError('Debes completar todos los campos.');
-        return;
+        return mostrarErrorRC('Debes completar todos los campos.');
       }
-      if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s'-]+$/.test(nombre1 + nombre2 + apellido1 + apellido2)) {
-        mostrarError('Los nombres solo pueden contener letras.');
-        return;
+      if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s'-]+$/.test(nombre1+nombre2+apellido1+apellido2)) {
+        return mostrarErrorRC('Los nombres solo pueden contener letras.');
       }
 
       const btn = document.getElementById('btn-crear');
       btn.disabled = true;
       btn.textContent = 'Generando...';
-      ocultarError();
+      ocultarErrorRC();
 
       try {
         const res = await fetch('/api/dni', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            discord_id: currentUser.id,
-            nombre1, nombre2, apellido1, apellido2, fecha_nac,
-          }),
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ discord_id: currentUser.id, nombre1, nombre2, apellido1, apellido2, fecha_nac }),
         });
         const data = await res.json();
-
         if (!res.ok) {
-          mostrarError(data.error || 'Error al crear la cédula.');
-          btn.disabled = false;
-          btn.textContent = 'Generar Cédula';
+          mostrarErrorRC(data.error || 'Error al crear la cédula.');
+          btn.disabled = false; btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Generar Cédula`;
           return;
         }
-
-        // ¡Éxito! Mostrar carnet
+        currentDNI = data.dni;
         document.getElementById('rc-form').style.display = 'none';
         mostrarCarnet(data.dni);
-
       } catch (err) {
-        mostrarError('Error de conexión. Intenta de nuevo.');
+        mostrarErrorRC('Error de conexión.');
         btn.disabled = false;
-        btn.textContent = 'Generar Cédula';
       }
     }
 
-    function mostrarError(msg) {
+    function mostrarErrorRC(msg) {
       const el = document.getElementById('rc-error');
-      el.textContent = msg;
-      el.classList.add('visible');
+      el.textContent = msg; el.classList.add('visible');
     }
-    function ocultarError() {
-      document.getElementById('rc-error').classList.remove('visible');
+    function ocultarErrorRC() { document.getElementById('rc-error').classList.remove('visible'); }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // BANCO
+    // ══════════════════════════════════════════════════════════════════════════
+    async function cargarBanco() {
+      if (!currentUser?.id) return;
+      document.getElementById('banco-loading').style.display = 'flex';
+      document.getElementById('banco-crear-form').style.display = 'none';
+      document.getElementById('banco-cuenta-wrap').style.display = 'none';
+
+      try {
+        const res = await fetch(`/api/banco?action=cuenta&discord_id=${currentUser.id}`);
+        document.getElementById('banco-loading').style.display = 'none';
+
+        if (res.status === 404) {
+          // Verificar si tiene DNI
+          const dniRes = await fetch(`/api/dni?discord_id=${currentUser.id}`);
+          const dniData = await dniRes.json();
+          if (!dniData.existe) {
+            const err = document.getElementById('banco-crear-error');
+            err.textContent = 'Debes crear tu cédula de identidad (DNI) antes de abrir una cuenta bancaria.';
+            err.classList.add('visible');
+            document.getElementById('btn-abrir-cuenta').disabled = true;
+          }
+          document.getElementById('banco-crear-form').style.display = 'flex';
+          return;
+        }
+
+        const data = await res.json();
+        currentCuenta = data.cuenta;
+
+        // Buscar DNI para nombre completo
+        let dniData = { existe: false };
+        try {
+          const dr = await fetch(`/api/dni?discord_id=${currentUser.id}`);
+          dniData = await dr.json();
+          if (dniData.existe) currentDNI = dniData.dni;
+        } catch(e){}
+
+        mostrarTarjeta(data.cuenta, dniData.dni);
+        document.getElementById('bank-saldo').textContent = formatearSaldo(data.cuenta.saldo);
+        document.getElementById('banco-cuenta-wrap').style.display = 'flex';
+
+        // Próximo sueldo
+        if (data.proximoSueldo) {
+          iniciarCountdown(data.proximoSueldo);
+        } else {
+          document.getElementById('proximo-sueldo-box').style.display = 'none';
+        }
+
+      } catch (err) {
+        document.getElementById('banco-loading').style.display = 'none';
+        document.getElementById('banco-crear-form').style.display = 'flex';
+      }
     }
+
+    function mostrarTarjeta(cuenta, dni) {
+      document.getElementById('bank-numero').textContent = cuenta.numero_cuenta;
+      if (dni) {
+        document.getElementById('bank-titular').textContent = `${dni.nombre1} ${dni.apellido1}`;
+        document.getElementById('bank-rut').textContent = dni.rut;
+      }
+    }
+
+    function formatearSaldo(n) {
+      return '$' + Number(n).toLocaleString('es-CL');
+    }
+
+    function iniciarCountdown(ps) {
+      const box = document.getElementById('proximo-sueldo-box');
+      box.style.display = 'flex';
+      document.getElementById('ps-nombre').textContent = ps.nombre;
+      if (countdownInterval) clearInterval(countdownInterval);
+
+      function actualizar() {
+        const ms = ps.msRestantes - (Date.now() - iniciadoEn);
+        if (ms <= 0) {
+          document.getElementById('ps-tiempo').textContent = 'Disponible ahora';
+          clearInterval(countdownInterval);
+          return;
+        }
+        const d = Math.floor(ms / 86400000);
+        const h = Math.floor((ms % 86400000) / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        const s = Math.floor((ms % 60000) / 1000);
+        let txt = '';
+        if (d > 0) txt += `${d}d `;
+        if (h > 0) txt += `${h}h `;
+        if (m > 0) txt += `${m}m `;
+        txt += `${s}s`;
+        document.getElementById('ps-tiempo').textContent = txt;
+      }
+
+      const iniciadoEn = Date.now();
+      actualizar();
+      countdownInterval = setInterval(actualizar, 1000);
+    }
+
+    async function crearCuenta() {
+      const btn = document.getElementById('btn-abrir-cuenta');
+      btn.disabled = true;
+      btn.textContent = 'Creando...';
+
+      try {
+        const res = await fetch('/api/banco?action=crear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discord_id: currentUser.id }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const err = document.getElementById('banco-crear-error');
+          err.textContent = data.error || 'Error al crear la cuenta.';
+          err.classList.add('visible');
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Crear Cuenta Bancaria`;
+          return;
+        }
+        currentCuenta = data.cuenta;
+        document.getElementById('banco-crear-form').style.display = 'none';
+        document.getElementById('banco-loading').style.display = 'none';
+        document.getElementById('bank-saldo').textContent = formatearSaldo(data.cuenta.saldo);
+        if (currentDNI) mostrarTarjeta(data.cuenta, currentDNI);
+        document.getElementById('banco-cuenta-wrap').style.display = 'flex';
+        document.getElementById('proximo-sueldo-box').style.display = 'none';
+      } catch (err) {
+        btn.disabled = false;
+      }
+    }
+
+    // Transferencia
+    function mostrarTransferir() {
+      document.getElementById('transfer-form').style.display = 'flex';
+      document.getElementById('historial-wrap').style.display = 'none';
+    }
+    function ocultarTransferir() {
+      document.getElementById('transfer-form').style.display = 'none';
+    }
+
+    async function hacerTransferencia() {
+      const rut   = document.getElementById('transfer-rut').value.trim();
+      const monto = document.getElementById('transfer-monto').value.trim();
+      const errEl = document.getElementById('transfer-error');
+      const okEl  = document.getElementById('transfer-success');
+      errEl.classList.remove('visible'); okEl.classList.remove('visible');
+
+      if (!rut || !monto) {
+        errEl.textContent = 'Completa el RUT y el monto.';
+        errEl.classList.add('visible'); return;
+      }
+
+      const btn = document.getElementById('btn-transferir');
+      btn.disabled = true; btn.textContent = 'Transfiriendo...';
+
+      try {
+        const res = await fetch('/api/banco?action=transferir', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ discord_id: currentUser.id, rut_destino: rut, monto }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.';
+          errEl.classList.add('visible');
+        } else {
+          currentCuenta.saldo = data.nuevoSaldo;
+          document.getElementById('bank-saldo').textContent = formatearSaldo(data.nuevoSaldo);
+          okEl.textContent = `Transferencia exitosa. Nuevo saldo: ${formatearSaldo(data.nuevoSaldo)}`;
+          okEl.classList.add('visible');
+          document.getElementById('transfer-rut').value = '';
+          document.getElementById('transfer-monto').value = '';
+        }
+      } catch(e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Transferir`;
+    }
+
+    // Historial
+    async function mostrarHistorial() {
+      const wrap = document.getElementById('historial-wrap');
+      const lista = document.getElementById('historial-lista');
+      document.getElementById('transfer-form').style.display = 'none';
+      wrap.style.display = 'block';
+      lista.innerHTML = '<div class="historial-vacio">Cargando...</div>';
+
+      try {
+        const res = await fetch(`/api/banco?action=historial&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        if (!data.transacciones.length) {
+          lista.innerHTML = '<div class="historial-vacio">Sin movimientos aún</div>';
+          return;
+        }
+        lista.innerHTML = data.transacciones.map(t => {
+          const signo = t.tipo === 'egreso' ? '-' : '+';
+          const fecha = new Date(t.created_at).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+          const icono = t.tipo === 'sueldo'
+            ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
+            : t.tipo === 'ingreso'
+            ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`
+            : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+          return `<div class="historial-item">
+            <div class="hi-icono ${t.tipo}">${icono}</div>
+            <div class="hi-desc">
+              <div class="hi-desc-titulo">${t.descripcion || t.tipo}</div>
+              <div class="hi-desc-fecha">${fecha}</div>
+            </div>
+            <div class="hi-monto ${t.tipo}">${signo}${formatearSaldo(t.monto)}</div>
+          </div>`;
+        }).join('');
+      } catch(e) {
+        lista.innerHTML = '<div class="historial-vacio">Error al cargar historial</div>';
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // ADMIN
+    // ══════════════════════════════════════════════════════════════════════════
+    function adminTab(tab) {
+      document.querySelectorAll('.admin-tab').forEach((t,i) => {
+        const ids = ['usuarios','sueldos'];
+        t.classList.toggle('active', ids[i] === tab);
+        document.getElementById(`admin-tab-${ids[i]}`).classList.toggle('visible', ids[i] === tab);
+      });
+    }
+
+    async function cargarAdminUsuarios() {
+      const loading = document.getElementById('admin-loading-users');
+      const lista   = document.getElementById('admin-usuarios-lista');
+      loading.style.display = 'flex'; lista.innerHTML = '';
+
+      try {
+        const res = await fetch(`/api/banco?action=admin_usuarios&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        loading.style.display = 'none';
+
+        if (!data.usuarios?.length) {
+          lista.innerHTML = '<div class="historial-vacio">No hay usuarios con cuenta bancaria.</div>';
+          return;
+        }
+
+        lista.innerHTML = data.usuarios.map(u => `
+          <div class="usuario-row">
+            <div class="ur-info">
+              <div class="ur-nombre">${u.nombre1 || '?'} ${u.apellido1 || ''}</div>
+              <div class="ur-rut">${u.rut || u.discord_id}</div>
+            </div>
+            <div class="ur-saldo">${formatearSaldo(u.saldo)}</div>
+            <button class="btn-small purple" onclick="abrirModalSaldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
+              Ajustar
+            </button>
+            <button class="btn-small" style="background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.25);"
+              onclick="seleccionarParaSueldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
+              Sueldos
+            </button>
+          </div>
+        `).join('');
+      } catch(e) {
+        loading.style.display = 'none';
+        lista.innerHTML = '<div class="historial-vacio">Error al cargar.</div>';
+      }
+    }
+
+    function abrirModalSaldo(discordId, nombre) {
+      adminTargetUser = { discordId, nombre };
+      document.getElementById('modal-saldo-label').textContent = `Usuario: ${nombre}`;
+      document.getElementById('modal-saldo-monto').value = '';
+      document.getElementById('modal-saldo-desc').value  = '';
+      document.getElementById('modal-saldo-error').classList.remove('visible');
+      document.getElementById('modal-saldo').classList.add('visible');
+    }
+
+    async function adminConfirmarSaldo() {
+      const monto = document.getElementById('modal-saldo-monto').value.trim();
+      const desc  = document.getElementById('modal-saldo-desc').value.trim();
+      const errEl = document.getElementById('modal-saldo-error');
+      errEl.classList.remove('visible');
+
+      if (!monto || isNaN(parseInt(monto))) {
+        errEl.textContent = 'Ingresa un monto válido.';
+        errEl.classList.add('visible'); return;
+      }
+
+      try {
+        const res = await fetch('/api/banco?action=admin_saldo', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ admin_id: currentUser.id, discord_id_target: adminTargetUser.discordId, monto, descripcion: desc }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.';
+          errEl.classList.add('visible'); return;
+        }
+        cerrarModal('modal-saldo');
+        cargarAdminUsuarios();
+      } catch(e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    function seleccionarParaSueldo(discordId, nombre) {
+      adminTargetUser = { discordId, nombre };
+      adminTab('sueldos');
+      document.getElementById('admin-sueldo-target-label').textContent = `Gestionando sueldos de: ${nombre}`;
+      document.getElementById('admin-sueldo-form-wrap').style.display = 'flex';
+      document.getElementById('admin-sueldo-info').style.display = 'none';
+      cargarSueldosTarget(discordId);
+    }
+
+    async function cargarSueldosTarget(discordId) {
+      const lista = document.getElementById('admin-sueldos-lista-target');
+      lista.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;">Cargando sueldos...</div>';
+
+      try {
+        const res = await fetch(`/api/banco?action=cuenta&discord_id=${discordId}`);
+        const data = await res.json();
+        const sueldos = data.sueldos || [];
+
+        if (!sueldos.length) {
+          lista.innerHTML = '<div class="historial-vacio">Sin sueldos activos.</div>';
+          return;
+        }
+
+        lista.innerHTML = sueldos.map(s => `
+          <div class="sueldo-item">
+            <div class="si-info">
+              <div class="si-nombre">${s.nombre}</div>
+              <div class="si-detalle">${formatearSaldo(s.monto)} cada ${s.dias} día(s)</div>
+            </div>
+            <button class="btn-small red" onclick="adminEliminarSueldo(${s.id})">Quitar</button>
+          </div>
+        `).join('');
+      } catch(e) {
+        lista.innerHTML = '<div class="historial-vacio">Error al cargar.</div>';
+      }
+    }
+
+    async function adminCrearSueldo() {
+      if (!adminTargetUser) return;
+      const nombre = document.getElementById('admin-sueldo-nombre').value.trim();
+      const monto  = document.getElementById('admin-sueldo-monto').value.trim();
+      const dias   = document.getElementById('admin-sueldo-dias').value.trim();
+      const errEl  = document.getElementById('admin-sueldo-error');
+      errEl.classList.remove('visible');
+
+      if (!nombre || !monto || !dias) {
+        errEl.textContent = 'Completa todos los campos.'; errEl.classList.add('visible'); return;
+      }
+
+      try {
+        const res = await fetch('/api/banco?action=admin_sueldo_crear', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ admin_id: currentUser.id, discord_id_target: adminTargetUser.discordId, nombre, monto, dias }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.'; errEl.classList.add('visible'); return;
+        }
+        document.getElementById('admin-sueldo-nombre').value = '';
+        document.getElementById('admin-sueldo-monto').value  = '';
+        document.getElementById('admin-sueldo-dias').value   = '';
+        cargarSueldosTarget(adminTargetUser.discordId);
+      } catch(e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    async function adminEliminarSueldo(sueldoId) {
+      try {
+        await fetch(`/api/banco?action=admin_sueldo_borrar&admin_id=${currentUser.id}&sueldo_id=${sueldoId}`, {
+          method: 'DELETE',
+        });
+        cargarSueldosTarget(adminTargetUser.discordId);
+      } catch(e) {}
+    }
+
+    function cerrarModal(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    // Cerrar modal al hacer click fuera
+    document.getElementById('modal-saldo').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal('modal-saldo');
+    });
   </script>
 </body>
 </html>
