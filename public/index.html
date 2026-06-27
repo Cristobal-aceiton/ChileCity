@@ -280,6 +280,62 @@
     }
     .nav-card:hover::after { opacity:0.4; }
     @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+    /* MOBILE */
+@media (max-width: 768px) {
+  .dash-nav {
+    padding: 12px 16px;
+  }
+
+  .dash-logo {
+    margin-left: 80px; /* evita que el logo esquina lo tape */
+  }
+
+  .nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-card {
+    padding: 28px 24px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  .card-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+
+  .card-sub {
+    font-size: 13px;
+  }
+
+  .card-arrow {
+    margin-left: auto;
+    position: static;
+    transform: none;
+    opacity: 1;
+  }
+
+  .nav-card:hover .card-arrow {
+    transform: none;
+  }
+
+  .dash-body {
+    padding: 24px 16px;
+  }
+
+  .logo-corner {
+    width: 52px;
+    height: 52px;
+    top: 16px;
+    left: 16px;
+  }
+}
   </style>
 </head>
 <body>
