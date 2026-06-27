@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 // IDs de Discord con acceso admin al banco
 const ADMIN_IDS = [
   // Agrega aquí los Discord IDs autorizados, ej: "123456789012345678"
-  "ADMIN_DISCORD_ID_1",
+  "1192236737565577287",
   "ADMIN_DISCORD_ID_2",
 ];
 
