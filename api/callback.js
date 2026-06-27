@@ -1,3 +1,6 @@
+import { setSessionCookie } from "../lib/auth.js";
+import { BASE_URL } from "../lib/constants.js";
+
 export default async function handler(req, res) {
   const code = req.query.code;
   if (!code) return res.status(400).send("Sin código de autorización");
@@ -12,7 +15,7 @@ export default async function handler(req, res) {
         client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type:    "authorization_code",
         code,
-        redirect_uri: "https://chile-city.vercel.app/auth/callback",
+        redirect_uri: `${BASE_URL}/auth/callback`,
       }),
     });
 
@@ -33,15 +36,17 @@ export default async function handler(req, res) {
       ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
       : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || 0) % 5}.png`;
 
-    // 3. Redirigir al frontend con los datos
-    const params = new URLSearchParams({
+    // 3. Firmar la sesión en el servidor (cookie httpOnly). El frontend ya no
+    //    recibe ni necesita el discord_id por la URL: cada API lo lee de la
+    //    cookie, así nadie puede falsificar de quién es la sesión.
+    setSessionCookie(res, {
+      id:     user.id,
       name:   user.global_name || user.username,
       tag:    user.discriminator !== "0" ? `#${user.discriminator}` : "",
       avatar,
-      id:     user.id,
     });
 
-    res.redirect(`/?${params.toString()}`);
+    res.redirect("/");
   } catch (err) {
     console.error("OAuth error:", err);
     res.status(500).send("Error interno de autenticación");

@@ -1,7 +1,6 @@
 import { neon } from "@neondatabase/serverless";
-
-// ── Super Admin hardcodeado (fallback si la BD falla) ────────────────────────
-const SUPER_ADMIN_ID = "1192236737565577287";
+import { requireSession } from "../lib/auth.js";
+import { SUPER_ADMIN_ID, BASE_URL } from "../lib/constants.js";
 
 async function getAdminIds(sql) {
   try {
@@ -26,7 +25,9 @@ function toNumber(value) {
 
 const CATEGORIAS_VALIDAS = ["vehiculos", "armas", "licencias", "otros"];
 
+let schemaReady = false;
 async function initTables(sql) {
+  if (schemaReady) return;
   // Tabla de productos de la tienda
   await sql`
     CREATE TABLE IF NOT EXISTS tienda_productos (
@@ -53,10 +54,12 @@ async function initTables(sql) {
       comprado_at   TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  schemaReady = true;
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", BASE_URL);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -65,10 +68,9 @@ export default async function handler(req, res) {
     const sql = neon(process.env.DATABASE_URL);
     await initTables(sql);
 
-    const ADMIN_IDS_TIENDA = await getAdminIds(sql);
     const { action } = req.query;
 
-    // ── GET: listar productos activos ────────────────────────────────────────
+    // ── GET: listar productos activos (catálogo público, no requiere sesión) ──
     if (req.method === "GET" && action === "productos") {
       const { categoria } = req.query;
       let rows;
@@ -90,10 +92,70 @@ export default async function handler(req, res) {
       });
     }
 
+    // ── PUBLIC: base de datos — todos los DNI con su inventario ────────────
+    // (Queda público a propósito: es el "padrón" de la ciudad, igual que en
+    // el diseño original.)
+    if (req.method === "GET" && action === "base_datos") {
+      const { q } = req.query;
+
+      let dnis;
+      if (q && q.trim()) {
+        const busq = `%${q.trim().toLowerCase()}%`;
+        dnis = await sql`
+          SELECT * FROM dni
+          WHERE LOWER(nombre1)   LIKE ${busq}
+             OR LOWER(nombre2)   LIKE ${busq}
+             OR LOWER(apellido1) LIKE ${busq}
+             OR LOWER(apellido2) LIKE ${busq}
+             OR LOWER(rut)       LIKE ${busq}
+          ORDER BY apellido1, nombre1
+        `;
+      } else {
+        dnis = await sql`SELECT * FROM dni ORDER BY apellido1, nombre1`;
+      }
+
+      const ids = dnis.map(d => d.discord_id);
+      let inventarios = [];
+      if (ids.length > 0) {
+        inventarios = await sql`
+          SELECT * FROM inventario
+          WHERE discord_id = ANY(${ids})
+          ORDER BY comprado_at DESC
+        `;
+      }
+
+      const invMap = {};
+      for (const item of inventarios) {
+        if (!invMap[item.discord_id]) invMap[item.discord_id] = [];
+        invMap[item.discord_id].push({ ...item, precio_pagado: toNumber(item.precio_pagado) });
+      }
+
+      return res.status(200).json({
+        registros: dnis.map(d => ({
+          discord_id: d.discord_id,
+          nombre1:    d.nombre1,
+          nombre2:    d.nombre2,
+          apellido1:  d.apellido1,
+          apellido2:  d.apellido2,
+          rut:        d.rut,
+          fecha_nac:  d.fecha_nac,
+          inventario: invMap[d.discord_id] || [],
+        })),
+      });
+    }
+
+    // ── A partir de aquí, todas las acciones requieren sesión ────────────────
+    const session = requireSession(req, res);
+    if (!session) return;
+    const discord_id = session.id;
+
+    const ADMIN_IDS_TIENDA = await getAdminIds(sql);
+    const esAdmin = ADMIN_IDS_TIENDA.includes(discord_id);
+
     // ── POST: comprar producto ────────────────────────────────────────────────
     if (req.method === "POST" && action === "comprar") {
-      const { discord_id, producto_id } = req.body;
-      if (!discord_id || !producto_id)
+      const { producto_id } = req.body;
+      if (!producto_id)
         return res.status(400).json({ error: "Faltan campos" });
 
       // Verificar producto existe y está activo
@@ -160,11 +222,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // ── GET: inventario del usuario ──────────────────────────────────────────
+    // ── GET: mi propio inventario ────────────────────────────────────────────
     if (req.method === "GET" && action === "inventario") {
-      const { discord_id } = req.query;
-      if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
-
       const rows = await sql`
         SELECT * FROM inventario
         WHERE discord_id = ${discord_id}
@@ -177,8 +236,7 @@ export default async function handler(req, res) {
 
     // ── ADMIN: listar todos los productos (incluyendo inactivos) ─────────────
     if (req.method === "GET" && action === "admin_productos") {
-      const { admin_id } = req.query;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
       const rows = await sql`
@@ -191,10 +249,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: crear producto ────────────────────────────────────────────────
     if (req.method === "POST" && action === "admin_crear_producto") {
-      const { admin_id, nombre, precio, categoria, imagen_url } = req.body;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { nombre, precio, categoria, imagen_url } = req.body;
       if (!nombre || !precio || !categoria)
         return res.status(400).json({ error: "Faltan campos obligatorios" });
 
@@ -217,10 +275,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: editar producto ───────────────────────────────────────────────
     if (req.method === "PUT" && action === "admin_editar_producto") {
-      const { admin_id, producto_id, nombre, precio, categoria, imagen_url } = req.body;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { producto_id, nombre, precio, categoria, imagen_url } = req.body;
       if (!producto_id)
         return res.status(400).json({ error: "Falta producto_id" });
 
@@ -252,22 +310,19 @@ export default async function handler(req, res) {
 
     // ── ADMIN: eliminar (desactivar) producto ────────────────────────────────
     if (req.method === "DELETE" && action === "admin_eliminar_producto") {
-      const { admin_id, producto_id } = req.query;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { producto_id } = req.query;
       await sql`UPDATE tienda_productos SET activo = FALSE WHERE id = ${producto_id}`;
       return res.status(200).json({ ok: true });
     }
 
     // ── ADMIN: listar todos los usuarios con inventario (con DNI) ────────────
     if (req.method === "GET" && action === "admin_inventarios") {
-      const { admin_id } = req.query;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
-      // Obtener todos los usuarios que tienen items en inventario
-      // y que tengan DNI registrado, con su nombre y RUT
       const rows = await sql`
         SELECT
           i.discord_id,
@@ -294,16 +349,16 @@ export default async function handler(req, res) {
 
     // ── ADMIN: obtener inventario de un usuario específico ─────────────────
     if (req.method === "GET" && action === "admin_inventario_usuario") {
-      const { admin_id, discord_id } = req.query;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
-      if (!discord_id)
+      const { discord_id: targetId } = req.query;
+      if (!targetId)
         return res.status(400).json({ error: "Falta discord_id" });
 
       const rows = await sql`
         SELECT * FROM inventario
-        WHERE discord_id = ${discord_id}
+        WHERE discord_id = ${targetId}
         ORDER BY comprado_at DESC
       `;
 
@@ -314,10 +369,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: eliminar item del inventario de un usuario ──────────────────
     if (req.method === "DELETE" && action === "admin_eliminar_item_inventario") {
-      const { admin_id, item_id } = req.query;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { item_id } = req.query;
       if (!item_id)
         return res.status(400).json({ error: "Falta item_id" });
 
@@ -325,63 +380,11 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true });
     }
 
-    // ── ADMIN: base de datos — todos los DNI con su inventario ─────────────
+    // ── ADMIN: base de datos con búsqueda (vista admin) ──────────────────────
     if (req.method === "GET" && action === "admin_base_datos") {
-      const { admin_id, q } = req.query;
-      if (!ADMIN_IDS_TIENDA.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
-      // Traer todos los DNI
-      let dnis;
-      if (q && q.trim()) {
-        const busq = `%${q.trim().toLowerCase()}%`;
-        dnis = await sql`
-          SELECT * FROM dni
-          WHERE LOWER(nombre1)   LIKE ${busq}
-             OR LOWER(nombre2)   LIKE ${busq}
-             OR LOWER(apellido1) LIKE ${busq}
-             OR LOWER(apellido2) LIKE ${busq}
-             OR LOWER(rut)       LIKE ${busq}
-          ORDER BY apellido1, nombre1
-        `;
-      } else {
-        dnis = await sql`SELECT * FROM dni ORDER BY apellido1, nombre1`;
-      }
-
-      // Traer inventarios de esos discord_ids
-      const ids = dnis.map(d => d.discord_id);
-      let inventarios = [];
-      if (ids.length > 0) {
-        inventarios = await sql`
-          SELECT * FROM inventario
-          WHERE discord_id = ANY(${ids})
-          ORDER BY comprado_at DESC
-        `;
-      }
-
-      // Agrupar inventario por discord_id
-      const invMap = {};
-      for (const item of inventarios) {
-        if (!invMap[item.discord_id]) invMap[item.discord_id] = [];
-        invMap[item.discord_id].push({ ...item, precio_pagado: toNumber(item.precio_pagado) });
-      }
-
-      return res.status(200).json({
-        registros: dnis.map(d => ({
-          discord_id: d.discord_id,
-          nombre1:   d.nombre1,
-          nombre2:   d.nombre2,
-          apellido1: d.apellido1,
-          apellido2: d.apellido2,
-          rut:       d.rut,
-          fecha_nac: d.fecha_nac,
-          inventario: invMap[d.discord_id] || [],
-        })),
-      });
-    }
-
-    // ── PUBLIC: base de datos — todos los DNI con su inventario ────────────
-    if (req.method === "GET" && action === "base_datos") {
       const { q } = req.query;
 
       let dnis;
@@ -419,12 +422,12 @@ export default async function handler(req, res) {
       return res.status(200).json({
         registros: dnis.map(d => ({
           discord_id: d.discord_id,
-          nombre1:    d.nombre1,
-          nombre2:    d.nombre2,
-          apellido1:  d.apellido1,
-          apellido2:  d.apellido2,
-          rut:        d.rut,
-          fecha_nac:  d.fecha_nac,
+          nombre1:   d.nombre1,
+          nombre2:   d.nombre2,
+          apellido1: d.apellido1,
+          apellido2: d.apellido2,
+          rut:       d.rut,
+          fecha_nac: d.fecha_nac,
           inventario: invMap[d.discord_id] || [],
         })),
       });

@@ -1,11 +1,12 @@
 import { neon } from "@neondatabase/serverless";
+import { requireSession } from "../lib/auth.js";
+import { SUPER_ADMIN_ID, BASE_URL } from "../lib/constants.js";
 
-// ── Super Admin (dueño del sistema, hardcodeado) ──────────────────────────────
-// Solo este ID puede gestionar los demás admins desde el Panel Admin.
-const SUPER_ADMIN_ID = "1192236737565577287";
 const MAX_ADMINS = 4; // máximo de admins adicionales (sin contar al super admin)
 
+let schemaReady = false;
 async function initTable(sql) {
+  if (schemaReady) return;
   await sql`
     CREATE TABLE IF NOT EXISTS admins (
       id          SERIAL PRIMARY KEY,
@@ -21,10 +22,12 @@ async function initTable(sql) {
     VALUES (${SUPER_ADMIN_ID}, 'Super Admin', 'system')
     ON CONFLICT (discord_id) DO NOTHING
   `;
+  schemaReady = true;
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", BASE_URL);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -35,11 +38,14 @@ export default async function handler(req, res) {
 
     const { action } = req.query;
 
-    // ── GET: verificar si un ID es admin ─────────────────────────────────────
-    if (req.method === "GET" && action === "verificar") {
-      const { discord_id } = req.query;
-      if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
+    // Quién está haciendo la petición se determina por la cookie de sesión,
+    // nunca por un discord_id que mande el cliente.
+    const session = requireSession(req, res);
+    if (!session) return;
+    const discord_id = session.id;
 
+    // ── GET: verificar si yo soy admin ───────────────────────────────────────
+    if (req.method === "GET" && action === "verificar") {
       const rows = await sql`SELECT * FROM admins WHERE discord_id = ${discord_id}`;
       const esSuperAdmin = discord_id === SUPER_ADMIN_ID;
       return res.status(200).json({
@@ -48,9 +54,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // ── GET: listar todos los admins ─────────────────────────────────────────
+    // ── GET: listar todos los admins (solo super admin) ──────────────────────
     if (req.method === "GET" && action === "listar") {
-      const { discord_id } = req.query;
       if (discord_id !== SUPER_ADMIN_ID)
         return res.status(403).json({ error: "No autorizado" });
 
@@ -58,11 +63,12 @@ export default async function handler(req, res) {
       return res.status(200).json({ admins: rows });
     }
 
-    // ── POST: agregar admin ──────────────────────────────────────────────────
+    // ── POST: agregar admin (solo super admin) ────────────────────────────────
     if (req.method === "POST" && action === "agregar") {
-      const { discord_id, target_id, nombre } = req.body;
       if (discord_id !== SUPER_ADMIN_ID)
         return res.status(403).json({ error: "No autorizado" });
+
+      const { target_id, nombre } = req.body;
       if (!target_id) return res.status(400).json({ error: "Falta target_id" });
       if (target_id === SUPER_ADMIN_ID)
         return res.status(400).json({ error: "Ese ID ya es el super admin" });
@@ -87,11 +93,12 @@ export default async function handler(req, res) {
       return res.status(201).json({ admin: rows[0] });
     }
 
-    // ── DELETE: eliminar admin ───────────────────────────────────────────────
+    // ── DELETE: eliminar admin (solo super admin) ─────────────────────────────
     if (req.method === "DELETE" && action === "eliminar") {
-      const { discord_id, target_id } = req.query;
       if (discord_id !== SUPER_ADMIN_ID)
         return res.status(403).json({ error: "No autorizado" });
+
+      const { target_id } = req.query;
       if (!target_id) return res.status(400).json({ error: "Falta target_id" });
       if (target_id === SUPER_ADMIN_ID)
         return res.status(400).json({ error: "No puedes eliminar al super admin" });

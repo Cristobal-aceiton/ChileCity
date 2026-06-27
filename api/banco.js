@@ -1,7 +1,6 @@
 import { neon } from "@neondatabase/serverless";
-
-// ── Super Admin hardcodeado (fallback si la BD falla) ────────────────────────
-const SUPER_ADMIN_ID = "1192236737565577287";
+import { requireSession } from "../lib/auth.js";
+import { SUPER_ADMIN_ID, BASE_URL } from "../lib/constants.js";
 
 const SALDO_INICIAL = 1000000;
 
@@ -31,7 +30,9 @@ async function getAdminIds(sql) {
   }
 }
 
+let schemaReady = false;
 async function initTables(sql) {
+  if (schemaReady) return;
   await sql`
     CREATE TABLE IF NOT EXISTS banco (
       id            SERIAL PRIMARY KEY,
@@ -79,10 +80,13 @@ async function initTables(sql) {
     VALUES (${SUPER_ADMIN_ID}, 'Super Admin', 'system')
     ON CONFLICT (discord_id) DO NOTHING
   `;
+  schemaReady = true;
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  // CORS restringido al propio dominio (antes era "*", abierto a cualquiera)
+  res.setHeader("Access-Control-Allow-Origin", BASE_URL);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -94,16 +98,32 @@ export default async function handler(req, res) {
     const ADMIN_IDS = await getAdminIds(sql);
     const { action } = req.query;
 
+    // Identidad real del usuario: SIEMPRE viene de la cookie de sesión
+    // firmada, nunca de un discord_id/admin_id que mande el cliente.
+    // Esto es lo que evita que alguien pueda transferirse plata de otra
+    // cuenta o auto-asignarse como admin con solo cambiar un parámetro.
+    const session = requireSession(req, res);
+    if (!session) return; // requireSession ya respondió 401
+    const discord_id = session.id;
+    const esAdmin = ADMIN_IDS.includes(discord_id);
+
     // ── GET: estado de cuenta ────────────────────────────────────────────────
     if (req.method === "GET" && action === "cuenta") {
-      const { discord_id } = req.query;
-      if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
+      // Por defecto cada uno solo ve su propia cuenta. Un admin puede pedir
+      // la cuenta de otro discord_id (ej. para gestionar sus sueldos), pero
+      // un usuario normal no puede hacerlo aunque mande ese parámetro.
+      let targetId = discord_id;
+      const { discord_id: discordIdQuery } = req.query;
+      if (discordIdQuery && discordIdQuery !== discord_id) {
+        if (!esAdmin) return res.status(403).json({ error: "No autorizado" });
+        targetId = discordIdQuery;
+      }
 
-      const rows = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      const rows = await sql`SELECT * FROM banco WHERE discord_id = ${targetId}`;
       if (rows.length === 0) return res.status(404).json({ existe: false });
 
       const sueldos = await sql`
-        SELECT * FROM sueldos WHERE discord_id = ${discord_id} AND activo = TRUE
+        SELECT * FROM sueldos WHERE discord_id = ${targetId} AND activo = TRUE
       `;
 
       const ahora = new Date();
@@ -115,18 +135,18 @@ export default async function handler(req, res) {
         if (diasDesde >= sueldo.dias) {
           const montoSueldo = toNumber(sueldo.monto);
           saldoActualizado += montoSueldo;
-          await sql`UPDATE banco SET saldo = saldo + ${montoSueldo} WHERE discord_id = ${discord_id}`;
+          await sql`UPDATE banco SET saldo = saldo + ${montoSueldo} WHERE discord_id = ${targetId}`;
           await sql`UPDATE sueldos SET ultimo_cobro = ${ahora.toISOString()} WHERE id = ${sueldo.id}`;
           await sql`
             INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
-            VALUES (${discord_id}, 'sueldo', ${montoSueldo}, ${'Sueldo: ' + sueldo.nombre}, ${saldoActualizado})
+            VALUES (${targetId}, 'sueldo', ${montoSueldo}, ${'Sueldo: ' + sueldo.nombre}, ${saldoActualizado})
           `;
         }
       }
 
-      const updated = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      const updated = await sql`SELECT * FROM banco WHERE discord_id = ${targetId}`;
       const sueldosActivos = await sql`
-        SELECT * FROM sueldos WHERE discord_id = ${discord_id} AND activo = TRUE
+        SELECT * FROM sueldos WHERE discord_id = ${targetId} AND activo = TRUE
       `;
 
       let proximoSueldo = null;
@@ -153,9 +173,6 @@ export default async function handler(req, res) {
 
     // ── POST: crear cuenta ───────────────────────────────────────────────────
     if (req.method === "POST" && action === "crear") {
-      const { discord_id } = req.body;
-      if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
-
       const dni = await sql`SELECT id FROM dni WHERE discord_id = ${discord_id}`;
       if (dni.length === 0)
         return res.status(403).json({ error: "Debes crear tu DNI primero" });
@@ -187,8 +204,8 @@ export default async function handler(req, res) {
 
     // ── POST: transferir ─────────────────────────────────────────────────────
     if (req.method === "POST" && action === "transferir") {
-      const { discord_id, rut_destino, monto } = req.body;
-      if (!discord_id || !rut_destino || !monto)
+      const { rut_destino, monto } = req.body;
+      if (!rut_destino || !monto)
         return res.status(400).json({ error: "Faltan campos" });
 
       const montoNum = parseMonto(monto);
@@ -238,9 +255,6 @@ export default async function handler(req, res) {
 
     // ── GET: historial ───────────────────────────────────────────────────────
     if (req.method === "GET" && action === "historial") {
-      const { discord_id } = req.query;
-      if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
-
       const rows = await sql`
         SELECT * FROM transacciones WHERE discord_id = ${discord_id}
         ORDER BY created_at DESC LIMIT 50
@@ -252,8 +266,7 @@ export default async function handler(req, res) {
 
     // ── ADMIN: listar usuarios con cuenta ────────────────────────────────────
     if (req.method === "GET" && action === "admin_usuarios") {
-      const { discord_id } = req.query;
-      if (!ADMIN_IDS.includes(discord_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
       const rows = await sql`
@@ -270,10 +283,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: ajustar saldo ──────────────────────────────────────────────────
     if (req.method === "POST" && action === "admin_saldo") {
-      const { admin_id, discord_id_target, monto, descripcion } = req.body;
-      if (!ADMIN_IDS.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { discord_id_target, monto, descripcion } = req.body;
       const montoNum = parseMonto(monto);
       if (montoNum === null)
         return res.status(400).json({ error: "Monto inválido" });
@@ -298,9 +311,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: resetear cuenta ────────────────────────────────────────────────
     if (req.method === "POST" && action === "admin_reset_cuenta") {
-      const { admin_id, discord_id_target } = req.body;
-      if (!ADMIN_IDS.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
+
+      const { discord_id_target } = req.body;
       if (!discord_id_target)
         return res.status(400).json({ error: "Falta discord_id_target" });
 
@@ -318,10 +332,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: crear sueldo ───────────────────────────────────────────────────
     if (req.method === "POST" && action === "admin_sueldo_crear") {
-      const { admin_id, discord_id_target, nombre, monto, dias } = req.body;
-      if (!ADMIN_IDS.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { discord_id_target, nombre, monto, dias } = req.body;
       const montoNum = parseMonto(monto);
       const diasNum  = parseMonto(dias);
       if (!nombre || montoNum === null || montoNum <= 0 || diasNum === null || diasNum <= 0)
@@ -337,10 +351,10 @@ export default async function handler(req, res) {
 
     // ── ADMIN: eliminar sueldo ────────────────────────────────────────────────
     if (req.method === "DELETE" && action === "admin_sueldo_borrar") {
-      const { admin_id, sueldo_id } = req.query;
-      if (!ADMIN_IDS.includes(admin_id))
+      if (!esAdmin)
         return res.status(403).json({ error: "No autorizado" });
 
+      const { sueldo_id } = req.query;
       await sql`UPDATE sueldos SET activo = FALSE WHERE id = ${sueldo_id}`;
       return res.status(200).json({ ok: true });
     }

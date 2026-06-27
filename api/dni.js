@@ -1,4 +1,6 @@
 import { neon } from "@neondatabase/serverless";
+import { requireSession } from "../lib/auth.js";
+import { BASE_URL } from "../lib/constants.js";
 
 // Genera un RUT chileno válido con formato XX.XXX.XXX-D
 function generarRut() {
@@ -27,16 +29,9 @@ function calcularDV(rut) {
   return String(resto);
 }
 
-export default async function handler(req, res) {
-  // CORS básico
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.status(200).end();
-
-  const sql = neon(process.env.DATABASE_URL);
-
-  // Crear tabla si no existe (se ejecuta en cada llamada, es idempotente)
+let schemaReady = false;
+async function initTable(sql) {
+  if (schemaReady) return;
   await sql`
     CREATE TABLE IF NOT EXISTS dni (
       id           SERIAL PRIMARY KEY,
@@ -51,55 +46,78 @@ export default async function handler(req, res) {
       created_at   TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  schemaReady = true;
+}
 
-  // ── GET: buscar DNI por discord_id ──────────────────────────────────────
-  if (req.method === "GET") {
-    const { discord_id } = req.query;
-    if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
+export default async function handler(req, res) {
+  // CORS restringido al propio dominio (antes era "*", abierto a cualquiera)
+  res.setHeader("Access-Control-Allow-Origin", BASE_URL);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.status(200).end();
 
-    const rows = await sql`SELECT * FROM dni WHERE discord_id = ${discord_id}`;
-    if (rows.length === 0) return res.status(404).json({ existe: false });
+  try {
+    const sql = neon(process.env.DATABASE_URL);
+    await initTable(sql);
 
-    return res.status(200).json({ existe: true, dni: rows[0] });
+    // El discord_id ya NO se toma del query/body: se lee de la cookie de
+    // sesión firmada, así nadie puede consultar o crear un DNI a nombre de
+    // otra persona con solo cambiar un parámetro.
+    const session = requireSession(req, res);
+    if (!session) return; // requireSession ya respondió 401
+
+    const discord_id = session.id;
+
+    // ── GET: buscar mi propio DNI ──────────────────────────────────────────
+    if (req.method === "GET") {
+      const rows = await sql`SELECT * FROM dni WHERE discord_id = ${discord_id}`;
+      if (rows.length === 0) return res.status(404).json({ existe: false });
+
+      return res.status(200).json({ existe: true, dni: rows[0] });
+    }
+
+    // ── POST: crear mi DNI ──────────────────────────────────────────────────
+    if (req.method === "POST") {
+      const { nombre1, nombre2, apellido1, apellido2, fecha_nac } = req.body;
+
+      if (!nombre1 || !nombre2 || !apellido1 || !apellido2 || !fecha_nac) {
+        return res.status(400).json({ error: "Faltan campos obligatorios" });
+      }
+
+      // Verificar que no exista ya
+      const existe = await sql`SELECT id FROM dni WHERE discord_id = ${discord_id}`;
+      if (existe.length > 0) {
+        return res.status(409).json({ error: "Ya tienes un DNI registrado" });
+      }
+
+      // Generar RUT único (reintenta si hay colisión)
+      let rut;
+      let intentos = 0;
+      while (intentos < 10) {
+        rut = generarRut();
+        const rutExiste = await sql`SELECT id FROM dni WHERE rut = ${rut}`;
+        if (rutExiste.length === 0) break;
+        intentos++;
+      }
+
+      const n1 = nombre1.trim().toUpperCase();
+      const n2 = nombre2.trim().toUpperCase();
+      const a1 = apellido1.trim().toUpperCase();
+      const a2 = apellido2.trim().toUpperCase();
+
+      const rows = await sql`
+        INSERT INTO dni (discord_id, rut, nombre1, nombre2, apellido1, apellido2, fecha_nac)
+        VALUES (${discord_id}, ${rut}, ${n1}, ${n2}, ${a1}, ${a2}, ${fecha_nac})
+        RETURNING *
+      `;
+
+      return res.status(201).json({ existe: true, dni: rows[0] });
+    }
+
+    return res.status(405).json({ error: "Método no permitido" });
+  } catch (err) {
+    console.error("Error en /api/dni:", err);
+    return res.status(500).json({ error: "Error interno del servidor. Intenta de nuevo." });
   }
-
-  // ── POST: crear nuevo DNI ────────────────────────────────────────────────
-  if (req.method === "POST") {
-    const { discord_id, nombre1, nombre2, apellido1, apellido2, fecha_nac } = req.body;
-
-    if (!discord_id || !nombre1 || !nombre2 || !apellido1 || !apellido2 || !fecha_nac) {
-      return res.status(400).json({ error: "Faltan campos obligatorios" });
-    }
-
-    // Verificar que no exista ya
-    const existe = await sql`SELECT id FROM dni WHERE discord_id = ${discord_id}`;
-    if (existe.length > 0) {
-      return res.status(409).json({ error: "Ya tienes un DNI registrado" });
-    }
-
-    // Generar RUT único (reintenta si hay colisión)
-    let rut;
-    let intentos = 0;
-    while (intentos < 10) {
-      rut = generarRut();
-      const rutExiste = await sql`SELECT id FROM dni WHERE rut = ${rut}`;
-      if (rutExiste.length === 0) break;
-      intentos++;
-    }
-
-    const n1 = nombre1.trim().toUpperCase();
-    const n2 = nombre2.trim().toUpperCase();
-    const a1 = apellido1.trim().toUpperCase();
-    const a2 = apellido2.trim().toUpperCase();
-
-    const rows = await sql`
-      INSERT INTO dni (discord_id, rut, nombre1, nombre2, apellido1, apellido2, fecha_nac)
-      VALUES (${discord_id}, ${rut}, ${n1}, ${n2}, ${a1}, ${a2}, ${fecha_nac})
-      RETURNING *
-    `;
-
-    return res.status(201).json({ existe: true, dni: rows[0] });
-  }
-
-  return res.status(405).json({ error: "Método no permitido" });
 }
