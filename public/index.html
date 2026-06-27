@@ -656,6 +656,121 @@
       .admin-tabs { gap: 6px; }
       .admin-tab { font-size: 11px; padding: 9px 6px; }
     }
+    /* ── TIENDA & INVENTARIO ──────────────────────────────────────────────── */
+    .tienda-filtros {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .filtro-btn {
+      padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.55);
+      font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .filtro-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .filtro-btn.active { background: rgba(220,30,30,0.2); border-color: rgba(220,30,30,0.5); color: #ff6b6b; }
+    .productos-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; width: 100%;
+    }
+    .producto-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; overflow: hidden; transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+      display: flex; flex-direction: column;
+    }
+    .producto-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .producto-img {
+      width: 100%; aspect-ratio: 1; object-fit: cover; background: rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: center; font-size: 52px;
+    }
+    .producto-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .producto-info { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .producto-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #fff; letter-spacing: 0.5px; }
+    .producto-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      padding: 3px 8px; border-radius: 20px; width: fit-content; }
+    .cat-vehiculos { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+    .cat-armas     { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .cat-licencias { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+    .cat-otros     { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.25); }
+    .producto-precio { font-size: 20px; font-weight: 800; color: #fff; margin-top: 4px; }
+    .btn-comprar {
+      margin-top: 10px; width: 100%; padding: 10px; border-radius: 10px;
+      background: linear-gradient(135deg, #dc1e1e, #a01010);
+      border: none; color: #fff; font-size: 12px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-comprar:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(220,30,30,0.4); }
+    .btn-comprar:active { transform: scale(0.97); }
+    .btn-comprar:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .tienda-empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.25); font-size: 14px; }
+    .compra-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35);
+      color: #34d399; padding: 14px 20px; border-radius: 14px;
+      font-size: 13px; font-weight: 700; backdrop-filter: blur(12px);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1); max-width: 320px; pointer-events: none;
+    }
+    .compra-toast.error { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: #ff8080; }
+    .compra-toast.show { transform: translateY(0); opacity: 1; }
+    .inventario-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; width: 100%;
+    }
+    .inv-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .inv-img { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: center; font-size: 44px; overflow: hidden; }
+    .inv-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .inv-info { padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .inv-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #fff; }
+    .inv-precio { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.45); }
+    .inv-fecha  { font-size: 11px; color: rgba(255,255,255,0.28); }
+    .ta-tab {
+      padding: 9px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.45);
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .ta-tab.active { background: rgba(220,30,30,0.2); border-color: rgba(220,30,30,0.45); color: #ff6b6b; }
+    .admin-producto-row {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 14px; flex-wrap: wrap;
+    }
+    .apr-img { width: 56px; height: 56px; border-radius: 10px; overflow: hidden;
+      background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0; }
+    .apr-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .apr-info { flex: 1; min-width: 100px; }
+    .apr-nombre { font-weight: 700; color: #fff; font-size: 14px; }
+    .apr-meta   { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .apr-precio { font-size: 16px; font-weight: 800; color: #fff; white-space: nowrap; }
+    .apr-acciones { display: flex; gap: 6px; flex-shrink: 0; }
+    .prod-form {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .prod-form h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #fff;
+      letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+    .cat-select {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; font-size: 14px; cursor: pointer;
+    }
+    .cat-select:focus { outline: none; border-color: rgba(220,30,30,0.5); }
+    .cat-select option { background: #111827; }
+    .tienda-admin-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .admin-ta-seccion { display: none; flex-direction: column; gap: 14px; }
+    .admin-ta-seccion.visible { display: flex; }
+    @media (max-width: 600px) {
+      .productos-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; }
+      .inventario-grid { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
+      .admin-producto-row { gap: 10px; }
+      .apr-acciones { width: 100%; }
+      .apr-acciones button { flex: 1; }
+    }
   </style>
 </head>
 <body>
@@ -739,25 +854,32 @@
           <span class="card-arrow">›</span>
         </div>
 
-        <a href="#" class="nav-card">
+        <div class="nav-card" onclick="abrirSeccion('tienda-screen'); cargarTienda()">
           <div class="card-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
-          <div><div class="card-title">Botón 3</div><div class="card-sub">Descripción corta</div></div>
+          <div><div class="card-title">🛒 Tienda</div><div class="card-sub">Compra vehículos, armas y más</div></div>
           <span class="card-arrow">›</span>
-        </a>
-        <a href="#" class="nav-card">
+        </div>
+        <div class="nav-card" onclick="abrirSeccion('inventario-screen'); cargarInventario()">
           <div class="card-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
           </div>
-          <div><div class="card-title">Botón 4</div><div class="card-sub">Descripción corta</div></div>
+          <div><div class="card-title">🎒 Inventario</div><div class="card-sub">Tus objetos y compras</div></div>
           <span class="card-arrow">›</span>
-        </a>
+        </div>
         <a href="#" class="nav-card" id="admin-card" style="display:none">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <div><div class="card-title">Administrar Banco</div><div class="card-sub">Panel de administración</div></div>
+          <span class="card-arrow">›</span>
+        </a>
+        <a href="#" class="nav-card" id="admin-tienda-card" style="display:none">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+          </div>
+          <div><div class="card-title">Administrar Tienda</div><div class="card-sub">Panel de administración</div></div>
           <span class="card-arrow">›</span>
         </a>
       </div>
@@ -1123,9 +1245,191 @@
     </div>
   </div>
 
+  <!-- TIENDA -->
+  <section class="screen seccion-screen" id="tienda-screen">
+    <div class="seccion-container" style="max-width:860px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Tienda
+        </div>
+      </div>
+
+      <div class="tienda-filtros">
+        <button class="filtro-btn active" onclick="filtrarCategoria('todos', this)">🌐 Todos</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('vehiculos', this)">🚗 Vehículos</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('armas', this)">🔫 Armas</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('licencias', this)">📄 Licencias</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('otros', this)">📦 Otros</button>
+      </div>
+
+      <div class="rc-loading" id="tienda-loading">
+        <div class="spinner"></div>
+        <span>Cargando productos...</span>
+      </div>
+      <div id="tienda-productos-wrap" style="display:none;">
+        <div class="productos-grid" id="tienda-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVENTARIO -->
+  <section class="screen seccion-screen" id="inventario-screen">
+    <div class="seccion-container" style="max-width:860px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          Mi Inventario
+        </div>
+      </div>
+
+      <div class="rc-loading" id="inventario-loading">
+        <div class="spinner"></div>
+        <span>Cargando inventario...</span>
+      </div>
+      <div id="inventario-wrap" style="display:none;">
+        <div class="inventario-grid" id="inventario-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN TIENDA -->
+  <section class="screen seccion-screen" id="admin-tienda-screen">
+    <div class="seccion-container" style="max-width:740px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+          Administrar Tienda
+        </div>
+      </div>
+
+      <div class="tienda-admin-tabs">
+        <button class="ta-tab active" onclick="adminTiendaTab('productos')">Productos</button>
+        <button class="ta-tab" onclick="adminTiendaTab('crear')">+ Agregar Producto</button>
+      </div>
+
+      <div class="admin-panel">
+        <!-- Tab Productos -->
+        <div class="admin-ta-seccion visible" id="at-tab-productos">
+          <div class="rc-loading" id="at-loading">
+            <div class="spinner"></div><span>Cargando productos...</span>
+          </div>
+          <div id="at-productos-lista"></div>
+        </div>
+
+        <!-- Tab Crear -->
+        <div class="admin-ta-seccion" id="at-tab-crear">
+          <div class="prod-form">
+            <h3>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuevo Producto
+            </h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre del producto</label>
+                <input type="text" id="at-nombre" placeholder="Ej: AK-47, Toyota Corolla...">
+              </div>
+              <div class="form-group">
+                <label>Precio ($)</label>
+                <input type="number" id="at-precio" placeholder="Ej: 500000" min="1">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Categoría</label>
+              <select class="cat-select" id="at-categoria">
+                <option value="">Selecciona categoría</option>
+                <option value="vehiculos">🚗 Vehículos</option>
+                <option value="armas">🔫 Armas</option>
+                <option value="licencias">📄 Licencias</option>
+                <option value="otros">📦 Otros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>URL de imagen (opcional)</label>
+              <input type="text" id="at-imagen" placeholder="https://imagen.com/producto.jpg">
+            </div>
+            <div class="rc-error" id="at-crear-error"></div>
+            <button class="btn-green" onclick="adminCrearProducto()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Crear Producto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL: Editar Producto -->
+  <div class="admin-modal-overlay" id="modal-editar-prod">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-editar-prod')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar Producto
+      </h3>
+      <input type="hidden" id="ep-id">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="ep-nombre">
+      </div>
+      <div class="form-group">
+        <label>Precio ($)</label>
+        <input type="number" id="ep-precio" min="1">
+      </div>
+      <div class="form-group">
+        <label>Categoría</label>
+        <select class="cat-select" id="ep-categoria">
+          <option value="vehiculos">🚗 Vehículos</option>
+          <option value="armas">🔫 Armas</option>
+          <option value="licencias">📄 Licencias</option>
+          <option value="otros">📦 Otros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>URL de imagen</label>
+        <input type="text" id="ep-imagen">
+      </div>
+      <div class="rc-error" id="ep-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" onclick="adminGuardarEdicion()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardar cambios
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-editar-prod')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de compra -->
+  <div class="compra-toast" id="compra-toast"></div>
+
   <script>
     // ── IDs admin (debe coincidir con banco.js) ───────────────────────────────
-    const ADMIN_IDS = ["1192236737565577287", "ADMIN_DISCORD_ID_2"];
+    // ⚠️ IDs admin del BANCO — deben coincidir con banco.js
+    const ADMIN_IDS = [
+      "1192236737565577287",  // Admin 1
+      "BANCO_ADMIN_ID_2",     // Admin 2 — reemplaza con el ID real
+      "BANCO_ADMIN_ID_3",     // Admin 3 — reemplaza con el ID real
+    ];
+
+    // ⚠️ IDs admin de la TIENDA — deben coincidir con tienda.js
+    const ADMIN_IDS_TIENDA = [
+      "1192236737565577287",  // Admin 1 (igual que banco)
+      "TIENDA_ADMIN_ID_2",    // Admin 2 — reemplaza con el ID real
+      "TIENDA_ADMIN_ID_3",    // Admin 3 — reemplaza con el ID real
+    ];
 
     // ── Estado global ─────────────────────────────────────────────────────────
     let currentUser = null;
@@ -1135,7 +1439,7 @@
     let countdownInterval = null;
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen'];
 
     function mostrarPantalla(id) {
       screens.forEach(s => {
@@ -1162,6 +1466,15 @@
         adminCard.onclick = () => { abrirSeccion('admin-screen'); cargarAdminUsuarios(); };
       } else {
         adminCard.style.display = 'none';
+      }
+
+      // Mostrar card admin tienda si corresponde
+      const adminTiendaCard = document.getElementById('admin-tienda-card');
+      if (ADMIN_IDS_TIENDA.includes(user.id)) {
+        adminTiendaCard.style.display = 'flex';
+        adminTiendaCard.onclick = () => { abrirSeccion('admin-tienda-screen'); cargarAdminProductos(); };
+      } else {
+        adminTiendaCard.style.display = 'none';
       }
 
       mostrarPantalla('dashboard');
@@ -1714,12 +2027,301 @@
     }
 
     // Cerrar modal al hacer click fuera
-    document.getElementById('modal-saldo').addEventListener('click', function(e) {
-      if (e.target === this) cerrarModal('modal-saldo');
+    document.getElementById('modal-editar-prod').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal('modal-editar-prod');
     });
-    document.getElementById('modal-reset').addEventListener('click', function(e) {
-      if (e.target === this) cerrarModal('modal-reset');
-    });
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // TIENDA
+    // ══════════════════════════════════════════════════════════════════════════
+    let todosLosProductos = [];
+    let categoriaActual = 'todos';
+
+    async function cargarTienda() {
+      if (!currentUser?.id) return;
+      document.getElementById('tienda-loading').style.display = 'flex';
+      document.getElementById('tienda-productos-wrap').style.display = 'none';
+
+      try {
+        const res  = await fetch('/api/tienda?action=productos');
+        const data = await res.json();
+        todosLosProductos = data.productos || [];
+        document.getElementById('tienda-loading').style.display = 'none';
+        document.getElementById('tienda-productos-wrap').style.display = 'block';
+        renderProductos(todosLosProductos);
+      } catch(e) {
+        document.getElementById('tienda-loading').style.display = 'none';
+        document.getElementById('tienda-grid').innerHTML = '<div class="tienda-empty">Error al cargar la tienda.</div>';
+        document.getElementById('tienda-productos-wrap').style.display = 'block';
+      }
+    }
+
+    function filtrarCategoria(cat, btn) {
+      categoriaActual = cat;
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filtrados = cat === 'todos' ? todosLosProductos : todosLosProductos.filter(p => p.categoria === cat);
+      renderProductos(filtrados);
+    }
+
+    function catEmoji(cat) {
+      const map = { vehiculos: '🚗', armas: '🔫', licencias: '📄', otros: '📦' };
+      return map[cat] || '📦';
+    }
+    function catLabel(cat) {
+      const map = { vehiculos: 'Vehículos', armas: 'Armas', licencias: 'Licencias', otros: 'Otros' };
+      return map[cat] || cat;
+    }
+
+    function renderProductos(lista) {
+      const grid = document.getElementById('tienda-grid');
+      if (!lista.length) {
+        grid.innerHTML = '<div class="tienda-empty">No hay productos disponibles en esta categoría.</div>';
+        return;
+      }
+      grid.innerHTML = lista.map(p => `
+        <div class="producto-card">
+          <div class="producto-img">
+            ${p.imagen_url
+              ? `<img src="${escHtml(p.imagen_url)}" alt="${escHtml(p.nombre)}" onerror="this.parentElement.innerHTML='${catEmoji(p.categoria)}';">`
+              : catEmoji(p.categoria)}
+          </div>
+          <div class="producto-info">
+            <div class="producto-nombre">${escHtml(p.nombre)}</div>
+            <span class="producto-cat cat-${p.categoria}">${catLabel(p.categoria)}</span>
+            <div class="producto-precio">${formatearSaldo(p.precio)}</div>
+            <button class="btn-comprar" onclick="comprarProducto(${p.id}, this)">
+              🛒 Comprar
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function comprarProducto(productoId, btn) {
+      if (!currentUser?.id) { mostrarToast('Debes iniciar sesión.', true); return; }
+      btn.disabled = true;
+      btn.textContent = 'Comprando...';
+
+      try {
+        const res  = await fetch('/api/tienda?action=comprar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discord_id: currentUser.id, producto_id: productoId }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const msg = data.faltante
+            ? `Fondos insuficientes. Te faltan ${formatearSaldo(data.faltante)}.`
+            : (data.error || 'Error al comprar.');
+          mostrarToast(msg, true);
+          btn.disabled = false;
+          btn.textContent = '🛒 Comprar';
+        } else {
+          // Actualizar saldo si la cuenta está cargada
+          if (currentCuenta) {
+            currentCuenta.saldo = data.nuevoSaldo;
+            const saldoEl = document.getElementById('bank-saldo');
+            if (saldoEl) saldoEl.textContent = formatearSaldo(data.nuevoSaldo);
+          }
+          mostrarToast(`✅ ¡Compra exitosa! Nuevo saldo: ${formatearSaldo(data.nuevoSaldo)}`);
+          btn.disabled = false;
+          btn.textContent = '🛒 Comprar';
+        }
+      } catch(e) {
+        mostrarToast('Error de conexión.', true);
+        btn.disabled = false;
+        btn.textContent = '🛒 Comprar';
+      }
+    }
+
+    let toastTimeout;
+    function mostrarToast(msg, esError = false) {
+      const toast = document.getElementById('compra-toast');
+      toast.textContent = msg;
+      toast.classList.toggle('error', esError);
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // INVENTARIO
+    // ══════════════════════════════════════════════════════════════════════════
+    async function cargarInventario() {
+      if (!currentUser?.id) return;
+      document.getElementById('inventario-loading').style.display = 'flex';
+      document.getElementById('inventario-wrap').style.display = 'none';
+
+      try {
+        const res  = await fetch(`/api/tienda?action=inventario&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        document.getElementById('inventario-loading').style.display = 'none';
+        document.getElementById('inventario-wrap').style.display = 'block';
+
+        const grid = document.getElementById('inventario-grid');
+        if (!data.items?.length) {
+          grid.innerHTML = '<div class="tienda-empty" style="grid-column:1/-1;">Tu inventario está vacío.<br>¡Visita la tienda para comprar!</div>';
+          return;
+        }
+        grid.innerHTML = data.items.map(item => {
+          const fecha = new Date(item.comprado_at).toLocaleDateString('es-CL', {day:'2-digit',month:'2-digit',year:'2-digit'});
+          return `
+            <div class="inv-card">
+              <div class="inv-img">
+                ${item.imagen_url
+                  ? `<img src="${escHtml(item.imagen_url)}" alt="${escHtml(item.nombre)}" onerror="this.parentElement.innerHTML='${catEmoji(item.categoria)}';">`
+                  : catEmoji(item.categoria)}
+              </div>
+              <div class="inv-info">
+                <div class="inv-nombre">${escHtml(item.nombre)}</div>
+                <span class="producto-cat cat-${item.categoria}">${catLabel(item.categoria)}</span>
+                <div class="inv-precio">Pagado: ${formatearSaldo(item.precio_pagado)}</div>
+                <div class="inv-fecha">📅 ${fecha}</div>
+              </div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        document.getElementById('inventario-loading').style.display = 'none';
+        document.getElementById('inventario-wrap').style.display = 'block';
+        document.getElementById('inventario-grid').innerHTML = '<div class="tienda-empty">Error al cargar el inventario.</div>';
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // ADMIN TIENDA
+    // ══════════════════════════════════════════════════════════════════════════
+    function adminTiendaTab(tab) {
+      document.querySelectorAll('.ta-tab').forEach((t, i) => {
+        const ids = ['productos','crear'];
+        t.classList.toggle('active', ids[i] === tab);
+        document.getElementById(`at-tab-${ids[i]}`).classList.toggle('visible', ids[i] === tab);
+      });
+      if (tab === 'productos') cargarAdminProductos();
+    }
+
+    async function cargarAdminProductos() {
+      if (!currentUser?.id) return;
+      const loading = document.getElementById('at-loading');
+      const lista   = document.getElementById('at-productos-lista');
+      loading.style.display = 'flex'; lista.innerHTML = '';
+
+      try {
+        const res  = await fetch(`/api/tienda?action=admin_productos&admin_id=${currentUser.id}`);
+        const data = await res.json();
+        loading.style.display = 'none';
+
+        if (!data.productos?.length) {
+          lista.innerHTML = '<div class="historial-vacio">No hay productos. ¡Agrega el primero!</div>';
+          return;
+        }
+
+        lista.innerHTML = data.productos.map(p => `
+          <div class="admin-producto-row" id="apr-${p.id}">
+            <div class="apr-img">
+              ${p.imagen_url
+                ? `<img src="${escHtml(p.imagen_url)}" alt="${escHtml(p.nombre)}" onerror="this.parentElement.innerHTML='${catEmoji(p.categoria)}';">`
+                : catEmoji(p.categoria)}
+            </div>
+            <div class="apr-info">
+              <div class="apr-nombre">${escHtml(p.nombre)}</div>
+              <div class="apr-meta">${catLabel(p.categoria)} · ${p.activo ? '✅ Activo' : '❌ Inactivo'}</div>
+            </div>
+            <div class="apr-precio">${formatearSaldo(p.precio)}</div>
+            <div class="apr-acciones">
+              <button class="btn-small purple" onclick="abrirModalEditar(${JSON.stringify(p).replace(/"/g,'&quot;')})">Editar</button>
+              <button class="btn-small red" onclick="adminEliminarProducto(${p.id})">Eliminar</button>
+            </div>
+          </div>
+        `).join('');
+      } catch(e) {
+        loading.style.display = 'none';
+        lista.innerHTML = '<div class="historial-vacio">Error al cargar.</div>';
+      }
+    }
+
+    async function adminCrearProducto() {
+      const nombre    = document.getElementById('at-nombre').value.trim();
+      const precio    = document.getElementById('at-precio').value.trim();
+      const categoria = document.getElementById('at-categoria').value;
+      const imagen    = document.getElementById('at-imagen').value.trim();
+      const errEl     = document.getElementById('at-crear-error');
+      errEl.classList.remove('visible');
+
+      if (!nombre || !precio || !categoria) {
+        errEl.textContent = 'Completa nombre, precio y categoría.';
+        errEl.classList.add('visible'); return;
+      }
+
+      try {
+        const res  = await fetch('/api/tienda?action=admin_crear_producto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id: currentUser.id, nombre, precio, categoria, imagen_url: imagen || null }),
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Error.'; errEl.classList.add('visible'); return; }
+
+        document.getElementById('at-nombre').value   = '';
+        document.getElementById('at-precio').value   = '';
+        document.getElementById('at-categoria').value = '';
+        document.getElementById('at-imagen').value   = '';
+        mostrarToast('✅ Producto creado exitosamente.');
+        adminTiendaTab('productos');
+      } catch(e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    function abrirModalEditar(p) {
+      document.getElementById('ep-id').value       = p.id;
+      document.getElementById('ep-nombre').value   = p.nombre;
+      document.getElementById('ep-precio').value   = p.precio;
+      document.getElementById('ep-categoria').value = p.categoria;
+      document.getElementById('ep-imagen').value   = p.imagen_url || '';
+      document.getElementById('ep-error').classList.remove('visible');
+      document.getElementById('modal-editar-prod').classList.add('visible');
+    }
+
+    async function adminGuardarEdicion() {
+      const id        = document.getElementById('ep-id').value;
+      const nombre    = document.getElementById('ep-nombre').value.trim();
+      const precio    = document.getElementById('ep-precio').value.trim();
+      const categoria = document.getElementById('ep-categoria').value;
+      const imagen    = document.getElementById('ep-imagen').value.trim();
+      const errEl     = document.getElementById('ep-error');
+      errEl.classList.remove('visible');
+
+      try {
+        const res = await fetch('/api/tienda?action=admin_editar_producto', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id: currentUser.id, producto_id: id, nombre, precio, categoria, imagen_url: imagen || null }),
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Error.'; errEl.classList.add('visible'); return; }
+        cerrarModal('modal-editar-prod');
+        mostrarToast('✅ Producto actualizado.');
+        cargarAdminProductos();
+      } catch(e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    async function adminEliminarProducto(productoId) {
+      if (!confirm('¿Eliminar este producto de la tienda?')) return;
+      try {
+        await fetch(`/api/tienda?action=admin_eliminar_producto&admin_id=${currentUser.id}&producto_id=${productoId}`, {
+          method: 'DELETE',
+        });
+        mostrarToast('Producto eliminado.');
+        cargarAdminProductos();
+      } catch(e) { mostrarToast('Error al eliminar.', true); }
+    }
   </script>
 </body>
 </html>
