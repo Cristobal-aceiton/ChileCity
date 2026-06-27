@@ -1,12 +1,16 @@
 import { neon } from "@neondatabase/serverless";
 
-// IDs de Discord con acceso admin a la tienda
-// ⚠️ COLOCA AQUÍ TUS 3 DISCORD IDs DE ADMIN PARA LA TIENDA
-const ADMIN_IDS_TIENDA = [
-  "1192236737565577287",  // Admin 1 (igual que banco)
-  "TIENDA_ADMIN_ID_2",    // Admin 2 — reemplaza con el ID real
-  "TIENDA_ADMIN_ID_3",    // Admin 3 — reemplaza con el ID real
-];
+// ── Super Admin hardcodeado (fallback si la BD falla) ────────────────────────
+const SUPER_ADMIN_ID = "1192236737565577287";
+
+async function getAdminIds(sql) {
+  try {
+    const rows = await sql`SELECT discord_id FROM admins`;
+    return rows.map(r => r.discord_id);
+  } catch {
+    return [SUPER_ADMIN_ID];
+  }
+}
 
 function parseMonto(value) {
   if (value === undefined || value === null || value === "") return null;
@@ -61,6 +65,7 @@ export default async function handler(req, res) {
     const sql = neon(process.env.DATABASE_URL);
     await initTables(sql);
 
+    const ADMIN_IDS_TIENDA = await getAdminIds(sql);
     const { action } = req.query;
 
     // ── GET: listar productos activos ────────────────────────────────────────

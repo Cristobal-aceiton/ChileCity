@@ -1,35 +1,34 @@
 import { neon } from "@neondatabase/serverless";
 
-// IDs de Discord con acceso admin al banco
-const ADMIN_IDS = [
-  // Agrega aquí los Discord IDs autorizados, ej: "123456789012345678"
-  "1192236737565577287",
-  "ADMIN_DISCORD_ID_2",
-];
+// ── Super Admin hardcodeado (fallback si la BD falla) ────────────────────────
+const SUPER_ADMIN_ID = "1192236737565577287";
 
 const SALDO_INICIAL = 1000000;
 
 function generarNumeroCuenta() {
-  // Formato: 0000-0000-0000-0000
   const seg = () => Math.floor(Math.random() * 9000 + 1000).toString();
   return `${seg()}-${seg()}-${seg()}-${seg()}`;
 }
 
-// Convierte de forma segura cualquier valor que venga de la BD (BIGINT llega
-// como string en JS) a un número real. Si no es válido, devuelve 0 en vez de
-// NaN, para que nunca se intente guardar NaN en una columna BIGINT.
 function toNumber(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
 }
 
-// Parsea un monto recibido del usuario/admin como entero seguro.
-// Devuelve null si no es un entero válido.
 function parseMonto(value) {
   if (value === undefined || value === null || value === "") return null;
   const n = Number(value);
   if (!Number.isFinite(n) || !Number.isInteger(n)) return null;
   return n;
+}
+
+async function getAdminIds(sql) {
+  try {
+    const rows = await sql`SELECT discord_id FROM admins`;
+    return rows.map(r => r.discord_id);
+  } catch {
+    return [SUPER_ADMIN_ID];
+  }
 }
 
 async function initTables(sql) {
@@ -66,6 +65,20 @@ async function initTables(sql) {
       created_at    TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS admins (
+      id          SERIAL PRIMARY KEY,
+      discord_id  TEXT UNIQUE NOT NULL,
+      nombre      TEXT,
+      agregado_por TEXT NOT NULL DEFAULT 'system',
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    INSERT INTO admins (discord_id, nombre, agregado_por)
+    VALUES (${SUPER_ADMIN_ID}, 'Super Admin', 'system')
+    ON CONFLICT (discord_id) DO NOTHING
+  `;
 }
 
 export default async function handler(req, res) {
@@ -74,14 +87,11 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  // Toda la lógica va dentro de un try/catch general: así, si algo inesperado
-  // falla (ej. un valor raro llega a una consulta SQL), el endpoint SIEMPRE
-  // responde con JSON válido en vez de crashear y devolver una respuesta no
-  // parseable (que en el frontend se ve como "Error de conexión").
   try {
     const sql = neon(process.env.DATABASE_URL);
     await initTables(sql);
 
+    const ADMIN_IDS = await getAdminIds(sql);
     const { action } = req.query;
 
     // ── GET: estado de cuenta ────────────────────────────────────────────────
@@ -92,7 +102,6 @@ export default async function handler(req, res) {
       const rows = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
       if (rows.length === 0) return res.status(404).json({ existe: false });
 
-      // Verificar sueldos pendientes
       const sueldos = await sql`
         SELECT * FROM sueldos WHERE discord_id = ${discord_id} AND activo = TRUE
       `;
@@ -105,14 +114,9 @@ export default async function handler(req, res) {
         const diasDesde = (ahora - ultimoCobro) / (1000 * 60 * 60 * 24);
         if (diasDesde >= sueldo.dias) {
           const montoSueldo = toNumber(sueldo.monto);
-          // Cobrar sueldo
           saldoActualizado += montoSueldo;
-          await sql`
-            UPDATE banco SET saldo = saldo + ${montoSueldo} WHERE discord_id = ${discord_id}
-          `;
-          await sql`
-            UPDATE sueldos SET ultimo_cobro = ${ahora.toISOString()} WHERE id = ${sueldo.id}
-          `;
+          await sql`UPDATE banco SET saldo = saldo + ${montoSueldo} WHERE discord_id = ${discord_id}`;
+          await sql`UPDATE sueldos SET ultimo_cobro = ${ahora.toISOString()} WHERE id = ${sueldo.id}`;
           await sql`
             INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
             VALUES (${discord_id}, 'sueldo', ${montoSueldo}, ${'Sueldo: ' + sueldo.nombre}, ${saldoActualizado})
@@ -120,13 +124,11 @@ export default async function handler(req, res) {
         }
       }
 
-      // Re-fetch actualizado
       const updated = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
       const sueldosActivos = await sql`
         SELECT * FROM sueldos WHERE discord_id = ${discord_id} AND activo = TRUE
       `;
 
-      // Calcular próximo sueldo
       let proximoSueldo = null;
       if (sueldosActivos.length > 0) {
         let menorTiempoRestante = Infinity;
@@ -154,17 +156,14 @@ export default async function handler(req, res) {
       const { discord_id } = req.body;
       if (!discord_id) return res.status(400).json({ error: "Falta discord_id" });
 
-      // Verificar DNI
       const dni = await sql`SELECT id FROM dni WHERE discord_id = ${discord_id}`;
       if (dni.length === 0)
         return res.status(403).json({ error: "Debes crear tu DNI primero" });
 
-      // Verificar que no tenga cuenta
       const existe = await sql`SELECT id FROM banco WHERE discord_id = ${discord_id}`;
       if (existe.length > 0)
         return res.status(409).json({ error: "Ya tienes una cuenta bancaria" });
 
-      // Generar número único
       let numero;
       for (let i = 0; i < 10; i++) {
         numero = generarNumeroCuenta();
@@ -196,7 +195,6 @@ export default async function handler(req, res) {
       if (montoNum === null || montoNum <= 0)
         return res.status(400).json({ error: "Monto inválido" });
 
-      // Cuenta origen
       const origen = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
       if (origen.length === 0)
         return res.status(404).json({ error: "No tienes cuenta bancaria" });
@@ -205,7 +203,6 @@ export default async function handler(req, res) {
       if (saldoOrigenActual < montoNum)
         return res.status(400).json({ error: "Saldo insuficiente" });
 
-      // Buscar destino por RUT
       const dniDest = await sql`SELECT discord_id FROM dni WHERE rut = ${rut_destino}`;
       if (dniDest.length === 0)
         return res.status(404).json({ error: "RUT destino no encontrado" });
@@ -224,7 +221,6 @@ export default async function handler(req, res) {
       await sql`UPDATE banco SET saldo = ${nuevoSaldoOrigen} WHERE discord_id = ${discord_id}`;
       await sql`UPDATE banco SET saldo = ${nuevoSaldoDest}   WHERE discord_id = ${destDiscordId}`;
 
-      // Registrar en historial de ambos
       const dniOrigen = await sql`SELECT nombre1, apellido1, rut FROM dni WHERE discord_id = ${discord_id}`;
       const nombreOrigen = dniOrigen.length > 0 ? `${dniOrigen[0].nombre1} ${dniOrigen[0].apellido1}` : discord_id;
 
@@ -301,8 +297,6 @@ export default async function handler(req, res) {
     }
 
     // ── ADMIN: resetear cuenta ────────────────────────────────────────────────
-    // Vuelve el saldo de un usuario al monto inicial ($1.000.000). Pensado
-    // como botón de emergencia para corregir cuentas con saldos corruptos.
     if (req.method === "POST" && action === "admin_reset_cuenta") {
       const { admin_id, discord_id_target } = req.body;
       if (!ADMIN_IDS.includes(admin_id))
