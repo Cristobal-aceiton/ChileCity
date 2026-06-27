@@ -1713,7 +1713,8 @@
 
 
   <script>
-    // ── Super Admin ID (solo para panel admin) ────────────────────────────────
+    // ── Super Admin ID (solo para resaltar visualmente su fila en el Panel
+    // Admin; la autorización real ya se valida en el servidor con la sesión) ──
     const SUPER_ADMIN_ID = "1192236737565577287";
     // IDs admin dinámicos (cargados desde la BD al hacer login)
     let ADMIN_IDS = [SUPER_ADMIN_ID];
@@ -1775,9 +1776,9 @@
         adminTiendaCard.style.display = 'none';
       }
 
-      // Mostrar card Panel Admin solo al super admin
+      // Mostrar card Panel Admin solo al super admin (verificado por el servidor)
       const panelAdminCard = document.getElementById('panel-admin-card');
-      if (user.id === SUPER_ADMIN_ID) {
+      if (user.esSuperAdmin) {
         panelAdminCard.style.display = 'flex';
         panelAdminCard.onclick = () => { abrirSeccion('panel-admin-screen'); paCargarAdmins(); };
       } else {
@@ -1789,7 +1790,10 @@
 
     function goToLanding() {
       currentUser = null; currentDNI = null; currentCuenta = null;
-      localStorage.removeItem('cc_user');
+      // La sesión ahora vive en una cookie httpOnly del servidor; se cierra
+      // pidiéndole al servidor que la borre (antes solo se borraba un dato
+      // en localStorage, que ni siquiera era la fuente real de verdad).
+      fetch('/api/logout', { method: 'POST' }).catch(() => {});
       mostrarPantalla('landing');
     }
 
@@ -1816,30 +1820,29 @@
     // ── Login desde URL params o sesión guardada ──────────────────────────────
     document.getElementById('f-fecha').max = new Date().toISOString().split('T')[0];
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('name')) {
-      const user = {
-        name:   params.get('name'),
-        tag:    params.get('tag'),
-        avatar: params.get('avatar'),
-        id:     params.get('id'),
-      };
-      localStorage.setItem('cc_user', JSON.stringify(user));
-      window.history.replaceState({ screen: 'dashboard' }, '', '/');
-      goToDashboard(user);
-    } else {
-      // Restaurar sesión si existe
+    // La identidad ya no se lee de la URL ni de localStorage (cualquiera podía
+    // editar esos valores y hacerse pasar por otro usuario). Ahora se le
+    // pregunta al servidor quién está autenticado según la cookie de sesión
+    // firmada que dejó /api/callback al iniciar sesión con Discord.
+    (async function initSesion() {
       try {
-        const saved = localStorage.getItem('cc_user');
-        if (saved) {
-          const user = JSON.parse(saved);
-          if (user && user.id) {
+        const r = await fetch('/api/me');
+        if (r.ok) {
+          const data = await r.json();
+          if (data.autenticado) {
+            const user = {
+              id: data.id,
+              name: data.name,
+              tag: data.tag,
+              avatar: data.avatar,
+              esSuperAdmin: data.esSuperAdmin,
+            };
             window.history.replaceState({ screen: 'dashboard' }, '', '/');
             goToDashboard(user);
           }
         }
-      } catch { localStorage.removeItem('cc_user'); }
-    }
+      } catch {}
+    })();
 
     // ── User pill ─────────────────────────────────────────────────────────────
     document.getElementById('user-pill').addEventListener('click', (e) => {
