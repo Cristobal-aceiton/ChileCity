@@ -4,6 +4,7 @@
     { "source": "/auth/callback", "destination": "/api/callback" },
     { "source": "/api/dni",       "destination": "/api/dni" },
     { "source": "/api/banco",     "destination": "/api/banco" },
+    { "source": "/api/tienda",    "destination": "/api/tienda" },
     { "source": "/",              "destination": "/public/index.html" }
   ]
 }
