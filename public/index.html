@@ -1736,7 +1736,7 @@
       });
     }
 
-    function volverDashboard() { mostrarPantalla('dashboard'); window.history.pushState({ screen: 'dashboard' }, '', '/'); }
+    function volverDashboard() { mostrarPantalla('dashboard'); _navegandoProgramaticamente = true; window.history.pushState({ screen: 'dashboard' }, '', '/'); setTimeout(() => { _navegandoProgramaticamente = false; }, 50); }
 
     
     async function goToDashboard(user) {
@@ -1793,16 +1793,23 @@
       mostrarPantalla('landing');
     }
 
+    let _navegandoProgramaticamente = false;
+
     function abrirSeccion(id) {
       mostrarPantalla(id);
+      _navegandoProgramaticamente = true;
       window.history.pushState({ screen: id }, '', '/');
+      setTimeout(() => { _navegandoProgramaticamente = false; }, 50);
     }
 
     // Interceptar botón atrás del navegador/celular
     window.addEventListener('popstate', () => {
+      if (_navegandoProgramaticamente) return;
       if (currentUser) {
         mostrarPantalla('dashboard');
+        _navegandoProgramaticamente = true;
         window.history.pushState({ screen: 'dashboard' }, '', '/');
+        setTimeout(() => { _navegandoProgramaticamente = false; }, 50);
       }
     });
 
