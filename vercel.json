@@ -1,8 +1,9 @@
 {
   "rewrites": [
-    { "source": "/auth/login",     "destination": "/api/login" },
-    { "source": "/auth/callback",  "destination": "/api/callback" },
-    { "source": "/api/dni",        "destination": "/api/dni" },
-    { "source": "/",               "destination": "/public/index.html" }
+    { "source": "/auth/login",    "destination": "/api/login" },
+    { "source": "/auth/callback", "destination": "/api/callback" },
+    { "source": "/api/dni",       "destination": "/api/dni" },
+    { "source": "/api/banco",     "destination": "/api/banco" },
+    { "source": "/",              "destination": "/public/index.html" }
   ]
 }
