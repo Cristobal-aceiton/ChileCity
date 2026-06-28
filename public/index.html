@@ -1110,6 +1110,257 @@
       .bd-carnet-mini { flex-direction: column; align-items: center; }
       .bd-mini-foto { width: 48px; height: 58px; }
     }
+
+    /* ══════════════════════════════════════════════════════
+       CASINO
+    ══════════════════════════════════════════════════════ */
+    #casino-screen { display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
+    .casino-container {
+      width: 100%; max-width: 720px;
+      padding: 100px 24px 60px;
+      display: flex; flex-direction: column; align-items: center; gap: 28px;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+
+    /* Saldo banner */
+    .casino-saldo-banner {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(220,30,30,0.08) 100%);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 16px; padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .csb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); font-weight: 700; }
+    .csb-valor { font-size: 26px; font-weight: 800; color: #F59E0B; }
+    .csb-mono  { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+    /* Tabs de juego */
+    .casino-tabs {
+      display: flex; gap: 8px; width: 100%;
+    }
+    .casino-tab {
+      flex: 1; padding: 13px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all 0.25s var(--ease); font-family: 'Inter', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .casino-tab.active {
+      background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4);
+      color: #F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.15);
+    }
+    .casino-tab:hover:not(.active) { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+
+    /* Panel juego */
+    .casino-juego { display: none; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
+    .casino-juego.visible { display: flex; }
+
+    /* ── RULETA ── */
+    .ruleta-wrap {
+      position: relative; width: 260px; height: 260px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ruleta-canvas-wrap {
+      position: relative; width: 260px; height: 260px;
+    }
+    .ruleta-canvas { border-radius: 50%; display: block; }
+    .ruleta-aguja {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 10px solid transparent; border-right: 10px solid transparent;
+      border-top: 22px solid #F59E0B;
+      filter: drop-shadow(0 2px 6px rgba(245,158,11,0.8));
+      z-index: 5;
+    }
+    .ruleta-centro {
+      position: absolute; width: 54px; height: 54px; border-radius: 50%;
+      background: radial-gradient(circle, #1a1a1a 60%, #333 100%);
+      border: 4px solid rgba(245,158,11,0.6);
+      box-shadow: 0 0 16px rgba(245,158,11,0.4), inset 0 0 10px rgba(0,0,0,0.8);
+      z-index: 4; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; color: rgba(245,158,11,0.8); letter-spacing: 1px;
+    }
+
+    /* ── MONEDA ── */
+    .moneda-scene {
+      width: 160px; height: 160px;
+      perspective: 600px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .moneda-wrap {
+      width: 140px; height: 140px;
+      position: relative; transform-style: preserve-3d;
+      transition: transform 0.1s;
+      border-radius: 50%;
+    }
+    .moneda-wrap.girando {
+      animation: coinFlip 1.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+    }
+    @keyframes coinFlip {
+      0%   { transform: rotateY(0deg) rotateX(0deg); }
+      20%  { transform: rotateY(360deg) rotateX(10deg); }
+      50%  { transform: rotateY(900deg) rotateX(-8deg); }
+      80%  { transform: rotateY(1440deg) rotateX(5deg); }
+      100% { transform: rotateY(1800deg) rotateX(0deg); }
+    }
+    .moneda-cara, .moneda-cruz {
+      position: absolute; inset: 0; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      font-size: 48px;
+    }
+    .moneda-cara {
+      background: radial-gradient(circle at 35% 35%, #f5d06b 0%, #d4af37 45%, #a07830 100%);
+      border: 4px solid rgba(255,255,255,0.3);
+      box-shadow: 0 0 30px rgba(212,175,55,0.6), inset 0 0 20px rgba(0,0,0,0.2);
+    }
+    .moneda-cruz {
+      background: radial-gradient(circle at 35% 35%, #c8a825 0%, #b8860b 45%, #7a5c00 100%);
+      border: 4px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 30px rgba(212,175,55,0.4), inset 0 0 20px rgba(0,0,0,0.3);
+      transform: rotateY(180deg);
+    }
+
+    /* Resultado flash */
+    .casino-resultado {
+      width: 100%; border-radius: 14px; padding: 16px 20px;
+      text-align: center; font-size: 15px; font-weight: 700;
+      display: none; animation: fadeUp 0.4s var(--ease);
+    }
+    .casino-resultado.visible { display: block; }
+    .casino-resultado.gano {
+      background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); color: #4ade80;
+    }
+    .casino-resultado.perdio {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #ff8080;
+    }
+
+    /* Apuesta form */
+    .casino-bet-form {
+      width: 100%; display: flex; flex-direction: column; gap: 14px;
+    }
+    .casino-bet-form label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); font-weight: 700; }
+    .casino-bet-form input[type="number"] {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700;
+      font-family: 'Inter', sans-serif; outline: none;
+      transition: border-color 0.2s;
+    }
+    .casino-bet-form input[type="number"]:focus { border-color: rgba(245,158,11,0.5); background: rgba(255,255,255,0.09); }
+    .casino-bet-form input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* Opciones de color/eleccion */
+    .casino-opciones {
+      display: flex; gap: 10px; width: 100%;
+    }
+    .casino-opcion {
+      flex: 1; padding: 14px 8px; border-radius: 12px; border: 2px solid transparent;
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all 0.22s var(--ease); font-family: 'Inter', sans-serif;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .casino-opcion span.co-emoji { font-size: 20px; }
+    .casino-opcion.sel-rojo   { border-color: #ef4444; background: rgba(239,68,68,0.18); color: #ff8080; }
+    .casino-opcion.sel-negro  { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.1); color: #fff; }
+    .casino-opcion.sel-verde  { border-color: #10B981; background: rgba(16,185,129,0.18); color: #4ade80; }
+    .casino-opcion.sel-cara   { border-color: #F59E0B; background: rgba(245,158,11,0.18); color: #fcd34d; }
+    .casino-opcion.sel-cruz   { border-color: #a78bfa; background: rgba(167,139,250,0.15); color: #c4b5fd; }
+    .casino-opcion:hover:not([class*="sel-"]) { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.2); }
+
+    /* Botón apostar */
+    .btn-casino {
+      width: 100%; padding: 16px; border-radius: 13px; border: none;
+      background: linear-gradient(135deg, #d97706 0%, #F59E0B 50%, #fbbf24 100%);
+      color: #000; font-size: 15px; font-weight: 800; cursor: pointer;
+      transition: all 0.3s var(--ease); font-family: 'Inter', sans-serif;
+      box-shadow: 0 0 30px rgba(245,158,11,0.4);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .btn-casino:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(245,158,11,0.6); }
+    .btn-casino:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Multiplicadores info */
+    .casino-mult-info {
+      width: 100%; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 14px 18px;
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .cmi-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.45); }
+    .cmi-badge {
+      font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px;
+    }
+    .cmi-badge.rojo  { background: rgba(239,68,68,0.2); color: #ff8080; }
+    .cmi-badge.negro { background: rgba(255,255,255,0.1); color: #e2e2e2; }
+    .cmi-badge.verde { background: rgba(16,185,129,0.2); color: #4ade80; }
+    .cmi-badge.moneda { background: rgba(245,158,11,0.2); color: #fbbf24; }
+
+    /* ── RANKING ── */
+    .casino-ranking {
+      width: 100%; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 20px;
+    }
+    .casino-ranking-titulo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #F59E0B;
+      letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .ranking-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+      border-radius: 10px; transition: background 0.2s;
+    }
+    .ranking-item:hover { background: rgba(255,255,255,0.04); }
+    .ranking-pos {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; flex-shrink: 0;
+    }
+    .ranking-pos.gold   { background: rgba(212,175,55,0.2);  color: #f5d06b; border: 1px solid rgba(212,175,55,0.3); }
+    .ranking-pos.silver { background: rgba(192,192,192,0.15); color: #d4d4d4; border: 1px solid rgba(192,192,192,0.25); }
+    .ranking-pos.bronze { background: rgba(205,127,50,0.15);  color: #cd7f32; border: 1px solid rgba(205,127,50,0.25); }
+    .ranking-pos.other  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.08); }
+    .ranking-nombre { flex: 1; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); }
+    .ranking-ganado { font-size: 14px; font-weight: 800; color: #10B981; }
+    .ranking-empty  { text-align: center; color: rgba(255,255,255,0.25); font-size: 13px; padding: 20px 0; }
+
+    /* ── HISTORIAL CASINO ── */
+    .casino-historial {
+      width: 100%; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 20px;
+    }
+    .casino-historial-titulo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: rgba(255,255,255,0.6);
+      letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .ch-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .ch-item:last-child { border-bottom: none; }
+    .ch-badge {
+      padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+    }
+    .ch-badge.gano   { background: rgba(16,185,129,0.15); color: #4ade80; }
+    .ch-badge.perdio { background: rgba(239,68,68,0.12);  color: #ff8080; }
+    .ch-info { flex: 1; }
+    .ch-juego { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+    .ch-det   { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+    .ch-monto { text-align: right; }
+    .ch-monto-val { font-size: 14px; font-weight: 800; }
+    .ch-monto-val.gano   { color: #4ade80; }
+    .ch-monto-val.perdio { color: #ff8080; }
+    .ch-monto-fecha { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+
+    @media (max-width: 540px) {
+      .ruleta-canvas-wrap { width: 220px; height: 220px; }
+      .ruleta-canvas { width: 220px !important; height: 220px !important; }
+      .casino-opciones { flex-wrap: wrap; }
+      .casino-opcion { min-width: calc(33% - 8px); }
+    }
   </style>
 </head>
 <body>
@@ -1259,6 +1510,14 @@
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/><circle cx="17" cy="17" r="3" fill="rgba(14,165,233,0.3)" stroke="#38bdf8"/></svg>
           </div>
           <div><div class="card-title" style="color:#38bdf8">Comisaría Virtual</div><div class="card-sub">Multas, antecedentes y denuncias</div></div>
+          <span class="card-arrow">›</span>
+        </div>
+
+        <div class="nav-card" onclick="abrirSeccion('casino-screen'); cargarCasino()" style="--card-color:#F59E0B; --card-glow:rgba(245,158,11,0.15)">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><circle cx="9" cy="9" r="1" fill="#F59E0B"/><circle cx="15" cy="9" r="1" fill="#F59E0B"/><circle cx="9" cy="15" r="1" fill="#F59E0B"/><circle cx="15" cy="15" r="1" fill="#F59E0B"/></svg>
+          </div>
+          <div><div class="card-title" style="color:#F59E0B">Casino</div><div class="card-sub">Ruleta, Cara o Cruz y más</div></div>
           <span class="card-arrow">›</span>
         </div>
 
@@ -1899,6 +2158,138 @@
   <!-- Toast container -->
   <div class="toast-container" id="toast-container"></div>
 
+  <!-- ══════════════════ CASINO ══════════════════ -->
+  <section class="screen seccion-screen" id="casino-screen">
+    <div class="casino-container">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title" style="color:#F59E0B;">
+          🎰 Casino
+        </div>
+      </div>
+
+      <!-- Saldo -->
+      <div class="casino-saldo-banner">
+        <div>
+          <div class="csb-label">Tu saldo disponible</div>
+          <div class="csb-valor" id="casino-saldo-val">$0</div>
+        </div>
+        <div class="csb-mono">CLP</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="casino-tabs">
+        <button class="casino-tab active" id="ctab-ruleta" onclick="casinoTab('ruleta')">🎡 Ruleta</button>
+        <button class="casino-tab" id="ctab-moneda" onclick="casinoTab('moneda')">🪙 Cara o Cruz</button>
+      </div>
+
+      <!-- ── RULETA ────────────────────────────────── -->
+      <div class="casino-juego visible" id="casino-panel-ruleta">
+        <div class="ruleta-canvas-wrap" id="ruleta-canvas-wrap">
+          <canvas class="ruleta-canvas" id="ruleta-canvas" width="260" height="260"></canvas>
+          <div class="ruleta-aguja"></div>
+          <div class="ruleta-centro">🎰</div>
+        </div>
+
+        <div class="casino-mult-info">
+          <div class="cmi-item"><span class="cmi-badge rojo">🔴 x2</span> Rojo</div>
+          <div class="cmi-item"><span class="cmi-badge negro">⚫ x2</span> Negro</div>
+          <div class="cmi-item"><span class="cmi-badge verde">🟢 x14</span> Verde</div>
+        </div>
+
+        <div class="casino-bet-form">
+          <label>Monto a apostar (CLP)</label>
+          <input type="number" id="ruleta-monto" placeholder="Ej: 5000" min="1" oninput="casinoActualizarGanancia('ruleta')">
+          <div id="ruleta-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+          <label>Elige tu apuesta</label>
+          <div class="casino-opciones">
+            <button class="casino-opcion" id="cop-rojo" onclick="casinoElegir('ruleta','rojo')">
+              <span class="co-emoji">🔴</span>
+              <span>Rojo</span>
+            </button>
+            <button class="casino-opcion" id="cop-negro" onclick="casinoElegir('ruleta','negro')">
+              <span class="co-emoji">⚫</span>
+              <span>Negro</span>
+            </button>
+            <button class="casino-opcion" id="cop-verde" onclick="casinoElegir('ruleta','verde')">
+              <span class="co-emoji">🟢</span>
+              <span>Verde</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="casino-resultado" id="ruleta-resultado"></div>
+
+        <button class="btn-casino" id="btn-ruleta" onclick="jugarRuleta()" disabled>
+          🎡 Girar Ruleta
+        </button>
+      </div>
+
+      <!-- ── CARA O CRUZ ─────────────────────────── -->
+      <div class="casino-juego" id="casino-panel-moneda">
+        <div class="moneda-scene">
+          <div class="moneda-wrap" id="moneda-wrap">
+            <div class="moneda-cara">🦅</div>
+            <div class="moneda-cruz">🌟</div>
+          </div>
+        </div>
+
+        <div class="casino-mult-info">
+          <div class="cmi-item"><span class="cmi-badge moneda">🪙 x2</span> Cara o Cruz — ganas el doble</div>
+        </div>
+
+        <div class="casino-bet-form">
+          <label>Monto a apostar (CLP)</label>
+          <input type="number" id="moneda-monto" placeholder="Ej: 5000" min="1" oninput="casinoActualizarGanancia('moneda')">
+          <div id="moneda-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+          <label>Elige tu lado</label>
+          <div class="casino-opciones">
+            <button class="casino-opcion" id="cop-cara" onclick="casinoElegir('moneda','cara')">
+              <span class="co-emoji">🦅</span>
+              <span>Cara</span>
+            </button>
+            <button class="casino-opcion" id="cop-cruz" onclick="casinoElegir('moneda','cruz')">
+              <span class="co-emoji">🌟</span>
+              <span>Cruz</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="casino-resultado" id="moneda-resultado"></div>
+
+        <button class="btn-casino" id="btn-moneda" onclick="jugarMoneda()" disabled>
+          🪙 Lanzar Moneda
+        </button>
+      </div>
+
+      <!-- ── RANKING ─────────────────────────────── -->
+      <div class="casino-ranking">
+        <div class="casino-ranking-titulo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 0 0 5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+          Top Ganadores
+        </div>
+        <div id="casino-ranking-lista">
+          <div class="ranking-empty">Cargando ranking...</div>
+        </div>
+      </div>
+
+      <!-- ── HISTORIAL ───────────────────────────── -->
+      <div class="casino-historial">
+        <div class="casino-historial-titulo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Historial de Apuestas
+        </div>
+        <div id="casino-historial-lista">
+          <div class="ranking-empty">Sin apuestas aún</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ERROR 403 -->
   <section class="screen" id="error-403">
     <div style="display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;padding:32px 24px;animation:fadeUp 0.7s var(--ease) both;">
@@ -2291,7 +2682,7 @@
     let countdownInterval = null;
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen','comisaria-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen','comisaria-screen','casino-screen','error-403','error-404'];
 
     function mostrarPantalla(id) {
       screens.forEach(s => {
@@ -3121,7 +3512,7 @@
     function mostrarError(tipo) {
       ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen',
        'inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen',
-       'error-403','error-404'].forEach(s => {
+       'casino-screen','error-403','error-404'].forEach(s => {
         const el = document.getElementById(s);
         if (el) el.classList.remove('active');
       });
@@ -4361,6 +4752,425 @@
         });
       }
     });
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  CASINO
+    // ══════════════════════════════════════════════════════════════════════
+    let casinoSaldo = 0;
+    let casinoEleccionRuleta = null;
+    let casinoEleccionMoneda = null;
+    let ruletaGirando = false;
+    let monedaGirando = false;
+    let ruletaAngle = 0; // current rotation of canvas
+
+    // ── Formateo ─────────────────────────────────────────────────────────
+    function casinoFmt(n) {
+      return '$' + Math.round(n).toLocaleString('es-CL');
+    }
+    function casinoFecha(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+    }
+
+    // ── Inicializar casino ────────────────────────────────────────────────
+    async function cargarCasino() {
+      if (!currentUser?.id) return;
+      try {
+        // Obtener saldo del banco
+        const res = await fetch(`/api/banco?action=cuenta&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        if (data.existe) {
+          casinoSaldo = data.cuenta.saldo;
+          document.getElementById('casino-saldo-val').textContent = casinoFmt(casinoSaldo);
+        }
+      } catch {}
+      dibujarRuleta(0);
+      await cargarRanking();
+      await cargarHistorialCasino();
+    }
+
+    // ── Tabs ─────────────────────────────────────────────────────────────
+    function casinoTab(tab) {
+      document.querySelectorAll('.casino-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.casino-juego').forEach(p => p.classList.remove('visible'));
+      document.getElementById('ctab-' + tab).classList.add('active');
+      document.getElementById('casino-panel-' + tab).classList.add('visible');
+    }
+
+    // ── Elección ─────────────────────────────────────────────────────────
+    function casinoElegir(juego, eleccion) {
+      if (juego === 'ruleta') {
+        casinoEleccionRuleta = eleccion;
+        document.querySelectorAll('[id^="cop-rojo"],[id^="cop-negro"],[id^="cop-verde"]').forEach(b => {
+          b.className = 'casino-opcion';
+        });
+        const btn = document.getElementById('cop-' + eleccion);
+        if (btn) btn.classList.add('sel-' + eleccion);
+        actualizarBtnRuleta();
+      } else {
+        casinoEleccionMoneda = eleccion;
+        document.getElementById('cop-cara').className = 'casino-opcion';
+        document.getElementById('cop-cruz').className = 'casino-opcion';
+        document.getElementById('cop-' + eleccion).classList.add('sel-' + eleccion);
+        actualizarBtnMoneda();
+      }
+    }
+
+    function casinoActualizarGanancia(juego) {
+      if (juego === 'ruleta') {
+        const m = parseInt(document.getElementById('ruleta-monto').value) || 0;
+        const el = document.getElementById('ruleta-ganancia-info');
+        if (m > 0) {
+          el.innerHTML = `Rojo/Negro: ganas <b style="color:#F59E0B">${casinoFmt(m*2)}</b> &nbsp;|&nbsp; Verde: ganas <b style="color:#4ade80">${casinoFmt(m*14)}</b>`;
+        } else el.textContent = '';
+        actualizarBtnRuleta();
+      } else {
+        const m = parseInt(document.getElementById('moneda-monto').value) || 0;
+        const el = document.getElementById('moneda-ganancia-info');
+        if (m > 0) el.innerHTML = `Si aciertas ganas <b style="color:#F59E0B">${casinoFmt(m*2)}</b>`;
+        else el.textContent = '';
+        actualizarBtnMoneda();
+      }
+    }
+
+    function actualizarBtnRuleta() {
+      const m = parseInt(document.getElementById('ruleta-monto').value) || 0;
+      document.getElementById('btn-ruleta').disabled = !(m > 0 && casinoEleccionRuleta && !ruletaGirando);
+    }
+    function actualizarBtnMoneda() {
+      const m = parseInt(document.getElementById('moneda-monto').value) || 0;
+      document.getElementById('btn-moneda').disabled = !(m > 0 && casinoEleccionMoneda && !monedaGirando);
+    }
+
+    // ── RULETA: dibujo canvas ────────────────────────────────────────────
+    const RULETA_SECTORES = [
+      // 38 sectores: 18 rojo, 18 negro, 2 verde (como ruleta americana)
+      {c:'negro',label:'2'},{c:'rojo',label:'28'},{c:'negro',label:'9'},{c:'rojo',label:'26'},
+      {c:'negro',label:'30'},{c:'rojo',label:'11'},{c:'negro',label:'7'},{c:'rojo',label:'20'},
+      {c:'negro',label:'32'},{c:'rojo',label:'17'},{c:'negro',label:'5'},{c:'rojo',label:'22'},
+      {c:'negro',label:'34'},{c:'rojo',label:'15'},{c:'negro',label:'3'},{c:'rojo',label:'24'},
+      {c:'negro',label:'36'},{c:'rojo',label:'13'},{c:'verde',label:'0'},{c:'negro',label:'27'},
+      {c:'rojo',label:'10'},{c:'negro',label:'25'},{c:'rojo',label:'29'},{c:'negro',label:'12'},
+      {c:'rojo',label:'8'},{c:'negro',label:'19'},{c:'rojo',label:'31'},{c:'negro',label:'18'},
+      {c:'rojo',label:'6'},{c:'negro',label:'21'},{c:'rojo',label:'33'},{c:'negro',label:'16'},
+      {c:'rojo',label:'4'},{c:'negro',label:'23'},{c:'rojo',label:'35'},{c:'negro',label:'14'},
+      {c:'rojo',label:'1'},{c:'verde',label:'00'}
+    ];
+    const N = RULETA_SECTORES.length;
+    const SECTOR_ANGLE = (2 * Math.PI) / N;
+
+    function dibujarRuleta(rotacion) {
+      const canvas = document.getElementById('ruleta-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      const cx = W/2, cy = H/2, r = W/2 - 4;
+      ctx.clearRect(0,0,W,H);
+
+      // Fondo exterior
+      ctx.beginPath(); ctx.arc(cx,cy,r+4,0,Math.PI*2);
+      const outerGrad = ctx.createRadialGradient(cx,cy,r-10,cx,cy,r+4);
+      outerGrad.addColorStop(0,'#2a2a2a'); outerGrad.addColorStop(1,'#1a1a1a');
+      ctx.fillStyle = outerGrad; ctx.fill();
+
+      // Borde exterior dorado
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 3; ctx.stroke();
+
+      for (let i = 0; i < N; i++) {
+        const angle = rotacion + i * SECTOR_ANGLE - Math.PI/2;
+        const next  = angle + SECTOR_ANGLE;
+        const sec   = RULETA_SECTORES[i];
+
+        // Sector relleno
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r - 4, angle, next);
+        ctx.closePath();
+        if (sec.c === 'rojo')  ctx.fillStyle = '#c41e3a';
+        else if (sec.c === 'negro') ctx.fillStyle = '#111111';
+        else ctx.fillStyle = '#146b3a';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+        // Número
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle + SECTOR_ANGLE/2);
+        ctx.translate(r - 22, 0);
+        ctx.rotate(Math.PI/2);
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${r < 120 ? 7 : 8}px Inter,sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(sec.label, 0, 0);
+        ctx.restore();
+      }
+
+      // Centro
+      ctx.beginPath(); ctx.arc(cx,cy,26,0,Math.PI*2);
+      const cGrad = ctx.createRadialGradient(cx-5,cy-5,2,cx,cy,26);
+      cGrad.addColorStop(0,'#3a3a3a'); cGrad.addColorStop(1,'#111');
+      ctx.fillStyle = cGrad; ctx.fill();
+      ctx.strokeStyle = 'rgba(212,175,55,0.6)'; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    // Calcular en qué color cae el puntero (puntero apunta a la parte superior → -PI/2)
+    function sectorEnPuntero(angulo) {
+      // El puntero está en la parte superior (angle = -PI/2)
+      // normalizar el ángulo
+      let normalized = ((angulo % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      // El puntero está en -PI/2 del canvas, que equivale a 3PI/2 normalizado
+      // Sector 0 empieza en rotacion - PI/2
+      let relAngle = (3 * Math.PI/2 - normalized + 2*Math.PI) % (2*Math.PI);
+      let idx = Math.floor(relAngle / SECTOR_ANGLE) % N;
+      return RULETA_SECTORES[idx].c;
+    }
+
+    // ── JUGAR RULETA ─────────────────────────────────────────────────────
+    async function jugarRuleta() {
+      const monto = parseInt(document.getElementById('ruleta-monto').value);
+      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
+      if (!casinoEleccionRuleta) { mostrarToast('Elige un color primero.', true); return; }
+      if (ruletaGirando) return;
+      ruletaGirando = true;
+      document.getElementById('btn-ruleta').disabled = true;
+      document.getElementById('ruleta-resultado').className = 'casino-resultado';
+
+      // Llamar al servidor
+      let serverData;
+      try {
+        const r = await fetch('/api/casino?action=jugar', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ juego: 'ruleta', monto, eleccion: casinoEleccionRuleta })
+        });
+        serverData = await r.json();
+        if (!r.ok) { mostrarToast(serverData.error || 'Error al apostar.', true); ruletaGirando = false; actualizarBtnRuleta(); return; }
+      } catch { mostrarToast('Error de conexión.', true); ruletaGirando = false; actualizarBtnRuleta(); return; }
+
+      // Animar la ruleta al sector correcto
+      const resultadoColor = serverData.resultado;
+      // Encontrar un sector con ese color para aterrizar
+      let targetIdx = RULETA_SECTORES.findIndex(s => s.c === resultadoColor);
+      // Elegir uno random si hay varios
+      const matching = RULETA_SECTORES.map((s,i) => s.c === resultadoColor ? i : -1).filter(x => x>=0);
+      targetIdx = matching[Math.floor(Math.random() * matching.length)];
+
+      // El puntero está en -PI/2 (top). Queremos que el sector targetIdx esté bajo el puntero.
+      // El sector i inicia en: initialAngle + i * SECTOR_ANGLE - PI/2
+      // Queremos que el centro del sector esté en -PI/2:
+      // initialAngle + (targetIdx + 0.5) * SECTOR_ANGLE - PI/2 ≡ -PI/2 + 2kPI
+      // initialAngle = -targetIdx * SECTOR_ANGLE - 0.5 * SECTOR_ANGLE + small_offset
+      const offset = (Math.random() - 0.5) * SECTOR_ANGLE * 0.6; // pequeño random dentro del sector
+      const targetAngle = -(targetIdx + 0.5) * SECTOR_ANGLE + offset;
+      const spins = 6 + Math.floor(Math.random() * 4); // 6-9 vueltas
+      const finalAngle = ruletaAngle + spins * 2 * Math.PI + ((targetAngle - ruletaAngle) % (2*Math.PI));
+
+      // Reproducir sonido de giro (Web Audio API)
+      casinoSonidoRuleta();
+
+      // Animación
+      const start = performance.now();
+      const duration = 4000 + Math.random() * 1000;
+      const startAngle = ruletaAngle;
+      const delta = finalAngle - startAngle;
+
+      function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+      function tick(now) {
+        let t = Math.min((now - start) / duration, 1);
+        ruletaAngle = startAngle + delta * easeOut(t);
+        dibujarRuleta(ruletaAngle);
+        if (t < 1) { requestAnimationFrame(tick); }
+        else {
+          ruletaAngle = finalAngle;
+          dibujarRuleta(ruletaAngle);
+          casinoSonidoBall();
+          // Mostrar resultado
+          setTimeout(() => {
+            casinoSaldo = serverData.nuevoSaldo;
+            document.getElementById('casino-saldo-val').textContent = casinoFmt(casinoSaldo);
+            const resEl = document.getElementById('ruleta-resultado');
+            const emoji = resultadoColor === 'rojo' ? '🔴' : resultadoColor === 'negro' ? '⚫' : '🟢';
+            if (serverData.gano) {
+              resEl.className = 'casino-resultado gano visible';
+              resEl.innerHTML = `${emoji} ¡Cayó <b>${resultadoColor.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${casinoFmt(serverData.premio)}</span>`;
+            } else {
+              resEl.className = 'casino-resultado perdio visible';
+              resEl.innerHTML = `${emoji} Cayó <b>${resultadoColor.toUpperCase()}</b>. Elegiste ${casinoEleccionRuleta.toUpperCase()}.<br>Perdiste ${casinoFmt(monto)}.`;
+            }
+            ruletaGirando = false;
+            actualizarBtnRuleta();
+            cargarRanking();
+            cargarHistorialCasino();
+          }, 500);
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ── JUGAR MONEDA ─────────────────────────────────────────────────────
+    async function jugarMoneda() {
+      const monto = parseInt(document.getElementById('moneda-monto').value);
+      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
+      if (!casinoEleccionMoneda) { mostrarToast('Elige cara o cruz primero.', true); return; }
+      if (monedaGirando) return;
+      monedaGirando = true;
+      document.getElementById('btn-moneda').disabled = true;
+      document.getElementById('moneda-resultado').className = 'casino-resultado';
+
+      let serverData;
+      try {
+        const r = await fetch('/api/casino?action=jugar', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ juego: 'moneda', monto, eleccion: casinoEleccionMoneda })
+        });
+        serverData = await r.json();
+        if (!r.ok) { mostrarToast(serverData.error || 'Error al apostar.', true); monedaGirando = false; actualizarBtnMoneda(); return; }
+      } catch { mostrarToast('Error de conexión.', true); monedaGirando = false; actualizarBtnMoneda(); return; }
+
+      // Sonido lanzamiento
+      casinoSonidoMoneda();
+
+      // Animar moneda
+      const wrap = document.getElementById('moneda-wrap');
+      wrap.classList.remove('girando');
+      void wrap.offsetWidth; // reflow
+      wrap.classList.add('girando');
+
+      setTimeout(() => {
+        wrap.classList.remove('girando');
+        // Mostrar resultado
+        const resultado = serverData.resultado; // 'cara' o 'cruz'
+        // Orientar la moneda: cara = 0deg, cruz = 180deg
+        wrap.style.transform = resultado === 'cara' ? 'rotateY(0deg)' : 'rotateY(180deg)';
+
+        casinoSonidoBall();
+        casinoSaldo = serverData.nuevoSaldo;
+        document.getElementById('casino-saldo-val').textContent = casinoFmt(casinoSaldo);
+        const resEl = document.getElementById('moneda-resultado');
+        const emoji = resultado === 'cara' ? '🦅' : '🌟';
+        if (serverData.gano) {
+          resEl.className = 'casino-resultado gano visible';
+          resEl.innerHTML = `${emoji} ¡Cayó <b>${resultado.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${casinoFmt(serverData.premio)}</span>`;
+        } else {
+          resEl.className = 'casino-resultado perdio visible';
+          resEl.innerHTML = `${emoji} Cayó <b>${resultado.toUpperCase()}</b>. Elegiste ${casinoEleccionMoneda.toUpperCase()}.<br>Perdiste ${casinoFmt(monto)}.`;
+        }
+        monedaGirando = false;
+        actualizarBtnMoneda();
+        cargarRanking();
+        cargarHistorialCasino();
+      }, 1500);
+    }
+
+    // ── Sonidos Web Audio ─────────────────────────────────────────────────
+    let _audioCtx = null;
+    function getAudioCtx() {
+      if (!_audioCtx) {
+        try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+      }
+      return _audioCtx;
+    }
+
+    function casinoSonidoRuleta() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      // Sonido de tick rápido
+      let t = ctx.currentTime;
+      for (let i = 0; i < 20; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 600 + Math.random() * 200;
+        osc.type = 'triangle';
+        const delay = t + i * 0.12 * Math.pow(0.88, i);
+        gain.gain.setValueAtTime(0.08, delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, delay + 0.06);
+        osc.start(delay); osc.stop(delay + 0.06);
+      }
+    }
+
+    function casinoSonidoBall() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+    }
+
+    function casinoSonidoMoneda() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      for (let i = 0; i < 6; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 1200 - i * 60;
+        osc.type = 'sine';
+        const d = t + i * 0.22;
+        gain.gain.setValueAtTime(0.09, d);
+        gain.gain.exponentialRampToValueAtTime(0.001, d + 0.18);
+        osc.start(d); osc.stop(d + 0.18);
+      }
+    }
+
+    // ── Ranking ───────────────────────────────────────────────────────────
+    async function cargarRanking() {
+      try {
+        const r = await fetch('/api/casino?action=ranking');
+        if (!r.ok) return;
+        const data = await r.json();
+        const lista = document.getElementById('casino-ranking-lista');
+        if (!data.ranking || data.ranking.length === 0) {
+          lista.innerHTML = '<div class="ranking-empty">Aún no hay ganadores registrados.</div>';
+          return;
+        }
+        const posClasses = ['gold','silver','bronze','other','other'];
+        const posEmoji = ['🥇','🥈','🥉','4°','5°'];
+        lista.innerHTML = data.ranking.map((u,i) => `
+          <div class="ranking-item">
+            <div class="ranking-pos ${posClasses[i]}">${posEmoji[i]}</div>
+            <div class="ranking-nombre">${escHtml(u.nombre || u.discord_id)}</div>
+            <div class="ranking-ganado">${casinoFmt(u.total_ganado)}</div>
+          </div>
+        `).join('');
+      } catch {}
+    }
+
+    // ── Historial casino ──────────────────────────────────────────────────
+    async function cargarHistorialCasino() {
+      try {
+        const r = await fetch('/api/casino?action=historial');
+        if (!r.ok) return;
+        const data = await r.json();
+        const lista = document.getElementById('casino-historial-lista');
+        if (!data.apuestas || data.apuestas.length === 0) {
+          lista.innerHTML = '<div class="ranking-empty">Sin apuestas aún</div>';
+          return;
+        }
+        const juegoLabel = { ruleta: '🎡 Ruleta', moneda: '🪙 Cara o Cruz' };
+        lista.innerHTML = data.apuestas.slice(0, 20).map(a => `
+          <div class="ch-item">
+            <span class="ch-badge ${a.gano ? 'gano' : 'perdio'}">${a.gano ? 'Ganó' : 'Perdió'}</span>
+            <div class="ch-info">
+              <div class="ch-juego">${juegoLabel[a.juego] || a.juego} — apostó <b>${a.eleccion}</b>, salió <b>${a.resultado}</b></div>
+              <div class="ch-det">${casinoFecha(a.created_at)}</div>
+            </div>
+            <div class="ch-monto">
+              <div class="ch-monto-val ${a.gano ? 'gano' : 'perdio'}">${a.gano ? '+' + casinoFmt(a.premio - a.monto) : '-' + casinoFmt(a.monto)}</div>
+              <div class="ch-monto-fecha">Apostó ${casinoFmt(a.monto)}</div>
+            </div>
+          </div>
+        `).join('');
+      } catch {}
+    }
 
   </script>
 </body>
