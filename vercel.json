@@ -8,6 +8,7 @@
     { "source": "/api/admin",      "destination": "/api/admin" },
     { "source": "/api/comisaria",  "destination": "/api/comisaria" },
     { "source": "/api/casino",     "destination": "/api/casino" },
+    { "source": "/api/apuestas",   "destination": "/api/apuestas" },
     { "source": "/",              "destination": "/public/index.html" }
   ]
 }
