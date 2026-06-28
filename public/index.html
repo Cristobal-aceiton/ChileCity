@@ -1510,6 +1510,341 @@
       .casino-opciones { flex-wrap: wrap; }
       .casino-opcion { min-width: calc(33% - 8px); }
     }
+
+    /* ══════════════════════════════════════════════════════
+       CASINO LOBBY (reemplaza tabs con tarjetas de juegos)
+    ══════════════════════════════════════════════════════ */
+    .casino-lobby {
+      width: 100%; display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 8px;
+    }
+    .casino-lobby-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 28px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative; overflow: hidden;
+    }
+    .casino-lobby-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, var(--clc, rgba(245,158,11,0.12)), transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .casino-lobby-card:hover::before { opacity: 1; }
+    .casino-lobby-card:hover {
+      border-color: var(--clc-border, rgba(245,158,11,0.4));
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px var(--clc-shadow, rgba(245,158,11,0.15));
+    }
+    .clc-emoji { font-size: 44px; filter: drop-shadow(0 0 12px currentColor); }
+    .clc-title { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+    .clc-sub { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; }
+    .clc-badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3);
+    }
+    .clc-badge.nuevo { background: rgba(99,102,241,0.15); color: #a5b4fc; border-color: rgba(99,102,241,0.3); }
+
+    /* ══════════════════════════════════════════════════════
+       APUESTAS DEPORTIVAS
+    ══════════════════════════════════════════════════════ */
+    #apuestas-screen { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .apuestas-container {
+      width: 100%; max-width: 760px;
+      padding: 100px 20px 60px;
+      display: flex; flex-direction: column; gap: 20px;
+      animation: fadeUp 0.6s var(--ease) both;
+    }
+
+    /* Saldo banner apuestas */
+    .ap-saldo-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(16,185,129,0.08));
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 14px; padding: 16px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ap-saldo-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); font-weight: 700; }
+    .ap-saldo-val { font-size: 26px; font-weight: 800; color: #fff; margin-top: 2px; }
+    .ap-saldo-mono { font-size: 12px; font-weight: 700; color: rgba(99,102,241,0.7); letter-spacing: 2px; }
+
+    /* Partido card */
+    .partido-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 22px 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      animation: fadeUp 0.5s var(--ease) both;
+    }
+    .partido-card:hover { border-color: rgba(99,102,241,0.3); box-shadow: 0 4px 24px rgba(99,102,241,0.08); }
+
+    /* Equipos row */
+    .partido-equipos {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .partido-equipo {
+      display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;
+    }
+    .equipo-logo {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; overflow: hidden;
+    }
+    .equipo-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .equipo-nombre { font-size: 13px; font-weight: 700; color: #fff; text-align: center; line-height: 1.3; }
+    .partido-vs { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .partido-marcador {
+      font-size: 32px; font-weight: 900; color: #fff;
+      font-family: 'Bebas Neue', sans-serif; letter-spacing: 4px;
+    }
+    .partido-estado-badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      padding: 4px 10px; border-radius: 99px;
+    }
+    .estado-activo { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+    .estado-en_curso { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+    .estado-finalizado { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+    .estado-cancelado { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+
+    /* Multiplicadores */
+    .partido-mults {
+      display: flex; gap: 8px; justify-content: center;
+    }
+    .mult-pill {
+      flex: 1; text-align: center; padding: 8px 6px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    }
+    .mult-pill-label { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .mult-pill-val { font-size: 18px; font-weight: 800; color: #fbbf24; margin-top: 2px; }
+    .mult-pill.ganador-A { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.08); }
+    .mult-pill.ganador-B { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
+    .mult-pill.ganador-empate { border-color: rgba(156,163,175,0.4); background: rgba(156,163,175,0.08); }
+
+    /* Botones de apuesta */
+    .partido-btns { display: flex; gap: 10px; }
+    .btn-apostar {
+      flex: 1; padding: 11px 14px; border-radius: 10px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+      transition: all 0.2s ease;
+    }
+    .btn-apostar.simple {
+      background: linear-gradient(135deg, rgba(99,102,241,0.9), rgba(79,70,229,0.9));
+      color: #fff;
+    }
+    .btn-apostar.simple:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+    .btn-apostar.combinada {
+      background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(234,88,12,0.85));
+      color: #fff;
+    }
+    .btn-apostar.combinada:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,0.35); }
+
+    /* Modal apuestas */
+    .ap-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px); z-index: 9000;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .ap-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .ap-modal {
+      background: #141414; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 28px 24px;
+      width: 100%; max-width: 440px;
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px); transition: transform 0.3s var(--ease);
+    }
+    .ap-modal-overlay.open .ap-modal { transform: translateY(0); }
+    .ap-modal-title {
+      font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px;
+    }
+    .ap-modal-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+    .ap-modal label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); font-weight: 700; display: block; margin-bottom: 6px; }
+    .ap-modal input[type="number"] {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; font-size: 16px; font-weight: 700;
+      transition: border-color 0.2s;
+    }
+    .ap-modal input[type="number"]:focus { outline: none; border-color: rgba(99,102,241,0.5); background: rgba(255,255,255,0.09); }
+    .ap-modal input::placeholder { color: rgba(255,255,255,0.2); }
+    .ap-eleccion-grid { display: flex; gap: 8px; margin-bottom: 16px; }
+    .ap-eleccion-btn {
+      flex: 1; padding: 10px 8px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; text-align: center;
+    }
+    .ap-eleccion-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .ap-eleccion-btn.sel-A { border-color: #6366f1; background: rgba(99,102,241,0.18); color: #a5b4fc; }
+    .ap-eleccion-btn.sel-empate { border-color: #9ca3af; background: rgba(156,163,175,0.15); color: #d1d5db; }
+    .ap-eleccion-btn.sel-B { border-color: #ef4444; background: rgba(239,68,68,0.15); color: #fca5a5; }
+    .ap-marcador-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .ap-marcador-row input { flex: 1; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 16px; font-weight: 700; text-align: center; }
+    .ap-marcador-row input:focus { outline: none; border-color: rgba(245,158,11,0.5); }
+    .ap-marcador-sep { font-size: 20px; font-weight: 900; color: rgba(255,255,255,0.3); }
+    .ap-premio-preview {
+      background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
+      font-size: 13px; color: rgba(255,255,255,0.6); min-height: 44px;
+    }
+    .ap-premio-preview b { color: #fbbf24; }
+    .ap-modal-btns { display: flex; gap: 10px; }
+    .btn-ap-cancel {
+      flex: 1; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+      background: transparent; color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-ap-cancel:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .btn-ap-confirm {
+      flex: 2; padding: 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff;
+      font-size: 14px; font-weight: 800; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-ap-confirm:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(99,102,241,0.45); }
+    .btn-ap-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-ap-confirm.combinada { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+    .btn-ap-confirm.combinada:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(245,158,11,0.4); }
+
+    /* Empty state apuestas */
+    .ap-empty {
+      text-align: center; padding: 48px 24px; color: rgba(255,255,255,0.25);
+    }
+    .ap-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .ap-empty-text { font-size: 14px; }
+
+    /* ══════════════════════════════════════════════════════
+       ADMIN CASINO - Panel de gestión de apuestas
+    ══════════════════════════════════════════════════════ */
+    #admin-casino-screen { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .admin-casino-container {
+      width: 100%; max-width: 800px;
+      padding: 100px 20px 60px;
+      display: flex; flex-direction: column; gap: 20px;
+      animation: fadeUp 0.6s var(--ease) both;
+    }
+    .adm-section {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 20px;
+    }
+    .adm-section-title {
+      font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.5); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .adm-form { display: flex; flex-direction: column; gap: 12px; }
+    .adm-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .adm-form-row > * { flex: 1; min-width: 140px; }
+    .adm-input {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; font-size: 13px; font-weight: 600;
+      transition: border-color 0.2s;
+    }
+    .adm-input:focus { outline: none; border-color: rgba(245,158,11,0.5); background: rgba(255,255,255,0.09); }
+    .adm-input::placeholder { color: rgba(255,255,255,0.2); }
+    .btn-adm {
+      padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 700; transition: all 0.2s;
+    }
+    .btn-adm.primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
+    .btn-adm.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,0.4); }
+    .btn-adm.success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .btn-adm.success:hover { box-shadow: 0 4px 16px rgba(16,185,129,0.35); }
+    .btn-adm.danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .btn-adm.danger:hover { background: rgba(239,68,68,0.25); }
+    .btn-adm.warning { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; }
+    .btn-adm.warning:hover { background: rgba(245,158,11,0.25); }
+    .btn-adm.ghost { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+    .btn-adm.ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* Tabla admin partidos */
+    .adm-partido-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 16px; margin-bottom: 10px;
+      animation: fadeUp 0.4s var(--ease) both;
+    }
+    .adm-partido-header {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    .adm-partido-teams { font-size: 15px; font-weight: 800; color: #fff; }
+    .adm-partido-score { font-size: 22px; font-weight: 900; color: #fbbf24; font-family: 'Bebas Neue', sans-serif; letter-spacing: 3px; }
+    .adm-partido-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .adm-marcador-form { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+    .adm-marcador-form input { width: 60px; padding: 7px 10px; border-radius: 8px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 16px; font-weight: 800; text-align: center; }
+    .adm-marcador-form input:focus { outline: none; border-color: rgba(245,158,11,0.5); }
+    .adm-marcador-sep { color: rgba(255,255,255,0.3); font-weight: 900; font-size: 18px; }
+
+    /* Tabla historial admin */
+    .ap-hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ap-hist-table th { text-align: left; padding: 8px 10px; color: rgba(255,255,255,0.35); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .ap-hist-table td { padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); vertical-align: middle; }
+    .ap-hist-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .hist-badge { padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .hist-badge.pendiente { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .hist-badge.ganada { background: rgba(16,185,129,0.15); color: #34d399; }
+    .hist-badge.perdida { background: rgba(239,68,68,0.12); color: #f87171; }
+    .hist-badge.cancelada { background: rgba(107,114,128,0.12); color: #9ca3af; }
+    .hist-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .hist-filter-btn { padding: 6px 14px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .hist-filter-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+
+    /* Historial personal apuestas */
+    .ap-hist-item {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      animation: fadeUp 0.4s var(--ease) both;
+    }
+    .ap-hist-item + .ap-hist-item { margin-top: 8px; }
+    .ap-hist-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .ap-hist-icon.ganada { background: rgba(16,185,129,0.15); }
+    .ap-hist-icon.perdida { background: rgba(239,68,68,0.1); }
+    .ap-hist-icon.pendiente { background: rgba(99,102,241,0.12); }
+    .ap-hist-icon.cancelada { background: rgba(107,114,128,0.1); }
+    .ap-hist-info { flex: 1; min-width: 0; }
+    .ap-hist-partido { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ap-hist-det { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .ap-hist-amount { text-align: right; flex-shrink: 0; }
+    .ap-hist-amount-val { font-size: 15px; font-weight: 800; }
+    .ap-hist-amount-val.ganada { color: #34d399; }
+    .ap-hist-amount-val.perdida { color: #f87171; }
+    .ap-hist-amount-val.pendiente { color: #a5b4fc; }
+    .ap-hist-amount-val.cancelada { color: #9ca3af; }
+    .ap-hist-amount-sub { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+
+    /* Edit partido modal */
+    .adm-edit-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px); z-index: 9500;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .adm-edit-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .adm-edit-modal {
+      background: #141414; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px); transition: transform 0.3s var(--ease);
+    }
+    .adm-edit-modal-overlay.open .adm-edit-modal { transform: translateY(0); }
+
+    @media (max-width: 540px) {
+      .casino-lobby { grid-template-columns: repeat(2, 1fr); }
+      .clc-emoji { font-size: 32px; }
+      .partido-card { padding: 16px 14px; }
+      .equipo-logo { width: 50px; height: 50px; font-size: 24px; }
+      .partido-marcador { font-size: 26px; }
+      .ap-hist-table { display: block; overflow-x: auto; }
+      .adm-partido-actions { gap: 4px; }
+      .btn-adm { padding: 8px 12px; font-size: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -1722,6 +2057,13 @@
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/><path d="M18 11l2 2 4-4" stroke="#f87171"/></svg>
           </div>
           <div><div class="card-title" style="color:#f87171">Panel Admin</div><div class="card-sub">Gestión de administradores</div></div>
+          <span class="card-arrow">›</span>
+        </a>
+        <a href="#" class="nav-card" id="admin-casino-card" style="display:none; --card-color:#f59e0b; --card-glow:rgba(245,158,11,0.12)" onclick="abrirAdminCasino()">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/><path d="M8 2l4 4 4-4"/></svg>
+          </div>
+          <div><div class="card-title" style="color:#f59e0b">Admin Casino</div><div class="card-sub">Gestión de partidos y apuestas</div></div>
           <span class="card-arrow">›</span>
         </a>
 
@@ -2400,14 +2742,43 @@
         <div class="csb-mono">CLP</div>
       </div>
 
-      <!-- Tabs -->
-      <div class="casino-tabs">
+      <!-- Lobby de juegos -->
+      <div id="casino-lobby-section">
+        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:14px;">Elige un juego</div>
+        <div class="casino-lobby">
+          <div class="casino-lobby-card" onclick="casinoAbrirJuego('ruleta')"
+               style="--clc:rgba(220,30,30,0.12);--clc-border:rgba(220,30,30,0.4);--clc-shadow:rgba(220,30,30,0.15);">
+            <div class="clc-emoji">🎰</div>
+            <div class="clc-title">Ruleta</div>
+            <div class="clc-sub">Elige color y gana hasta x14</div>
+            <div class="clc-badge">Disponible</div>
+          </div>
+          <div class="casino-lobby-card" onclick="casinoAbrirJuego('moneda')"
+               style="--clc:rgba(245,158,11,0.12);--clc-border:rgba(245,158,11,0.4);--clc-shadow:rgba(245,158,11,0.15);">
+            <div class="clc-emoji">🪙</div>
+            <div class="clc-title">Cara o Cruz</div>
+            <div class="clc-sub">50/50 — ganas el doble</div>
+            <div class="clc-badge">Disponible</div>
+          </div>
+          <div class="casino-lobby-card" onclick="abrirSeccion('apuestas-screen'); cargarApuestas()"
+               style="--clc:rgba(99,102,241,0.12);--clc-border:rgba(99,102,241,0.4);--clc-shadow:rgba(99,102,241,0.15);">
+            <div class="clc-emoji">⚽</div>
+            <div class="clc-title">Apuestas Deportivas</div>
+            <div class="clc-sub">Partidos en tiempo real</div>
+            <div class="clc-badge nuevo">Nuevo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs (ocultas hasta abrir juego) -->
+      <div class="casino-tabs" id="casino-tabs-bar" style="display:none;">
+        <button class="casino-tab" id="ctab-lobby" onclick="casinoVolverLobby()">← Lobby</button>
         <button class="casino-tab active" id="ctab-ruleta" onclick="casinoTab('ruleta')">🎡 Ruleta</button>
         <button class="casino-tab" id="ctab-moneda" onclick="casinoTab('moneda')">🪙 Cara o Cruz</button>
       </div>
 
       <!-- ── RULETA ────────────────────────────────── -->
-      <div class="casino-juego visible" id="casino-panel-ruleta">
+      <div class="casino-juego" id="casino-panel-ruleta">
         <div class="ruleta-outer">
   <div class="ruleta-canvas-wrap" id="ruleta-canvas-wrap">
     <canvas id="ruleta-canvas" class="ruleta-canvas" width="280" height="280"></canvas>
@@ -2510,6 +2881,218 @@
 
     </div>
   </section>
+
+  <!-- ══════════════════ APUESTAS DEPORTIVAS ══════════════════ -->
+  <section class="screen seccion-screen" id="apuestas-screen">
+    <div class="apuestas-container">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title" style="color:#6366f1;">⚽ Apuestas Deportivas</div>
+      </div>
+
+      <!-- Saldo -->
+      <div class="ap-saldo-banner">
+        <div>
+          <div class="ap-saldo-label">Tu saldo disponible</div>
+          <div class="ap-saldo-val" id="ap-saldo-val">$0</div>
+        </div>
+        <div class="ap-saldo-mono">CLP</div>
+      </div>
+
+      <!-- Tabs historial / partidos -->
+      <div class="casino-tabs" style="margin:0;">
+        <button class="casino-tab active" id="aptab-partidos" onclick="apTab('partidos')">⚽ Partidos</button>
+        <button class="casino-tab" id="aptab-historial" onclick="apTab('historial')">📋 Mi Historial</button>
+      </div>
+
+      <!-- Lista partidos -->
+      <div id="ap-partidos-section">
+        <div id="ap-partidos-lista">
+          <div class="ap-empty"><div class="ap-empty-icon">⏳</div><div class="ap-empty-text">Cargando partidos...</div></div>
+        </div>
+      </div>
+
+      <!-- Historial personal -->
+      <div id="ap-historial-section" style="display:none;">
+        <div id="ap-historial-lista">
+          <div class="ap-empty"><div class="ap-empty-icon">📋</div><div class="ap-empty-text">Sin apuestas aún</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal apuesta -->
+  <div class="ap-modal-overlay" id="ap-modal-overlay" onclick="cerrarModalApuesta(event)">
+    <div class="ap-modal" id="ap-modal">
+      <div class="ap-modal-title" id="ap-modal-title">Apuesta Simple</div>
+      <div class="ap-modal-sub" id="ap-modal-sub">Equipo A vs Equipo B</div>
+
+      <label>¿Quién gana?</label>
+      <div class="ap-eleccion-grid" id="ap-eleccion-grid">
+        <button class="ap-eleccion-btn" id="ap-btn-A" onclick="apElegir('A')">
+          <div id="ap-label-A" style="font-weight:800;">Equipo A</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-A">x2.0</div>
+        </button>
+        <button class="ap-eleccion-btn" id="ap-btn-empate" onclick="apElegir('empate')">
+          <div style="font-weight:800;">Empate</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-empate">x3.0</div>
+        </button>
+        <button class="ap-eleccion-btn" id="ap-btn-B" onclick="apElegir('B')">
+          <div id="ap-label-B" style="font-weight:800;">Equipo B</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-B">x2.0</div>
+        </button>
+      </div>
+
+      <!-- Marcador predicho (solo combinada) -->
+      <div id="ap-marcador-section" style="display:none;">
+        <label>Predice el marcador exacto (opcional — doble premio)</label>
+        <div class="ap-marcador-row">
+          <input type="number" id="ap-marc-a" min="0" max="99" placeholder="0" oninput="apActualizarPremio()">
+          <div class="ap-marcador-sep">–</div>
+          <input type="number" id="ap-marc-b" min="0" max="99" placeholder="0" oninput="apActualizarPremio()">
+        </div>
+      </div>
+
+      <label style="margin-top:4px;">Monto a apostar (CLP)</label>
+      <input type="number" id="ap-monto-input" min="1" placeholder="Ej: 10000" oninput="apActualizarPremio()" style="margin-bottom:14px;">
+
+      <div class="ap-premio-preview" id="ap-premio-preview">
+        Elige un resultado e ingresa el monto para ver el premio estimado.
+      </div>
+
+      <div class="ap-modal-btns">
+        <button class="btn-ap-cancel" onclick="cerrarModalApuesta()">Cancelar</button>
+        <button class="btn-ap-confirm" id="ap-btn-confirm" onclick="confirmarApuesta()" disabled>
+          Confirmar apuesta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ ADMIN CASINO ══════════════════ -->
+  <section class="screen seccion-screen" id="admin-casino-screen">
+    <div class="admin-casino-container">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title" style="color:#f59e0b;">🎲 Admin Casino</div>
+      </div>
+
+      <!-- Crear partido -->
+      <div class="adm-section">
+        <div class="adm-section-title">➕ Crear nuevo partido</div>
+        <div class="adm-form">
+          <div class="adm-form-row">
+            <input class="adm-input" id="adm-eq-a" placeholder="Equipo A (ej: Chile)">
+            <input class="adm-input" id="adm-eq-b" placeholder="Equipo B (ej: Argentina)">
+          </div>
+          <div class="adm-form-row">
+            <input class="adm-input" id="adm-logo-a" placeholder="URL Logo A (opcional)">
+            <input class="adm-input" id="adm-logo-b" placeholder="URL Logo B (opcional)">
+          </div>
+          <div class="adm-form-row">
+            <div>
+              <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. Equipo A</label>
+              <input class="adm-input" id="adm-mult-a" type="number" step="0.1" min="1" value="2.0" placeholder="2.0">
+            </div>
+            <div>
+              <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. Empate</label>
+              <input class="adm-input" id="adm-mult-e" type="number" step="0.1" min="1" value="3.0" placeholder="3.0">
+            </div>
+            <div>
+              <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. Equipo B</label>
+              <input class="adm-input" id="adm-mult-b" type="number" step="0.1" min="1" value="2.0" placeholder="2.0">
+            </div>
+          </div>
+          <button class="btn-adm primary" onclick="admCrearPartido()">➕ Crear Partido</button>
+        </div>
+      </div>
+
+      <!-- Lista partidos (admin) -->
+      <div class="adm-section">
+        <div class="adm-section-title" style="justify-content:space-between;">
+          <span>📋 Partidos</span>
+          <button class="btn-adm ghost" style="padding:5px 12px;font-size:12px;" onclick="admCargarPartidos()">↻ Actualizar</button>
+        </div>
+        <div id="adm-partidos-lista">
+          <div class="ap-empty"><div class="ap-empty-icon">⚽</div><div class="ap-empty-text">Sin partidos creados</div></div>
+        </div>
+      </div>
+
+      <!-- Historial admin -->
+      <div class="adm-section">
+        <div class="adm-section-title">📊 Historial de Apuestas</div>
+        <div class="hist-filter-bar">
+          <button class="hist-filter-btn active" onclick="admFiltrarHistorial('todos', this)">Todas</button>
+          <button class="hist-filter-btn" onclick="admFiltrarHistorial('pendiente', this)">Pendientes</button>
+          <button class="hist-filter-btn" onclick="admFiltrarHistorial('ganada', this)">Ganadas</button>
+          <button class="hist-filter-btn" onclick="admFiltrarHistorial('perdida', this)">Perdidas</button>
+          <button class="hist-filter-btn" onclick="admFiltrarHistorial('cancelada', this)">Canceladas</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ap-hist-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Partido</th>
+                <th>Tipo</th>
+                <th>Monto</th>
+                <th>Elección</th>
+                <th>Marcador</th>
+                <th>Estado</th>
+                <th>Premio</th>
+              </tr>
+            </thead>
+            <tbody id="adm-hist-tbody">
+              <tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal editar partido (admin) -->
+  <div class="adm-edit-modal-overlay" id="adm-edit-overlay" onclick="admCerrarEditModal(event)">
+    <div class="adm-edit-modal">
+      <div class="ap-modal-title">✏️ Editar Partido</div>
+      <div class="ap-modal-sub" style="margin-bottom:20px;" id="adm-edit-sub"></div>
+      <input type="hidden" id="adm-edit-id">
+      <div class="adm-form">
+        <div class="adm-form-row">
+          <input class="adm-input" id="adm-edit-eq-a" placeholder="Equipo A">
+          <input class="adm-input" id="adm-edit-eq-b" placeholder="Equipo B">
+        </div>
+        <div class="adm-form-row">
+          <input class="adm-input" id="adm-edit-logo-a" placeholder="URL Logo A">
+          <input class="adm-input" id="adm-edit-logo-b" placeholder="URL Logo B">
+        </div>
+        <div class="adm-form-row">
+          <div>
+            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. A</label>
+            <input class="adm-input" id="adm-edit-mult-a" type="number" step="0.1" min="1">
+          </div>
+          <div>
+            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. Empate</label>
+            <input class="adm-input" id="adm-edit-mult-e" type="number" step="0.1" min="1">
+          </div>
+          <div>
+            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. B</label>
+            <input class="adm-input" id="adm-edit-mult-b" type="number" step="0.1" min="1">
+          </div>
+        </div>
+        <div class="ap-modal-btns">
+          <button class="btn-ap-cancel" onclick="admCerrarEditModal()">Cancelar</button>
+          <button class="btn-ap-confirm" onclick="admGuardarEdicion()">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ERROR 403 -->
   <section class="screen" id="error-403">
@@ -2903,7 +3486,7 @@
     let countdownInterval = null;
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen','comisaria-screen','casino-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'];
 
     function mostrarPantalla(id) {
       screens.forEach(s => {
@@ -2958,6 +3541,14 @@
         panelAdminCard.onclick = () => { abrirSeccion('panel-admin-screen'); paCargarAdmins(); gpCargarPolicias(); };
       } else {
         panelAdminCard.style.display = 'none';
+      }
+
+      // Mostrar card Admin Casino a todos los admins
+      const adminCasinoCard = document.getElementById('admin-casino-card');
+      if (user.esAdmin) {
+        adminCasinoCard.style.display = 'flex';
+      } else {
+        adminCasinoCard.style.display = 'none';
       }
 
       mostrarPantalla('dashboard');
@@ -3733,7 +4324,7 @@
     function mostrarError(tipo) {
       ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen',
        'inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen',
-       'casino-screen','error-403','error-404'].forEach(s => {
+       'casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'].forEach(s => {
         const el = document.getElementById(s);
         if (el) el.classList.remove('active');
       });
@@ -4984,6 +5575,19 @@
     let monedaGirando = false;
     let ruletaAngle = 0; // current rotation of canvas
 
+    // ── Casino Lobby ──────────────────────────────────────────────────────
+    function casinoAbrirJuego(tab) {
+      document.getElementById('casino-lobby-section').style.display = 'none';
+      document.getElementById('casino-tabs-bar').style.display = 'flex';
+      // Ranking y historial siempre visibles debajo
+      casinoTab(tab);
+    }
+    function casinoVolverLobby() {
+      document.getElementById('casino-lobby-section').style.display = 'block';
+      document.getElementById('casino-tabs-bar').style.display = 'none';
+      document.querySelectorAll('.casino-juego').forEach(p => p.classList.remove('visible'));
+    }
+
     // ── Formateo ─────────────────────────────────────────────────────────
     function casinoFmt(n) {
       return '$' + Math.round(n).toLocaleString('es-CL');
@@ -5395,6 +5999,482 @@
           </div>
         `).join('');
       } catch {}
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       APUESTAS DEPORTIVAS — JS completo
+    ═══════════════════════════════════════════════════════════════ */
+    let apSaldo = 0;
+    let apPartidoActivo = null; // partido seleccionado para apostar
+    let apTipoActivo = null;    // 'simple' | 'combinada'
+    let apEleccion = null;      // 'A' | 'B' | 'empate'
+
+    function apFmt(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
+    function apFecha(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+    }
+
+    async function cargarApuestas() {
+      if (!currentUser?.id) return;
+      const el = document.getElementById('apuestas-screen');
+      if (el) el.scrollTop = 0;
+      // Obtener saldo
+      try {
+        const r = await fetch(`/api/banco?action=cuenta&discord_id=${currentUser.id}`);
+        const d = await r.json();
+        if (d.existe) {
+          apSaldo = d.cuenta.saldo;
+          document.getElementById('ap-saldo-val').textContent = apFmt(apSaldo);
+        }
+      } catch {}
+      await apCargarPartidos();
+    }
+
+    function apTab(tab) {
+      document.querySelectorAll('[id^="aptab-"]').forEach(b => b.classList.remove('active'));
+      document.getElementById('aptab-' + tab).classList.add('active');
+      document.getElementById('ap-partidos-section').style.display = tab === 'partidos' ? 'block' : 'none';
+      document.getElementById('ap-historial-section').style.display = tab === 'historial' ? 'block' : 'none';
+      if (tab === 'historial') apCargarHistorialPersonal();
+    }
+
+    async function apCargarPartidos() {
+      const lista = document.getElementById('ap-partidos-lista');
+      lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⏳</div><div class="ap-empty-text">Cargando partidos...</div></div>';
+      try {
+        const r = await fetch('/api/apuestas?action=partidos');
+        const d = await r.json();
+        if (!d.partidos || d.partidos.length === 0) {
+          lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⚽</div><div class="ap-empty-text">No hay partidos disponibles en este momento.</div></div>';
+          return;
+        }
+        lista.innerHTML = d.partidos.map(p => apRenderPartido(p)).join('');
+      } catch {
+        lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⚠️</div><div class="ap-empty-text">Error al cargar partidos.</div></div>';
+      }
+    }
+
+    function apRenderLogo(url, nombre) {
+      if (url) return `<img src="${escHtml(url)}" alt="${escHtml(nombre)}" onerror="this.style.display='none';this.parentElement.textContent='⚽'">`;
+      return '⚽';
+    }
+
+    function apRenderPartido(p) {
+      const estadoClass = 'estado-' + p.estado;
+      const estadoLabel = { activo: '🟢 Abierto', en_curso: '⚡ En curso', finalizado: '🏁 Finalizado', cancelado: '❌ Cancelado' }[p.estado] || p.estado;
+      const ganadorInfo = p.estado === 'finalizado' ? `
+        <div style="text-align:center;font-size:12px;color:rgba(255,255,255,0.4);margin-top:-8px;">
+          ${{A:`🏆 Ganó ${escHtml(p.equipo_a)}`, B:`🏆 Ganó ${escHtml(p.equipo_b)}`, empate:'🤝 Empate'}[p.ganador] || ''}
+        </div>` : '';
+      return `
+      <div class="partido-card">
+        <div class="partido-equipos">
+          <div class="partido-equipo">
+            <div class="equipo-logo">${apRenderLogo(p.logo_a, p.equipo_a)}</div>
+            <div class="equipo-nombre">${escHtml(p.equipo_a)}</div>
+          </div>
+          <div class="partido-vs">
+            <div class="partido-marcador">${p.goles_a} – ${p.goles_b}</div>
+            <div class="partido-estado-badge ${estadoClass}">${estadoLabel}</div>
+          </div>
+          <div class="partido-equipo">
+            <div class="equipo-logo">${apRenderLogo(p.logo_b, p.equipo_b)}</div>
+            <div class="equipo-nombre">${escHtml(p.equipo_b)}</div>
+          </div>
+        </div>
+        ${ganadorInfo}
+        <div class="partido-mults">
+          <div class="mult-pill ${p.estado==='finalizado'&&p.ganador==='A'?'ganador-A':''}">
+            <div class="mult-pill-label">${escHtml(p.equipo_a)}</div>
+            <div class="mult-pill-val">x${p.mult_a.toFixed(1)}</div>
+          </div>
+          <div class="mult-pill ${p.estado==='finalizado'&&p.ganador==='empate'?'ganador-empate':''}">
+            <div class="mult-pill-label">Empate</div>
+            <div class="mult-pill-val">x${p.mult_empate.toFixed(1)}</div>
+          </div>
+          <div class="mult-pill ${p.estado==='finalizado'&&p.ganador==='B'?'ganador-B':''}">
+            <div class="mult-pill-label">${escHtml(p.equipo_b)}</div>
+            <div class="mult-pill-val">x${p.mult_b.toFixed(1)}</div>
+          </div>
+        </div>
+        ${p.estado === 'activo' || p.estado === 'en_curso' ? `
+        <div class="partido-btns">
+          <button class="btn-apostar simple" onclick='abrirModalApuesta(${JSON.stringify(p)}, "simple")'>🎯 Apuesta Simple</button>
+          <button class="btn-apostar combinada" onclick='abrirModalApuesta(${JSON.stringify(p)}, "combinada")'>⭐ Apuesta Combinada</button>
+        </div>` : ''}
+      </div>`;
+    }
+
+    function abrirModalApuesta(partido, tipo) {
+      apPartidoActivo = partido;
+      apTipoActivo = tipo;
+      apEleccion = null;
+
+      document.getElementById('ap-modal-title').textContent = tipo === 'simple' ? '🎯 Apuesta Simple' : '⭐ Apuesta Combinada';
+      document.getElementById('ap-modal-sub').textContent = `${partido.equipo_a} vs ${partido.equipo_b}`;
+      document.getElementById('ap-label-A').textContent = partido.equipo_a;
+      document.getElementById('ap-label-B').textContent = partido.equipo_b;
+      document.getElementById('ap-mult-A').textContent = `x${partido.mult_a.toFixed(1)}`;
+      document.getElementById('ap-mult-empate').textContent = `x${partido.mult_empate.toFixed(1)}`;
+      document.getElementById('ap-mult-B').textContent = `x${partido.mult_b.toFixed(1)}`;
+
+      // Reset
+      ['A','empate','B'].forEach(e => document.getElementById('ap-btn-' + e).className = 'ap-eleccion-btn');
+      document.getElementById('ap-monto-input').value = '';
+      document.getElementById('ap-marc-a').value = '';
+      document.getElementById('ap-marc-b').value = '';
+      document.getElementById('ap-premio-preview').innerHTML = 'Elige un resultado e ingresa el monto para ver el premio estimado.';
+      document.getElementById('ap-btn-confirm').disabled = true;
+      document.getElementById('ap-btn-confirm').className = `btn-ap-confirm ${tipo}`;
+
+      // Mostrar marcador solo en combinada
+      document.getElementById('ap-marcador-section').style.display = tipo === 'combinada' ? 'block' : 'none';
+
+      document.getElementById('ap-modal-overlay').classList.add('open');
+    }
+
+    function cerrarModalApuesta(e) {
+      if (e && e.target !== document.getElementById('ap-modal-overlay')) return;
+      document.getElementById('ap-modal-overlay').classList.remove('open');
+      apPartidoActivo = null; apTipoActivo = null; apEleccion = null;
+    }
+
+    function apElegir(eleccion) {
+      apEleccion = eleccion;
+      ['A','empate','B'].forEach(e => {
+        document.getElementById('ap-btn-' + e).className = 'ap-eleccion-btn' + (e === eleccion ? ' sel-' + e : '');
+      });
+      apActualizarPremio();
+    }
+
+    function apActualizarPremio() {
+      if (!apPartidoActivo) return;
+      const monto = parseInt(document.getElementById('ap-monto-input').value) || 0;
+      const prevEl = document.getElementById('ap-premio-preview');
+      const confirmBtn = document.getElementById('ap-btn-confirm');
+
+      if (!apEleccion || monto <= 0) {
+        prevEl.innerHTML = 'Elige un resultado e ingresa el monto para ver el premio estimado.';
+        confirmBtn.disabled = true;
+        return;
+      }
+
+      const p = apPartidoActivo;
+      const multMap = { A: p.mult_a, empate: p.mult_empate, B: p.mult_b };
+      const mult = multMap[apEleccion] || 1;
+      const premioBase = Math.floor(monto * mult);
+
+      if (apTipoActivo === 'simple') {
+        prevEl.innerHTML = `Si <b>${apEleccion === 'A' ? escHtml(p.equipo_a) : apEleccion === 'B' ? escHtml(p.equipo_b) : 'Empate'}</b> gana, recibirás <b style="color:#fbbf24">${apFmt(premioBase)}</b> (x${mult.toFixed(1)})`;
+      } else {
+        const mA = document.getElementById('ap-marc-a').value;
+        const mB = document.getElementById('ap-marc-b').value;
+        const premioDoble = Math.floor(monto * mult * 2);
+        if (mA !== '' && mB !== '') {
+          prevEl.innerHTML = `Ganador: <b style="color:#fbbf24">${apFmt(premioBase)}</b> (x${mult.toFixed(1)})<br>
+            Si además el marcador es exactamente <b>${mA}–${mB}</b>: <b style="color:#34d399">${apFmt(premioDoble)}</b> (x${(mult*2).toFixed(1)})`;
+        } else {
+          prevEl.innerHTML = `Si gana: <b style="color:#fbbf24">${apFmt(premioBase)}</b> (x${mult.toFixed(1)})<br>
+            <span style="color:rgba(255,255,255,0.35)">Agrega marcador exacto para ganar x${(mult*2).toFixed(1)}</span>`;
+        }
+      }
+
+      confirmBtn.disabled = monto <= 0 || monto > apSaldo;
+    }
+
+    async function confirmarApuesta() {
+      if (!apPartidoActivo || !apEleccion) return;
+      const monto = parseInt(document.getElementById('ap-monto-input').value);
+      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > apSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
+
+      const btn = document.getElementById('ap-btn-confirm');
+      btn.disabled = true; btn.textContent = 'Procesando...';
+
+      const body = {
+        partido_id: apPartidoActivo.id,
+        tipo: apTipoActivo,
+        eleccion: apEleccion,
+        monto,
+      };
+      if (apTipoActivo === 'combinada') {
+        const mA = document.getElementById('ap-marc-a').value;
+        const mB = document.getElementById('ap-marc-b').value;
+        if (mA !== '') body.marcador_a = parseInt(mA);
+        if (mB !== '') body.marcador_b = parseInt(mB);
+      }
+
+      try {
+        const r = await fetch('/api/apuestas?action=apostar', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(body),
+        });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error al apostar.', true); btn.disabled = false; btn.textContent = 'Confirmar apuesta'; return; }
+
+        apSaldo = d.nuevoSaldo;
+        document.getElementById('ap-saldo-val').textContent = apFmt(apSaldo);
+        document.getElementById('ap-modal-overlay').classList.remove('open');
+        mostrarToast('✅ ¡Apuesta registrada! Suerte 🍀');
+        apCargarPartidos();
+      } catch {
+        mostrarToast('Error de conexión.', true);
+        btn.disabled = false; btn.textContent = 'Confirmar apuesta';
+      }
+    }
+
+    async function apCargarHistorialPersonal() {
+      const lista = document.getElementById('ap-historial-lista');
+      lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⏳</div><div class="ap-empty-text">Cargando...</div></div>';
+      try {
+        const r = await fetch('/api/apuestas?action=mi-historial');
+        const d = await r.json();
+        if (!d.apuestas || d.apuestas.length === 0) {
+          lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">📋</div><div class="ap-empty-text">Sin apuestas aún.</div></div>';
+          return;
+        }
+        lista.innerHTML = d.apuestas.map(a => {
+          const iconMap = { ganada: '🏆', perdida: '💸', pendiente: '⏳', cancelada: '↩️' };
+          const eleccionLabel = { A: escHtml(a.equipo_a), B: escHtml(a.equipo_b), empate: 'Empate' }[a.eleccion] || a.eleccion;
+          const marcadorInfo = a.tipo === 'combinada' && a.marcador_a !== null ? ` | Marcador: ${a.marcador_a}–${a.marcador_b}` : '';
+          let amountStr = '';
+          if (a.estado === 'ganada') amountStr = `+${apFmt(a.premio)}`;
+          else if (a.estado === 'perdida') amountStr = `-${apFmt(a.monto)}`;
+          else if (a.estado === 'cancelada') amountStr = `+${apFmt(a.monto)}`;
+          else amountStr = apFmt(a.monto);
+          return `
+          <div class="ap-hist-item">
+            <div class="ap-hist-icon ${a.estado}">${iconMap[a.estado] || '⚽'}</div>
+            <div class="ap-hist-info">
+              <div class="ap-hist-partido">${escHtml(a.equipo_a)} vs ${escHtml(a.equipo_b)}</div>
+              <div class="ap-hist-det">${a.tipo === 'combinada' ? '⭐ Combinada' : '🎯 Simple'} · Elegí: ${eleccionLabel}${marcadorInfo}</div>
+              <div class="ap-hist-det">${apFecha(a.created_at)}${a.acierto_marcador ? ' · 🎯 ¡Marcador exacto!' : ''}</div>
+            </div>
+            <div class="ap-hist-amount">
+              <div class="ap-hist-amount-val ${a.estado}">${amountStr}</div>
+              <div class="ap-hist-amount-sub">Aposté ${apFmt(a.monto)}</div>
+            </div>
+          </div>`;
+        }).join('');
+      } catch {
+        lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⚠️</div><div class="ap-empty-text">Error al cargar historial.</div></div>';
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ADMIN CASINO — JS
+    ═══════════════════════════════════════════════════════════════ */
+    function abrirAdminCasino() {
+      abrirSeccion('admin-casino-screen');
+      admCargarPartidos();
+      admCargarHistorial('todos');
+    }
+
+    async function admCrearPartido() {
+      const equipo_a = document.getElementById('adm-eq-a').value.trim();
+      const equipo_b = document.getElementById('adm-eq-b').value.trim();
+      if (!equipo_a || !equipo_b) { mostrarToast('Ingresa los nombres de ambos equipos.', true); return; }
+      const body = {
+        equipo_a, equipo_b,
+        logo_a: document.getElementById('adm-logo-a').value.trim() || null,
+        logo_b: document.getElementById('adm-logo-b').value.trim() || null,
+        mult_a: parseFloat(document.getElementById('adm-mult-a').value) || 2.0,
+        mult_empate: parseFloat(document.getElementById('adm-mult-e').value) || 3.0,
+        mult_b: parseFloat(document.getElementById('adm-mult-b').value) || 2.0,
+      };
+      try {
+        const r = await fetch('/api/apuestas?action=crear-partido', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error.', true); return; }
+        mostrarToast('✅ Partido creado correctamente.');
+        ['adm-eq-a','adm-eq-b','adm-logo-a','adm-logo-b'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('adm-mult-a').value = '2.0';
+        document.getElementById('adm-mult-e').value = '3.0';
+        document.getElementById('adm-mult-b').value = '2.0';
+        admCargarPartidos();
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+
+    async function admCargarPartidos() {
+      const lista = document.getElementById('adm-partidos-lista');
+      lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⏳</div><div class="ap-empty-text">Cargando...</div></div>';
+      try {
+        const r = await fetch('/api/apuestas?action=todos-partidos');
+        const d = await r.json();
+        if (!d.partidos || d.partidos.length === 0) {
+          lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⚽</div><div class="ap-empty-text">Sin partidos aún.</div></div>';
+          return;
+        }
+        lista.innerHTML = d.partidos.map(p => admRenderPartido(p)).join('');
+      } catch { lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⚠️</div><div class="ap-empty-text">Error.</div></div>'; }
+    }
+
+    function admRenderPartido(p) {
+      const estadoClass = 'estado-' + p.estado;
+      const estadoLabel = { activo:'🟢 Activo', en_curso:'⚡ En Curso', finalizado:'🏁 Finalizado', cancelado:'❌ Cancelado' }[p.estado] || p.estado;
+      const puedeEditar = p.estado !== 'finalizado' && p.estado !== 'cancelado';
+      const puedeAcciones = puedeEditar;
+      return `
+      <div class="adm-partido-card">
+        <div class="adm-partido-header">
+          <div>
+            <div class="adm-partido-teams">${escHtml(p.equipo_a)} <span style="color:rgba(255,255,255,0.3)">vs</span> ${escHtml(p.equipo_b)}</div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:4px;">
+              <span class="partido-estado-badge ${estadoClass}" style="font-size:10px;">${estadoLabel}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.3);">Mults: x${p.mult_a} / x${p.mult_empate} / x${p.mult_b}</span>
+            </div>
+          </div>
+          <div class="adm-partido-score">${p.goles_a} – ${p.goles_b}</div>
+        </div>
+        ${puedeAcciones ? `
+        <div class="adm-marcador-form">
+          <input type="number" min="0" max="99" id="marc-a-${p.id}" value="${p.goles_a}" placeholder="0">
+          <div class="adm-marcador-sep">–</div>
+          <input type="number" min="0" max="99" id="marc-b-${p.id}" value="${p.goles_b}" placeholder="0">
+          <button class="btn-adm warning" onclick="admActualizarMarcador(${p.id})">📊 Actualizar</button>
+          <button class="btn-adm success" onclick="admFinalizarPartido(${p.id})">🏁 Finalizar</button>
+        </div>
+        <div class="adm-partido-actions">
+          <button class="btn-adm ghost" onclick="admAbrirEditar(${p.id}, '${escHtml(p.equipo_a)}','${escHtml(p.equipo_b)}','${p.logo_a||''}','${p.logo_b||''}',${p.mult_a},${p.mult_empate},${p.mult_b})">✏️ Editar</button>
+          <button class="btn-adm warning" onclick="admCancelarPartido(${p.id})">↩️ Cancelar</button>
+          <button class="btn-adm danger" onclick="admEliminarPartido(${p.id})">🗑️ Eliminar</button>
+          <button class="btn-adm ghost" onclick="admVerApuestas(${p.id})">👁 Ver Apuestas</button>
+        </div>` : `
+        <div class="adm-partido-actions">
+          <button class="btn-adm danger" onclick="admEliminarPartido(${p.id})">🗑️ Eliminar</button>
+          <button class="btn-adm ghost" onclick="admVerApuestas(${p.id})">👁 Ver Apuestas</button>
+        </div>`}
+      </div>`;
+    }
+
+    async function admActualizarMarcador(id) {
+      const goles_a = parseInt(document.getElementById('marc-a-'+id).value) || 0;
+      const goles_b = parseInt(document.getElementById('marc-b-'+id).value) || 0;
+      try {
+        const r = await fetch('/api/apuestas?action=marcador', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id, goles_a, goles_b}) });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error.', true); return; }
+        mostrarToast('✅ Marcador actualizado.');
+        admCargarPartidos();
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+
+    async function admFinalizarPartido(id) {
+      const goles_a = parseInt(document.getElementById('marc-a-'+id).value) || 0;
+      const goles_b = parseInt(document.getElementById('marc-b-'+id).value) || 0;
+      if (!confirm(`¿Finalizar el partido con marcador ${goles_a}–${goles_b}?\nEsto resolverá todas las apuestas y pagará a los ganadores.`)) return;
+      try {
+        const r = await fetch('/api/apuestas?action=finalizar', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id, goles_a, goles_b}) });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error.', true); return; }
+        mostrarToast('🏁 Partido finalizado y premios distribuidos.');
+        admCargarPartidos();
+        admCargarHistorial('todos');
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+
+    async function admCancelarPartido(id) {
+      if (!confirm('¿Cancelar el partido? Se devolverán todas las apuestas automáticamente.')) return;
+      try {
+        const r = await fetch('/api/apuestas?action=cancelar', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id}) });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error.', true); return; }
+        mostrarToast('↩️ Partido cancelado y apuestas devueltas.');
+        admCargarPartidos();
+        admCargarHistorial('todos');
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+
+    async function admEliminarPartido(id) {
+      if (!confirm('¿Eliminar este partido? Esta acción no se puede deshacer.')) return;
+      try {
+        const r = await fetch(`/api/apuestas?action=eliminar-partido&id=${id}`, { method:'DELETE' });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error.', true); return; }
+        mostrarToast('🗑️ Partido eliminado.');
+        admCargarPartidos();
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+
+    function admVerApuestas(partido_id) {
+      admCargarHistorial('todos', partido_id);
+      document.getElementById('admin-casino-screen').scrollTo({ top: 9999, behavior: 'smooth' });
+    }
+
+    function admAbrirEditar(id, eqA, eqB, logoA, logoB, mA, mE, mB) {
+      document.getElementById('adm-edit-id').value = id;
+      document.getElementById('adm-edit-sub').textContent = `${eqA} vs ${eqB}`;
+      document.getElementById('adm-edit-eq-a').value = eqA;
+      document.getElementById('adm-edit-eq-b').value = eqB;
+      document.getElementById('adm-edit-logo-a').value = logoA || '';
+      document.getElementById('adm-edit-logo-b').value = logoB || '';
+      document.getElementById('adm-edit-mult-a').value = mA;
+      document.getElementById('adm-edit-mult-e').value = mE;
+      document.getElementById('adm-edit-mult-b').value = mB;
+      document.getElementById('adm-edit-overlay').classList.add('open');
+    }
+    function admCerrarEditModal(e) {
+      if (e && e.target !== document.getElementById('adm-edit-overlay')) return;
+      document.getElementById('adm-edit-overlay').classList.remove('open');
+    }
+    async function admGuardarEdicion() {
+      const body = {
+        id: parseInt(document.getElementById('adm-edit-id').value),
+        equipo_a: document.getElementById('adm-edit-eq-a').value.trim(),
+        equipo_b: document.getElementById('adm-edit-eq-b').value.trim(),
+        logo_a: document.getElementById('adm-edit-logo-a').value.trim() || null,
+        logo_b: document.getElementById('adm-edit-logo-b').value.trim() || null,
+        mult_a: parseFloat(document.getElementById('adm-edit-mult-a').value) || 2.0,
+        mult_empate: parseFloat(document.getElementById('adm-edit-mult-e').value) || 3.0,
+        mult_b: parseFloat(document.getElementById('adm-edit-mult-b').value) || 2.0,
+      };
+      try {
+        const r = await fetch('/api/apuestas?action=editar-partido', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const d = await r.json();
+        if (!r.ok) { mostrarToast(d.error || 'Error.', true); return; }
+        mostrarToast('✅ Partido actualizado.');
+        document.getElementById('adm-edit-overlay').classList.remove('open');
+        admCargarPartidos();
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+
+    async function admCargarHistorial(estado, partido_id) {
+      const tbody = document.getElementById('adm-hist-tbody');
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;">Cargando...</td></tr>';
+      try {
+        let url = '/api/apuestas?action=historial-admin';
+        if (partido_id) url += `&partido_id=${partido_id}`;
+        else if (estado && estado !== 'todos') url += `&estado=${estado}`;
+        const r = await fetch(url);
+        const d = await r.json();
+        if (!d.apuestas || d.apuestas.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;">Sin apuestas.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = d.apuestas.map(a => {
+          const eleccionLabel = { A: escHtml(a.equipo_a), B: escHtml(a.equipo_b), empate: 'Empate' }[a.eleccion] || a.eleccion;
+          const marcador = a.tipo === 'combinada' && a.marcador_a !== null ? `${a.marcador_a}–${a.marcador_b}` : '–';
+          const premioStr = a.premio > 0 ? apFmt(a.premio) : '–';
+          return `<tr>
+            <td style="font-weight:600;color:#fff;font-size:11px;">${escHtml(a.discord_id.slice(0,8))}…</td>
+            <td style="font-size:11px;">${escHtml(a.equipo_a)} vs ${escHtml(a.equipo_b)}</td>
+            <td style="font-size:11px;">${a.tipo === 'combinada' ? '⭐' : '🎯'} ${a.tipo}</td>
+            <td style="color:#fbbf24;font-weight:700;">${apFmt(a.monto)}</td>
+            <td>${eleccionLabel}</td>
+            <td style="font-size:11px;">${marcador}${a.acierto_marcador ? ' 🎯' : ''}</td>
+            <td><span class="hist-badge ${a.estado}">${a.estado}</span></td>
+            <td style="color:#34d399;font-weight:700;">${premioStr}</td>
+          </tr>`;
+        }).join('');
+      } catch { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.2);">Error.</td></tr>'; }
+    }
+
+    function admFiltrarHistorial(estado, btn) {
+      document.querySelectorAll('.hist-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      admCargarHistorial(estado);
     }
 
   </script>
