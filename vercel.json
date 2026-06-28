@@ -5,7 +5,8 @@
     { "source": "/api/dni",       "destination": "/api/dni" },
     { "source": "/api/banco",     "destination": "/api/banco" },
     { "source": "/api/tienda",    "destination": "/api/tienda" },
-    { "source": "/api/admin",     "destination": "/api/admin" },
+    { "source": "/api/admin",      "destination": "/api/admin" },
+    { "source": "/api/comisaria",  "destination": "/api/comisaria" },
     { "source": "/",              "destination": "/public/index.html" }
   ]
 }
