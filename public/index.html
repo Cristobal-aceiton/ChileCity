@@ -1114,7 +1114,7 @@
     /* ══════════════════════════════════════════════════════
        CASINO
     ══════════════════════════════════════════════════════ */
-    #casino-screen { display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    #casino-screen { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
     .casino-container {
       width: 100%; max-width: 720px;
@@ -1131,7 +1131,9 @@
       border: 1px solid rgba(245,158,11,0.25);
       border-radius: 16px; padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between;
-      position: relative; z-index: 2;
+      position: sticky; top: 12px; z-index: 5;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .csb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); font-weight: 700; }
     .csb-valor { font-size: 26px; font-weight: 800; color: #F59E0B; }
@@ -4794,6 +4796,8 @@
     // ── Inicializar casino ────────────────────────────────────────────────
     async function cargarCasino() {
       if (!currentUser?.id) return;
+      const casinoScreenEl = document.getElementById('casino-screen');
+      if (casinoScreenEl) casinoScreenEl.scrollTop = 0;
       try {
         // Obtener saldo del banco
         const res = await fetch(`/api/banco?action=cuenta&discord_id=${currentUser.id}`);
@@ -4814,6 +4818,8 @@
       document.querySelectorAll('.casino-juego').forEach(p => p.classList.remove('visible'));
       document.getElementById('ctab-' + tab).classList.add('active');
       document.getElementById('casino-panel-' + tab).classList.add('visible');
+      const casinoScreenEl = document.getElementById('casino-screen');
+      if (casinoScreenEl) casinoScreenEl.scrollTop = 0;
     }
 
     // ── Elección ─────────────────────────────────────────────────────────
