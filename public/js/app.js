@@ -20,13 +20,70 @@
     }
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'];
+
+    // ── Indicador de sección activa ──────────────────────────────────────────
+    let _sectionIndicatorTimer = null;
+    function mostrarIndicadorSeccion(id) {
+      const labels = {
+        'landing': null,
+        'dashboard': null,
+        'registro-civil': 'Registro Civil',
+        'banco-screen': 'Banco',
+        'admin-screen': 'Admin Banco',
+        'tienda-screen': 'Tienda',
+        'inventario-screen': 'Inventario',
+        'admin-tienda-screen': 'Admin Tienda',
+        'perfil-publico-screen': 'Perfil Público',
+        'panel-admin-screen': 'Panel Admin',
+        'comisaria-screen': 'Comisaría Virtual',
+        'casino-screen': 'Casino',
+        'apuestas-screen': 'Apuestas',
+        'admin-casino-screen': 'Admin Casino',
+      };
+      const label = labels[id];
+      let indicator = document.getElementById('section-indicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'section-indicator';
+        document.body.appendChild(indicator);
+      }
+      if (!label) { indicator.classList.remove('si-visible'); return; }
+      indicator.textContent = label;
+      indicator.classList.add('si-visible');
+      clearTimeout(_sectionIndicatorTimer);
+      _sectionIndicatorTimer = setTimeout(() => indicator.classList.remove('si-visible'), 1800);
+    }
 
     function mostrarPantalla(id) {
+      const prev = screens.find(s => {
+        const el = document.getElementById(s);
+        return el && el.classList.contains('active');
+      });
+      const isDashToSection = prev === 'dashboard' && id !== 'dashboard' && id !== 'landing';
+      const isSectionToDash = id === 'dashboard' && prev !== 'landing';
+
       screens.forEach(s => {
         const el = document.getElementById(s);
-        if (el) el.classList.toggle('active', s === id);
+        if (!el) return;
+        if (s === id) {
+          el.classList.add('active');
+          if (isDashToSection) {
+            el.classList.add('screen-enter');
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => el.classList.remove('screen-enter'));
+            });
+          } else if (isSectionToDash) {
+            el.classList.add('screen-return');
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => el.classList.remove('screen-return'));
+            });
+          }
+        } else {
+          el.classList.remove('active');
+        }
       });
+      mostrarIndicadorSeccion(id);
     }
 
     function volverDashboard() { mostrarPantalla('dashboard'); _navegandoProgramaticamente = true; window.history.pushState({ screen: 'dashboard' }, '', '/'); setTimeout(() => { _navegandoProgramaticamente = false; }, 50); }
