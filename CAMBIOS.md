@@ -53,3 +53,51 @@ un usuario normal solo puede ver la suya aunque cambie ese parámetro.
 - `GET /api/tienda?action=base_datos` sigue siendo público: es el "padrón" de la ciudad,
   tal como estaba diseñado originalmente.
 - SEO / Open Graph / favicon: pediste dejarlo fuera de esta tanda.
+
+---
+
+## v9 — Seguridad, UX y limpieza de código
+
+### 🔴 Seguridad
+
+**Rate limiting en APIs (via base de datos — funciona en serverless):**
+- Casino: 1 jugada cada 3 segundos por usuario
+- Apuestas deportivas: 1 apuesta cada 5 segundos
+- Transferencias bancarias: 1 transferencia cada 10 segundos
+- Todos los cooldowns son configurables con variables de entorno (`RATE_CASINO_SEG`, `RATE_APUESTA_SEG`, `RATE_TRANSFER_SEG`)
+
+**Límites de apuesta en casino:**
+- Mínimo: $1.000 CLP (configurable con `CASINO_MIN_APUESTA`)
+- Máximo: $500.000 CLP (configurable con `CASINO_MAX_APUESTA`)
+
+### 🟡 UX
+
+**Escape para cerrar modales:**  
+Todos los modales (ajustar saldo, resetear cuenta, editar producto, modal de apuesta, editar partido) ahora se cierran con la tecla Escape.
+
+**Favicon y PWA:**
+- `favicon.svg` — ícono visible en pestañas del navegador
+- `manifest.json` — la app se puede "instalar" desde Chrome/Safari en el celular como si fuera una app nativa (tema oscuro, pantalla completa, sin barra de navegación)
+- Meta tags de Apple para iOS
+
+### 🟢 Calidad de código
+
+**Funciones duplicadas eliminadas:**
+- `escHtml()` → definición única en `app.js` (antes duplicada en `tienda.js` como `escHtml` y en `comisaria.js` como `cvEsc`)
+- `formatCLP()` → definición única en `app.js` (antes: `formatearSaldo` en banco/tienda, `apFmt` en apuestas, `casinoFmt` en casino)
+
+**Estado global documentado:**
+- Variables `currentUser`, `currentDNI`, `currentCuenta`, etc. agrupadas con comentario claro
+- Función `resetEstado()` como punto único de reset — usada en logout
+
+**Archivo muerto eliminado:**
+- `Fondo.png` (380KB) — no se usaba en ningún lado
+
+### ⚙️ Configuración
+
+Nuevas variables de entorno opcionales en Vercel (todas tienen valores por defecto razonables):
+- `CASINO_MIN_APUESTA` — apuesta mínima en casino (default: 1000)
+- `CASINO_MAX_APUESTA` — apuesta máxima en casino (default: 500000)
+- `RATE_CASINO_SEG` — cooldown casino en segundos (default: 3)
+- `RATE_APUESTA_SEG` — cooldown apuestas en segundos (default: 5)
+- `RATE_TRANSFER_SEG` — cooldown transferencias en segundos (default: 10)
