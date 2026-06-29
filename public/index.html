@@ -1772,7 +1772,238 @@
   <script src="/js/banco.js"></script>
   <script src="/js/tienda.js"></script>
   <script src="/js/admin-tienda.js"></script>
-  <script src="/js/perfil-publico.js"></script>
+  <script>
+    // PERFIL PÚBLICO
+    // ══════════════════════════════════════════════════════════════════════════
+    let ppRegistros   = [];
+    let ppSearchTimer = null;
+
+    // Debounce en búsqueda con validación en tiempo real
+    (function() {
+      const inp = document.getElementById('pp-search');
+      if (!inp) return;
+      inp.addEventListener('input', () => {
+        clearTimeout(ppSearchTimer);
+        const q = inp.value.trim();
+        // Feedback visual inmediato
+        const clearBtn = document.getElementById('pp-clear');
+        if (clearBtn) clearBtn.style.opacity = q ? '1' : '0';
+        ppSearchTimer = setTimeout(() => cargarPerfilPublico(q), 280);
+      });
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { inp.value = ''; limpiarBusquedaPP(); }
+      });
+    })();
+
+    function limpiarBusquedaPP() {
+      const inp = document.getElementById('pp-search');
+      const clearBtn = document.getElementById('pp-clear');
+      if (inp) inp.value = '';
+      if (clearBtn) clearBtn.style.opacity = '0';
+      cargarPerfilPublico('');
+    }
+
+    async function cargarPerfilPublico(q = '') {
+      if (!currentUser?.id) return;
+      document.getElementById('pp-loading').style.display = 'flex';
+      document.getElementById('pp-lista').innerHTML = '';
+      document.getElementById('pp-stats').style.display = 'none';
+
+      try {
+        const url = `/api/perfil-publico${q ? '?q=' + encodeURIComponent(q) : ''}`;
+        const res  = await fetch(url, { credentials: 'same-origin' });
+        document.getElementById('pp-loading').style.display = 'none';
+        if (res.status === 401) {
+          document.getElementById('pp-lista').innerHTML =
+            '<div class="historial-vacio">Sesión no válida. Cierra sesión y vuelve a entrar.</div>';
+          return;
+        }
+        if (!res.ok) throw new Error('Error ' + res.status);
+        const data = await res.json();
+        ppRegistros = data.registros || [];
+        renderPerfilPublico(ppRegistros);
+      } catch(e) {
+        document.getElementById('pp-loading').style.display = 'none';
+        document.getElementById('pp-lista').innerHTML =
+          '<div class="historial-vacio">Error al cargar el perfil público.</div>';
+      }
+    }
+
+    function renderPerfilPublico(lista) {
+      const el      = document.getElementById('pp-lista');
+      const statsEl = document.getElementById('pp-stats');
+
+      if (!lista.length) {
+        el.innerHTML = '<div class="historial-vacio">No se encontraron ciudadanos.</div>';
+        statsEl.style.display = 'none';
+        return;
+      }
+
+      // Stats
+      const totalItems  = lista.reduce((s, r) => s + r.inventario.length, 0);
+      const totalMultas = lista.reduce((s, r) => s + r.multas.length, 0);
+      const totalAnts   = lista.reduce((s, r) => s + r.antecedentes.length, 0);
+      document.getElementById('pp-total-registros').textContent = lista.length;
+      document.getElementById('pp-total-items').textContent     = totalItems;
+      document.getElementById('pp-total-multas').textContent    = totalMultas;
+      document.getElementById('pp-total-ants').textContent      = totalAnts;
+      statsEl.style.display = 'flex';
+
+      el.innerHTML = lista.map(r => {
+        const nombreCompleto = [r.nombre1, r.nombre2, r.apellido1, r.apellido2].filter(Boolean).join(' ');
+        const apellidos      = [r.apellido1, r.apellido2].filter(Boolean).join(' ');
+        const nombres        = [r.nombre1, r.nombre2].filter(Boolean).join(' ');
+        const fnac           = r.fecha_nac
+          ? (() => { const p = r.fecha_nac.split('-'); return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : r.fecha_nac; })()
+          : '—';
+
+        const invCount  = r.inventario.length;
+        const multCount = r.multas.length;
+        const antCount  = r.antecedentes.length;
+
+        // Badges de alerta
+        const multaBadge = multCount > 0
+          ? `<span class="pp-badge pp-badge-multa">${multCount} multa${multCount!==1?'s':''}</span>` : '';
+        const antBadge = antCount > 0
+          ? `<span class="pp-badge pp-badge-ant">${antCount} antecedente${antCount!==1?'s':''}</span>` : '';
+
+        // Inventario HTML
+        const invHtml = invCount === 0
+          ? '<div class="pp-empty-slot">Sin items en inventario</div>'
+          : r.inventario.map(item => `
+              <div class="pp-inv-item">
+                <div class="pp-inv-img">
+                  ${item.imagen_url
+                    ? `<img src="${escHtml(item.imagen_url)}" alt="${escHtml(item.nombre)}" onerror="this.parentElement.innerHTML='${catEmoji(item.categoria)}';">`
+                    : catEmoji(item.categoria)}
+                </div>
+                <div class="pp-inv-nombre">${escHtml(item.nombre)}</div>
+                <div class="pp-inv-precio">${formatCLP(item.precio_pagado)}</div>
+              </div>`).join('');
+
+        // Multas HTML
+        const multasHtml = multCount === 0
+          ? '<div class="pp-empty-slot">Sin multas registradas</div>'
+          : r.multas.map(m => {
+              const fecha = m.created_at ? new Date(m.created_at).toLocaleDateString('es-CL') : '—';
+              const estado = m.estado === 'pagada'
+                ? '<span class="pp-estado pp-estado-ok">Pagada</span>'
+                : '<span class="pp-estado pp-estado-pend">Pendiente</span>';
+              return `
+              <div class="pp-record-row">
+                <div class="pp-record-main">
+                  <div class="pp-record-titulo">${escHtml(m.motivo)}</div>
+                  <div class="pp-record-meta">${fecha} · ${escHtml(m.funcionario_nombre || 'Sin datos')}</div>
+                </div>
+                <div class="pp-record-right">
+                  <div class="pp-record-valor">${formatCLP(m.valor)}</div>
+                  ${estado}
+                </div>
+              </div>`;
+            }).join('');
+
+        // Antecedentes HTML
+        const antsHtml = antCount === 0
+          ? '<div class="pp-empty-slot">Sin antecedentes registrados</div>'
+          : r.antecedentes.map(a => {
+              const fecha = a.created_at ? new Date(a.created_at).toLocaleDateString('es-CL') : '—';
+              return `
+              <div class="pp-record-row">
+                <div class="pp-record-main">
+                  <div class="pp-record-titulo">${escHtml(a.motivo)}</div>
+                  ${a.articulos ? `<div class="pp-record-arts">${escHtml(a.articulos)}</div>` : ''}
+                  <div class="pp-record-meta">${fecha} · ${escHtml(a.funcionario_nombre || 'Sin datos')}</div>
+                </div>
+                ${a.tiempo_carcel ? `<div class="pp-record-right"><span class="pp-carcel-badge">⏱ ${escHtml(a.tiempo_carcel)}</span></div>` : ''}
+              </div>`;
+            }).join('');
+
+        return `
+          <div class="pp-card" id="ppc-${r.discord_id}">
+            <div class="pp-card-header" onclick="togglePPCard('${r.discord_id}')">
+              <div class="pp-avatar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+              <div class="pp-header-info">
+                <div class="pp-nombre">${escHtml(nombreCompleto)}</div>
+                <div class="pp-rut">${escHtml(r.rut || '—')}</div>
+              </div>
+              <div class="pp-header-badges">
+                ${multaBadge}${antBadge}
+              </div>
+              <div class="pp-header-meta">
+                <span>${fnac}</span>
+                <span>${invCount} item${invCount!==1?'s':''}</span>
+              </div>
+              <svg class="pp-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+
+            <div class="pp-card-body">
+              <!-- Carnet mini -->
+              <div class="pp-carnet-mini">
+                <div class="pp-mini-foto">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </div>
+                <div class="pp-mini-datos">
+                  <div class="pp-mini-campo"><div class="pp-mini-label">Apellidos</div><div class="pp-mini-valor">${escHtml(apellidos)}</div></div>
+                  <div class="pp-mini-campo"><div class="pp-mini-label">Nombres</div><div class="pp-mini-valor">${escHtml(nombres)}</div></div>
+                  <div class="pp-mini-campo"><div class="pp-mini-label">Fecha de Nacimiento</div><div class="pp-mini-valor">${fnac}</div></div>
+                  <div class="pp-mini-campo"><div class="pp-mini-label">R.U.N.</div><div class="pp-mini-valor pp-mini-rut">${escHtml(r.rut || '—')}</div></div>
+                  <div class="pp-mini-campo"><div class="pp-mini-label">Nacionalidad</div><div class="pp-mini-valor">${escHtml(r.nacionalidad || 'Chilena')}</div></div>
+                </div>
+              </div>
+
+              <!-- Tabs de contenido -->
+              <div class="pp-tabs" id="ppt-${r.discord_id}">
+                <button class="pp-tab active" onclick="ppSwitchTab('${r.discord_id}','inv',this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+                  Inventario <span class="pp-tab-count">${invCount}</span>
+                </button>
+                <button class="pp-tab" onclick="ppSwitchTab('${r.discord_id}','multas',this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Multas <span class="pp-tab-count ${multCount>0?'pp-tab-count-alert':''}">${multCount}</span>
+                </button>
+                <button class="pp-tab" onclick="ppSwitchTab('${r.discord_id}','ants',this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Antecedentes <span class="pp-tab-count ${antCount>0?'pp-tab-count-alert':''}">${antCount}</span>
+                </button>
+              </div>
+
+              <div class="pp-tab-panel active" id="pptp-${r.discord_id}-inv">
+                <div class="pp-inv-grid">${invHtml}</div>
+              </div>
+              <div class="pp-tab-panel" id="pptp-${r.discord_id}-multas">
+                <div class="pp-records-list">${multasHtml}</div>
+              </div>
+              <div class="pp-tab-panel" id="pptp-${r.discord_id}-ants">
+                <div class="pp-records-list">${antsHtml}</div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function togglePPCard(id) {
+      const card = document.getElementById(`ppc-${id}`);
+      if (card) card.classList.toggle('open');
+    }
+
+    function ppSwitchTab(cardId, tabName, btn) {
+      // Desactivar todos los tabs y panels de esta card
+      const tabsContainer = document.getElementById(`ppt-${cardId}`);
+      if (!tabsContainer) return;
+      tabsContainer.querySelectorAll('.pp-tab').forEach(t => t.classList.remove('active'));
+
+      ['inv','multas','ants'].forEach(name => {
+        const panel = document.getElementById(`pptp-${cardId}-${name}`);
+        if (panel) panel.classList.remove('active');
+      });
+
+      btn.classList.add('active');
+      const activePanel = document.getElementById(`pptp-${cardId}-${tabName}`);
+      if (activePanel) activePanel.classList.add('active');
+    }
+  </script>
   <script src="/js/panel-admin.js"></script>
   <script src="/js/comisaria.js"></script>
   <script src="/js/casino.js"></script>
