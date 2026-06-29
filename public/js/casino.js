@@ -22,9 +22,6 @@
     }
 
     // ── Formateo ─────────────────────────────────────────────────────────
-    function casinoFmt(n) {
-      return '$' + Math.round(n).toLocaleString('es-CL');
-    }
     function casinoFecha(iso) {
       if (!iso) return '';
       return new Date(iso).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
@@ -41,7 +38,7 @@
         const data = await res.json();
         if (data.existe) {
           casinoSaldo = data.cuenta.saldo;
-          document.getElementById('casino-saldo-val').textContent = casinoFmt(casinoSaldo);
+          document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
         }
       } catch {}
       dibujarRuleta(0);
@@ -83,13 +80,13 @@
         const m = parseInt(document.getElementById('ruleta-monto').value) || 0;
         const el = document.getElementById('ruleta-ganancia-info');
         if (m > 0) {
-          el.innerHTML = `Rojo/Negro: ganas <b style="color:#F59E0B">${casinoFmt(m*2)}</b> &nbsp;|&nbsp; Verde: ganas <b style="color:#4ade80">${casinoFmt(m*14)}</b>`;
+          el.innerHTML = `Rojo/Negro: ganas <b style="color:#F59E0B">${formatCLP(m*2)}</b> &nbsp;|&nbsp; Verde: ganas <b style="color:#4ade80">${formatCLP(m*14)}</b>`;
         } else el.textContent = '';
         actualizarBtnRuleta();
       } else {
         const m = parseInt(document.getElementById('moneda-monto').value) || 0;
         const el = document.getElementById('moneda-ganancia-info');
-        if (m > 0) el.innerHTML = `Si aciertas ganas <b style="color:#F59E0B">${casinoFmt(m*2)}</b>`;
+        if (m > 0) el.innerHTML = `Si aciertas ganas <b style="color:#F59E0B">${formatCLP(m*2)}</b>`;
         else el.textContent = '';
         actualizarBtnMoneda();
       }
@@ -252,15 +249,15 @@
           // Mostrar resultado
           setTimeout(() => {
             casinoSaldo = serverData.nuevoSaldo;
-            document.getElementById('casino-saldo-val').textContent = casinoFmt(casinoSaldo);
+            document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
             const resEl = document.getElementById('ruleta-resultado');
             const emoji = resultadoColor === 'rojo' ? '🔴' : resultadoColor === 'negro' ? '⚫' : '🟢';
             if (serverData.gano) {
               resEl.className = 'casino-resultado gano visible';
-              resEl.innerHTML = `${emoji} ¡Cayó <b>${resultadoColor.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${casinoFmt(serverData.premio)}</span>`;
+              resEl.innerHTML = `${emoji} ¡Cayó <b>${resultadoColor.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio)}</span>`;
             } else {
               resEl.className = 'casino-resultado perdio visible';
-              resEl.innerHTML = `${emoji} Cayó <b>${resultadoColor.toUpperCase()}</b>. Elegiste ${casinoEleccionRuleta.toUpperCase()}.<br>Perdiste ${casinoFmt(monto)}.`;
+              resEl.innerHTML = `${emoji} Cayó <b>${resultadoColor.toUpperCase()}</b>. Elegiste ${casinoEleccionRuleta.toUpperCase()}.<br>Perdiste ${formatCLP(monto)}.`;
             }
             ruletaGirando = false;
             actualizarBtnRuleta();
@@ -312,15 +309,15 @@
 
         casinoSonidoBall();
         casinoSaldo = serverData.nuevoSaldo;
-        document.getElementById('casino-saldo-val').textContent = casinoFmt(casinoSaldo);
+        document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
         const resEl = document.getElementById('moneda-resultado');
         const emoji = resultado === 'cara' ? '🦅' : '🌟';
         if (serverData.gano) {
           resEl.className = 'casino-resultado gano visible';
-          resEl.innerHTML = `${emoji} ¡Cayó <b>${resultado.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${casinoFmt(serverData.premio)}</span>`;
+          resEl.innerHTML = `${emoji} ¡Cayó <b>${resultado.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio)}</span>`;
         } else {
           resEl.className = 'casino-resultado perdio visible';
-          resEl.innerHTML = `${emoji} Cayó <b>${resultado.toUpperCase()}</b>. Elegiste ${casinoEleccionMoneda.toUpperCase()}.<br>Perdiste ${casinoFmt(monto)}.`;
+          resEl.innerHTML = `${emoji} Cayó <b>${resultado.toUpperCase()}</b>. Elegiste ${casinoEleccionMoneda.toUpperCase()}.<br>Perdiste ${formatCLP(monto)}.`;
         }
         monedaGirando = false;
         actualizarBtnMoneda();
@@ -400,7 +397,7 @@
           <div class="ranking-item">
             <div class="ranking-pos ${posClasses[i]}">${posEmoji[i]}</div>
             <div class="ranking-nombre">${escHtml(u.nombre || u.discord_id)}</div>
-            <div class="ranking-ganado">${casinoFmt(u.total_ganado)}</div>
+            <div class="ranking-ganado">${formatCLP(u.total_ganado)}</div>
           </div>
         `).join('');
       } catch {}
@@ -426,8 +423,8 @@
               <div class="ch-det">${casinoFecha(a.created_at)}</div>
             </div>
             <div class="ch-monto">
-              <div class="ch-monto-val ${a.gano ? 'gano' : 'perdio'}">${a.gano ? '+' + casinoFmt(a.premio - a.monto) : '-' + casinoFmt(a.monto)}</div>
-              <div class="ch-monto-fecha">Apostó ${casinoFmt(a.monto)}</div>
+              <div class="ch-monto-val ${a.gano ? 'gano' : 'perdio'}">${a.gano ? '+' + formatCLP(a.premio - a.monto) : '-' + formatCLP(a.monto)}</div>
+              <div class="ch-monto-fecha">Apostó ${formatCLP(a.monto)}</div>
             </div>
           </div>
         `).join('');

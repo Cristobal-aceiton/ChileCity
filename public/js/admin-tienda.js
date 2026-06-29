@@ -37,7 +37,7 @@
               <div class="apr-nombre">${escHtml(p.nombre)}</div>
               <div class="apr-meta">${catLabel(p.categoria)} · ${p.activo ? 'Activo' : 'Inactivo'}</div>
             </div>
-            <div class="apr-precio">${formatearSaldo(p.precio)}</div>
+            <div class="apr-precio">${formatCLP(p.precio)}</div>
             <div class="apr-acciones">
               <button class="btn-small purple" onclick="abrirModalEditar(${JSON.stringify(p).replace(/"/g,'&quot;')})">Editar</button>
               <button class="btn-small red" onclick="adminEliminarProducto(${p.id})">Eliminar</button>
@@ -272,7 +272,7 @@
                     <div class="iai-nombre">${escHtml(item.nombre)}</div>
                     <div class="iai-meta">${catLabel(item.categoria)} · ${fecha}</div>
                   </div>
-                  <div class="iai-precio">${formatearSaldo(item.precio_pagado)}</div>
+                  <div class="iai-precio">${formatCLP(item.precio_pagado)}</div>
                   <button class="btn-small red" onclick="adminEliminarItemInventario(${item.id}, '${discordId}')">Eliminar</button>
                 </div>`;
             }).join('')}

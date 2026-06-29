@@ -66,7 +66,7 @@
                     : catEmoji(item.categoria)}
                 </div>
                 <div class="bd-inv-item-nombre">${escHtml(item.nombre)}</div>
-                <div class="bd-inv-item-precio">${formatearSaldo(item.precio_pagado)}</div>
+                <div class="bd-inv-item-precio">${formatCLP(item.precio_pagado)}</div>
               </div>`).join('');
 
         return `

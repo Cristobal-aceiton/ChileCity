@@ -85,7 +85,7 @@
           <div class="producto-info">
             <div class="producto-nombre">${escHtml(p.nombre)}</div>
             <span class="producto-cat cat-${p.categoria}">${catLabel(p.categoria)}</span>
-            <div class="producto-precio">${formatearSaldo(p.precio)}</div>
+            <div class="producto-precio">${formatCLP(p.precio)}</div>
             <button class="btn-comprar${yaComprado ? ' btn-ya-tienes' : ''}"
               ${yaComprado ? 'disabled title="Ya tienes este producto"' : `onclick="comprarProducto(${p.id}, this)"`}>
               ${yaComprado ? 'Ya tienes' : 'Comprar'}
@@ -109,7 +109,7 @@
         const data = await res.json();
         if (!res.ok) {
           const msg = data.faltante
-            ? `Fondos insuficientes. Te faltan ${formatearSaldo(data.faltante)}.`
+            ? `Fondos insuficientes. Te faltan ${formatCLP(data.faltante)}.`
             : (data.error || 'Error al comprar.');
           mostrarToast(msg, true);
           btn.disabled = false;
@@ -119,9 +119,9 @@
           if (currentCuenta) {
             currentCuenta.saldo = data.nuevoSaldo;
             const saldoEl = document.getElementById('bank-saldo');
-            if (saldoEl) saldoEl.textContent = formatearSaldo(data.nuevoSaldo);
+            if (saldoEl) saldoEl.textContent = formatCLP(data.nuevoSaldo);
           }
-          mostrarToast(`Compra exitosa. Nuevo saldo: ${formatearSaldo(data.nuevoSaldo)}`);
+          mostrarToast(`Compra exitosa. Nuevo saldo: ${formatCLP(data.nuevoSaldo)}`);
           btn.disabled = false;
           btn.textContent = 'Comprar';
         }
@@ -187,9 +187,6 @@
       if (errEl) errEl.classList.add('active');
     }
 
-    function escHtml(str) {
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
-    }
 
     // ══════════════════════════════════════════════════════════════════════════
     // INVENTARIO
@@ -222,7 +219,7 @@
               <div class="inv-info">
                 <div class="inv-nombre">${escHtml(item.nombre)}</div>
                 <span class="producto-cat cat-${item.categoria}">${catLabel(item.categoria)}</span>
-                <div class="inv-precio">Pagado: ${formatearSaldo(item.precio_pagado)}</div>
+                <div class="inv-precio">Pagado: ${formatCLP(item.precio_pagado)}</div>
                 <div class="inv-fecha">${fecha}</div>
               </div>
             </div>`;

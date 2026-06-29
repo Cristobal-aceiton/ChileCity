@@ -36,7 +36,7 @@
         } catch(e){}
 
         mostrarTarjeta(data.cuenta, dniData.dni);
-        document.getElementById('bank-saldo').textContent = formatearSaldo(data.cuenta.saldo);
+        document.getElementById('bank-saldo').textContent = formatCLP(data.cuenta.saldo);
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
 
         // Próximo sueldo
@@ -60,9 +60,6 @@
       }
     }
 
-    function formatearSaldo(n) {
-      return '$' + Number(n).toLocaleString('es-CL');
-    }
 
     function iniciarCountdown(ps) {
       const box = document.getElementById('proximo-sueldo-box');
@@ -117,7 +114,7 @@
         currentCuenta = data.cuenta;
         document.getElementById('banco-crear-form').style.display = 'none';
         document.getElementById('banco-loading').style.display = 'none';
-        document.getElementById('bank-saldo').textContent = formatearSaldo(data.cuenta.saldo);
+        document.getElementById('bank-saldo').textContent = formatCLP(data.cuenta.saldo);
         if (currentDNI) mostrarTarjeta(data.cuenta, currentDNI);
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
         document.getElementById('proximo-sueldo-box').style.display = 'none';
@@ -162,8 +159,8 @@
           errEl.classList.add('visible');
         } else {
           currentCuenta.saldo = data.nuevoSaldo;
-          document.getElementById('bank-saldo').textContent = formatearSaldo(data.nuevoSaldo);
-          okEl.textContent = `Transferencia exitosa. Nuevo saldo: ${formatearSaldo(data.nuevoSaldo)}`;
+          document.getElementById('bank-saldo').textContent = formatCLP(data.nuevoSaldo);
+          okEl.textContent = `Transferencia exitosa. Nuevo saldo: ${formatCLP(data.nuevoSaldo)}`;
           okEl.classList.add('visible');
           document.getElementById('transfer-rut').value = '';
           document.getElementById('transfer-monto').value = '';
@@ -204,7 +201,7 @@
               <div class="hi-desc-titulo">${t.descripcion || t.tipo}</div>
               <div class="hi-desc-fecha">${fecha}</div>
             </div>
-            <div class="hi-monto ${t.tipo}">${signo}${formatearSaldo(t.monto)}</div>
+            <div class="hi-monto ${t.tipo}">${signo}${formatCLP(t.monto)}</div>
           </div>`;
         }).join('');
       } catch(e) {
@@ -244,7 +241,7 @@
               <div class="ur-nombre">${u.nombre1 || '?'} ${u.apellido1 || ''}</div>
               <div class="ur-rut">${u.rut || u.discord_id}</div>
             </div>
-            <div class="ur-saldo">${formatearSaldo(u.saldo)}</div>
+            <div class="ur-saldo">${formatCLP(u.saldo)}</div>
             <div class="ur-acciones">
               <button class="btn-small purple" onclick="abrirModalSaldo('${u.discord_id}','${u.nombre1} ${u.apellido1}')">
                 Ajustar
@@ -361,7 +358,7 @@
           <div class="sueldo-item">
             <div class="si-info">
               <div class="si-nombre">${s.nombre}</div>
-              <div class="si-detalle">${formatearSaldo(s.monto)} cada ${s.dias} día(s)</div>
+              <div class="si-detalle">${formatCLP(s.monto)} cada ${s.dias} día(s)</div>
             </div>
             <button class="btn-small red" onclick="adminEliminarSueldo(${s.id})">Quitar</button>
           </div>

@@ -2,12 +2,22 @@
     // Admin; la autorización real ya se valida en el servidor con la sesión) ──
     const SUPER_ADMIN_ID = "1192236737565577287";
 
-    // ── Estado global ─────────────────────────────────────────────────────────
-    let currentUser = null;
-    let currentDNI  = null;
-    let currentCuenta = null;
-    let adminTargetUser = null;
-    let countdownInterval = null;
+    // ── Estado global de sesión ───────────────────────────────────────────────
+    // Todas las variables de sesión viven aquí. Para resetear la sesión completa
+    // usa resetEstado() — no las borres una por una en distintos archivos.
+    let currentUser     = null;  // objeto Discord del usuario logueado
+    let currentDNI      = null;  // datos del carnet (dni, nombre, etc.)
+    let currentCuenta   = null;  // datos de la cuenta bancaria
+    let adminTargetUser = null;  // usuario objetivo en panel admin banco
+    let countdownInterval = null; // intervalo del countdown de sueldo
+
+    function resetEstado() {
+      currentUser = null;
+      currentDNI  = null;
+      currentCuenta = null;
+      adminTargetUser = null;
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    }
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
     const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'];
@@ -83,7 +93,7 @@
     }
 
     function goToLanding() {
-      currentUser = null; currentDNI = null; currentCuenta = null;
+      resetEstado();
       // La sesión ahora vive en una cookie httpOnly del servidor; se cierra
       // pidiéndole al servidor que la borre (antes solo se borraba un dato
       // en localStorage, que ni siquiera era la fuente real de verdad).
@@ -152,3 +162,39 @@
       goToLanding();
     });
 
+
+    // ── Utilidades globales ──────────────────────────────────────────────────
+    // Función única de escape HTML (antes: escHtml en tienda/admin-tienda,
+    // cvEsc en comisaria — ahora una sola definición global)
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Función única de formato de pesos CLP (antes: formatearSaldo, apFmt, casinoFmt)
+    function formatCLP(n) {
+      return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
+    }
+
+    // ── Cerrar modales con Escape ────────────────────────────────────────────
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      // Modales de banco/admin (clase admin-modal-overlay con toggle 'visible')
+      ['modal-saldo', 'modal-reset', 'modal-editar-prod'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.classList.contains('visible')) el.classList.remove('visible');
+      });
+      // Modal de apuesta deportiva
+      const apModal = document.getElementById('ap-modal-overlay');
+      if (apModal && apModal.classList.contains('open')) {
+        apModal.classList.remove('open');
+        if (typeof apPartidoActivo !== 'undefined') { apPartidoActivo = null; apTipoActivo = null; apEleccion = null; }
+      }
+      // Modal editar partido (admin casino)
+      const admModal = document.getElementById('adm-edit-overlay');
+      if (admModal && admModal.classList.contains('open')) admModal.classList.remove('open');
+    });

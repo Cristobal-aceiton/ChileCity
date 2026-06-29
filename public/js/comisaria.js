@@ -109,16 +109,16 @@
           const estadoColor = m.estado === 'pagada' ? '#4ade80' : '#fbbf24';
           card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-              <span style="font-weight:700;color:#fff;font-size:15px;">${cvEsc(m.motivo)}</span>
+              <span style="font-weight:700;color:#fff;font-size:15px;">${escHtml(m.motivo)}</span>
               <span style="background:rgba(0,0,0,0.3);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:600;color:${estadoColor};">${m.estado.toUpperCase()}</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:13px;color:rgba(255,255,255,0.55);">
               <span>💰 Valor: <b style="color:#fbbf24;">$${Number(m.valor).toLocaleString('es-CL')}</b></span>
               <span>📅 Emitida: ${cvFecha(m.created_at)}</span>
               <span>⏰ Vence: ${m.fecha_limite}</span>
-              <span>👮 ${cvEsc(m.funcionario_nombre || m.funcionario_id)}</span>
+              <span>👮 ${escHtml(m.funcionario_nombre || m.funcionario_id)}</span>
             </div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${cvEsc(m.funcionario_id)}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${escHtml(m.funcionario_id)}</div>
           `;
           lista.appendChild(card);
         });
@@ -146,19 +146,19 @@
           const card = document.createElement('div');
           card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;display:flex;gap:16px;';
           const fotoHtml = a.foto_url
-            ? `<img src="${cvEsc(a.foto_url)}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;" onerror="this.style.display='none'">`
+            ? `<img src="${escHtml(a.foto_url)}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;" onerror="this.style.display='none'">`
             : `<div style="width:72px;height:72px;background:rgba(255,255,255,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;">📷</div>`;
           card.innerHTML = `
             ${fotoHtml}
             <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
-              <span style="font-weight:700;color:#f87171;font-size:15px;">${cvEsc(a.motivo)}</span>
+              <span style="font-weight:700;color:#f87171;font-size:15px;">${escHtml(a.motivo)}</span>
               <div style="font-size:13px;color:rgba(255,255,255,0.55);display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
-                <span>📜 Artículos: ${cvEsc(a.articulos || '—')}</span>
-                <span>⏱ Cárcel: ${cvEsc(a.tiempo_carcel || '—')}</span>
+                <span>📜 Artículos: ${escHtml(a.articulos || '—')}</span>
+                <span>⏱ Cárcel: ${escHtml(a.tiempo_carcel || '—')}</span>
                 <span>📅 Fecha: ${cvFecha(a.created_at)}</span>
-                <span>👮 ${cvEsc(a.funcionario_nombre || a.funcionario_id)}</span>
+                <span>👮 ${escHtml(a.funcionario_nombre || a.funcionario_id)}</span>
               </div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${cvEsc(a.funcionario_id)}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${escHtml(a.funcionario_id)}</div>
             </div>
           `;
           lista.appendChild(card);
@@ -218,7 +218,7 @@
         data.ciudadanos.forEach(c => {
           const row = document.createElement('div');
           row.style.cssText = 'padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;color:#fff;';
-          row.innerHTML = `<b>${cvEsc(c.nombre_completo)}</b> <span style="color:rgba(255,255,255,0.4);">DNI: ${cvEsc(c.dni || '—')}</span>`;
+          row.innerHTML = `<b>${escHtml(c.nombre_completo)}</b> <span style="color:rgba(255,255,255,0.4);">DNI: ${escHtml(c.dni || '—')}</span>`;
           row.onmouseenter = () => { row.style.background = 'rgba(255,255,255,0.07)'; };
           row.onmouseleave = () => { row.style.background = ''; };
           row.onclick = () => {
@@ -293,10 +293,10 @@
           const estadoColor = m.estado === 'pagada' ? '#4ade80' : '#fbbf24';
           card.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:200px;">
-              <b style="color:#fff;">${cvEsc(m.ciudadano_nombre || m.ciudadano_id)}</b>
-              <span style="font-size:12px;color:rgba(255,255,255,0.4);">DNI: ${cvEsc(m.ciudadano_dni || '—')} · ID: ${cvEsc(m.ciudadano_id)}</span>
-              <span style="font-size:13px;color:rgba(255,255,255,0.7);">${cvEsc(m.motivo)}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.35);">👮 ${cvEsc(m.funcionario_nombre || m.funcionario_id)} · 📅 ${cvFecha(m.created_at)}</span>
+              <b style="color:#fff;">${escHtml(m.ciudadano_nombre || m.ciudadano_id)}</b>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);">DNI: ${escHtml(m.ciudadano_dni || '—')} · ID: ${escHtml(m.ciudadano_id)}</span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.7);">${escHtml(m.motivo)}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.35);">👮 ${escHtml(m.funcionario_nombre || m.funcionario_id)} · 📅 ${cvFecha(m.created_at)}</span>
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
               <span style="color:${estadoColor};font-weight:700;font-size:13px;">${m.estado.toUpperCase()}</span>
@@ -369,16 +369,16 @@
           const card = document.createElement('div');
           card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;gap:14px;flex-wrap:wrap;';
           const fotoHtml = a.foto_url
-            ? `<img src="${cvEsc(a.foto_url)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`
+            ? `<img src="${escHtml(a.foto_url)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`
             : '';
           card.innerHTML = `
             ${fotoHtml}
             <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:5px;">
-              <b style="color:#fff;">${cvEsc(a.ciudadano_nombre || a.ciudadano_id)}</b>
-              <span style="font-size:12px;color:rgba(255,255,255,0.4);">DNI: ${cvEsc(a.ciudadano_dni || '—')} · ID: ${cvEsc(a.ciudadano_id)}</span>
-              <span style="font-size:13px;color:#f87171;">${cvEsc(a.motivo)}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.4);">📜 ${cvEsc(a.articulos || '—')} · ⏱ ${cvEsc(a.tiempo_carcel || '—')}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.3);">👮 ${cvEsc(a.funcionario_nombre || a.funcionario_id)} · 📅 ${cvFecha(a.created_at)}</span>
+              <b style="color:#fff;">${escHtml(a.ciudadano_nombre || a.ciudadano_id)}</b>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);">DNI: ${escHtml(a.ciudadano_dni || '—')} · ID: ${escHtml(a.ciudadano_id)}</span>
+              <span style="font-size:13px;color:#f87171;">${escHtml(a.motivo)}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);">📜 ${escHtml(a.articulos || '—')} · ⏱ ${escHtml(a.tiempo_carcel || '—')}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.3);">👮 ${escHtml(a.funcionario_nombre || a.funcionario_id)} · 📅 ${cvFecha(a.created_at)}</span>
             </div>
             <div style="display:flex;align-items:flex-start;">
               <button onclick="cvEliminarAntecedente(${a.id}, this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:5px 12px;color:#f87171;font-size:12px;cursor:pointer;">Eliminar</button>
@@ -423,13 +423,13 @@
           card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
               <div>
-                <b style="color:#fff;">${cvEsc(d.motivo)}</b>
-                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">📣 ${cvEsc(d.denunciante_nombre || d.denunciante_id)} · ID: ${cvEsc(d.denunciante_id)} · 📅 ${cvFecha(d.created_at)}</div>
+                <b style="color:#fff;">${escHtml(d.motivo)}</b>
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">📣 ${escHtml(d.denunciante_nombre || d.denunciante_id)} · ID: ${escHtml(d.denunciante_id)} · 📅 ${cvFecha(d.created_at)}</div>
               </div>
               <button onclick="cvEliminarDenuncia(${d.id}, this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:5px 12px;color:#f87171;font-size:12px;cursor:pointer;flex-shrink:0;">Eliminar</button>
             </div>
-            <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.5;">${cvEsc(d.descripcion)}</p>
-            ${d.evidencia_url ? `<a href="${cvEsc(d.evidencia_url)}" target="_blank" style="color:#38bdf8;font-size:12px;">🔗 Ver evidencia</a>` : ''}
+            <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.5;">${escHtml(d.descripcion)}</p>
+            ${d.evidencia_url ? `<a href="${escHtml(d.evidencia_url)}" target="_blank" style="color:#38bdf8;font-size:12px;">🔗 Ver evidencia</a>` : ''}
           `;
           lista.appendChild(card);
         });
@@ -470,9 +470,9 @@
           const accionColor = l.accion.includes('ELIMINAR') ? '#f87171' : l.accion.includes('REVOCAR') ? '#fbbf24' : '#4ade80';
           row.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:200px;">
-              <span style="font-size:13px;font-weight:700;color:${accionColor};">${cvEsc(l.accion)}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.55);">${cvEsc(l.detalle || '')}</span>
-              <span style="font-size:11px;color:rgba(255,255,255,0.25);">👤 ${cvEsc(l.usuario_nombre || l.usuario_id)} · ID: ${cvEsc(l.usuario_id)}</span>
+              <span style="font-size:13px;font-weight:700;color:${accionColor};">${escHtml(l.accion)}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.55);">${escHtml(l.detalle || '')}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.25);">👤 ${escHtml(l.usuario_nombre || l.usuario_id)} · ID: ${escHtml(l.usuario_id)}</span>
             </div>
             <span style="font-size:11px;color:rgba(255,255,255,0.3);white-space:nowrap;">${cvFecha(l.created_at)}</span>
           `;
@@ -577,11 +577,11 @@
           row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.15);border-radius:10px;gap:12px;flex-wrap:wrap;';
           row.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <b style="color:#38bdf8;">${cvEsc(p.nombre || '—')}</b>
-              <span style="font-size:12px;color:rgba(255,255,255,0.4);">ID: ${cvEsc(p.discord_id)}</span>
-              <span style="font-size:11px;color:rgba(255,255,255,0.25);">Autorizado por: ${cvEsc(p.autorizado_por_nombre || p.autorizado_por_id)} · ${cvFecha(p.created_at)}</span>
+              <b style="color:#38bdf8;">${escHtml(p.nombre || '—')}</b>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);">ID: ${escHtml(p.discord_id)}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.25);">Autorizado por: ${escHtml(p.autorizado_por_nombre || p.autorizado_por_id)} · ${cvFecha(p.created_at)}</span>
             </div>
-            <button onclick="gpRevocar('${cvEsc(p.discord_id)}', this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:6px 14px;color:#f87171;font-size:12px;cursor:pointer;flex-shrink:0;">Revocar</button>
+            <button onclick="gpRevocar('${escHtml(p.discord_id)}', this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:6px 14px;color:#f87171;font-size:12px;cursor:pointer;flex-shrink:0;">Revocar</button>
           `;
           lista.appendChild(row);
         });
@@ -625,10 +625,6 @@
     }
 
     // Helpers
-    function cvEsc(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
     function cvFecha(iso) {
       if (!iso) return '—';
       return new Date(iso).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });

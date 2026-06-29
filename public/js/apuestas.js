@@ -1,4 +1,3 @@
-    function apFmt(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
     function apFecha(iso) {
       if (!iso) return '';
       return new Date(iso).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
@@ -14,7 +13,7 @@
         const d = await r.json();
         if (d.existe) {
           apSaldo = d.cuenta.saldo;
-          document.getElementById('ap-saldo-val').textContent = apFmt(apSaldo);
+          document.getElementById('ap-saldo-val').textContent = formatCLP(apSaldo);
         }
       } catch {}
       await apCargarPartidos();
@@ -155,16 +154,16 @@
       const premioBase = Math.floor(monto * mult);
 
       if (apTipoActivo === 'simple') {
-        prevEl.innerHTML = `Si <b>${apEleccion === 'A' ? escHtml(p.equipo_a) : apEleccion === 'B' ? escHtml(p.equipo_b) : 'Empate'}</b> gana, recibirás <b style="color:#fbbf24">${apFmt(premioBase)}</b> (x${mult.toFixed(1)})`;
+        prevEl.innerHTML = `Si <b>${apEleccion === 'A' ? escHtml(p.equipo_a) : apEleccion === 'B' ? escHtml(p.equipo_b) : 'Empate'}</b> gana, recibirás <b style="color:#fbbf24">${formatCLP(premioBase)}</b> (x${mult.toFixed(1)})`;
       } else {
         const mA = document.getElementById('ap-marc-a').value;
         const mB = document.getElementById('ap-marc-b').value;
         const premioDoble = Math.floor(monto * mult * 2);
         if (mA !== '' && mB !== '') {
-          prevEl.innerHTML = `Ganador: <b style="color:#fbbf24">${apFmt(premioBase)}</b> (x${mult.toFixed(1)})<br>
-            Si además el marcador es exactamente <b>${mA}–${mB}</b>: <b style="color:#34d399">${apFmt(premioDoble)}</b> (x${(mult*2).toFixed(1)})`;
+          prevEl.innerHTML = `Ganador: <b style="color:#fbbf24">${formatCLP(premioBase)}</b> (x${mult.toFixed(1)})<br>
+            Si además el marcador es exactamente <b>${mA}–${mB}</b>: <b style="color:#34d399">${formatCLP(premioDoble)}</b> (x${(mult*2).toFixed(1)})`;
         } else {
-          prevEl.innerHTML = `Si gana: <b style="color:#fbbf24">${apFmt(premioBase)}</b> (x${mult.toFixed(1)})<br>
+          prevEl.innerHTML = `Si gana: <b style="color:#fbbf24">${formatCLP(premioBase)}</b> (x${mult.toFixed(1)})<br>
             <span style="color:rgba(255,255,255,0.35)">Agrega marcador exacto para ganar x${(mult*2).toFixed(1)}</span>`;
         }
       }
@@ -204,7 +203,7 @@
         if (!r.ok) { mostrarToast(d.error || 'Error al apostar.', true); btn.disabled = false; btn.textContent = 'Confirmar apuesta'; return; }
 
         apSaldo = d.nuevoSaldo;
-        document.getElementById('ap-saldo-val').textContent = apFmt(apSaldo);
+        document.getElementById('ap-saldo-val').textContent = formatCLP(apSaldo);
         document.getElementById('ap-modal-overlay').classList.remove('open');
         mostrarToast('✅ ¡Apuesta registrada! Suerte 🍀');
         apCargarPartidos();
@@ -229,10 +228,10 @@
           const eleccionLabel = { A: escHtml(a.equipo_a), B: escHtml(a.equipo_b), empate: 'Empate' }[a.eleccion] || a.eleccion;
           const marcadorInfo = a.tipo === 'combinada' && a.marcador_a !== null ? ` | Marcador: ${a.marcador_a}–${a.marcador_b}` : '';
           let amountStr = '';
-          if (a.estado === 'ganada') amountStr = `+${apFmt(a.premio)}`;
-          else if (a.estado === 'perdida') amountStr = `-${apFmt(a.monto)}`;
-          else if (a.estado === 'cancelada') amountStr = `+${apFmt(a.monto)}`;
-          else amountStr = apFmt(a.monto);
+          if (a.estado === 'ganada') amountStr = `+${formatCLP(a.premio)}`;
+          else if (a.estado === 'perdida') amountStr = `-${formatCLP(a.monto)}`;
+          else if (a.estado === 'cancelada') amountStr = `+${formatCLP(a.monto)}`;
+          else amountStr = formatCLP(a.monto);
           return `
           <div class="ap-hist-item">
             <div class="ap-hist-icon ${a.estado}">${iconMap[a.estado] || '⚽'}</div>
@@ -243,7 +242,7 @@
             </div>
             <div class="ap-hist-amount">
               <div class="ap-hist-amount-val ${a.estado}">${amountStr}</div>
-              <div class="ap-hist-amount-sub">Aposté ${apFmt(a.monto)}</div>
+              <div class="ap-hist-amount-sub">Aposté ${formatCLP(a.monto)}</div>
             </div>
           </div>`;
         }).join('');
@@ -445,12 +444,12 @@
         tbody.innerHTML = d.apuestas.map(a => {
           const eleccionLabel = { A: escHtml(a.equipo_a), B: escHtml(a.equipo_b), empate: 'Empate' }[a.eleccion] || a.eleccion;
           const marcador = a.tipo === 'combinada' && a.marcador_a !== null ? `${a.marcador_a}–${a.marcador_b}` : '–';
-          const premioStr = a.premio > 0 ? apFmt(a.premio) : '–';
+          const premioStr = a.premio > 0 ? formatCLP(a.premio) : '–';
           return `<tr>
             <td style="font-weight:600;color:#fff;font-size:11px;">${escHtml(a.discord_id.slice(0,8))}…</td>
             <td style="font-size:11px;">${escHtml(a.equipo_a)} vs ${escHtml(a.equipo_b)}</td>
             <td style="font-size:11px;">${a.tipo === 'combinada' ? '⭐' : '🎯'} ${a.tipo}</td>
-            <td style="color:#fbbf24;font-weight:700;">${apFmt(a.monto)}</td>
+            <td style="color:#fbbf24;font-weight:700;">${formatCLP(a.monto)}</td>
             <td>${eleccionLabel}</td>
             <td style="font-size:11px;">${marcador}${a.acierto_marcador ? ' 🎯' : ''}</td>
             <td><span class="hist-badge ${a.estado}">${a.estado}</span></td>
