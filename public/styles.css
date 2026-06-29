@@ -1531,6 +1531,226 @@
     .clc-badge.nuevo { background: rgba(99,102,241,0.15); color: #a5b4fc; border-color: rgba(99,102,241,0.3); }
 
     /* ══════════════════════════════════════════════════════
+       CASINO PRO — Betano-style overrides
+    ══════════════════════════════════════════════════════ */
+
+    /* Header del casino - brand premium */
+    .seccion-title svg { filter: drop-shadow(0 0 8px rgba(245,158,11,0.6)); }
+
+    /* Saldo banner mejorado */
+    .casino-saldo-banner {
+      background: linear-gradient(135deg, rgba(15,10,5,0.95) 0%, rgba(30,20,5,0.98) 100%) !important;
+      border: 1px solid rgba(245,158,11,0.35) !important;
+      border-radius: 14px !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .casino-saldo-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245,158,11,0.8), transparent);
+    }
+    .csb-valor {
+      font-family: 'Bebas Neue', sans-serif !important;
+      font-size: 32px !important;
+      letter-spacing: 1px;
+      text-shadow: 0 0 20px rgba(245,158,11,0.5);
+    }
+    .csb-mono {
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 700;
+      color: rgba(245,158,11,0.7) !important;
+      font-size: 11px !important;
+      letter-spacing: 1.5px;
+    }
+
+    /* Tabs estilo casino profesional */
+    .casino-tabs {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .casino-tab {
+      border-radius: 10px !important;
+      border: none !important;
+      background: transparent !important;
+      color: rgba(255,255,255,0.4) !important;
+      font-size: 11px !important;
+      letter-spacing: 0.8px !important;
+      padding: 11px 8px !important;
+    }
+    .casino-tab.active {
+      background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(220,120,0,0.15)) !important;
+      border: none !important;
+      color: #F59E0B !important;
+      box-shadow: none !important;
+    }
+    .casino-tab:hover:not(.active) {
+      background: rgba(255,255,255,0.06) !important;
+      color: rgba(255,255,255,0.7) !important;
+    }
+
+    /* Lobby de juegos - estilo Betano */
+    .casino-lobby {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 12px !important;
+    }
+    .casino-lobby-card {
+      background: linear-gradient(160deg, rgba(20,16,10,0.9) 0%, rgba(12,10,5,0.95) 100%) !important;
+      border: 1px solid rgba(255,255,255,0.07) !important;
+      border-radius: 14px !important;
+      padding: 24px 16px !important;
+      transition: all 0.2s ease !important;
+    }
+    .casino-lobby-card:hover {
+      border-color: var(--clc-border, rgba(245,158,11,0.5)) !important;
+      background: linear-gradient(160deg, rgba(30,22,8,0.95) 0%, rgba(20,14,4,0.98) 100%) !important;
+      box-shadow: 0 0 0 1px var(--clc-border, rgba(245,158,11,0.3)), 0 12px 40px rgba(0,0,0,0.5) !important;
+      transform: translateY(-2px) !important;
+    }
+    .clc-emoji {
+      width: 52px !important; height: 52px !important;
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .clc-title { font-size: 14px !important; font-weight: 800 !important; letter-spacing: 0.3px !important; }
+    .clc-sub { font-size: 10px !important; color: rgba(255,255,255,0.35) !important; }
+
+    /* Bet form premium */
+    .casino-bet-form input[type="number"] {
+      background: rgba(0,0,0,0.4) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      border-radius: 10px !important;
+      font-size: 18px !important;
+      padding: 14px 18px !important;
+      color: #fff !important;
+    }
+    .casino-bet-form input[type="number"]:focus {
+      border-color: rgba(245,158,11,0.6) !important;
+      background: rgba(0,0,0,0.5) !important;
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.1) !important;
+    }
+
+    /* Opciones de apuesta - más premium */
+    .casino-opcion {
+      background: rgba(0,0,0,0.35) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      border-radius: 10px !important;
+      padding: 16px 6px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.3px !important;
+    }
+    .casino-opcion:hover:not([class*="sel-"]) {
+      background: rgba(255,255,255,0.07) !important;
+      border-color: rgba(255,255,255,0.18) !important;
+    }
+    .casino-opcion span.co-emoji { font-size: 0 !important; line-height: 0; } /* reset size, SVG handles it */
+    .casino-opcion span.co-emoji svg { width: 26px; height: 26px; }
+
+    /* Botón apostar - Betano green/gold CTA */
+    .btn-casino {
+      background: linear-gradient(135deg, #b45309 0%, #d97706 40%, #F59E0B 70%, #fbbf24 100%) !important;
+      border-radius: 12px !important;
+      padding: 18px !important;
+      font-size: 14px !important;
+      font-weight: 900 !important;
+      letter-spacing: 2px !important;
+      box-shadow: 0 4px 24px rgba(245,158,11,0.3), 0 0 0 1px rgba(245,158,11,0.2) !important;
+      text-transform: uppercase !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-casino::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .btn-casino:hover::after { left: 150%; }
+    .btn-casino:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 36px rgba(245,158,11,0.45), 0 0 0 1px rgba(245,158,11,0.3) !important;
+    }
+
+    /* Avión display - cockpit style */
+    #avion-display {
+      background: linear-gradient(180deg, rgba(0,20,40,0.95) 0%, rgba(0,8,16,0.98) 100%) !important;
+      border: 1px solid rgba(6,182,212,0.25) !important;
+      border-radius: 20px !important;
+      position: relative;
+      overflow: hidden;
+    }
+    #avion-display::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 60%;
+      background: radial-gradient(ellipse at 50% -20%, rgba(6,182,212,0.08), transparent 70%);
+      pointer-events: none;
+    }
+    #avion-mult-display {
+      font-family: 'Bebas Neue', 'Inter', sans-serif !important;
+      letter-spacing: 2px !important;
+      text-shadow: 0 0 30px rgba(6,182,212,0.8), 0 0 60px rgba(6,182,212,0.4) !important;
+    }
+    /* Animated grid lines in avion panel */
+    #avion-pista {
+      background: repeating-linear-gradient(90deg, rgba(6,182,212,0.12) 0px, rgba(6,182,212,0.12) 1px, transparent 1px, transparent 40px) !important;
+      height: 1px !important;
+    }
+
+    /* Resultado premium */
+    .casino-resultado.gano {
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.08)) !important;
+      border: 1px solid rgba(16,185,129,0.4) !important;
+      box-shadow: 0 0 20px rgba(16,185,129,0.1) !important;
+    }
+    .casino-resultado.perdio {
+      background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(185,28,28,0.08)) !important;
+      border: 1px solid rgba(239,68,68,0.4) !important;
+    }
+
+    /* Mult info badges */
+    .casino-mult-info {
+      background: rgba(0,0,0,0.3) !important;
+      border: 1px solid rgba(255,255,255,0.06) !important;
+      border-radius: 10px !important;
+    }
+
+    /* Ranking premium */
+    .casino-ranking, .casino-historial {
+      background: linear-gradient(160deg, rgba(10,8,4,0.9) 0%, rgba(5,4,2,0.95) 100%) !important;
+      border: 1px solid rgba(255,255,255,0.07) !important;
+      border-radius: 16px !important;
+    }
+    .ranking-pos.gold { background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1)) !important; }
+    .ranking-pos.silver { background: linear-gradient(135deg, rgba(192,192,192,0.2), rgba(192,192,192,0.08)) !important; }
+    .ranking-pos.bronze { background: linear-gradient(135deg, rgba(205,127,50,0.2), rgba(205,127,50,0.08)) !important; }
+
+    /* Moneda caras */
+    .moneda-cara {
+      background: radial-gradient(circle at 35% 35%, #f7e07a 0%, #d4af37 45%, #96761a 100%) !important;
+      box-shadow: 0 0 40px rgba(212,175,55,0.7), inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 6px rgba(0,0,0,0.3) !important;
+      border: 3px solid rgba(255,215,0,0.5) !important;
+    }
+    .moneda-cruz {
+      background: radial-gradient(circle at 35% 35%, #d4af37 0%, #a07830 45%, #6b4f10 100%) !important;
+      box-shadow: 0 0 30px rgba(212,175,55,0.5), inset 0 2px 8px rgba(255,255,255,0.15), inset 0 -2px 6px rgba(0,0,0,0.4) !important;
+      border: 3px solid rgba(180,140,40,0.4) !important;
+    }
+
+    @media (min-width: 540px) {
+      .casino-lobby { grid-template-columns: repeat(4, 1fr) !important; }
+    }
+
+        /* ══════════════════════════════════════════════════════
        APUESTAS DEPORTIVAS
     ══════════════════════════════════════════════════════ */
     #apuestas-screen { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
