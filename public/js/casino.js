@@ -251,10 +251,11 @@
             casinoSaldo = serverData.nuevoSaldo;
             document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
             const resEl = document.getElementById('ruleta-resultado');
-            const emoji = resultadoColor === 'rojo' ? '🔴' : resultadoColor === 'negro' ? '⚫' : '🟢';
+            const dotColor = resultadoColor === 'rojo' ? '#c41e3a' : resultadoColor === 'negro' ? '#333' : '#146b3a';
+            const emoji = `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:4px;border-radius:50%;"><circle cx="7" cy="7" r="7" fill="${dotColor}"/></svg>`;
             if (serverData.gano) {
               resEl.className = 'casino-resultado gano visible';
-              resEl.innerHTML = `${emoji} ¡Cayó <b>${resultadoColor.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio)}</span>`;
+              resEl.innerHTML = `${emoji} ¡Cayó <b>${resultadoColor.toUpperCase()}</b>! &nbsp;<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio)}</span>`;
             } else {
               resEl.className = 'casino-resultado perdio visible';
               resEl.innerHTML = `${emoji} Cayó <b>${resultadoColor.toUpperCase()}</b>. Elegiste ${casinoEleccionRuleta.toUpperCase()}.<br>Perdiste ${formatCLP(monto)}.`;
@@ -311,10 +312,12 @@
         casinoSaldo = serverData.nuevoSaldo;
         document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
         const resEl = document.getElementById('moneda-resultado');
-        const emoji = resultado === 'cara' ? '🦅' : '🌟';
+        const svgCara = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" style="vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><path d="M9 8.5c.5-1 1.5-1.5 3-1.5s3 .8 3 2.2c0 1.5-1.5 2-3 2.3C10.5 11.8 9 12.3 9 13.8c0 1.4 1.5 2.2 3 2.2 1.5 0 2.5-.8 3-1.5"/></svg>';
+        const svgCruz = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" style="vertical-align:middle;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+        const emoji = resultado === 'cara' ? svgCara : svgCruz;
         if (serverData.gano) {
           resEl.className = 'casino-resultado gano visible';
-          resEl.innerHTML = `${emoji} ¡Cayó <b>${resultado.toUpperCase()}</b>! &nbsp;🎉 ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio)}</span>`;
+          resEl.innerHTML = `${emoji} ¡Cayó <b>${resultado.toUpperCase()}</b>! &nbsp;<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" style="vertical-align:middle"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ¡GANASTE! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio)}</span>`;
         } else {
           resEl.className = 'casino-resultado perdio visible';
           resEl.innerHTML = `${emoji} Cayó <b>${resultado.toUpperCase()}</b>. Elegiste ${casinoEleccionMoneda.toUpperCase()}.<br>Perdiste ${formatCLP(monto)}.`;
@@ -364,6 +367,141 @@
       osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
     }
 
+    // ── Sonidos Avión ──────────────────────────────────────────────────────
+    let avionEngineNode = null;
+    let avionEngineGain = null;
+
+    function casinoSonidoAvionDespegue() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      // Motor de avión: ruido de turbina que sube de tono
+      const bufferSize = ctx.sampleRate * 1.5;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1);
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      const bpf = ctx.createBiquadFilter();
+      bpf.type = 'bandpass';
+      bpf.frequency.setValueAtTime(180, t);
+      bpf.frequency.linearRampToValueAtTime(480, t + 1.5);
+      bpf.Q.value = 1.2;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.4);
+      gain.gain.setValueAtTime(0.18, t + 1.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+      src.connect(bpf); bpf.connect(gain); gain.connect(ctx.destination);
+      src.start(t); src.stop(t + 1.5);
+      // Silbido de turbina
+      const osc = ctx.createOscillator();
+      const og = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(680, t + 1.4);
+      og.gain.setValueAtTime(0.0, t);
+      og.gain.linearRampToValueAtTime(0.06, t + 0.3);
+      og.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+      osc.connect(og); og.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 1.5);
+    }
+
+    function casinoSonidoAvionVuelo(duration) {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      stopAvionEngine();
+      const t = ctx.currentTime;
+      // Motor continuo mientras vuela
+      const bufSrc = ctx.createBufferSource();
+      bufSrc.loop = true;
+      const buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1);
+      bufSrc.buffer = buf;
+      const bpf = ctx.createBiquadFilter();
+      bpf.type = 'bandpass'; bpf.frequency.value = 380; bpf.Q.value = 1.5;
+      avionEngineGain = ctx.createGain();
+      avionEngineGain.gain.setValueAtTime(0.0, t);
+      avionEngineGain.gain.linearRampToValueAtTime(0.12, t + 0.5);
+      avionEngineGain.gain.setValueAtTime(0.12, t + duration - 0.5);
+      avionEngineGain.gain.linearRampToValueAtTime(0.0, t + duration);
+      bufSrc.connect(bpf); bpf.connect(avionEngineGain); avionEngineGain.connect(ctx.destination);
+      bufSrc.start(t);
+      avionEngineNode = bufSrc;
+      setTimeout(() => stopAvionEngine(), duration * 1000 + 100);
+    }
+
+    function stopAvionEngine() {
+      if (avionEngineNode) {
+        try { avionEngineNode.stop(); } catch {}
+        avionEngineNode = null;
+      }
+    }
+
+    function casinoSonidoAvionExplosion() {
+      stopAvionEngine();
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      // Boom de explosión
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random()*2-1) * Math.pow(1 - i/data.length, 1.5);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const lpf = ctx.createBiquadFilter();
+      lpf.type = 'lowpass'; lpf.frequency.value = 350;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.5, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+      src.connect(lpf); lpf.connect(gain); gain.connect(ctx.destination);
+      src.start(t);
+      // Chisporroteo
+      for (let i = 0; i < 5; i++) {
+        const sparkosc = ctx.createOscillator();
+        const sparkg = ctx.createGain();
+        sparkosc.type = 'square';
+        sparkosc.frequency.value = 200 + Math.random() * 600;
+        const d2 = t + 0.05 + i * 0.06;
+        sparkg.gain.setValueAtTime(0.08, d2);
+        sparkg.gain.exponentialRampToValueAtTime(0.001, d2 + 0.08);
+        sparkosc.connect(sparkg); sparkg.connect(ctx.destination);
+        sparkosc.start(d2); sparkosc.stop(d2 + 0.08);
+      }
+    }
+
+    function casinoSonidoAvionAterrizaje() {
+      stopAvionEngine();
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      // Motor apagándose suavemente
+      const bufSrc = ctx.createBufferSource();
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 1.0, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1);
+      bufSrc.buffer = buf;
+      const bpf = ctx.createBiquadFilter();
+      bpf.type = 'bandpass';
+      bpf.frequency.setValueAtTime(380, t);
+      bpf.frequency.exponentialRampToValueAtTime(120, t + 1.0);
+      bpf.Q.value = 1.5;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
+      bufSrc.connect(bpf); bpf.connect(gain); gain.connect(ctx.destination);
+      bufSrc.start(t);
+      // Ding de éxito
+      for (let i = 0; i < 3; i++) {
+        const osc = ctx.createOscillator();
+        const og = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = [880, 1100, 1320][i];
+        const d2 = t + 0.6 + i * 0.18;
+        og.gain.setValueAtTime(0.12, d2);
+        og.gain.exponentialRampToValueAtTime(0.001, d2 + 0.35);
+        osc.connect(og); og.connect(ctx.destination);
+        osc.start(d2); osc.stop(d2 + 0.35);
+      }
+    }
+
     function casinoSonidoMoneda() {
       const ctx = getAudioCtx(); if (!ctx) return;
       const t = ctx.currentTime;
@@ -392,7 +530,7 @@
           return;
         }
         const posClasses = ['gold','silver','bronze','other','other'];
-        const posEmoji = ['🥇','🥈','🥉','4°','5°'];
+        const posEmoji = ['1°','2°','3°','4°','5°'];
         lista.innerHTML = data.ranking.map((u,i) => `
           <div class="ranking-item">
             <div class="ranking-pos ${posClasses[i]}">${posEmoji[i]}</div>
@@ -414,7 +552,7 @@
           lista.innerHTML = '<div class="ranking-empty">Sin apuestas aún</div>';
           return;
         }
-        const juegoLabel = { ruleta: '🎡 Ruleta', moneda: '🪙 Cara o Cruz', avion: '✈️ Avión' };
+        const juegoLabel = { ruleta: 'Ruleta', moneda: 'Cara o Cruz', avion: 'Avión' };
         lista.innerHTML = data.apuestas.slice(0, 20).map(a => `
           <div class="ch-item">
             <span class="ch-badge ${a.gano ? 'gano' : 'perdio'}">${a.gano ? 'Ganó' : 'Perdió'}</span>
@@ -513,7 +651,9 @@
 
       display.style.background = 'linear-gradient(180deg,rgba(6,182,212,0.12) 0%,rgba(0,0,0,0) 100%)';
       avionEmoji.style.transform = 'rotate(-15deg) translateY(-5px)';
-      estadoEl.textContent = 'Volando... 🚀';
+      estadoEl.textContent = 'Volando...';
+      casinoSonidoAvionDespegue();
+      setTimeout(() => casinoSonidoAvionVuelo(duration / 1000), 500);
 
       let current = 1.0;
       const targetMult = gano ? mult : crashMult;
@@ -542,23 +682,25 @@
               display.style.background = 'linear-gradient(180deg,rgba(16,185,129,0.12) 0%,rgba(0,0,0,0) 100%)';
               multDisplay.style.color = '#10B981';
               avionEmoji.style.transform = 'rotate(-25deg) translateY(-20px)';
-              estadoEl.textContent = '¡Aterrizaje exitoso! ✅';
+              estadoEl.textContent = '¡Aterrizaje exitoso!';
+              casinoSonidoAvionAterrizaje();
               resEl.className = 'casino-resultado gano visible';
-              resEl.innerHTML = `✈️ ¡El avión llegó a <b>x${targetMult.toFixed(2)}</b>! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio - monto)}</span>`;
+              resEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> ¡El avión llegó a <b>x${targetMult.toFixed(2)}</b>! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio - monto)}</span>`;
             } else {
               display.style.background = 'linear-gradient(180deg,rgba(239,68,68,0.12) 0%,rgba(0,0,0,0) 100%)';
               multDisplay.style.color = '#ef4444';
-              avionEmoji.textContent = '💥';
+              avionEmoji.innerHTML = '<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L9.5 8.5 3 6l4.5 6L2 18l7-2 3 6 3-6 7 2-4.5-6L22 6l-6.5 2.5z" fill="rgba(239,68,68,0.2)"/></svg>';
               avionEmoji.style.transform = 'none';
-              estadoEl.textContent = `Explotó en x${crashMult.toFixed(2)} 💥`;
+              casinoSonidoAvionExplosion();
+              estadoEl.textContent = `Explotó en x${crashMult.toFixed(2)}`;
               resEl.className = 'casino-resultado perdio visible';
-              resEl.innerHTML = `💥 El avión explotó en <b>x${crashMult.toFixed(2)}</b>. Querías x${mult.toFixed(2)}.<br>Perdiste ${formatCLP(monto)}.`;
+              resEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff8080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M12 2L9.5 8.5 3 6l4.5 6L2 18l7-2 3 6 3-6 7 2-4.5-6L22 6l-6.5 2.5z"/></svg> El avión explotó en <b>x${crashMult.toFixed(2)}</b>. Querías x${mult.toFixed(2)}.<br>Perdiste ${formatCLP(monto)}.`;
             }
 
             // Reset para próxima ronda
             setTimeout(() => {
               multDisplay.style.color = '#06B6D4';
-              avionEmoji.textContent = '✈️';
+              avionEmoji.innerHTML = '<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="rgba(6,182,212,0.15)"/></svg>';
               avionEmoji.style.transform = 'none';
               display.style.background = 'linear-gradient(180deg,rgba(6,182,212,0.08) 0%,rgba(0,0,0,0) 100%)';
               estadoEl.textContent = 'Esperando apuesta...';
