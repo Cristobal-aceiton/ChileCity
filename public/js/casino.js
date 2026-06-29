@@ -414,12 +414,12 @@
           lista.innerHTML = '<div class="ranking-empty">Sin apuestas aún</div>';
           return;
         }
-        const juegoLabel = { ruleta: '🎡 Ruleta', moneda: '🪙 Cara o Cruz' };
+        const juegoLabel = { ruleta: '🎡 Ruleta', moneda: '🪙 Cara o Cruz', avion: '✈️ Avión' };
         lista.innerHTML = data.apuestas.slice(0, 20).map(a => `
           <div class="ch-item">
             <span class="ch-badge ${a.gano ? 'gano' : 'perdio'}">${a.gano ? 'Ganó' : 'Perdió'}</span>
             <div class="ch-info">
-              <div class="ch-juego">${juegoLabel[a.juego] || a.juego} — apostó <b>${a.eleccion}</b>, salió <b>${a.resultado}</b></div>
+              <div class="ch-juego">${juegoLabel[a.juego] || a.juego} — ${a.juego === 'avion' ? 'quería x' + a.eleccion + ', crasheó en x' + a.resultado : 'apostó ' + a.eleccion + ', salió ' + a.resultado}</div>
               <div class="ch-det">${casinoFecha(a.created_at)}</div>
             </div>
             <div class="ch-monto">
@@ -439,3 +439,137 @@
     let apTipoActivo = null;    // 'simple' | 'combinada'
     let apEleccion = null;      // 'A' | 'B' | 'empate'
 
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  AVIÓN
+    // ══════════════════════════════════════════════════════════════════════
+    let avionVolando = false;
+    let avionAnimFrame = null;
+
+    function avionSliderChange() {
+      const val = parseInt(document.getElementById('avion-mult-slider').value);
+      const mult = (val / 100).toFixed(2);
+      document.getElementById('avion-mult-label').textContent = 'x' + mult;
+      avionActualizarInfo();
+    }
+
+    function avionActualizarInfo() {
+      const monto = parseInt(document.getElementById('avion-monto').value) || 0;
+      const mult = parseFloat((parseInt(document.getElementById('avion-mult-slider').value) / 100).toFixed(2));
+      const infoEl = document.getElementById('avion-ganancia-info');
+      const btn = document.getElementById('btn-avion');
+      if (monto > 0) {
+        const ganancia = Math.floor(monto * mult);
+        infoEl.innerHTML = `Si el avión llega a <b style="color:#06B6D4">x${mult}</b> ganarás <b style="color:#fbbf24">${formatCLP(ganancia)}</b>`;
+        btn.disabled = avionVolando;
+      } else {
+        infoEl.textContent = '';
+        btn.disabled = true;
+      }
+    }
+
+    async function jugarAvion() {
+      if (avionVolando) return;
+      const monto = parseInt(document.getElementById('avion-monto').value);
+      const mult = parseFloat((parseInt(document.getElementById('avion-mult-slider').value) / 100).toFixed(2));
+      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
+
+      avionVolando = true;
+      document.getElementById('btn-avion').disabled = true;
+      document.getElementById('avion-resultado').className = 'casino-resultado';
+      document.getElementById('avion-estado').textContent = 'Despegando...';
+
+      // Llamar al servidor
+      let serverData;
+      try {
+        const r = await fetch('/api/casino?action=jugar', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ juego: 'avion', monto, eleccion: mult.toString() })
+        });
+        serverData = await r.json();
+        if (!r.ok) {
+          mostrarToast(serverData.error || 'Error al apostar.', true);
+          avionVolando = false;
+          avionActualizarInfo();
+          return;
+        }
+      } catch {
+        mostrarToast('Error de conexión.', true);
+        avionVolando = false;
+        avionActualizarInfo();
+        return;
+      }
+
+      const crashMult = parseFloat(serverData.resultado);
+      const gano = serverData.gano;
+
+      // Animar el avión subiendo
+      const multDisplay = document.getElementById('avion-mult-display');
+      const avionEmoji = document.getElementById('avion-emoji');
+      const estadoEl = document.getElementById('avion-estado');
+      const display = document.getElementById('avion-display');
+
+      display.style.background = 'linear-gradient(180deg,rgba(6,182,212,0.12) 0%,rgba(0,0,0,0) 100%)';
+      avionEmoji.style.transform = 'rotate(-15deg) translateY(-5px)';
+      estadoEl.textContent = 'Volando... 🚀';
+
+      let current = 1.0;
+      const targetMult = gano ? mult : crashMult;
+      const duration = gano ? 2500 : Math.min(2500, 800 + crashMult * 400);
+      const startTime = performance.now();
+
+      function animarVuelo(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 2);
+        current = 1.0 + (targetMult - 1.0) * eased;
+        multDisplay.textContent = 'x' + current.toFixed(2);
+
+        if (progress < 1) {
+          avionAnimFrame = requestAnimationFrame(animarVuelo);
+        } else {
+          // Terminó la animación
+          clearTimeout(avionAnimFrame);
+          setTimeout(() => {
+            multDisplay.textContent = 'x' + targetMult.toFixed(2);
+            casinoSaldo = serverData.nuevoSaldo;
+            document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
+
+            const resEl = document.getElementById('avion-resultado');
+            if (gano) {
+              display.style.background = 'linear-gradient(180deg,rgba(16,185,129,0.12) 0%,rgba(0,0,0,0) 100%)';
+              multDisplay.style.color = '#10B981';
+              avionEmoji.style.transform = 'rotate(-25deg) translateY(-20px)';
+              estadoEl.textContent = '¡Aterrizaje exitoso! ✅';
+              resEl.className = 'casino-resultado gano visible';
+              resEl.innerHTML = `✈️ ¡El avión llegó a <b>x${targetMult.toFixed(2)}</b>! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio - monto)}</span>`;
+            } else {
+              display.style.background = 'linear-gradient(180deg,rgba(239,68,68,0.12) 0%,rgba(0,0,0,0) 100%)';
+              multDisplay.style.color = '#ef4444';
+              avionEmoji.textContent = '💥';
+              avionEmoji.style.transform = 'none';
+              estadoEl.textContent = `Explotó en x${crashMult.toFixed(2)} 💥`;
+              resEl.className = 'casino-resultado perdio visible';
+              resEl.innerHTML = `💥 El avión explotó en <b>x${crashMult.toFixed(2)}</b>. Querías x${mult.toFixed(2)}.<br>Perdiste ${formatCLP(monto)}.`;
+            }
+
+            // Reset para próxima ronda
+            setTimeout(() => {
+              multDisplay.style.color = '#06B6D4';
+              avionEmoji.textContent = '✈️';
+              avionEmoji.style.transform = 'none';
+              display.style.background = 'linear-gradient(180deg,rgba(6,182,212,0.08) 0%,rgba(0,0,0,0) 100%)';
+              estadoEl.textContent = 'Esperando apuesta...';
+              multDisplay.textContent = 'x1.00';
+              avionVolando = false;
+              avionActualizarInfo();
+              cargarRanking();
+              cargarHistorialCasino();
+            }, 3000);
+          }, 200);
+        }
+      }
+      avionAnimFrame = requestAnimationFrame(animarVuelo);
+    }
