@@ -2385,3 +2385,26 @@
       .pp-stat { min-width: 60px; padding: 10px; }
       .pp-stat-num { font-size: 22px; }
     }
+
+    /* ── SCROLL FIX — Perfil Público ─────────────────────────────────────
+       Al expandir cards la pantalla pierde el contexto de scroll en iOS.
+       Solución: el scroll vive en el contenedor interno, no en la pantalla.
+    ── */
+    .pp-screen {
+      overflow: hidden !important;
+      align-items: flex-start !important;
+      justify-content: flex-start !important;
+    }
+    .pp-container {
+      height: 100%;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain;
+      width: 100%;
+      padding-top: 0;
+    }
+
+    /* Stat bar simplificada — solo ciudadanos */
+    .pp-stat-bar { justify-content: flex-start; }
+    .pp-stat { max-width: 180px; }

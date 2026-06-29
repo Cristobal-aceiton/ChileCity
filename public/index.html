@@ -1417,8 +1417,8 @@
   </section>
 
   <!-- PERFIL PÚBLICO -->
-  <section class="screen seccion-screen" id="perfil-publico-screen">
-    <div class="seccion-container" style="max-width:860px;">
+  <section class="screen seccion-screen pp-screen" id="perfil-publico-screen">
+    <div class="seccion-container pp-container" style="max-width:860px;">
       <div class="seccion-header">
         <button class="sec-back" onclick="volverDashboard()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1434,19 +1434,7 @@
       <div class="pp-stat-bar" id="pp-stats" style="display:none;">
         <div class="pp-stat">
           <div class="pp-stat-num" id="pp-total-registros">0</div>
-          <div class="pp-stat-label">Ciudadanos</div>
-        </div>
-        <div class="pp-stat">
-          <div class="pp-stat-num" id="pp-total-items">0</div>
-          <div class="pp-stat-label">Items</div>
-        </div>
-        <div class="pp-stat pp-stat-alert">
-          <div class="pp-stat-num" id="pp-total-multas">0</div>
-          <div class="pp-stat-label">Multas</div>
-        </div>
-        <div class="pp-stat pp-stat-danger">
-          <div class="pp-stat-num" id="pp-total-ants">0</div>
-          <div class="pp-stat-label">Antecedentes</div>
+          <div class="pp-stat-label">Ciudadanos registrados</div>
         </div>
       </div>
 
@@ -1840,13 +1828,7 @@
       }
 
       // Stats
-      const totalItems  = lista.reduce((s, r) => s + r.inventario.length, 0);
-      const totalMultas = lista.reduce((s, r) => s + r.multas.length, 0);
-      const totalAnts   = lista.reduce((s, r) => s + r.antecedentes.length, 0);
       document.getElementById('pp-total-registros').textContent = lista.length;
-      document.getElementById('pp-total-items').textContent     = totalItems;
-      document.getElementById('pp-total-multas').textContent    = totalMultas;
-      document.getElementById('pp-total-ants').textContent      = totalAnts;
       statsEl.style.display = 'flex';
 
       el.innerHTML = lista.map(r => {
