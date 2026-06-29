@@ -126,7 +126,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Elección inválida para ruleta." });
       if (juego === "moneda" && !["cara","cruz"].includes(eleccion))
         return res.status(400).json({ error: "Elección inválida para cara o cruz." });
-      if (!["ruleta","moneda"].includes(juego))
+      if (juego === "avion") {
+        const mult = parseFloat(eleccion);
+        if (isNaN(mult) || mult < 1.1 || mult > 100)
+          return res.status(400).json({ error: "Multiplicador inválido (entre 1.1x y 100x)." });
+      }
+      if (!["ruleta","moneda","avion"].includes(juego))
         return res.status(400).json({ error: "Juego inválido." });
 
       // Verificar cuenta bancaria
@@ -156,11 +161,28 @@ export default async function handler(req, res) {
         } else {
           premio = 0;
         }
-      } else {
-        // moneda
+      } else if (juego === "moneda") {
         resultado = lanzarMoneda();
         gano = resultado === eleccion;
         premio = gano ? montoNum * 2 : 0;
+      } else if (juego === "avion") {
+        // El avión: se genera un multiplicador de crash aleatorio
+        // Distribución: 90% chances crash antes de 10x, más probable crashear bajo
+        // Formula: crash = 0.99 / (1 - random) pero con house edge
+        const r = Math.random();
+        let crashMultiplier;
+        if (r < 0.05) {
+          // 5% crashea inmediatamente (antes de 1.1x)
+          crashMultiplier = 1.0;
+        } else {
+          // Distribución exponencial con house edge del 5%
+          crashMultiplier = Math.max(1.0, 0.95 / (1 - Math.random()));
+          crashMultiplier = Math.round(crashMultiplier * 100) / 100;
+        }
+        const multObjetivo = parseFloat(eleccion);
+        gano = crashMultiplier >= multObjetivo;
+        resultado = crashMultiplier.toFixed(2);
+        premio = gano ? Math.floor(montoNum * multObjetivo) : 0;
       }
 
       // Calcular nuevo saldo
