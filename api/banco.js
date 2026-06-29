@@ -81,6 +81,16 @@ async function initTables(sql) {
     VALUES (${SUPER_ADMIN_ID}, 'Super Admin', 'system')
     ON CONFLICT (discord_id) DO NOTHING
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS contactos_banco (
+      id            SERIAL PRIMARY KEY,
+      discord_id    TEXT NOT NULL,
+      nombre        TEXT NOT NULL,
+      rut           TEXT NOT NULL,
+      created_at    TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(discord_id, rut)
+    )
+  `;
   schemaReady = true;
 }
 
@@ -361,6 +371,57 @@ export default async function handler(req, res) {
 
       const { sueldo_id } = req.query;
       await sql`UPDATE sueldos SET activo = FALSE WHERE id = ${sueldo_id}`;
+      return res.status(200).json({ ok: true });
+    }
+
+    // ── GET: listar contactos ─────────────────────────────────────────────────
+    if (req.method === "GET" && action === "contactos") {
+      const rows = await sql`
+        SELECT * FROM contactos_banco WHERE discord_id = ${discord_id}
+        ORDER BY created_at ASC
+      `;
+      return res.status(200).json({ contactos: rows });
+    }
+
+    // ── POST: agregar contacto ────────────────────────────────────────────────
+    if (req.method === "POST" && action === "contacto_agregar") {
+      const { nombre, rut } = req.body;
+      if (!nombre || !rut)
+        return res.status(400).json({ error: "Faltan campos" });
+
+      const count = await sql`
+        SELECT COUNT(*) FROM contactos_banco WHERE discord_id = ${discord_id}
+      `;
+      if (parseInt(count[0].count) >= 5)
+        return res.status(400).json({ error: "Máximo 5 contactos permitidos" });
+
+      // Verificar que el RUT existe en el sistema
+      const dniCheck = await sql`SELECT discord_id, nombre1, apellido1 FROM dni WHERE rut = ${rut}`;
+      if (dniCheck.length === 0)
+        return res.status(404).json({ error: "RUT no encontrado en el sistema" });
+      if (dniCheck[0].discord_id === discord_id)
+        return res.status(400).json({ error: "No puedes agregarte a ti mismo" });
+
+      try {
+        const rows = await sql`
+          INSERT INTO contactos_banco (discord_id, nombre, rut)
+          VALUES (${discord_id}, ${nombre.trim()}, ${rut.trim()})
+          RETURNING *
+        `;
+        return res.status(201).json({ contacto: rows[0] });
+      } catch (e) {
+        if (e.message?.includes("unique") || e.code === "23505")
+          return res.status(409).json({ error: "Este RUT ya está en tus contactos" });
+        throw e;
+      }
+    }
+
+    // ── DELETE: eliminar contacto ─────────────────────────────────────────────
+    if (req.method === "DELETE" && action === "contacto_borrar") {
+      const { id } = req.query;
+      await sql`
+        DELETE FROM contactos_banco WHERE id = ${id} AND discord_id = ${discord_id}
+      `;
       return res.status(200).json({ ok: true });
     }
 
