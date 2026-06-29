@@ -1,103 +1,95 @@
-# Cambios aplicados — ChileCity RP
+# Cambios aplicados — ChileCity RP v13
 
-## ⚠️ Acción requerida antes de desplegar
+## ⚠️ Variables de entorno requeridas
 
-Agrega esta variable de entorno nueva en Vercel (Project Settings → Environment Variables):
-
-- `SESSION_SECRET` → un valor largo y aleatorio (ej. genera uno con `openssl rand -hex 32`).
-  Se usa para firmar la cookie de sesión. Sin esto, el login con Discord fallará.
-
-Las variables que ya tenías (`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DATABASE_URL`) siguen igual.
-
-Opcionales (tienen un valor por defecto igual al que ya usabas, así que no son obligatorias):
-- `APP_URL` → tu dominio (ej. `https://chile-city.vercel.app`). Por defecto usa ese mismo.
-- `SUPER_ADMIN_ID` → tu ID de Discord de super admin. Por defecto usa el que ya tenías hardcodeado.
-
-## 🔴 Seguridad: autenticación real en el servidor
-
-Antes, cada usuario "se identificaba" mandando su propio `discord_id` en cada petición
-(por URL, body o `localStorage`). Cualquiera podía editarlo desde la consola del navegador
-y hacerse pasar por otra persona — incluido el super admin.
-
-Ahora, al loguearte con Discord (`/api/callback`) el servidor firma una **cookie httpOnly**
-con tu identidad (`lib/auth.js`). Todas las APIs (`banco`, `dni`, `tienda`, `admin`) leen
-quién eres desde esa cookie, nunca desde un parámetro que mande el navegador. Los
-endpoints sensibles ahora responden `401` si no hay sesión válida.
-
-Se agregaron dos endpoints nuevos:
-- `GET /api/me` — para que el frontend sepa quién está logueado (reemplaza leer la URL/localStorage).
-- `POST /api/logout` — borra la cookie de sesión.
-
-El panel de admin para gestionar sueldos de otro usuario sigue funcionando: un admin
-puede consultar la cuenta de un tercero (`/api/banco?action=cuenta&discord_id=X`), pero
-un usuario normal solo puede ver la suya aunque cambie ese parámetro.
-
-## 🟠 Otras correcciones de seguridad
-
-- CORS restringido a tu propio dominio (antes era `*`, abierto a cualquier sitio).
-- El ID de super admin estaba duplicado y hardcodeado en 3 archivos distintos
-  (`banco.js`, `tienda.js`, `admin.js`); ahora vive en un solo lugar (`lib/constants.js`).
-- `dni.js` no tenía manejo de errores (`try/catch`); ahora es consistente con el resto.
-
-## 🟡 Rendimiento
-
-- Las funciones ya no ejecutan `CREATE TABLE IF NOT EXISTS...` en cada request; solo la
-  primera vez que la función arranca (se cachea en memoria mientras la instancia esté "tibia").
-- `logo.webp`: pesaba 176 KB para mostrarse a 64px; se redujo a 128px de origen → 7 KB,
-  sin pérdida de calidad visible.
-- Se eliminó `Fondo.png` (y su copia en `.webp`): no se usaba en ningún lado — el fondo real
-  se carga desde una URL externa de Imgur. Eran 380 KB muertos en el repo.
-
-## Lo que NO se tocó (a propósito)
-
-- `GET /api/tienda?action=base_datos` sigue siendo público: es el "padrón" de la ciudad,
-  tal como estaba diseñado originalmente.
-- SEO / Open Graph / favicon: pediste dejarlo fuera de esta tanda.
+Las mismas que v12: `SESSION_SECRET`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DATABASE_URL`.
+No se requieren variables nuevas.
 
 ---
 
-## v9 — Seguridad, UX y limpieza de código
+## 🔴 Perfil Público (reemplaza Base de Datos)
 
-### 🔴 Seguridad
+### Qué cambia
+- La sección **"Base de Datos"** fue eliminada completamente.
+- La reemplaza **"Perfil Público"** — accesible solo para usuarios con sesión iniciada.
+- La ruta pública `GET /api/tienda?action=base_datos` queda obsoleta (ya no se llama desde el frontend).
+- La nueva API es `GET /api/perfil-publico` — requiere sesión (cookie httpOnly), devuelve todos los ciudadanos con su inventario, multas y antecedentes en una sola llamada paralela.
 
-**Rate limiting en APIs (via base de datos — funciona en serverless):**
-- Casino: 1 jugada cada 3 segundos por usuario
-- Apuestas deportivas: 1 apuesta cada 5 segundos
-- Transferencias bancarias: 1 transferencia cada 10 segundos
-- Todos los cooldowns son configurables con variables de entorno (`RATE_CASINO_SEG`, `RATE_APUESTA_SEG`, `RATE_TRANSFER_SEG`)
+### Qué muestra cada ciudadano
+Cada DNI registrado en la ciudad expande un panel con tres pestañas:
+- **Inventario** — grid con imagen, nombre y precio pagado de cada item.
+- **Multas** — lista con motivo, fecha, funcionario, monto y estado (pendiente/pagada).
+- **Antecedentes** — lista con motivo, artículos, fecha, funcionario y tiempo de cárcel.
 
-**Límites de apuesta en casino:**
-- Mínimo: $1.000 CLP (configurable con `CASINO_MIN_APUESTA`)
-- Máximo: $500.000 CLP (configurable con `CASINO_MAX_APUESTA`)
+### Búsqueda
+- Barra con debounce de 280 ms — no spamea el servidor mientras el usuario escribe.
+- Botón ✕ para limpiar (también funciona con `Escape`).
+- Busca por nombre, apellidos o RUT en todos los campos.
 
-### 🟡 UX
+### Stats bar
+Cuatro contadores en tiempo real: ciudadanos, items totales, multas y antecedentes.
+Los últimos dos tienen color de alerta (amarillo y rojo).
 
-**Escape para cerrar modales:**  
-Todos los modales (ajustar saldo, resetear cuenta, editar producto, modal de apuesta, editar partido) ahora se cierran con la tecla Escape.
+---
 
-**Favicon y PWA:**
-- `favicon.svg` — ícono visible en pestañas del navegador
-- `manifest.json` — la app se puede "instalar" desde Chrome/Safari en el celular como si fuera una app nativa (tema oscuro, pantalla completa, sin barra de navegación)
-- Meta tags de Apple para iOS
+## 🟡 Rendimiento
 
-### 🟢 Calidad de código
+- `GET /api/perfil-publico` carga inventarios, multas y antecedentes en **paralelo** con `Promise.all`, no en secuencia — una sola ida a la BD en lugar de tres.
+- El esquema de la tabla de `dni` solo se inicializa la primera vez que la función arranca (igual que el resto de las APIs en v12).
+- La búsqueda en el frontend tiene debounce de 280 ms para no disparar peticiones en cada tecla.
 
-**Funciones duplicadas eliminadas:**
-- `escHtml()` → definición única en `app.js` (antes duplicada en `tienda.js` como `escHtml` y en `comisaria.js` como `cvEsc`)
-- `formatCLP()` → definición única en `app.js` (antes: `formatearSaldo` en banco/tienda, `apFmt` en apuestas, `casinoFmt` en casino)
+---
 
-**Estado global documentado:**
-- Variables `currentUser`, `currentDNI`, `currentCuenta`, etc. agrupadas con comentario claro
-- Función `resetEstado()` como punto único de reset — usada en logout
+## 🎨 Visual — Dashboard cards premium
 
-**Archivo muerto eliminado:**
-- `Fondo.png` (380KB) — no se usaba en ningún lado
+- Las cards del dashboard cambiaron de layout **vertical → horizontal** (icono a la izquierda, texto centrado, flecha a la derecha).
+- El icono de cada card tiene su propio `border-radius` y fondo, y escala suavemente al hacer hover.
+- La flecha `›` de cada card ahora se desplaza levemente hacia la derecha al hover en lugar de aparecer desde la nada.
+- Un indicador de color (línea de 3px en el borde izquierdo) aparece al hover, usando `--card-color` de cada card.
+- `backdrop-filter: blur(12px)` en todas las cards para efecto glass más premium.
+- En mobile (≤600px) el grid cambia a **1 columna**.
 
-### ⚙️ Configuración
+---
 
-Nuevas variables de entorno opcionales en Vercel (todas tienen valores por defecto razonables):
-- `CASINO_MIN_APUESTA` — apuesta mínima en casino (default: 1000)
-- `CASINO_MAX_APUESTA` — apuesta máxima en casino (default: 500000)
-- `RATE_CASINO_SEG` — cooldown casino en segundos (default: 3)
-- `RATE_APUESTA_SEG` — cooldown apuestas en segundos (default: 5)
-- `RATE_TRANSFER_SEG` — cooldown transferencias en segundos (default: 10)
+## ✨ Visual — Transiciones de sección
+
+- `mostrarPantalla()` detecta si el usuario va del dashboard a una sección (`screen-enter`) o vuelve al dashboard (`screen-return`) y aplica animaciones distintas:
+  - **Hacia sección**: desliza desde la derecha (`translateX(32px → 0)`).
+  - **Volver al dashboard**: desliza desde la izquierda (`translateX(-24px → 0)`).
+- Las animaciones duran 420 ms y 380 ms respectivamente, con la curva `cubic-bezier(0.16,1,0.3,1)`.
+
+---
+
+## 🧭 UX — Indicador de sección
+
+- Al navegar entre secciones aparece una **píldora flotante** centrada en la parte superior con el nombre de la sección activa.
+- Desaparece automáticamente después de 1.8 s.
+- Diseño: fondo dark con `backdrop-filter`, borde sutil, fade + slide vertical.
+- No aparece en landing ni dashboard.
+
+---
+
+## ✅ UX — Validación en tiempo real (Registro Civil)
+
+- Los campos de nombre y apellido muestran borde **verde** al superar 2 caracteres válidos, y borde **rojo** + micro-animación de sacudida si se detecta un carácter inválido (números, símbolos).
+- El campo de fecha muestra borde verde al seleccionarse.
+- La validación ocurre en `input` (en cada tecla), no solo al enviar.
+
+---
+
+## 📱 UX — Mobile First pass
+
+- `seccion-container` ahora respeta `safe-area-inset` de iOS (notch y barra de gestos).
+- El header de sección, título y botón volver tienen tamaños optimizados para pantallas ≤480px.
+- El header de cada card de Perfil Público oculta la meta (fecha/items) en pantallas pequeñas para no colapsar el layout.
+- La barra de búsqueda de Perfil Público oculta el botón X nativo de Chrome/iOS (`.pp-search-input::-webkit-search-cancel-button`) para usar solo el nuestro.
+- El grid de inventario dentro de Perfil Público reduce el ancho mínimo de items en mobile.
+
+---
+
+## Lo que NO se tocó
+
+- Banco, Tienda, Casino, Apuestas, Comisaría, Panel Admin, Admin Banco, Admin Tienda — sin cambios.
+- SEO / Open Graph / favicon — sin cambios.
+- Rate limiting — sin cambios.
+- Autenticación por cookie httpOnly — sin cambios.
