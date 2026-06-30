@@ -1,4 +1,76 @@
-# Cambios aplicados — ChileCity RP v16 (índices, SW, SEO, bugfix)
+# Cambios aplicados — ChileCity RP v21 (pull-to-refresh, offline, haptics, recibo)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v20 — sin cambios.
+
+---
+
+## 📱 Pull-to-refresh en pantallas con datos en vivo
+
+Nuevo `public/js/pull-to-refresh.js`: gesto táctil genérico (sin librerías)
+que detecta el arrastre hacia abajo cuando el `scrollTop` de la pantalla ya
+está en 0, con resistencia progresiva y un indicador giratorio. Activado en:
+
+- **Banco** (`#banco-screen`) → refresca saldo y cuenta (`cargarBanco()`).
+- **Apuestas** (`#apuestas-screen`) → refresca saldo y, según la pestaña
+  activa, partidos o historial personal (nueva función `apRefrescarActivo()`
+  en `apuestas.js`).
+- **Campanita de notificaciones** (`#notif-list`) → refresca la bandeja
+  (`notifCargar()`). El indicador se cuelga como hermano de la lista, no
+  como hijo, porque `notifRenderLista()` reemplaza el `innerHTML` de la
+  lista en cada sondeo y lo hubiera borrado.
+
+Da un pulso corto de vibración (`navigator.vibrate(12)`) justo al cruzar el
+umbral de soltar, como confirmación táctil de que el refresco se va a
+disparar.
+
+## 📡 Indicador de sin conexión
+
+Nuevo banner discreto (`#offline-banner` en `app.js`) que escucha los
+eventos `online`/`offline` del navegador y se muestra en la parte superior
+de la pantalla con el texto "Sin conexión — mostrando datos guardados".
+El `sw.js` ya servía contenido cacheado sin red, pero eso era invisible
+para el usuario — esto evita que alguien haga una apuesta o transferencia
+creyendo que se procesó cuando en realidad nunca llegó al servidor.
+
+## 📳 Haptic feedback (navigator.vibrate)
+
+- `feedbackResultado()` en `app.js` — el punto único ya compartido entre
+  Casino y Apuestas Deportivas para victorias/derrotas — ahora vibra
+  además de sonar: patrón doble corto en victoria, pulso seco en derrota.
+  Cubre automáticamente todos los juegos de casino y las apuestas
+  deportivas sin tocar cada archivo de juego por separado.
+- `notifCargar()` en `notificaciones.js` — vibración corta al llegar una
+  notificación nueva (multa, transferencia recibida, resultado de apuesta),
+  junto con el sonido y la animación de campanita que ya existían.
+- Todas las llamadas están envueltas en `if (navigator.vibrate)` + try/catch:
+  en navegadores que no lo soportan (Safari/iOS) quedan como no-op, no
+  rompen nada.
+
+## 🧾 Recibo de transferencia (reemplaza el toast de 3s)
+
+Nuevo modal `#modal-recibo-transferencia` (mismo patrón visual que los
+modales admin existentes: `admin-modal-overlay` + `.visible`), con ícono
+de check, monto grande, destinatario (nombre si está en los Contactos
+guardados del usuario, si no el RUT), fecha/hora y el nuevo saldo. Se
+dispara desde `hacerTransferencia()` en `banco.js` vía la nueva función
+`mostrarReciboTransferencia()`, y el usuario lo cierra a propósito con el
+botón "Listo" (o Escape) — no se autodescarta solo. El mensaje inline
+(`#transfer-success`) se mantiene como apoyo, no se quitó.
+
+### Archivos tocados
+- `public/js/pull-to-refresh.js` — nuevo.
+- `public/js/app.js` — banner offline, vibración en `feedbackResultado()`.
+- `public/js/notificaciones.js` — vibración en notificación nueva.
+- `public/js/apuestas.js` — `apRefrescarActivo()`.
+- `public/js/banco.js` — `mostrarReciboTransferencia()`, caché de contactos.
+- `public/index.html` — modal de recibo, script tag de pull-to-refresh.js.
+- `public/styles.css` — estilos de `.ptr-indicator`, `#offline-banner`,
+  `.tx-receipt-*`.
+- `public/sw.js` — agrega `pull-to-refresh.js` al precache, sube a `v2`.
+
+
 
 ## ⚠️ Variables de entorno requeridas
 
