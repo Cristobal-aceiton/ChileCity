@@ -85,7 +85,7 @@
 
     function adminEmpresasTab(tab) {
       document.querySelectorAll('.ae-tab').forEach((t, i) => {
-        const ids = ['listado', 'crear', 'logros'];
+        const ids = ['listado', 'crear'];
         t.classList.toggle('active', ids[i] === tab);
         document.getElementById(`ae-tab-${ids[i]}`).classList.toggle('visible', ids[i] === tab);
       });
