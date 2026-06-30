@@ -91,6 +91,7 @@
     
     async function goToDashboard(user) {
       currentUser = user;
+      actualizarBotonLogin();
       document.getElementById('discord-name').textContent = user.name;
       document.getElementById('discord-tag').textContent  = user.tag || '';
       document.getElementById('discord-avatar').src       = user.avatar;
@@ -157,7 +158,45 @@
       // pidiéndole al servidor que la borre (antes solo se borraba un dato
       // en localStorage, que ni siquiera era la fuente real de verdad).
       fetch('/api/logout', { method: 'POST' }).catch(() => {});
+      actualizarBotonLogin();
       mostrarPantalla('landing');
+    }
+
+    // Vuelve a la pantalla de inicio (portal) SIN cerrar sesión. A diferencia
+    // de goToLanding(), no borra el estado ni pide al servidor cerrar la
+    // cookie: el usuario sigue logueado y puede volver al panel cuando quiera.
+    function irAlPortal() {
+      const pill = document.getElementById('user-pill');
+      if (pill) pill.classList.remove('open');
+      actualizarBotonLogin();
+      mostrarPantalla('landing');
+      _navegandoProgramaticamente = true;
+      window.history.pushState({ screen: 'landing' }, '', '/');
+      setTimeout(() => { _navegandoProgramaticamente = false; }, 50);
+    }
+
+    // Si hay sesión activa, el botón de la landing ya no debe mandar a
+    // /auth/login (eso reiniciaría el login con Discord innecesariamente):
+    // debe llevar directo al panel. Sin sesión, se comporta como siempre.
+    function actualizarBotonLogin() {
+      const btn = document.getElementById('login-btn');
+      const txt = document.getElementById('login-btn-text');
+      if (!btn) return;
+      if (currentUser) {
+        btn.href = '#';
+        txt.textContent = 'Ir al Panel';
+        btn.onclick = (e) => {
+          e.preventDefault();
+          mostrarPantalla('dashboard');
+          _navegandoProgramaticamente = true;
+          window.history.pushState({ screen: 'dashboard' }, '', '/');
+          setTimeout(() => { _navegandoProgramaticamente = false; }, 50);
+        };
+      } else {
+        btn.href = '/auth/login';
+        txt.textContent = 'Entrar con Discord';
+        btn.onclick = null;
+      }
     }
 
     let _navegandoProgramaticamente = false;
@@ -219,6 +258,9 @@
     document.getElementById('logout-btn').addEventListener('click', () => {
       document.getElementById('user-pill').classList.remove('open');
       goToLanding();
+    });
+    document.getElementById('portal-btn').addEventListener('click', () => {
+      irAlPortal();
     });
 
 
