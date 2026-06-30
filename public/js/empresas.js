@@ -85,7 +85,7 @@
 
     function adminEmpresasTab(tab) {
       document.querySelectorAll('.ae-tab').forEach((t, i) => {
-        const ids = ['listado', 'crear'];
+        const ids = ['listado', 'crear', 'logros'];
         t.classList.toggle('active', ids[i] === tab);
         document.getElementById(`ae-tab-${ids[i]}`).classList.toggle('visible', ids[i] === tab);
       });
@@ -158,11 +158,17 @@
       const discord_url   = document.getElementById('ae-discord').value.trim();
       const dueno_nombre  = document.getElementById('ae-dueno-nombre').value.trim();
       const dueno_avatar  = document.getElementById('ae-dueno-avatar').value.trim();
+      const dueno_id      = document.getElementById('ae-dueno-id').value.trim();
       const errEl = document.getElementById('ae-crear-error');
       errEl.classList.remove('visible');
 
       if (!nombre || !discord_url || !dueno_nombre) {
         errEl.textContent = 'El nombre, el link de Discord y el nombre de Discord del dueño son obligatorios.';
+        errEl.classList.add('visible');
+        return;
+      }
+      if (!dueno_id || !/^\d{15,25}$/.test(dueno_id)) {
+        errEl.textContent = 'El Discord ID del dueño es obligatorio y debe ser numérico.';
         errEl.classList.add('visible');
         return;
       }
@@ -173,7 +179,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             nombre, logo_url: logo_url || null, descripcion: descripcion || null, discord_url,
-            dueno_nombre, dueno_avatar_url: dueno_avatar || null,
+            dueno_nombre, dueno_avatar_url: dueno_avatar || null, dueno_discord_id: dueno_id,
           }),
         });
         const data = await res.json();
@@ -185,7 +191,8 @@
         document.getElementById('ae-discord').value = '';
         document.getElementById('ae-dueno-nombre').value = '';
         document.getElementById('ae-dueno-avatar').value = '';
-        mostrarToast('Empresa creada exitosamente.');
+        document.getElementById('ae-dueno-id').value = '';
+        mostrarToast('Empresa creada exitosamente. Se otorgó el logro "Empresario" al dueño.');
         adminEmpresasTab('listado');
       } catch (e) {
         errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
@@ -202,6 +209,7 @@
       document.getElementById('ee-discord').value = e.discord_url;
       document.getElementById('ee-dueno-nombre').value = e.dueno_nombre || '';
       document.getElementById('ee-dueno-avatar').value = e.dueno_avatar_url || '';
+      document.getElementById('ee-dueno-id').value = e.dueno_discord_id || '';
       document.getElementById('ee-error').classList.remove('visible');
       document.getElementById('modal-editar-empresa').classList.add('visible');
     }
@@ -214,8 +222,15 @@
       const discord_url    = document.getElementById('ee-discord').value.trim();
       const dueno_nombre   = document.getElementById('ee-dueno-nombre').value.trim();
       const dueno_avatar   = document.getElementById('ee-dueno-avatar').value.trim();
+      const dueno_id       = document.getElementById('ee-dueno-id').value.trim();
       const errEl = document.getElementById('ee-error');
       errEl.classList.remove('visible');
+
+      if (dueno_id && !/^\d{15,25}$/.test(dueno_id)) {
+        errEl.textContent = 'El Discord ID del dueño debe ser numérico.';
+        errEl.classList.add('visible');
+        return;
+      }
 
       try {
         const res = await fetch('/api/admin?action=empresas_admin_editar', {
@@ -223,7 +238,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             empresa_id, nombre, logo_url, descripcion, discord_url,
-            dueno_nombre, dueno_avatar_url: dueno_avatar,
+            dueno_nombre, dueno_avatar_url: dueno_avatar, dueno_discord_id: dueno_id || undefined,
           }),
         });
         const data = await res.json();
