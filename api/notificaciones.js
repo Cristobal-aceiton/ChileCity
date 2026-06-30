@@ -20,9 +20,12 @@ async function ensureSchema(sql) {
     CREATE TABLE IF NOT EXISTS notif_estado (
       discord_id  TEXT PRIMARY KEY,
       last_visto  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      limpiado_en TIMESTAMPTZ,
       updated_at  TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  // Por si la tabla ya existía de antes de agregar "limpiar bandeja".
+  await sql`ALTER TABLE notif_estado ADD COLUMN IF NOT EXISTS limpiado_en TIMESTAMPTZ`;
   await sql`
     CREATE TABLE IF NOT EXISTS notif_admin (
       id            SERIAL PRIMARY KEY,
@@ -109,6 +112,19 @@ export default async function handler(req, res) {
       return res.status(201).json({ ok: true, enviadoA: ids.length });
     }
 
+    if (req.method === "POST" && action === "limpiar") {
+      // Vaciar la bandeja: todo lo anterior a este instante deja de listarse,
+      // aunque los datos originales (multas, transferencias, etc.) sigan
+      // existiendo intactos en sus tablas — esto solo afecta qué se muestra
+      // en la campanita de este usuario.
+      await sql`
+        INSERT INTO notif_estado (discord_id, last_visto, limpiado_en, updated_at)
+        VALUES (${discordId}, NOW(), NOW(), NOW())
+        ON CONFLICT (discord_id) DO UPDATE SET last_visto = NOW(), limpiado_en = NOW(), updated_at = NOW()
+      `;
+      return res.status(200).json({ ok: true });
+    }
+
     if (req.method === "POST") {
       // Marcar como leídas: el usuario abrió la campanita.
       await sql`
@@ -126,16 +142,17 @@ export default async function handler(req, res) {
     // Si el usuario nunca abrió la campanita, le creamos un punto de partida
     // en este mismo instante. Así no le aparecen como "nuevas" multas,
     // apuestas o transferencias de hace meses la primera vez que entra.
-    let estado = await sql`SELECT last_visto FROM notif_estado WHERE discord_id = ${discordId}`;
+    let estado = await sql`SELECT last_visto, limpiado_en FROM notif_estado WHERE discord_id = ${discordId}`;
     if (estado.length === 0) {
       await sql`
         INSERT INTO notif_estado (discord_id, last_visto)
         VALUES (${discordId}, NOW())
         ON CONFLICT (discord_id) DO NOTHING
       `;
-      estado = await sql`SELECT last_visto FROM notif_estado WHERE discord_id = ${discordId}`;
+      estado = await sql`SELECT last_visto, limpiado_en FROM notif_estado WHERE discord_id = ${discordId}`;
     }
     const lastVisto = estado[0].last_visto;
+    const limpiadoEn = estado[0].limpiado_en;
 
     const LIMITE_POR_TIPO = 12;
 
@@ -242,8 +259,14 @@ export default async function handler(req, res) {
       });
     }
 
-    items.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-    const itemsFinal = items.slice(0, 30).map(it => ({
+    // Si el usuario limpió la bandeja, todo lo anterior a ese momento
+    // desaparece de la lista (no solo se marca como leído).
+    const itemsVisibles = limpiadoEn
+      ? items.filter(it => new Date(it.fecha) > new Date(limpiadoEn))
+      : items;
+
+    itemsVisibles.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    const itemsFinal = itemsVisibles.slice(0, 30).map(it => ({
       ...it,
       nuevo: new Date(it.fecha) > new Date(lastVisto),
     }));
