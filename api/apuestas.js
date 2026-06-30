@@ -57,6 +57,12 @@ async function initTables(sql) {
       resuelto_at     TIMESTAMPTZ
     )
   `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_sport_apuestas_discord_id ON sport_apuestas(discord_id)
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_sport_apuestas_partido_id ON sport_apuestas(partido_id)
+  `;
 
   schemaReady = true;
 }

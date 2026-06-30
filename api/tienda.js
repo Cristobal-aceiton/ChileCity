@@ -55,6 +55,9 @@ async function initTables(sql) {
       comprado_at   TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_inventario_discord_id ON inventario(discord_id)
+  `;
   schemaReady = true;
 }
 

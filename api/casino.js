@@ -33,6 +33,9 @@ async function initTables(sql) {
       created_at   TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_casino_apuestas_discord_id ON casino_apuestas(discord_id)
+  `;
 
   await sql`
     CREATE TABLE IF NOT EXISTS casino_ganancias (

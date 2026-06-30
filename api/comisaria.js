@@ -35,6 +35,9 @@ async function initTables(sql) {
       created_at      TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_multas_ciudadano_id ON multas(ciudadano_id)
+  `;
 
   // Tabla de antecedentes
   await sql`
@@ -51,6 +54,9 @@ async function initTables(sql) {
       funcionario_nombre TEXT,
       created_at        TIMESTAMPTZ DEFAULT NOW()
     )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_antecedentes_ciudadano_id ON antecedentes(ciudadano_id)
   `;
 
   // Tabla de denuncias
@@ -203,9 +209,9 @@ export default async function handler(req, res) {
 
       // Intentar cobrar automáticamente desde la cuenta bancaria
       try {
-        const cuenta = await sql`SELECT saldo FROM cuentas WHERE discord_id = ${ciudadano_id}`;
+        const cuenta = await sql`SELECT saldo FROM banco WHERE discord_id = ${ciudadano_id}`;
         if (cuenta.length > 0 && Number(cuenta[0].saldo) >= Number(valor)) {
-          await sql`UPDATE cuentas SET saldo = saldo - ${valor} WHERE discord_id = ${ciudadano_id}`;
+          await sql`UPDATE banco SET saldo = saldo - ${valor} WHERE discord_id = ${ciudadano_id}`;
           await sql`
             INSERT INTO transacciones (discord_id, tipo, monto, descripcion)
             VALUES (${ciudadano_id}, 'egreso', ${valor}, ${"Cobro automático de multa: " + motivo})

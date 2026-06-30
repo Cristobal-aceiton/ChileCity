@@ -57,6 +57,9 @@ async function initTables(sql) {
     )
   `;
   await sql`
+    CREATE INDEX IF NOT EXISTS idx_transacciones_discord_id ON transacciones(discord_id)
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS sueldos (
       id            SERIAL PRIMARY KEY,
       discord_id    TEXT NOT NULL,
@@ -67,6 +70,9 @@ async function initTables(sql) {
       activo        BOOLEAN DEFAULT TRUE,
       created_at    TIMESTAMPTZ DEFAULT NOW()
     )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_sueldos_discord_id ON sueldos(discord_id)
   `;
   await sql`
     CREATE TABLE IF NOT EXISTS admins (
