@@ -233,7 +233,7 @@
           else if (a.estado === 'cancelada') amountStr = `+${formatCLP(a.monto)}`;
           else amountStr = formatCLP(a.monto);
           return `
-          <div class="ap-hist-item">
+          <div class="ap-hist-item" id="ap-hist-${a.id}">
             <div class="ap-hist-icon ${a.estado}">${iconMap[a.estado] || '⚽'}</div>
             <div class="ap-hist-info">
               <div class="ap-hist-partido">${escHtml(a.equipo_a)} vs ${escHtml(a.equipo_b)}</div>
@@ -246,9 +246,37 @@
             </div>
           </div>`;
         }).join('');
+        apCelebrarNuevosResultados(d.apuestas);
       } catch {
         lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⚠️</div><div class="ap-empty-text">Error al cargar historial.</div></div>';
       }
+    }
+
+    // Da feedback (sonido + microanimación) la primera vez que el usuario ve
+    // una apuesta ya resuelta (ganada/perdida). Se guarda qué IDs ya se
+    // "celebraron" en localStorage para no repetir el efecto en cada
+    // recarga de la pestaña — solo la primera vez que aparece resuelta.
+    function apCelebrarNuevosResultados(apuestas) {
+      let vistos;
+      try { vistos = JSON.parse(localStorage.getItem('ap_celebrados') || '[]'); }
+      catch { vistos = []; }
+      const vistosSet = new Set(vistos);
+
+      const nuevas = apuestas.filter(a =>
+        (a.estado === 'ganada' || a.estado === 'perdida') && !vistosSet.has(a.id)
+      );
+      if (nuevas.length === 0) return;
+
+      // Solo celebramos la más reciente para no saturar con varios sonidos
+      // a la vez si el usuario entra después de varios días.
+      const masReciente = nuevas[0];
+      const el = document.getElementById(`ap-hist-${masReciente.id}`);
+      if (typeof feedbackResultado === 'function') {
+        feedbackResultado(el, masReciente.estado === 'ganada');
+      }
+
+      nuevas.forEach(a => vistosSet.add(a.id));
+      try { localStorage.setItem('ap_celebrados', JSON.stringify([...vistosSet])); } catch {}
     }
 
     /* ═══════════════════════════════════════════════════════════════

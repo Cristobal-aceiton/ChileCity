@@ -147,10 +147,12 @@
       }
 
       mostrarPantalla('dashboard');
+      if (typeof notifIniciar === 'function') notifIniciar();
     }
 
     function goToLanding() {
       resetEstado();
+      if (typeof notifDetener === 'function') notifDetener();
       // La sesión ahora vive en una cookie httpOnly del servidor; se cierra
       // pidiéndole al servidor que la borre (antes solo se borraba un dato
       // en localStorage, que ni siquiera era la fuente real de verdad).
@@ -237,9 +239,97 @@
       return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
     }
 
+    // ── Feedback de victoria/derrota (sonido + microanimación) ───────────────
+    // Compartido entre Casino y Apuestas para que la sensación de "ganaste"
+    // o "perdiste" sea consistente en toda la app. No reemplaza los sonidos
+    // específicos de cada juego (giro de ruleta, motor del avión, etc.),
+    // se suma como una capa extra justo cuando se revela el resultado.
+    let _fbAudioCtx = null;
+    function _fbGetCtx() {
+      if (!_fbAudioCtx) {
+        try { _fbAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+      }
+      return _fbAudioCtx;
+    }
+
+    function sonidoVictoria() {
+      const ctx = _fbGetCtx(); if (!ctx) return;
+      // Arpegio ascendente y brillante (do-mi-sol-do agudo)
+      const notas = [523.25, 659.25, 783.99, 1046.5];
+      notas.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        const t = ctx.currentTime + i * 0.09;
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.16, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+        osc.start(t); osc.stop(t + 0.34);
+      });
+    }
+
+    function sonidoDerrota() {
+      const ctx = _fbGetCtx(); if (!ctx) return;
+      // Descenso grave y corto, tipo "buzzer" suave (no agresivo)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      const t = ctx.currentTime;
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(90, t + 0.4);
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      osc.start(t); osc.stop(t + 0.45);
+    }
+
+    // Dispara un puñado de "confeti" (emojis) cayendo dentro del elemento
+    // de resultado. Liviano: sin librerías, solo spans con animación CSS
+    // que se autodestruyen.
+    function dispararConfeti(el) {
+      if (!el) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'fb-confeti-wrap';
+      const piezas = ['🎉', '✨', '💰', '🪙'];
+      const cantidad = 10;
+      for (let i = 0; i < cantidad; i++) {
+        const span = document.createElement('span');
+        span.className = 'fb-confeti-pieza';
+        span.textContent = piezas[Math.floor(Math.random() * piezas.length)];
+        span.style.left = (Math.random() * 90 + 2) + '%';
+        span.style.animationDelay = (Math.random() * 0.15) + 's';
+        span.style.fontSize = (12 + Math.random() * 10) + 'px';
+        wrap.appendChild(span);
+      }
+      el.appendChild(wrap);
+      setTimeout(() => wrap.remove(), 1200);
+    }
+
+    // Punto de entrada único: aplica la animación de pulso/sacudida sobre
+    // el elemento de resultado (clásicamente .casino-resultado) y reproduce
+    // el sonido correspondiente. Se puede llamar en cualquier juego o
+    // historial donde se revele un resultado de victoria/derrota.
+    function feedbackResultado(el, gano) {
+      if (el) {
+        el.classList.remove('fb-gano', 'fb-perdio');
+        void el.offsetWidth; // reflow, para poder repetir la animación
+        el.classList.add(gano ? 'fb-gano' : 'fb-perdio');
+      }
+      if (gano) {
+        sonidoVictoria();
+        dispararConfeti(el);
+      } else {
+        sonidoDerrota();
+      }
+    }
+
     // ── Cerrar modales con Escape ────────────────────────────────────────────
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
+      // Panel de notificaciones
+      if (typeof notifCerrar === 'function') notifCerrar();
       // Modales de banco/admin (clase admin-modal-overlay con toggle 'visible')
       ['modal-saldo', 'modal-reset', 'modal-editar-prod'].forEach(id => {
         const el = document.getElementById(id);

@@ -260,6 +260,7 @@
               resEl.className = 'casino-resultado perdio visible';
               resEl.innerHTML = `${emoji} Cayó <b>${resultadoColor.toUpperCase()}</b>. Elegiste ${casinoEleccionRuleta.toUpperCase()}.<br>Perdiste ${formatCLP(monto)}.`;
             }
+            if (typeof feedbackResultado === 'function') feedbackResultado(resEl, serverData.gano);
             ruletaGirando = false;
             actualizarBtnRuleta();
             cargarRanking();
@@ -322,6 +323,7 @@
           resEl.className = 'casino-resultado perdio visible';
           resEl.innerHTML = `${emoji} Cayó <b>${resultado.toUpperCase()}</b>. Elegiste ${casinoEleccionMoneda.toUpperCase()}.<br>Perdiste ${formatCLP(monto)}.`;
         }
+        if (typeof feedbackResultado === 'function') feedbackResultado(resEl, serverData.gano);
         monedaGirando = false;
         actualizarBtnMoneda();
         cargarRanking();
@@ -686,6 +688,7 @@
               casinoSonidoAvionAterrizaje();
               resEl.className = 'casino-resultado gano visible';
               resEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> ¡El avión llegó a <b>x${targetMult.toFixed(2)}</b>! <br><span style="font-size:18px;color:#fbbf24;">+${formatCLP(serverData.premio - monto)}</span>`;
+              if (typeof feedbackResultado === 'function') feedbackResultado(resEl, true);
             } else {
               display.style.background = 'linear-gradient(180deg,rgba(239,68,68,0.12) 0%,rgba(0,0,0,0) 100%)';
               multDisplay.style.color = '#ef4444';
@@ -695,6 +698,7 @@
               estadoEl.textContent = `Explotó en x${crashMult.toFixed(2)}`;
               resEl.className = 'casino-resultado perdio visible';
               resEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff8080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M12 2L9.5 8.5 3 6l4.5 6L2 18l7-2 3 6 3-6 7 2-4.5-6L22 6l-6.5 2.5z"/></svg> El avión explotó en <b>x${crashMult.toFixed(2)}</b>. Querías x${mult.toFixed(2)}.<br>Perdiste ${formatCLP(monto)}.`;
+              if (typeof feedbackResultado === 'function') feedbackResultado(resEl, false);
             }
 
             // Reset para próxima ronda
