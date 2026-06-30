@@ -114,6 +114,12 @@
       } else if (it.tipo === 'apuesta') {
         abrirSeccion('apuestas-screen');
         if (typeof apCargarHistorialPersonal === 'function') apCargarHistorialPersonal();
+      } else if (it.tipo === 'antecedente') {
+        abrirSeccion('comisaria-screen');
+        if (typeof abrirComisaria === 'function') abrirComisaria();
+      } else if (it.tipo === 'admin') {
+        // Aviso de administración: no tiene una sección propia a la cual ir,
+        // solo se marca como leído al abrir el panel.
       }
     }
 

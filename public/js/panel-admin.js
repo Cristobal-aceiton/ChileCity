@@ -97,4 +97,74 @@
     }
 
 
+    // ── PANEL ADMIN: enviar notificaciones ─────────────────────────────────────
+    let pnModo = 'todos';
+
+    function pnSetModo(modo) {
+      pnModo = modo;
+      const btnTodos = document.getElementById('pn-btn-todos');
+      const btnEspecificos = document.getElementById('pn-btn-especificos');
+      const inputIds = document.getElementById('pn-input-ids');
+      if (!btnTodos || !btnEspecificos || !inputIds) return;
+
+      if (modo === 'todos') {
+        btnTodos.style.background = 'rgba(99,102,241,0.25)';
+        btnTodos.style.borderColor = 'rgba(99,102,241,0.5)';
+        btnTodos.style.color = '#fff';
+        btnEspecificos.style.background = 'rgba(255,255,255,0.05)';
+        btnEspecificos.style.borderColor = 'rgba(255,255,255,0.12)';
+        btnEspecificos.style.color = '#9ca3af';
+        inputIds.style.display = 'none';
+      } else {
+        btnEspecificos.style.background = 'rgba(99,102,241,0.25)';
+        btnEspecificos.style.borderColor = 'rgba(99,102,241,0.5)';
+        btnEspecificos.style.color = '#fff';
+        btnTodos.style.background = 'rgba(255,255,255,0.05)';
+        btnTodos.style.borderColor = 'rgba(255,255,255,0.12)';
+        btnTodos.style.color = '#9ca3af';
+        inputIds.style.display = 'block';
+      }
+    }
+
+    async function pnEnviarNotificacion() {
+      const titulo  = document.getElementById('pn-input-titulo').value.trim();
+      const detalle = document.getElementById('pn-input-detalle').value.trim();
+      const msg     = document.getElementById('pn-msg');
+
+      if (!titulo) { msg.style.color = '#f87171'; msg.textContent = 'Ingresa un título.'; return; }
+
+      let destinatarios = 'todos';
+      if (pnModo === 'especificos') {
+        const raw = document.getElementById('pn-input-ids').value.trim();
+        const ids = raw.split(',').map(s => s.trim()).filter(Boolean);
+        if (ids.length === 0) { msg.style.color = '#f87171'; msg.textContent = 'Ingresa al menos un Discord ID.'; return; }
+        destinatarios = ids;
+      }
+
+      msg.style.color = '#9ca3af'; msg.textContent = 'Enviando...';
+
+      try {
+        const r = await fetch('/api/notificaciones?action=enviar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo, detalle, destinatarios })
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          msg.style.color = '#f87171'; msg.textContent = data.error || 'Error desconocido.';
+          return;
+        }
+        msg.style.color = '#4ade80';
+        msg.textContent = destinatarios === 'todos'
+          ? '✓ Notificación enviada a todos los usuarios.'
+          : `✓ Notificación enviada a ${data.enviadoA} usuario(s).`;
+        document.getElementById('pn-input-titulo').value = '';
+        document.getElementById('pn-input-detalle').value = '';
+        document.getElementById('pn-input-ids').value = '';
+      } catch {
+        msg.style.color = '#f87171'; msg.textContent = 'Error de conexión.';
+      }
+    }
+
+
     // ══════════════════════════════════════════════════════════════════════
