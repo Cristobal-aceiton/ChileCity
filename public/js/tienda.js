@@ -50,12 +50,18 @@
       renderProductos(lista);
     }
 
-    // Listeners de búsqueda - se registran una sola vez al cargar la página
+    // Listeners de búsqueda - se registran una sola vez al cargar la página.
+    // OJO: tienda.js se carga ANTES que admin-tienda.js, así que
+    // aplicarFiltrosAdmin todavía no existe en este punto. Se envuelve en
+    // una función anónima para que solo se resuelva cuando el usuario
+    // realmente escriba algo (momento en el que admin-tienda.js ya cargó).
     (function() {
       const s = document.getElementById('tienda-search');
       if (s) s.addEventListener('input', aplicarFiltros);
       const sa = document.getElementById('admin-tienda-search');
-      if (sa) sa.addEventListener('input', aplicarFiltrosAdmin);
+      if (sa) sa.addEventListener('input', () => {
+        if (typeof aplicarFiltrosAdmin === 'function') aplicarFiltrosAdmin();
+      });
     })();
 
     function catEmoji(cat) {
