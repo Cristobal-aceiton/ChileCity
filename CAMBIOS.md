@@ -1,11 +1,73 @@
-# Cambios aplicados — ChileCity RP v13
+# Cambios aplicados — ChileCity RP v14
 
 ## ⚠️ Variables de entorno requeridas
 
-Las mismas que v12: `SESSION_SECRET`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DATABASE_URL`.
-No se requieren variables nuevas.
+Las mismas que v13 — sin cambios.
 
 ---
+
+## 🔒 Seguridad — XSS almacenado en Banco y Panel Admin
+
+- `public/js/banco.js`: la descripción de las transacciones, los nombres de
+  usuario/RUT del panel admin, los nombres de sueldo y los contactos
+  guardados se renderizaban con `innerHTML` **sin escapar**. Si alguien
+  escribía HTML/JS en el concepto de una transferencia (por ejemplo), se
+  ejecutaba en la pantalla de quien viera ese historial. Ahora todos esos
+  campos pasan por `escHtml()`, igual que en comisaría/perfil público.
+- `public/js/panel-admin.js`: el nombre de Discord y el ID de cada admin en
+  la lista del Panel Admin tampoco se escapaban. Corregido por consistencia
+  y defensa en profundidad.
+- Se auditó el resto de los módulos (`casino.js`, `tienda.js`,
+  `admin-tienda.js`, `empresas.js`, `apuestas.js`): ya escapaban
+  correctamente todo el texto proveniente de usuarios, no requerían cambios.
+
+## 📱 PWA — Set completo de íconos
+
+- El manifest solo traía un ícono de 128×128 sin propósito `maskable` bien
+  formado (recortaba mal en algunos launchers Android). Se generaron
+  `icon-192.png`, `icon-512.png` (purpose `any`) e `icon-maskable-512.png`
+  (con relleno de seguridad y fondo `#0a0a0f`) a partir del logo original,
+  y se agregaron sus rewrites correspondientes en `vercel.json`.
+
+## 🖼️ Rendimiento — imagen de fondo
+
+- `index.html`: se agregó `<link rel="preload" fetchpriority="high">` para
+  la imagen de fondo, además de `fetchpriority="high"` y `decoding="async"`
+  en el `<img>`, ya que es contenido visible de inmediato (no debe ir con
+  `loading="lazy"`).
+- Se agregó un fundido de entrada (`opacity` + `transition`) para que la
+  imagen no aparezca de golpe ("pop-in") mientras carga, con manejo de
+  `onerror` para que la pantalla no se quede oscura si la imagen falla.
+- Nota: la imagen sigue sirviéndose desde Imgur sin variantes responsivas;
+  para una mejora real de peso conviene autoalojar una versión comprimida
+  (WebP, varias resoluciones) — no se pudo hacer en este cambio por no
+  tener acceso de red para descargarla y recomprimirla.
+
+## 🔊 Sonidos y microinteracciones
+
+- Nuevas funciones globales en `app.js`: `sonidoNotificacion()` (ping suave,
+  dos tonos) y `sonidoConfirmacion()` (click corto tipo "listo"), con el
+  mismo motor de Web Audio que ya usaban los sonidos de victoria/derrota del
+  casino — sin archivos de audio externos.
+- La campanita de notificaciones ahora también suena (sutil) cuando llega
+  una notificación nueva, además de agitarse como antes.
+- Transferencias bancarias exitosas y toasts de tipo `success` (compras en
+  tienda, acciones varias) reproducen `sonidoConfirmacion()`.
+- Generar la Cédula de Identidad por primera vez ahora tiene una animación
+  de aparición (`rc-carnet-reveal`) + sonido de confirmación — pero solo la
+  primera vez que se crea, no cada vez que se abre Registro Civil con un
+  carnet ya existente.
+
+### Archivos tocados
+- `public/js/banco.js`, `public/js/panel-admin.js` — fix de XSS.
+- `public/manifest.json`, `vercel.json` — íconos PWA.
+- `public/index.html`, `public/styles.css` — preload/fade de fondo, animación de carnet.
+- `public/js/app.js` — nuevos sonidos `sonidoNotificacion()` / `sonidoConfirmacion()`.
+- `public/js/notificaciones.js`, `public/js/tienda.js`, `public/js/registro-civil.js` — enganche de los nuevos sonidos.
+
+---
+
+
 
 ## 🔔 Notificaciones — antecedentes + avisos de administración
 

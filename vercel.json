@@ -17,6 +17,9 @@
     { "source": "/favicon.svg",    "destination": "/public/favicon.svg" },
     { "source": "/styles.css",     "destination": "/public/styles.css" },
     { "source": "/logo.webp",      "destination": "/public/logo.webp" },
+    { "source": "/icon-192.png",   "destination": "/public/icon-192.png" },
+    { "source": "/icon-512.png",   "destination": "/public/icon-512.png" },
+    { "source": "/icon-maskable-512.png", "destination": "/public/icon-maskable-512.png" },
     { "source": "/js/:file",       "destination": "/public/js/:file" },
     { "source": "/",              "destination": "/public/index.html" }
   ]
