@@ -11,6 +11,9 @@
     { "source": "/icon-192.png",   "destination": "/public/icon-192.png" },
     { "source": "/icon-512.png",   "destination": "/public/icon-512.png" },
     { "source": "/icon-maskable-512.png", "destination": "/public/icon-maskable-512.png" },
+    { "source": "/sw.js",          "destination": "/public/sw.js" },
+    { "source": "/robots.txt",     "destination": "/public/robots.txt" },
+    { "source": "/sitemap.xml",    "destination": "/public/sitemap.xml" },
     { "source": "/js/:file",       "destination": "/public/js/:file" },
     { "source": "/",              "destination": "/public/index.html" }
   ],
@@ -44,6 +47,13 @@
       "source": "/(icon-192.png|icon-512.png|icon-maskable-512.png|logo.webp|favicon.svg)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=2592000, immutable" }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
       ]
     }
   ]

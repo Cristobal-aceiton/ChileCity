@@ -1,3 +1,106 @@
+# Cambios aplicados — ChileCity RP v16 (índices, SW, SEO, bugfix)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v15 — sin cambios.
+
+---
+
+## 🐛 Bugfix — Cobro automático de multas nunca funcionaba
+
+- `api/comisaria.js`, acción `agregarMulta`: el código intentaba descontar el
+  monto de la multa desde una tabla llamada `cuentas`, que **no existe en
+  ningún lado del proyecto** (la tabla real es `banco`, usada en
+  `banco.js`/`casino.js`/`tienda.js`/`apuestas.js`). El error quedaba
+  silenciado por un `catch` que asumía "la cuenta puede no existir", pero en
+  realidad la query fallaba siempre por nombre de tabla incorrecto.
+- Resultado antes del fix: **ninguna multa se cobraba automáticamente**,
+  todas quedaban en estado `pendiente` aunque el ciudadano tuviera saldo
+  suficiente.
+- Corregido: ahora consulta y actualiza `banco`, como el resto del sistema.
+  **Esto cambia comportamiento visible**: de aquí en adelante, si el
+  ciudadano multado tiene saldo suficiente en su cuenta, la multa se
+  cobra sola al crearla y queda `pagada` automáticamente (como decía el
+  comentario original del código, que nunca se había cumplido).
+
+## 🚀 Rendimiento — Índices en la base de datos
+
+Se agregaron índices `CREATE INDEX IF NOT EXISTS` (no bloquean, idempotentes
+como las tablas) en las columnas que se filtran en cada `WHERE` de forma
+constante y que antes dependían de un table scan completo:
+
+| Tabla              | Columna       | Dónde se usa                          |
+|---------------------|---------------|----------------------------------------|
+| `transacciones`     | `discord_id`  | Historial bancario de cada usuario     |
+| `sueldos`           | `discord_id`  | Cobro de sueldo recurrente             |
+| `multas`            | `ciudadano_id`| Multas por ciudadano (Comisaría/Perfil)|
+| `antecedentes`      | `ciudadano_id`| Antecedentes por ciudadano             |
+| `inventario`        | `discord_id`  | Inventario de tienda por usuario       |
+| `casino_apuestas`   | `discord_id`  | Historial de casino                    |
+| `sport_apuestas`    | `discord_id`  | Apuestas deportivas por usuario        |
+| `sport_apuestas`    | `partido_id`  | Apuestas por partido (resolución/pagos)|
+
+No se indexaron `denuncias.denunciante_id` ni `comisaria_logs.usuario_id`
+porque sus búsquedas usan `ILIKE '%...%'` (substring) — un índice B-tree
+normal no ayuda ahí, se necesitaría una extensión `pg_trgm` aparte. Se deja
+pendiente si en algún momento esas búsquedas se sienten lentas con datos
+reales.
+
+## 📱 PWA — Service Worker
+
+- Nuevo `public/sw.js`: cachea JS/CSS/íconos con estrategia
+  *stale-while-revalidate* (responde con lo cacheado al instante y actualiza
+  en segundo plano), y la navegación (`/`) con *network-first* + fallback a
+  cache si no hay señal.
+- **`/api/*` y `/auth/*` nunca se cachean** — son datos en vivo (saldo,
+  sesión, inventario); cachearlos mostraría info vieja o de otra sesión.
+- Registrado en `public/js/app.js` al final de `window.load`, con manejo de
+  error silencioso si el navegador no soporta Service Workers.
+- `vercel.json`: rewrite `/sw.js` → `/public/sw.js` + header
+  `Cache-Control: no-cache` (para que las actualizaciones del SW lleguen
+  rápido a los clientes) y `Service-Worker-Allowed: /`.
+
+## 🔍 SEO — robots.txt y sitemap.xml
+
+- Nuevos `public/robots.txt` (permite todo excepto `/api/` y `/auth/`) y
+  `public/sitemap.xml` (con la home; el resto de las secciones son parte de
+  la SPA detrás de login, no rutas indexables por separado).
+- `vercel.json`: rewrites `/robots.txt` y `/sitemap.xml` hacia sus archivos
+  en `/public`.
+
+## 🖼️ Rendimiento — Íconos PNG comprimidos
+
+- `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` pasados por
+  `optipng -o4` (compresión **sin pérdida**, mismos píxeles exactos).
+  Reducción modesta (~3-6%) porque ya estaban relativamente optimizados.
+- Se evaluó `pngquant` (compresión con pérdida, reduce a 256 colores) pero
+  se descartó: el logo tiene degradados metálicos finos que se notarían con
+  banding visible a esa paleta reducida. Se priorizó mantener la calidad
+  visual intacta.
+
+## 🖼️ Rendimiento — `loading="lazy"` en imágenes de listas
+
+- Se agregó `loading="lazy"` a las imágenes generadas dinámicamente en:
+  `tienda.js` (catálogo + inventario), `perfil-publico.js` (inventario por
+  ciudadano), `admin-tienda.js` (catálogo + inventario admin),
+  `comisaria.js` (fotos de antecedentes), `empresas.js` (logos + avatares),
+  `apuestas.js` (logos de equipos).
+- No se tocó la imagen de fondo (`video-bg`) ni los íconos PWA — esas ya
+  usan `fetchpriority="high"` porque son visibles de inmediato y no deben
+  ir con `lazy`.
+
+### Archivos tocados
+- `api/comisaria.js` — bugfix tabla `cuentas` → `banco`, índices.
+- `api/banco.js`, `api/tienda.js`, `api/casino.js`, `api/apuestas.js` — índices.
+- `public/sw.js` — nuevo, Service Worker.
+- `public/js/app.js` — registro del Service Worker.
+- `public/robots.txt`, `public/sitemap.xml` — nuevos.
+- `public/icon-*.png` — comprimidos sin pérdida.
+- `public/js/tienda.js`, `perfil-publico.js`, `admin-tienda.js`, `comisaria.js`, `empresas.js`, `apuestas.js` — `loading="lazy"`.
+- `vercel.json` — rewrites de `/sw.js`, `/robots.txt`, `/sitemap.xml`.
+
+---
+
 # Cambios aplicados — ChileCity RP v15 (auditoría de mejoras)
 
 ## ⚠️ Variables de entorno requeridas
