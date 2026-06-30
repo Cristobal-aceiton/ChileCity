@@ -6,6 +6,7 @@
     { "source": "/api/banco",     "destination": "/api/banco" },
     { "source": "/api/tienda",    "destination": "/api/tienda" },
     { "source": "/api/admin",      "destination": "/api/admin" },
+    { "source": "/api/empresas",   "destination": "/api/empresas" },
     { "source": "/api/comisaria",  "destination": "/api/comisaria" },
     { "source": "/api/casino",     "destination": "/api/casino" },
     { "source": "/api/apuestas",       "destination": "/api/apuestas" },
