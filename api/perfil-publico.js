@@ -40,23 +40,50 @@ export default async function handler(req, res) {
 
     const { q } = req.query;
 
-    // Búsqueda de DNIs
-    let dnis;
+    // ── Paginación ───────────────────────────────────────────────────────
+    // Antes se traían hasta 200 ciudadanos (o 100 en una búsqueda) en una
+    // sola llamada, junto con todo su inventario/multas/antecedentes. Si la
+    // ciudad crece a miles de DNIs eso se vuelve una respuesta enorme y
+    // lenta. Ahora se pagina: el cliente pide "page" (desde 1) y "limit"
+    // (tope 60), y el servidor además devuelve el total de registros que
+    // calzan con la búsqueda para que el front sepa si hay más páginas.
+    const PAGE_SIZE_DEFAULT = 30;
+    const PAGE_SIZE_MAX     = 60;
+    const page  = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(PAGE_SIZE_MAX, Math.max(1, parseInt(req.query.limit, 10) || PAGE_SIZE_DEFAULT));
+    const offset = (page - 1) * limit;
+
+    // Búsqueda de DNIs (paginada)
+    let dnis, totalRow;
     if (q && q.trim()) {
       const busq = `%${q.trim().toLowerCase()}%`;
-      dnis = await sql`
-        SELECT * FROM dni
-        WHERE LOWER(nombre1)   LIKE ${busq}
-           OR LOWER(nombre2)   LIKE ${busq}
-           OR LOWER(apellido1) LIKE ${busq}
-           OR LOWER(apellido2) LIKE ${busq}
-           OR LOWER(rut)       LIKE ${busq}
-        ORDER BY apellido1, nombre1
-        LIMIT 100
-      `;
+      [dnis, totalRow] = await Promise.all([
+        sql`
+          SELECT * FROM dni
+          WHERE LOWER(nombre1)   LIKE ${busq}
+             OR LOWER(nombre2)   LIKE ${busq}
+             OR LOWER(apellido1) LIKE ${busq}
+             OR LOWER(apellido2) LIKE ${busq}
+             OR LOWER(rut)       LIKE ${busq}
+          ORDER BY apellido1, nombre1
+          LIMIT ${limit} OFFSET ${offset}
+        `,
+        sql`
+          SELECT COUNT(*)::int AS total FROM dni
+          WHERE LOWER(nombre1)   LIKE ${busq}
+             OR LOWER(nombre2)   LIKE ${busq}
+             OR LOWER(apellido1) LIKE ${busq}
+             OR LOWER(apellido2) LIKE ${busq}
+             OR LOWER(rut)       LIKE ${busq}
+        `,
+      ]);
     } else {
-      dnis = await sql`SELECT * FROM dni ORDER BY apellido1, nombre1 LIMIT 200`;
+      [dnis, totalRow] = await Promise.all([
+        sql`SELECT * FROM dni ORDER BY apellido1, nombre1 LIMIT ${limit} OFFSET ${offset}`,
+        sql`SELECT COUNT(*)::int AS total FROM dni`,
+      ]);
     }
+    const total = totalRow[0]?.total || 0;
 
     const ids = dnis.map(d => d.discord_id);
     let inventarios = [], multas = [], antecedentes = [];
@@ -85,6 +112,10 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
+      page,
+      limit,
+      total,
+      hasMore: offset + dnis.length < total,
       registros: dnis.map(d => ({
         discord_id:   d.discord_id,
         nombre1:      d.nombre1,
