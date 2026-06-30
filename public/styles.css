@@ -1043,6 +1043,66 @@
     .btn-comprar:active { transform: scale(0.97); }
     .btn-comprar:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
     .tienda-empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.25); font-size: 14px; }
+
+    /* ── EMPRESAS ──────────────────────────────────────────────────────────── */
+    .empresas-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px; width: 100%;
+    }
+    .empresa-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 20px; display: flex; flex-direction: column;
+      align-items: center; text-align: center; gap: 10px;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .empresa-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .empresa-logo {
+      width: 72px; height: 72px; border-radius: 16px; overflow: hidden;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0;
+    }
+    .empresa-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .empresa-info { display: flex; flex-direction: column; gap: 4px; }
+    .empresa-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 19px; color: #fff; letter-spacing: 0.5px; }
+    .empresa-desc { font-size: 12.5px; line-height: 1.6; color: rgba(255,255,255,0.5); }
+    .empresa-dueno {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11.5px; color: rgba(255,255,255,0.45);
+      padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); width: 100%;
+      justify-content: center;
+    }
+    .empresa-dueno strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+    .empresa-dueno-avatar {
+      width: 22px; height: 22px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+      background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .empresa-dueno-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .btn-discord-empresa {
+      margin-top: 4px; display: flex; align-items: center; gap: 8px;
+      background: var(--discord); color: #fff; border: none; border-radius: 10px;
+      padding: 10px 20px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+      text-decoration: none; transition: all 0.25s var(--ease);
+      box-shadow: 0 0 16px var(--discord-glow);
+    }
+    .btn-discord-empresa:hover { transform: translateY(-2px); box-shadow: 0 0 26px rgba(88,101,242,0.7); background: #6875f5; }
+
+    .emp-paginacion { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 28px; }
+    .emp-pag-btn {
+      min-width: 36px; padding: 8px 12px; border-radius: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6); font-size: 12.5px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .emp-pag-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: #fff; }
+    .emp-pag-btn.activo { background: rgba(220,30,30,0.22); border-color: rgba(220,30,30,0.5); color: #ff6b6b; }
+    .emp-pag-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    @media (max-width: 540px) {
+      .empresas-grid { grid-template-columns: 1fr; }
+    }
+
     .compra-toast {
       position: fixed; bottom: 24px; right: 24px; z-index: 9999;
       background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35);
