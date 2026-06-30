@@ -10,6 +10,7 @@
     { "source": "/api/casino",     "destination": "/api/casino" },
     { "source": "/api/apuestas",       "destination": "/api/apuestas" },
     { "source": "/api/perfil-publico", "destination": "/api/perfil-publico" },
+    { "source": "/api/notificaciones", "destination": "/api/notificaciones" },
     { "source": "/api/logout",         "destination": "/api/logout" },
     { "source": "/api/me",             "destination": "/api/me" },
     { "source": "/manifest.json",  "destination": "/public/manifest.json" },
