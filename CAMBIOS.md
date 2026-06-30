@@ -7,6 +7,27 @@ No se requieren variables nuevas.
 
 ---
 
+## 🔔 Notificaciones — antecedentes + avisos de administración
+
+### Qué cambia
+- La campanita de notificaciones (`/api/notificaciones`) ahora también avisa cuando a un usuario **le registran un antecedente policial** (tabla `antecedentes`), además de multas, transferencias recibidas y resultados de apuestas deportivas que ya existían.
+- Nueva tabla `notif_admin`: permite al Panel Admin **enviar avisos manuales** a todos los usuarios o a Discord IDs específicos. Aparecen en la campanita con el ícono 📢 y el título que escriba el admin.
+- Cualquier cuenta que esté en la tabla `admins` (o el `SUPER_ADMIN_ID`) puede enviar avisos — mismo criterio de permisos que el resto del Panel Admin.
+- Nuevo endpoint: `POST /api/notificaciones?action=enviar` con body `{ titulo, detalle, destinatarios }`, donde `destinatarios` es `"todos"` o un arreglo de Discord IDs (máx. 50).
+- Se corrigió el scroll del panel de notificaciones: antes el encabezado ("Notificaciones" / "Marcar leídas") se desplazaba junto con la lista; ahora queda fijo arriba y solo la lista de notificaciones hace scroll, sin filtrarse el scroll hacia el resto de la página (`overscroll-behavior: contain`).
+- Nueva sección **"Enviar Notificación"** dentro de Panel Admin → permite elegir entre "Todos los usuarios" o "Usuarios específicos" (Discord IDs separados por coma), con título y mensaje opcional.
+
+### Archivos tocados
+- `api/notificaciones.js` — antecedentes, tabla `notif_admin`, acción `enviar`.
+- `public/js/notificaciones.js` — manejo del nuevo tipo `admin` y `antecedente`.
+- `public/js/panel-admin.js` — `pnSetModo()` / `pnEnviarNotificacion()`.
+- `public/index.html` — formulario "Enviar Notificación" en Panel Admin.
+- `public/styles.css` — fix de scroll del panel de notificaciones.
+
+---
+
+## ⚠️ Variables de entorno requeridas (heredado)
+
 ## 🔴 Perfil Público (reemplaza Base de Datos)
 
 ### Qué cambia
