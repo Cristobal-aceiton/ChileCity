@@ -8,6 +8,12 @@
     let monedaGirando = false;
     let ruletaAngle = 0; // current rotation of canvas
 
+    // Tiene que ser el mismo valor que CASINO_MAX_APUESTA en lib/constants.js.
+    // Se valida acá también para avisar al toque (sin esperar la respuesta
+    // del servidor) y dejar clarísimo por qué no te deja apostar — antes no
+    // pasaba nada visible y parecía que la página se había trabado.
+    const MONTO_MAXIMO_CASINO = 850000000;
+
     // ── Casino Lobby ──────────────────────────────────────────────────────
     function casinoAbrirJuego(tab) {
       document.getElementById('casino-lobby-section').style.display = 'none';
@@ -79,14 +85,18 @@
       if (juego === 'ruleta') {
         const m = parseInt(document.getElementById('ruleta-monto').value) || 0;
         const el = document.getElementById('ruleta-ganancia-info');
-        if (m > 0) {
+        if (m > MONTO_MAXIMO_CASINO) {
+          el.innerHTML = `<span style="color:#f87171;">La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.</span>`;
+        } else if (m > 0) {
           el.innerHTML = `Rojo/Negro: ganas <b style="color:#F59E0B">${formatCLP(m*2)}</b> &nbsp;|&nbsp; Verde: ganas <b style="color:#4ade80">${formatCLP(m*14)}</b>`;
         } else el.textContent = '';
         actualizarBtnRuleta();
       } else {
         const m = parseInt(document.getElementById('moneda-monto').value) || 0;
         const el = document.getElementById('moneda-ganancia-info');
-        if (m > 0) el.innerHTML = `Si aciertas ganas <b style="color:#F59E0B">${formatCLP(m*2)}</b>`;
+        if (m > MONTO_MAXIMO_CASINO) {
+          el.innerHTML = `<span style="color:#f87171;">La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.</span>`;
+        } else if (m > 0) el.innerHTML = `Si aciertas ganas <b style="color:#F59E0B">${formatCLP(m*2)}</b>`;
         else el.textContent = '';
         actualizarBtnMoneda();
       }
@@ -94,11 +104,11 @@
 
     function actualizarBtnRuleta() {
       const m = parseInt(document.getElementById('ruleta-monto').value) || 0;
-      document.getElementById('btn-ruleta').disabled = !(m > 0 && casinoEleccionRuleta && !ruletaGirando);
+      document.getElementById('btn-ruleta').disabled = !(m > 0 && m <= MONTO_MAXIMO_CASINO && casinoEleccionRuleta && !ruletaGirando);
     }
     function actualizarBtnMoneda() {
       const m = parseInt(document.getElementById('moneda-monto').value) || 0;
-      document.getElementById('btn-moneda').disabled = !(m > 0 && casinoEleccionMoneda && !monedaGirando);
+      document.getElementById('btn-moneda').disabled = !(m > 0 && m <= MONTO_MAXIMO_CASINO && casinoEleccionMoneda && !monedaGirando);
     }
 
     // ── RULETA: dibujo canvas ────────────────────────────────────────────
@@ -189,6 +199,7 @@
     async function jugarRuleta() {
       const monto = parseInt(document.getElementById('ruleta-monto').value);
       if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > MONTO_MAXIMO_CASINO) { mostrarToast(`La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.`, true); return; }
       if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
       if (!casinoEleccionRuleta) { mostrarToast('Elige un color primero.', true); return; }
       if (ruletaGirando) return;
@@ -275,6 +286,7 @@
     async function jugarMoneda() {
       const monto = parseInt(document.getElementById('moneda-monto').value);
       if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > MONTO_MAXIMO_CASINO) { mostrarToast(`La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.`, true); return; }
       if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
       if (!casinoEleccionMoneda) { mostrarToast('Elige cara o cruz primero.', true); return; }
       if (monedaGirando) return;
@@ -598,7 +610,10 @@
       const mult = parseFloat((parseInt(document.getElementById('avion-mult-slider').value) / 100).toFixed(2));
       const infoEl = document.getElementById('avion-ganancia-info');
       const btn = document.getElementById('btn-avion');
-      if (monto > 0) {
+      if (monto > MONTO_MAXIMO_CASINO) {
+        infoEl.innerHTML = `<span style="color:#f87171;">La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.</span>`;
+        btn.disabled = true;
+      } else if (monto > 0) {
         const ganancia = Math.floor(monto * mult);
         infoEl.innerHTML = `Si el avión llega a <b style="color:#06B6D4">x${mult}</b> ganarás <b style="color:#fbbf24">${formatCLP(ganancia)}</b>`;
         btn.disabled = avionVolando;
@@ -613,6 +628,7 @@
       const monto = parseInt(document.getElementById('avion-monto').value);
       const mult = parseFloat((parseInt(document.getElementById('avion-mult-slider').value) / 100).toFixed(2));
       if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > MONTO_MAXIMO_CASINO) { mostrarToast(`La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.`, true); return; }
       if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
 
       avionVolando = true;
