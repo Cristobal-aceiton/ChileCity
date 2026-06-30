@@ -241,7 +241,7 @@
       background: linear-gradient(135deg, #fff, var(--neon2));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; letter-spacing: 1px;
-      margin-left: 60px; /* deja espacio al logo redondo de la esquina (64px + margen) para que no se pisen en PC */
+      margin-left: 88px; /* deja espacio al logo redondo de la esquina (64px + margen) para que no se pisen en PC */
     }
 
     .dash-nav-right { display: flex; align-items: center; gap: 12px; }
