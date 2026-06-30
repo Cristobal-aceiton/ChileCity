@@ -44,6 +44,7 @@
         if (!notifPrimeraCarga && (data.noLeidas || 0) > noLeidasPrevias) {
           notifAgitarCampana();
           if (typeof sonidoNotificacion === 'function') sonidoNotificacion();
+          if (navigator.vibrate) { try { navigator.vibrate(20); } catch {} }
         }
         notifPrimeraCarga = false;
       } catch { /* fallo silencioso: no rompe la navegación por esto */ }

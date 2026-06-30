@@ -371,6 +371,13 @@
         void el.offsetWidth; // reflow, para poder repetir la animación
         el.classList.add(gano ? 'fb-gano' : 'fb-perdio');
       }
+      // Haptic feedback (gratis en código, se siente nativo en PWA instaladas).
+      // Patrón doble y corto para victoria (sensación de "celebración"), un
+      // solo pulso seco para derrota. navigator.vibrate no existe en iOS
+      // Safari/PWA — el try/catch + chequeo de existencia lo vuelve un no-op ahí.
+      if (navigator.vibrate) {
+        try { navigator.vibrate(gano ? [15, 50, 25] : 30); } catch {}
+      }
       if (gano) {
         sonidoVictoria();
         dispararConfeti(el);
@@ -424,7 +431,7 @@
       // Panel de notificaciones
       if (typeof notifCerrar === 'function') notifCerrar();
       // Modales de banco/admin (clase admin-modal-overlay con toggle 'visible')
-      ['modal-saldo', 'modal-reset', 'modal-editar-prod'].forEach(id => {
+      ['modal-saldo', 'modal-reset', 'modal-editar-prod', 'modal-recibo-transferencia'].forEach(id => {
         const el = document.getElementById(id);
         if (el && el.classList.contains('visible')) el.classList.remove('visible');
       });
@@ -447,3 +454,22 @@
         });
       });
     }
+
+    // ── Indicador de sin conexión ─────────────────────────────────────────────
+    // El sw.js ya sirve estáticos/HTML cacheados cuando no hay red, pero eso es
+    // invisible para el usuario: podría estar viendo un saldo o un partido
+    // desactualizado sin saberlo, o intentar una apuesta que nunca llega al
+    // servidor. Este banner discreto avisa el estado real de la conexión.
+    function ccActualizarBannerOffline() {
+      let banner = document.getElementById('offline-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'offline-banner';
+        banner.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg><span>Sin conexión — mostrando datos guardados</span>`;
+        document.body.appendChild(banner);
+      }
+      banner.classList.toggle('visible', !navigator.onLine);
+    }
+    window.addEventListener('online', ccActualizarBannerOffline);
+    window.addEventListener('offline', ccActualizarBannerOffline);
+    document.addEventListener('DOMContentLoaded', ccActualizarBannerOffline);

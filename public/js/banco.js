@@ -132,6 +132,26 @@
       document.getElementById('transfer-form').style.display = 'none';
     }
 
+    // Caché liviana de contactos guardados, para mostrar el nombre del
+    // destinatario en el recibo cuando esté disponible (no hace ningún
+    // request extra: solo aprovecha lo que ya cargó la pestaña Contactos).
+    let _contactosCache = {};
+
+    // Recibo post-transferencia: reemplaza el "toast que desaparece" por un
+    // modal que el usuario cierra a propósito, con el detalle completo
+    // (monto, destinatario, fecha, nuevo saldo) — pensado sobre todo para
+    // transferencias grandes donde el usuario quiere confirmar que sí salió.
+    function mostrarReciboTransferencia(monto, rutDestino, nuevoSaldo) {
+      const nombre = _contactosCache[rutDestino];
+      document.getElementById('recibo-tx-monto').textContent = formatCLP(monto);
+      document.getElementById('recibo-tx-destino').textContent = nombre ? `${nombre} (${rutDestino})` : rutDestino;
+      document.getElementById('recibo-tx-fecha').textContent = new Date().toLocaleString('es-CL', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+      });
+      document.getElementById('recibo-tx-saldo').textContent = formatCLP(nuevoSaldo);
+      document.getElementById('modal-recibo-transferencia').classList.add('visible');
+    }
+
     async function hacerTransferencia() {
       const rut   = document.getElementById('transfer-rut').value.trim();
       const monto = document.getElementById('transfer-monto').value.trim();
@@ -163,6 +183,7 @@
           okEl.textContent = `Transferencia exitosa. Nuevo saldo: ${formatCLP(data.nuevoSaldo)}`;
           okEl.classList.add('visible');
           if (typeof sonidoConfirmacion === 'function') sonidoConfirmacion();
+          mostrarReciboTransferencia(monto, rut, data.nuevoSaldo);
           document.getElementById('transfer-rut').value = '';
           document.getElementById('transfer-monto').value = '';
         }
@@ -440,6 +461,8 @@
         const res = await fetch('/api/banco?action=contactos');
         const data = await res.json();
         const contactos = data.contactos || [];
+        _contactosCache = {};
+        contactos.forEach(c => { _contactosCache[c.rut] = c.nombre; });
         if (!contactos.length) {
           lista.innerHTML = '<div class="historial-vacio">No tienes contactos guardados aún</div>';
           return;

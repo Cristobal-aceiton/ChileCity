@@ -27,6 +27,23 @@
       if (tab === 'historial') apCargarHistorialPersonal();
     }
 
+    // Refresca lo que esté efectivamente visible (usado por pull-to-refresh):
+    // saldo siempre, y la lista de partidos o el historial según el tab activo.
+    async function apRefrescarActivo() {
+      if (!currentUser?.id) return;
+      try {
+        const r = await fetch(`/api/banco?action=cuenta&discord_id=${currentUser.id}`);
+        const d = await r.json();
+        if (d.existe) {
+          apSaldo = d.cuenta.saldo;
+          document.getElementById('ap-saldo-val').textContent = formatCLP(apSaldo);
+        }
+      } catch {}
+      const enHistorial = document.getElementById('ap-historial-section').style.display !== 'none';
+      if (enHistorial) await apCargarHistorialPersonal();
+      else await apCargarPartidos();
+    }
+
     async function apCargarPartidos() {
       const lista = document.getElementById('ap-partidos-lista');
       lista.innerHTML = '<div class="ap-empty"><div class="ap-empty-icon">⏳</div><div class="ap-empty-text">Cargando partidos...</div></div>';
