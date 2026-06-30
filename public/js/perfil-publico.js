@@ -280,7 +280,7 @@
                 <div class="pp-records-list">${antsHtml}</div>
               </div>
               <div class="pp-tab-panel" id="pptp-${r.discord_id}-logros">
-                ${logrosHtml}
+                <div class="pp-logros-scroll">${logrosHtml}</div>
               </div>
             </div>
           </div>`;
@@ -290,6 +290,7 @@
     function togglePPCard(id) {
       const card = document.getElementById(`ppc-${id}`);
       if (card) card.classList.toggle('open');
+      ppDespertarScroll();
     }
 
     function ppSwitchTab(cardId, tabName, btn) {
@@ -306,4 +307,21 @@
       btn.classList.add('active');
       const activePanel = document.getElementById(`pptp-${cardId}-${tabName}`);
       if (activePanel) activePanel.classList.add('active');
+
+      ppDespertarScroll();
+    }
+
+    // Workaround para un bug conocido de iOS Safari: dentro de un contenedor
+    // con -webkit-overflow-scrolling:touch, si el contenido cambia de alto
+    // de golpe (como al mostrar un panel con muchos logros), el scroll
+    // puede quedar "trabado" y dejar de responder hacia arriba. Forzar un
+    // reflow apagando y prendiendo esa propiedad lo destraba.
+    function ppDespertarScroll() {
+      const scroller = document.getElementById('perfil-publico-screen');
+      if (!scroller) return;
+      requestAnimationFrame(() => {
+        scroller.style.webkitOverflowScrolling = 'auto';
+        void scroller.offsetHeight; // fuerza el reflow
+        scroller.style.webkitOverflowScrolling = 'touch';
+      });
     }
