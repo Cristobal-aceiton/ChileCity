@@ -1448,8 +1448,32 @@
       </div>
 
       <div class="rc-loading" id="pp-loading">
-        <div class="spinner"></div>
-        <span>Cargando ciudadanos…</span>
+        <div class="skeleton-wrap" style="width:100%;">
+          <div class="skeleton-card" style="flex-direction:row;align-items:center;gap:14px;">
+            <div class="skeleton-line" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+              <div class="skeleton-line" style="height:13px;width:55%;"></div>
+              <div class="skeleton-line" style="height:11px;width:30%;"></div>
+            </div>
+            <div class="skeleton-line" style="height:20px;width:70px;border-radius:99px;"></div>
+          </div>
+          <div class="skeleton-card" style="flex-direction:row;align-items:center;gap:14px;">
+            <div class="skeleton-line" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+              <div class="skeleton-line" style="height:13px;width:65%;"></div>
+              <div class="skeleton-line" style="height:11px;width:35%;"></div>
+            </div>
+            <div class="skeleton-line" style="height:20px;width:70px;border-radius:99px;"></div>
+          </div>
+          <div class="skeleton-card" style="flex-direction:row;align-items:center;gap:14px;">
+            <div class="skeleton-line" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+              <div class="skeleton-line" style="height:13px;width:45%;"></div>
+              <div class="skeleton-line" style="height:11px;width:28%;"></div>
+            </div>
+            <div class="skeleton-line" style="height:20px;width:70px;border-radius:99px;"></div>
+          </div>
+        </div>
       </div>
       <div id="pp-lista" style="display:flex; flex-direction:column; gap:12px; width:100%; padding-bottom:32px;"></div>
     </div>
@@ -1574,13 +1598,43 @@
 
         <!-- ── MIS MULTAS ───────────────────────────────────────────── -->
         <div class="admin-seccion" id="cv-tab-mis-multas" style="gap:14px;">
-          <div class="rc-loading" id="cv-mis-multas-loading"><div class="spinner"></div><span>Cargando multas...</span></div>
+          <div class="rc-loading" id="cv-mis-multas-loading">
+            <div class="skeleton-wrap" style="width:100%;">
+              <div class="skeleton-card">
+                <div class="skeleton-line" style="height:13px;width:45%;"></div>
+                <div class="skeleton-line" style="height:11px;width:80%;"></div>
+                <div class="skeleton-line" style="height:11px;width:60%;"></div>
+              </div>
+              <div class="skeleton-card">
+                <div class="skeleton-line" style="height:13px;width:55%;"></div>
+                <div class="skeleton-line" style="height:11px;width:70%;"></div>
+                <div class="skeleton-line" style="height:11px;width:50%;"></div>
+              </div>
+            </div>
+          </div>
           <div id="cv-mis-multas-lista"></div>
         </div>
 
         <!-- ── MIS ANTECEDENTES ────────────────────────────────────── -->
         <div class="admin-seccion" id="cv-tab-mis-antecedentes" style="gap:14px;">
-          <div class="rc-loading" id="cv-mis-antec-loading"><div class="spinner"></div><span>Cargando antecedentes...</span></div>
+          <div class="rc-loading" id="cv-mis-antec-loading">
+            <div class="skeleton-wrap" style="width:100%;">
+              <div class="skeleton-card" style="flex-direction:row;gap:16px;">
+                <div class="skeleton-line" style="width:72px;height:72px;border-radius:10px;flex-shrink:0;"></div>
+                <div style="display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center;">
+                  <div class="skeleton-line" style="height:13px;width:50%;"></div>
+                  <div class="skeleton-line" style="height:11px;width:75%;"></div>
+                </div>
+              </div>
+              <div class="skeleton-card" style="flex-direction:row;gap:16px;">
+                <div class="skeleton-line" style="width:72px;height:72px;border-radius:10px;flex-shrink:0;"></div>
+                <div style="display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center;">
+                  <div class="skeleton-line" style="height:13px;width:60%;"></div>
+                  <div class="skeleton-line" style="height:11px;width:65%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="cv-mis-antec-lista"></div>
         </div>
 
@@ -1754,8 +1808,28 @@
        Se añade como tab adicional al panel-admin-screen
        ═══════════════════════════════════════════════════════════ -->
 
+  <!-- ══════════════════════════════════════════════════════════
+       NOTIFICACIONES (campanita) — vive fuera de los .screen para
+       quedar visible sobre cualquier sección mientras hay sesión.
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="notif-bell-wrap">
+    <button class="notif-bell-btn" id="notif-bell-btn" aria-label="Notificaciones">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+    </button>
+    <div class="notif-panel">
+      <div class="notif-panel-header">
+        <span class="notif-panel-title">Notificaciones</span>
+        <button class="notif-panel-marcar" id="notif-marcar-leidas">Marcar leídas</button>
+      </div>
+      <div class="notif-list" id="notif-list">
+        <div class="notif-empty">Cargando…</div>
+      </div>
+    </div>
+  </div>
 
   <script src="/js/app.js"></script>
+  <script src="/js/notificaciones.js"></script>
   <script src="/js/registro-civil.js"></script>
   <script src="/js/banco.js"></script>
   <script src="/js/tienda.js"></script>
@@ -1765,6 +1839,10 @@
     // ══════════════════════════════════════════════════════════════════════════
     let ppRegistros   = [];
     let ppSearchTimer = null;
+    let ppPaginaActual = 1;
+    let ppQueryActual  = '';
+    let ppCargandoMas  = false;
+    let ppHasMore      = false;
 
     // Debounce en búsqueda con validación en tiempo real
     (function() {
@@ -1791,33 +1869,88 @@
       cargarPerfilPublico('');
     }
 
+    // q: término de búsqueda. Siempre reinicia a la página 1 (nueva búsqueda).
     async function cargarPerfilPublico(q = '') {
       if (!currentUser?.id) return;
+      ppQueryActual  = q;
+      ppPaginaActual = 1;
       document.getElementById('pp-loading').style.display = 'flex';
       document.getElementById('pp-lista').innerHTML = '';
       document.getElementById('pp-stats').style.display = 'none';
+      ocultarBotonCargarMasPP();
 
       try {
-        const url = `/api/perfil-publico${q ? '?q=' + encodeURIComponent(q) : ''}`;
-        const res  = await fetch(url, { credentials: 'same-origin' });
+        const data = await ppFetchPagina(q, 1);
         document.getElementById('pp-loading').style.display = 'none';
-        if (res.status === 401) {
+        ppRegistros = data.registros || [];
+        ppHasMore   = !!data.hasMore;
+        renderPerfilPublico(ppRegistros, data.total ?? ppRegistros.length);
+        actualizarBotonCargarMasPP();
+      } catch(e) {
+        document.getElementById('pp-loading').style.display = 'none';
+        if (e && e.sesionInvalida) {
           document.getElementById('pp-lista').innerHTML =
             '<div class="historial-vacio">Sesión no válida. Cierra sesión y vuelve a entrar.</div>';
           return;
         }
-        if (!res.ok) throw new Error('Error ' + res.status);
-        const data = await res.json();
-        ppRegistros = data.registros || [];
-        renderPerfilPublico(ppRegistros);
-      } catch(e) {
-        document.getElementById('pp-loading').style.display = 'none';
         document.getElementById('pp-lista').innerHTML =
           '<div class="historial-vacio">Error al cargar el perfil público.</div>';
       }
     }
 
-    function renderPerfilPublico(lista) {
+    // Trae la siguiente página y la agrega al final de la lista ya cargada
+    // (en vez de pedir todos los ciudadanos de una sola vez, que se vuelve
+    // pesado si la ciudad llega a tener miles de DNIs registrados).
+    async function ppCargarMas() {
+      if (ppCargandoMas || !ppHasMore) return;
+      ppCargandoMas = true;
+      const btn = document.getElementById('pp-cargar-mas');
+      if (btn) { btn.disabled = true; btn.textContent = 'Cargando…'; }
+
+      try {
+        const data = await ppFetchPagina(ppQueryActual, ppPaginaActual + 1);
+        ppPaginaActual += 1;
+        ppHasMore = !!data.hasMore;
+        ppRegistros = ppRegistros.concat(data.registros || []);
+        renderPerfilPublico(ppRegistros, data.total ?? ppRegistros.length);
+      } catch {
+        if (typeof mostrarToast === 'function') mostrarToast('Error al cargar más ciudadanos.', true);
+      } finally {
+        ppCargandoMas = false;
+        actualizarBotonCargarMasPP();
+      }
+    }
+
+    async function ppFetchPagina(q, page) {
+      const params = new URLSearchParams({ page: String(page) });
+      if (q) params.set('q', q);
+      const res = await fetch(`/api/perfil-publico?${params.toString()}`, { credentials: 'same-origin' });
+      if (res.status === 401) { const err = new Error('401'); err.sesionInvalida = true; throw err; }
+      if (!res.ok) throw new Error('Error ' + res.status);
+      return res.json();
+    }
+
+    function actualizarBotonCargarMasPP() {
+      let btn = document.getElementById('pp-cargar-mas');
+      const lista = document.getElementById('pp-lista');
+      if (!ppHasMore) { ocultarBotonCargarMasPP(); return; }
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'pp-cargar-mas';
+        btn.className = 'pp-cargar-mas-btn';
+        btn.onclick = ppCargarMas;
+        lista.parentElement.appendChild(btn);
+      }
+      btn.disabled = false;
+      btn.textContent = `Cargar más ciudadanos`;
+    }
+
+    function ocultarBotonCargarMasPP() {
+      const btn = document.getElementById('pp-cargar-mas');
+      if (btn) btn.remove();
+    }
+
+    function renderPerfilPublico(lista, totalServer) {
       const el      = document.getElementById('pp-lista');
       const statsEl = document.getElementById('pp-stats');
 
@@ -1827,8 +1960,9 @@
         return;
       }
 
-      // Stats
-      document.getElementById('pp-total-registros').textContent = lista.length;
+      // Stats — el total real en la BD (o que calza con la búsqueda), no
+      // solo lo que se ha cargado hasta ahora en pantalla.
+      document.getElementById('pp-total-registros').textContent = totalServer ?? lista.length;
       statsEl.style.display = 'flex';
 
       el.innerHTML = lista.map(r => {

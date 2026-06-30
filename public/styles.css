@@ -1355,6 +1355,7 @@
       width: 100%; border-radius: 14px; padding: 16px 20px;
       text-align: center; font-size: 15px; font-weight: 700;
       display: none; animation: fadeUp 0.4s var(--ease);
+      position: relative;
     }
     .casino-resultado.visible { display: block; }
     .casino-resultado.gano {
@@ -1362,6 +1363,43 @@
     }
     .casino-resultado.perdio {
       background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #ff8080;
+    }
+    /* Microanimaciones de victoria/derrota: se agregan como clase aparte
+       (no reemplazan .gano/.perdio) para poder repetir el efecto en cada
+       ronda quitando y volviendo a poner la clase. */
+    .casino-resultado.fb-gano {
+      animation: fbPulseGano 0.55s var(--ease);
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.5);
+    }
+    @keyframes fbPulseGano {
+      0%   { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(16,185,129,0.55); }
+      40%  { transform: scale(1.04); box-shadow: 0 0 22px 4px rgba(16,185,129,0.35); }
+      100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+    .casino-resultado.fb-perdio {
+      animation: fbShakePerdio 0.45s var(--ease);
+    }
+    @keyframes fbShakePerdio {
+      0%, 100% { transform: translateX(0); }
+      20%  { transform: translateX(-6px); }
+      40%  { transform: translateX(5px); }
+      60%  { transform: translateX(-4px); }
+      80%  { transform: translateX(3px); }
+    }
+
+    /* Confeti liviano (solo CSS + spans generados por JS, sin librerías) */
+    .fb-confeti-wrap {
+      position: absolute; inset: 0; overflow: visible;
+      pointer-events: none; z-index: 5;
+    }
+    .fb-confeti-pieza {
+      position: absolute; top: 0; font-size: 16px;
+      animation: fbConfetiCaer 0.9s ease-in forwards;
+      opacity: 0.95;
+    }
+    @keyframes fbConfetiCaer {
+      0%   { transform: translateY(-6px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(70px) rotate(220deg); opacity: 0; }
     }
 
     /* Apuesta form */
@@ -2001,7 +2039,10 @@
       border-radius: 12px; padding: 14px 16px;
       display: flex; align-items: center; gap: 12px;
       animation: fadeUp 0.4s var(--ease) both;
+      position: relative;
     }
+    .ap-hist-item.fb-gano { animation: fbPulseGano 0.55s var(--ease); }
+    .ap-hist-item.fb-perdio { animation: fbShakePerdio 0.45s var(--ease); }
     .ap-hist-item + .ap-hist-item { margin-top: 8px; }
     .ap-hist-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
     .ap-hist-icon.ganada { background: rgba(16,185,129,0.15); }
@@ -2150,6 +2191,126 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* ── NOTIFICACIONES (campanita) ─────────────────────────────────────
+       Reusa el mismo lenguaje visual que #section-indicator: fondo oscuro
+       semitransparente con blur, borde sutil, esquinas muy redondeadas. ── */
+    #notif-bell-wrap {
+      position: fixed; top: 16px; right: 18px; z-index: 9990;
+      display: none; /* se activa por JS al iniciar sesión */
+    }
+    #notif-bell-wrap.nb-activo { display: block; }
+
+    .notif-bell-btn {
+      position: relative;
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(20,20,20,0.88);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.85);
+      cursor: pointer;
+      transition: background 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
+    }
+    .notif-bell-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.22); }
+    .notif-bell-btn:active { transform: scale(0.94); }
+    .notif-bell-btn.nb-ring svg { animation: nbRing 0.6s ease-in-out; }
+    @keyframes nbRing {
+      0%, 100% { transform: rotate(0deg); }
+      15% { transform: rotate(14deg); }
+      30% { transform: rotate(-12deg); }
+      45% { transform: rotate(9deg); }
+      60% { transform: rotate(-6deg); }
+      75% { transform: rotate(3deg); }
+    }
+
+    .notif-badge {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 17px; height: 17px; padding: 0 4px;
+      background: #ef4444; border: 2px solid rgba(20,20,20,0.9);
+      border-radius: 99px;
+      font-size: 10px; font-weight: 800; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+
+    .notif-panel {
+      position: absolute; top: 52px; right: 0;
+      width: 340px; max-width: calc(100vw - 28px);
+      max-height: 70vh; overflow-y: auto;
+      background: rgba(20,20,20,0.92);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+      padding: 8px;
+      opacity: 0; transform: translateY(-8px) scale(0.97);
+      pointer-events: none;
+      transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+    }
+    #notif-bell-wrap.nb-open .notif-panel {
+      opacity: 1; transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    .notif-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 4px;
+    }
+    .notif-panel-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+      letter-spacing: 0.5px; color: #fff;
+    }
+    .notif-panel-marcar {
+      font-size: 11px; color: rgba(255,255,255,0.4);
+      background: none; border: none; cursor: pointer;
+      font-weight: 600; letter-spacing: 0.3px;
+      transition: color 0.15s var(--ease);
+    }
+    .notif-panel-marcar:hover { color: rgba(255,255,255,0.75); }
+
+    .notif-list { display: flex; flex-direction: column; gap: 4px; max-height: 420px; }
+    .notif-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px; border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.15s var(--ease);
+    }
+    .notif-item:hover { background: rgba(255,255,255,0.06); }
+    .notif-item.nv-nuevo { background: rgba(99,102,241,0.08); }
+    .notif-item-icono {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .notif-item-info { flex: 1; min-width: 0; }
+    .notif-item-titulo {
+      font-size: 13px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .notif-item-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #818cf8;
+      flex-shrink: 0;
+    }
+    .notif-item-detalle {
+      font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .notif-item-tiempo {
+      font-size: 10.5px; color: rgba(255,255,255,0.3); margin-top: 4px;
+    }
+    .notif-empty {
+      padding: 36px 16px; text-align: center;
+      color: rgba(255,255,255,0.35); font-size: 13px;
+    }
+
+    @media (max-width: 520px) {
+      #notif-bell-wrap { top: 12px; right: 12px; }
+      .notif-panel { right: -4px; width: calc(100vw - 24px); }
+    }
+
     /* ── 4. VALIDACIÓN EN TIEMPO REAL ────────────────────────────────── */
     input.input-ok {
       border-color: rgba(16,185,129,0.55) !important;
@@ -2261,6 +2422,20 @@
     .pp-rut    { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; font-family: monospace; }
 
     .pp-header-badges { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+
+    .pp-cargar-mas-btn {
+      width: 100%; margin-top: 4px; padding: 13px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      color: rgba(255,255,255,0.75);
+      font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+      cursor: pointer; transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+    }
+    .pp-cargar-mas-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);
+    }
+    .pp-cargar-mas-btn:disabled { opacity: 0.6; cursor: default; }
     .pp-badge {
       font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
       padding: 3px 8px; border-radius: 20px;
