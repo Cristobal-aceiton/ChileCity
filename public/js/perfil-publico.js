@@ -280,7 +280,7 @@
                 <div class="pp-records-list">${antsHtml}</div>
               </div>
               <div class="pp-tab-panel" id="pptp-${r.discord_id}-logros">
-                <div class="pp-logros-scroll">${logrosHtml}</div>
+                ${logrosHtml}
               </div>
             </div>
           </div>`;
