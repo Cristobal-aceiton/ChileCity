@@ -223,6 +223,7 @@
       if (paEsSuperAdmin && typeof paCargarAdmins === 'function') paCargarAdmins();
       if (typeof gpCargarPolicias === 'function') gpCargarPolicias();
       if (typeof psCargarStaff === 'function') psCargarStaff();
+      if (typeof slCargarLogs === 'function') slCargarLogs();
     }
 
     function volverPanelAdmin() {

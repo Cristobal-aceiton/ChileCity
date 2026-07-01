@@ -241,3 +241,56 @@
         psCargarStaff();
       } catch { alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Revocar'; }
     }
+
+    // ── Logs de Staff ────────────────────────────────────────────────────────
+    // Mismo patrón visual que los logs de la Comisaría Virtual (cvCargarLogs),
+    // pero lee /api/admin?action=staff_logs_listar, que junta las acciones de
+    // Admin Banco, Empresas, Logros, Policías y Staff en un solo lugar.
+    function slFecha(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+
+    function slColorAccion(accion) {
+      if (accion.includes('QUITAR') || accion.includes('ELIMINAR') || accion.includes('REVOCAR') || accion.includes('BORRAR'))
+        return '#f87171';
+      if (accion.includes('RESETEAR'))
+        return '#fbbf24';
+      return '#4ade80';
+    }
+
+    async function slCargarLogs() {
+      const q       = document.getElementById('sl-buscar-q')?.value?.trim() || '';
+      const loading = document.getElementById('sl-loading');
+      const lista   = document.getElementById('sl-lista');
+      if (!loading || !lista) return;
+      loading.style.display = 'flex'; lista.innerHTML = '';
+      try {
+        const url = `/api/admin?action=staff_logs_listar${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+        const r    = await fetch(url);
+        const data = await r.json();
+        loading.style.display = 'none';
+        if (!r.ok) { lista.innerHTML = `<p style="color:#f87171;font-size:13px;">${escHtml(data.error || 'Error al cargar.')}</p>`; return; }
+        const logs = data.logs || [];
+        if (logs.length === 0) {
+          lista.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:24px;">Sin logs registrados.</p>';
+          return;
+        }
+        logs.forEach(l => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;';
+          row.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:200px;">
+              <span style="font-size:13px;font-weight:700;color:${slColorAccion(l.accion)};">${escHtml(l.accion)}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.55);">${escHtml(l.detalle || '')}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.25);">👤 ${escHtml(l.actor_nombre || l.actor_id)} · ID: ${escHtml(l.actor_id)}</span>
+            </div>
+            <span style="font-size:11px;color:rgba(255,255,255,0.3);white-space:nowrap;">${slFecha(l.created_at)}</span>
+          `;
+          lista.appendChild(row);
+        });
+      } catch {
+        loading.style.display = 'none';
+        lista.innerHTML = '<p style="color:#f87171;font-size:13px;">Error al cargar.</p>';
+      }
+    }
