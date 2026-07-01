@@ -103,6 +103,17 @@ async function esPoliciaVirtual(sql, discord_id) {
   return rows.length > 0;
 }
 
+// Gestionar quién es Policía Virtual es una acción de administración del
+// staff, no de la policía misma. Antes esta función no se usaba en ningún
+// lado y las rutas de gestión (autorizar/revocar/listar/buscar policía)
+// quedaban abiertas a cualquier sesión válida pese al comentario "solo
+// admins" — cualquier usuario logueado podía darse a sí mismo (o a
+// cualquiera) el rol de Policía Virtual llamando la API directamente.
+async function esAdminComisaria(sql, discord_id) {
+  const rows = await sql`SELECT id FROM admins WHERE discord_id = ${discord_id}`;
+  return rows.length > 0;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", BASE_URL);
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -131,14 +142,18 @@ export default async function handler(req, res) {
     // GESTIÓN DE POLICÍAS (desde Panel Admin)
     // ═══════════════════════════════════════════════════════════════════════
 
-    // Listar policías
+    // Listar policías (solo admins)
     if (req.method === "GET" && action === "listarPolicias") {
+      if (!(await esAdminComisaria(sql, discord_id)))
+        return res.status(403).json({ error: "No autorizado" });
       const rows = await sql`SELECT * FROM policia_virtual ORDER BY created_at DESC`;
       return res.status(200).json({ policias: rows });
     }
 
-    // Buscar policía por ID o nombre
+    // Buscar policía por ID o nombre (solo admins)
     if (req.method === "GET" && action === "buscarPolicia") {
+      if (!(await esAdminComisaria(sql, discord_id)))
+        return res.status(403).json({ error: "No autorizado" });
       const { q } = req.query;
       if (!q) return res.status(400).json({ error: "Falta parámetro de búsqueda" });
       const rows = await sql`
@@ -151,6 +166,8 @@ export default async function handler(req, res) {
 
     // Autorizar policía (solo admins)
     if (req.method === "POST" && action === "autorizarPolicia") {
+      if (!(await esAdminComisaria(sql, discord_id)))
+        return res.status(403).json({ error: "No autorizado" });
       const { target_id, nombre } = req.body;
       if (!target_id) return res.status(400).json({ error: "Falta target_id" });
 
@@ -170,6 +187,8 @@ export default async function handler(req, res) {
 
     // Revocar policía (solo admins)
     if (req.method === "DELETE" && action === "revocarPolicia") {
+      if (!(await esAdminComisaria(sql, discord_id)))
+        return res.status(403).json({ error: "No autorizado" });
       const { target_id } = req.query;
       if (!target_id) return res.status(400).json({ error: "Falta target_id" });
 
@@ -401,7 +420,8 @@ export default async function handler(req, res) {
     // ═══════════════════════════════════════════════════════════════════════
     if (req.method === "GET" && action === "logs") {
       const esPolicia = await esPoliciaVirtual(sql, discord_id);
-      if (!esPolicia) return res.status(403).json({ error: "No autorizado" });
+      const esAdminSesion = esPolicia ? true : await esAdminComisaria(sql, discord_id);
+      if (!esPolicia && !esAdminSesion) return res.status(403).json({ error: "No autorizado" });
 
       const { q } = req.query;
       let rows;
