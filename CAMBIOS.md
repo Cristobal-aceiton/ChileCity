@@ -1,3 +1,47 @@
+# Cambios aplicados — ChileCity RP v24 (Panel Staff separado de Comisaría)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v23 — sin cambios.
+
+---
+
+## 🧭 "Staff" ya no es Comisaría — ahora es su propio rol
+
+Antes la card **"Staff"** del dashboard abría directamente la Comisaría
+Virtual (`abrirComisaria()`), duplicando la card "Comisaría Virtual" que ya
+existía por separado. Ahora son dos cosas totalmente independientes:
+
+- La card **"Staff"** abre un nuevo `staff-panel-screen`, que analiza acceso
+  contra el servidor (`GET /api/admin?action=verificarStaff`, nunca confía
+  en el cliente) con la misma animación de "Analizando tu acceso..." que ya
+  usan Comisaría y Panel Admin.
+  - Si la cuenta no está en la nueva tabla `staff` → pantalla de "Sin
+    acceso".
+  - Si es staff → se muestra el panel (por ahora un placeholder de
+    bienvenida; listo para agregarle herramientas cuando se definan).
+- La card **"Comisaría Virtual"** sigue exactamente igual que antes, con su
+  propia autorización (`policia_virtual`) independiente de todo lo demás.
+
+## 🔑 Nuevo rol "staff", gestionado por los admins desde el Panel Admin
+
+- Nueva tabla `staff` (discord_id, nombre, quién lo agregó) creada en
+  `api/admin.js`, junto a la tabla `admins` ya existente.
+- Nueva sección **"Gestión de Staff"** dentro de `panel-admin-screen`
+  (debajo de "Gestión de Policías Virtuales"), disponible para **cualquier
+  admin** — no solo el super admin, igual que esa sección de Policías.
+  Permite autorizar/revocar/buscar staff por Discord ID
+  (`/api/admin?action=staff_admin_listar|agregar|eliminar`).
+- El rol "staff" **no da acceso al Panel Admin ni a ninguna de sus
+  herramientas** (Admin Banco, Admin Tienda, Admin Empresas, Admin Casino,
+  Gestión de Admins/Staff/Policías/Logros) — solo entra al Panel Staff.
+- Los **admins** (tabla `admins`, gestionada por cualquier admin salvo la
+  gestión de la propia lista de admins que sigue siendo exclusiva del
+  super admin) ya tenían acceso completo al Panel Admin con todas sus
+  funciones — eso no cambió, se mantiene igual que en v23.
+
+---
+
 # Cambios aplicados — ChileCity RP v23 (botón único "Admin" + fix de seguridad en Policía Virtual)
 
 ## ⚠️ Variables de entorno requeridas
