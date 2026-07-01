@@ -429,3 +429,15 @@ Los últimos dos tienen color de alerta (amarillo y rojo).
 - SEO / Open Graph / favicon — sin cambios.
 - Rate limiting — sin cambios.
 - Autenticación por cookie httpOnly — sin cambios.
+
+---
+
+## 👤 v22 — Card de Perfil en el Dashboard
+
+- Nueva **card de perfil** arriba del dashboard: avatar de Discord con punto de estado, nombre, y badges (`@usuario` de Discord, RUT o aviso de "Sin cédula", cantidad de logros desbloqueados).
+- **Biografía editable**: cada ciudadano puede escribir una bio corta (máx. 160 caracteres) desde su propia card, con botón de editar/guardar/cancelar. Requiere tener cédula creada.
+  - Nueva columna `bio` en la tabla `dni` (se agrega sola con `ALTER TABLE ... IF NOT EXISTS`, no requiere migración manual).
+  - Nuevo método `PATCH` en `/api/dni` para guardar la bio (no se creó un endpoint nuevo: ya se estaba en el límite de 12 funciones serverless de Vercel).
+- Nueva **card de saldo bancario** al lado del perfil: muestra el saldo actual y el número de cuenta apenas se entra al dashboard (antes había que entrar a Banco para verlo), con botón directo "Ir al Banco".
+- Diseño inspirado en la estructura de otros portales de roleplay (avatar + badges + saldo destacado), reinterpretado con la paleta y tipografía propias de ChileCity RP (rojo neón, Bebas Neue, fondo oscuro).
+- Se eliminó el antiguo encabezado "Panel Principal / Hola, {nombre}" — reemplazado por la card de perfil.
