@@ -1,4 +1,67 @@
-# Cambios aplicados — ChileCity RP v21 (pull-to-refresh, offline, haptics, recibo)
+# Cambios aplicados — ChileCity RP v23 (botón único "Admin" + fix de seguridad en Policía Virtual)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v22 — sin cambios. El acceso admin sigue funcionando igual
+que siempre: `SUPER_ADMIN_ID` (o la variable de entorno) más la tabla
+`admins`, que el super admin gestiona **desde dentro del propio Panel
+Admin**, agregando IDs de Discord.
+
+---
+
+## 🧭 Un solo botón "Admin" para todo el staff
+
+Antes existían pantallas administrativas (Admin Banco, Admin Tienda, Admin
+Empresas, Admin Casino, Panel Admin) sin ningún botón real que llevara a
+ellas — habían quedado huérfanas tras un cambio anterior. Ahora:
+
+- La card **"Admin"** del dashboard (visible para cualquier usuario logueado)
+  abre `panel-admin-screen`, que primero **analiza el acceso** contra el
+  servidor (`GET /api/admin?action=verificar`, nunca confía en el cliente)
+  con la misma animación de "Analizando tu acceso..." que ya usaba Comisaría.
+  - Si la cuenta no está en la tabla `admins` → pantalla de "Sin acceso" con
+    botón para volver al dashboard.
+  - Si es admin → se muestra el hub con una grilla de **Herramientas**
+    (Admin Banco / Admin Tienda / Admin Empresas / Admin Casino) que antes
+    no tenían ningún punto de entrada, más las secciones que ya existían:
+    Enviar Notificación, Gestión de Policías Virtuales y Gestión de Logros.
+  - La sección "Gestión de Admins" (agregar/quitar por Discord ID) sigue
+    siendo **exclusiva del super admin** — se oculta para el resto.
+- Los 4 sub-paneles (Admin Banco/Tienda/Empresas/Casino) ahora regresan con
+  su botón "Volver" al hub del Panel Admin (`volverPanelAdmin()`) en vez de
+  saltar directo al dashboard, para reforzar que son herramientas agrupadas.
+- La card **"Staff"** ahora abre Comisaría Virtual (`abrirComisaria()`),
+  donde ya vivían las herramientas de Policía Virtual (se muestran solas si
+  la cuenta está autorizada como policía).
+
+## 🔒 Seguridad — Gestión de Policía Virtual sin protección
+
+Se detectó que `api/comisaria.js` tenía comentarios de "solo admins" en
+`autorizarPolicia`, `revocarPolicia`, `listarPolicias` y `buscarPolicia`,
+pero **nunca validaba esa condición en el código** — cualquier sesión válida
+(cualquier usuario logueado) podía llamar esas rutas directamente y
+otorgarse a sí mismo (o a cualquiera) el rol de Policía Virtual, sin pasar
+por el Panel Admin ni por ningún admin real. Corregido: las cuatro rutas
+ahora validan explícitamente contra la tabla `admins` antes de ejecutar
+cualquier cambio. El endpoint de `logs` ahora acepta tanto a policías como
+a admins (antes solo a policías).
+
+### Archivos tocados
+- `api/comisaria.js` — nuevo helper `esAdminComisaria()`, gate en
+  `listarPolicias`, `buscarPolicia`, `autorizarPolicia`, `revocarPolicia`,
+  `logs`.
+- `public/index.html` — cards "Admin"/"Staff" con `onclick`, grilla de
+  Herramientas dentro de `panel-admin-screen`, bloques de "Analizando
+  acceso" / "Sin acceso", botones "Volver" de los 4 sub-paneles apuntando
+  al hub.
+- `public/js/app.js` — `abrirPanelAdmin()`, `volverPanelAdmin()`,
+  `abrirAdminBanco()`, `abrirAdminTiendaPanel()`, `abrirAdminEmpresasPanel()`.
+- `public/js/comisaria.js` — eliminado código muerto de inyección dinámica
+  de la tab de policías (apuntaba a un `id` de card que ya no existía).
+
+---
+
+
 
 ## ⚠️ Variables de entorno requeridas
 
