@@ -168,3 +168,76 @@
 
 
     // ══════════════════════════════════════════════════════════════════════
+
+    // ── Gestión de Staff ─────────────────────────────────────────────────────
+    // Mismo patrón que la Gestión de Policías Virtuales (comisaria.js), pero
+    // para el rol "staff": solo da acceso al Panel Staff, nunca al Panel
+    // Admin. Disponible para cualquier admin (no solo el super admin).
+    async function psCargarStaff() {
+      const q       = document.getElementById('ps-buscar-q')?.value?.trim() || '';
+      const loading = document.getElementById('ps-loading');
+      const lista   = document.getElementById('ps-lista');
+      if (!loading || !lista) return;
+      loading.style.display = 'flex'; lista.innerHTML = '';
+      try {
+        const url = `/api/admin?action=staff_admin_listar${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+        const r    = await fetch(url);
+        const data = await r.json();
+        loading.style.display = 'none';
+        if (!r.ok) { lista.innerHTML = `<p style="color:#f87171;font-size:13px;">${escHtml(data.error || 'Error al cargar.')}</p>`; return; }
+        const staff = data.staff || [];
+        if (staff.length === 0) {
+          lista.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:13px;padding:16px 0;">Sin staff autorizado.</p>';
+          return;
+        }
+        staff.forEach(s => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.15);border-radius:10px;gap:12px;flex-wrap:wrap;';
+          row.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <b style="color:#a78bfa;">${escHtml(s.nombre || '—')}</b>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);">ID: ${escHtml(s.discord_id)}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.25);">Autorizado por: ${escHtml(s.agregado_por_nombre || s.agregado_por_id)} · ${new Date(s.created_at).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })}</span>
+            </div>
+            <button onclick="psRevocar('${escHtml(s.discord_id)}', this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:6px 14px;color:#f87171;font-size:12px;cursor:pointer;flex-shrink:0;">Revocar</button>
+          `;
+          lista.appendChild(row);
+        });
+      } catch {
+        loading.style.display = 'none';
+        lista.innerHTML = '<p style="color:#f87171;font-size:13px;">Error al cargar.</p>';
+      }
+    }
+
+    async function psAgregar() {
+      const targetId = document.getElementById('ps-input-id')?.value?.trim();
+      const nombre   = document.getElementById('ps-input-nombre')?.value?.trim();
+      const msg      = document.getElementById('ps-msg');
+      if (!msg) return;
+      if (!targetId) { msg.style.color = '#f87171'; msg.textContent = 'Ingresa un Discord ID.'; return; }
+      msg.style.color = '#9ca3af'; msg.textContent = 'Autorizando...';
+      try {
+        const r = await fetch('/api/admin?action=staff_admin_agregar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_id: targetId, nombre: nombre || null })
+        });
+        const data = await r.json();
+        if (!r.ok) { msg.style.color = '#f87171'; msg.textContent = data.error || 'Error.'; return; }
+        msg.style.color = '#4ade80'; msg.textContent = '✓ Staff autorizado.';
+        document.getElementById('ps-input-id').value = '';
+        document.getElementById('ps-input-nombre').value = '';
+        psCargarStaff();
+      } catch { msg.style.color = '#f87171'; msg.textContent = 'Error de conexión.'; }
+    }
+
+    async function psRevocar(targetId, btn) {
+      if (!confirm('¿Revocar el acceso de este miembro del Staff?')) return;
+      btn.disabled = true; btn.textContent = '...';
+      try {
+        const r = await fetch(`/api/admin?action=staff_admin_eliminar&target_id=${encodeURIComponent(targetId)}`, { method: 'DELETE' });
+        const data = await r.json();
+        if (!r.ok) { alert(data.error || 'Error.'); btn.disabled = false; btn.textContent = 'Revocar'; return; }
+        psCargarStaff();
+      } catch { alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Revocar'; }
+    }

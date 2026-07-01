@@ -20,7 +20,7 @@
     }
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
 
     // ── Indicador de sección activa ──────────────────────────────────────────
     let _sectionIndicatorTimer = null;
@@ -36,6 +36,7 @@
         'admin-tienda-screen': 'Admin Tienda',
         'perfil-publico-screen': 'Perfil Público',
         'panel-admin-screen': 'Panel Admin',
+        'staff-panel-screen': 'Panel Staff',
         'comisaria-screen': 'Comisaría Virtual',
         'casino-screen': 'Casino',
         'apuestas-screen': 'Apuestas',
@@ -106,9 +107,12 @@
 
       // Nota: los antiguos paneles administrativos separados (Banco, Tienda,
       // Empresas, Panel Admin, Casino) fueron reemplazados por los botones
-      // únicos "Staff" y "Admin" del nav-grid. La lógica de permisos vive en
-      // abrirPanelAdmin() (analiza acceso vía /api/admin?action=verificar)
-      // y abrirComisaria() (analiza acceso vía /api/comisaria?action=verificar).
+      // únicos "Staff" y "Admin" del nav-grid. Son tres roles independientes
+      // entre sí. La lógica de permisos vive en abrirPanelAdmin() (analiza
+      // acceso vía /api/admin?action=verificar), abrirPanelStaff() (analiza
+      // acceso vía /api/admin?action=verificarStaff) y abrirComisaria()
+      // (analiza acceso vía /api/comisaria?action=verificar, para el nav-card
+      // "Comisaría Virtual", separado del apartado "Staff").
 
       mostrarPantalla('dashboard');
       if (typeof notifIniciar === 'function') notifIniciar();
@@ -218,10 +222,49 @@
       if (gestionAdmins) gestionAdmins.style.display = paEsSuperAdmin ? '' : 'none';
       if (paEsSuperAdmin && typeof paCargarAdmins === 'function') paCargarAdmins();
       if (typeof gpCargarPolicias === 'function') gpCargarPolicias();
+      if (typeof psCargarStaff === 'function') psCargarStaff();
     }
 
     function volverPanelAdmin() {
       abrirPanelAdmin();
+    }
+
+    // ── PANEL STAFF: punto de entrada único ──────────────────────────────────
+    // Rol independiente de "admins". Al entrar se analiza el acceso contra el
+    // servidor: GET /api/admin?action=verificarStaff responde { esStaff }
+    // según la tabla `staff`, que solo los admins pueden editar desde dentro
+    // del Panel Admin (sección "Gestión de Staff"). Quien es staff pero no
+    // admin nunca ve el Panel Admin ni sus herramientas.
+    async function abrirPanelStaff() {
+      abrirSeccion('staff-panel-screen');
+      document.getElementById('ps-acceso-loading').style.display = 'flex';
+      document.getElementById('ps-sin-acceso').style.display = 'none';
+      document.getElementById('ps-contenido').style.display = 'none';
+      const barra = document.getElementById('ps-barra-progreso');
+      barra.style.width = '0%';
+
+      setTimeout(() => { barra.style.width = '60%'; }, 100);
+      setTimeout(() => { barra.style.width = '85%'; }, 600);
+
+      let esStaff = false;
+      try {
+        const r = await fetch('/api/admin?action=verificarStaff');
+        const data = await r.json();
+        esStaff = data.esStaff || false;
+      } catch {
+        esStaff = false;
+      }
+
+      barra.style.width = '100%';
+      await new Promise(res => setTimeout(res, 500));
+      document.getElementById('ps-acceso-loading').style.display = 'none';
+
+      if (!esStaff) {
+        document.getElementById('ps-sin-acceso').style.display = 'flex';
+        return;
+      }
+
+      document.getElementById('ps-contenido').style.display = 'flex';
     }
 
     // Openers de las herramientas agrupadas dentro del Panel Admin. Cada una
