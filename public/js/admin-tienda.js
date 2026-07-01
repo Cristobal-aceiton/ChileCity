@@ -1,7 +1,13 @@
     // ADMIN TIENDA
     // ══════════════════════════════════════════════════════════════════════════
     function adminTiendaTab(tab) {
-      document.querySelectorAll('.ta-tab').forEach((t, i) => {
+      // OJO: la clase .ta-tab también la usan los botones de "Administrar
+      // Empresas" (Listado / + Agregar Empresa). Si se selecciona sin
+      // filtrar, esos botones extra rompen el mapeo por índice contra
+      // ids=['productos','inventarios','crear'] y lanzan un error que corta
+      // la función antes de llegar a cargarAdminInventarios(). Por eso se
+      // excluye explícitamente .ae-tab.
+      document.querySelectorAll('.ta-tab:not(.ae-tab)').forEach((t, i) => {
         const ids = ['productos','inventarios','crear'];
         t.classList.toggle('active', ids[i] === tab);
         document.getElementById(`at-tab-${ids[i]}`).classList.toggle('visible', ids[i] === tab);
