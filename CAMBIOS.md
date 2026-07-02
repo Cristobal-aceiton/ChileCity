@@ -1,3 +1,41 @@
+# Cambios aplicados — ChileCity RP v25 (Logs de Staff)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v24 — sin cambios.
+
+---
+
+## 📋 Nueva tabla `staff_logs` + sección "Logs de Staff" en el Panel Admin
+
+Nuevo módulo compartido `lib/staffLogs.js` (no es un archivo de `/api` para
+no sumar otra Serverless Function) con la tabla `staff_logs` y la función
+`registrarStaffLog()`, usada desde `api/admin.js`, `api/banco.js` y
+`api/comisaria.js` para dejar constancia de cada acción administrativa:
+
+- **Admin Banco**: agregar/quitar dinero a un usuario (`SALDO_AGREGAR` /
+  `SALDO_QUITAR`), resetear cuenta (`CUENTA_RESETEAR`), agregar/quitar un
+  sueldo (`SUELDO_AGREGAR` / `SUELDO_QUITAR`).
+- **Administrar Empresas**: crear/eliminar empresa (`EMPRESA_CREAR` /
+  `EMPRESA_ELIMINAR`).
+- **Gestión de Logros**: otorgar/quitar un logro (`LOGRO_OTORGAR` /
+  `LOGRO_QUITAR`).
+- **Gestión de Policías Virtuales**: autorizar/revocar
+  (`POLICIA_AUTORIZAR` / `POLICIA_REVOCAR`) — además del log propio que ya
+  tenía Comisaría, este también queda en `staff_logs`.
+- **Gestión de Staff**: autorizar/revocar (`STAFF_AUTORIZAR` /
+  `STAFF_REVOCAR`).
+
+Cada log guarda quién hizo la acción (`actor_id`/`actor_nombre`, tomado
+siempre de la cookie de sesión, nunca del cliente), qué hizo y sobre quién
+(con nombre real vía DNI cuando existe, si no el Discord ID), y cuándo.
+
+Nueva sección **"Logs de Staff"** al fondo del `panel-admin-screen`, visible
+para cualquier admin (no solo el super admin), con buscador por staff,
+acción o detalle. Se lee de `GET /api/admin?action=staff_logs_listar`.
+
+---
+
 # Cambios aplicados — ChileCity RP v24 (Panel Staff separado de Comisaría)
 
 ## ⚠️ Variables de entorno requeridas
