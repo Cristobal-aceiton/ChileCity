@@ -5,17 +5,17 @@
 
     // Tabs de comisaría
     const CV_TABS_USUARIO = [
-      { id: 'mis-multas',     label: '🏷 Mis Multas' },
-      { id: 'mis-antecedentes', label: '📋 Mis Antecedentes' },
-      { id: 'denuncia',       label: '📣 Realizar Denuncia' },
+      { id: 'mis-multas',     label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.24L3 3v6.59a2 2 0 00.59 1.41l9.59 9.59a2 2 0 002.82 0l4.59-4.59a2 2 0 000-2.82z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg> Mis Multas' },
+      { id: 'mis-antecedentes', label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/></svg> Mis Antecedentes' },
+      { id: 'denuncia',       label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a2 2 0 002 2h1l4 4V5L6 9H5a2 2 0 00-2 2z"/><path d="M15 8a4 4 0 010 8"/><path d="M18 5a8 8 0 010 14"/></svg> Realizar Denuncia' },
     ];
     const CV_TABS_POLICIA = [
-      { id: 'agregar-multa',  label: '➕ Agregar Multa' },
-      { id: 'bd-multas',      label: '📂 BD Multas' },
-      { id: 'agregar-antec',  label: '➕ Agregar Antecedente' },
-      { id: 'bd-antec',       label: '📂 BD Antecedentes' },
-      { id: 'bd-denuncias',   label: '📂 BD Denuncias' },
-      { id: 'logs',           label: '🔎 Logs' },
+      { id: 'agregar-multa',  label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar Multa' },
+      { id: 'bd-multas',      label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg> BD Multas' },
+      { id: 'agregar-antec',  label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar Antecedente' },
+      { id: 'bd-antec',       label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg> BD Antecedentes' },
+      { id: 'bd-denuncias',   label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg> BD Denuncias' },
+      { id: 'logs',           label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Logs' },
     ];
 
     function cvSetTab(id) {
@@ -47,7 +47,7 @@
         const btn = document.createElement('button');
         btn.className = 'admin-tab' + (i === 0 ? ' active' : '');
         btn.dataset.tab = t.id;
-        btn.textContent = t.label;
+        btn.innerHTML = t.label;
         btn.onclick = () => cvSetTab(t.id);
         container.appendChild(btn);
       });
@@ -113,10 +113,10 @@
               <span style="background:rgba(0,0,0,0.3);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:600;color:${estadoColor};">${m.estado.toUpperCase()}</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:13px;color:rgba(255,255,255,0.55);">
-              <span>💰 Valor: <b style="color:#fbbf24;">$${Number(m.valor).toLocaleString('es-CL')}</b></span>
-              <span>📅 Emitida: ${cvFecha(m.created_at)}</span>
-              <span>⏰ Vence: ${m.fecha_limite}</span>
-              <span>👮 ${escHtml(m.funcionario_nombre || m.funcionario_id)}</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a1.5 1.5 0 011.5-1.5h3M9 14.5a1.5 1.5 0 001.5 1.5h3a1.5 1.5 0 000-3h-3a1.5 1.5 0 010-3M12 6v2M12 16v2"/></svg> Valor: <b style="color:#fbbf24;">$${Number(m.valor).toLocaleString('es-CL')}</b></span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Emitida: ${cvFecha(m.created_at)}</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M5 3L2 6M19 3l3 3"/></svg> Vence: ${m.fecha_limite}</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg> ${escHtml(m.funcionario_nombre || m.funcionario_id)}</span>
             </div>
             <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${escHtml(m.funcionario_id)}</div>
           `;
@@ -147,16 +147,16 @@
           card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;display:flex;gap:16px;';
           const fotoHtml = a.foto_url
             ? `<img src="${escHtml(a.foto_url)}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">`
-            : `<div style="width:72px;height:72px;background:rgba(255,255,255,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;">📷</div>`;
+            : `<div style="width:72px;height:72px;background:rgba(255,255,255,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
           card.innerHTML = `
             ${fotoHtml}
             <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
               <span style="font-weight:700;color:#f87171;font-size:15px;">${escHtml(a.motivo)}</span>
               <div style="font-size:13px;color:rgba(255,255,255,0.55);display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
-                <span>📜 Artículos: ${escHtml(a.articulos || '—')}</span>
-                <span>⏱ Cárcel: ${escHtml(a.tiempo_carcel || '—')}</span>
-                <span>📅 Fecha: ${cvFecha(a.created_at)}</span>
-                <span>👮 ${escHtml(a.funcionario_nombre || a.funcionario_id)}</span>
+                <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Artículos: ${escHtml(a.articulos || '—')}</span>
+                <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg> Cárcel: ${escHtml(a.tiempo_carcel || '—')}</span>
+                <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Fecha: ${cvFecha(a.created_at)}</span>
+                <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg> ${escHtml(a.funcionario_nombre || a.funcionario_id)}</span>
               </div>
               <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${escHtml(a.funcionario_id)}</div>
             </div>
@@ -187,7 +187,7 @@
         });
         const data = await r.json();
         if (!r.ok) { errEl.textContent = data.error || 'Error al enviar denuncia.'; errEl.style.display = 'block'; return; }
-        okEl.textContent = '✓ Denuncia enviada correctamente.';
+        okEl.textContent = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Denuncia enviada correctamente.';
         okEl.style.display = 'block';
         document.getElementById('den-motivo').value = '';
         document.getElementById('den-descripcion').value = '';
@@ -262,7 +262,7 @@
         const data = await r.json();
         if (!r.ok) { errEl.textContent = data.error || 'Error.'; errEl.style.display = 'block'; return; }
         const pagada = data.multa?.estado === 'pagada';
-        okEl.textContent = pagada ? '✓ Multa registrada y cobrada automáticamente.' : '✓ Multa registrada. Estado: Pendiente.';
+        okEl.textContent = pagada ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Multa registrada y cobrada automáticamente.' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Multa registrada. Estado: Pendiente.';
         okEl.style.display = 'block';
         document.getElementById('multa-ciudadano-id').value = '';
         document.getElementById('multa-ciudadano-nombre').value = '';
@@ -296,7 +296,7 @@
               <b style="color:#fff;">${escHtml(m.ciudadano_nombre || m.ciudadano_id)}</b>
               <span style="font-size:12px;color:rgba(255,255,255,0.4);">DNI: ${escHtml(m.ciudadano_dni || '—')} · ID: ${escHtml(m.ciudadano_id)}</span>
               <span style="font-size:13px;color:rgba(255,255,255,0.7);">${escHtml(m.motivo)}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.35);">👮 ${escHtml(m.funcionario_nombre || m.funcionario_id)} · 📅 ${cvFecha(m.created_at)}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.35);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg> ${escHtml(m.funcionario_nombre || m.funcionario_id)} · <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> ${cvFecha(m.created_at)}</span>
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
               <span style="color:${estadoColor};font-weight:700;font-size:13px;">${m.estado.toUpperCase()}</span>
@@ -345,7 +345,7 @@
         });
         const data = await r.json();
         if (!r.ok) { errEl.textContent = data.error || 'Error.'; errEl.style.display = 'block'; return; }
-        okEl.textContent = '✓ Antecedente registrado correctamente.';
+        okEl.textContent = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Antecedente registrado correctamente.';
         okEl.style.display = 'block';
         ['antec-ciudadano-id','antec-ciudadano-nombre','antec-ciudadano-dni','antec-foto','antec-motivo','antec-articulos','antec-tiempo-carcel'].forEach(id => { document.getElementById(id).value = ''; });
       } catch { errEl.textContent = 'Error de conexión.'; errEl.style.display = 'block'; }
@@ -377,8 +377,8 @@
               <b style="color:#fff;">${escHtml(a.ciudadano_nombre || a.ciudadano_id)}</b>
               <span style="font-size:12px;color:rgba(255,255,255,0.4);">DNI: ${escHtml(a.ciudadano_dni || '—')} · ID: ${escHtml(a.ciudadano_id)}</span>
               <span style="font-size:13px;color:#f87171;">${escHtml(a.motivo)}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.4);">📜 ${escHtml(a.articulos || '—')} · ⏱ ${escHtml(a.tiempo_carcel || '—')}</span>
-              <span style="font-size:12px;color:rgba(255,255,255,0.3);">👮 ${escHtml(a.funcionario_nombre || a.funcionario_id)} · 📅 ${cvFecha(a.created_at)}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ${escHtml(a.articulos || '—')} · <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg> ${escHtml(a.tiempo_carcel || '—')}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.3);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg> ${escHtml(a.funcionario_nombre || a.funcionario_id)} · <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> ${cvFecha(a.created_at)}</span>
             </div>
             <div style="display:flex;align-items:flex-start;">
               <button onclick="cvEliminarAntecedente(${a.id}, this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:5px 12px;color:#f87171;font-size:12px;cursor:pointer;">Eliminar</button>
@@ -424,12 +424,12 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
               <div>
                 <b style="color:#fff;">${escHtml(d.motivo)}</b>
-                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">📣 ${escHtml(d.denunciante_nombre || d.denunciante_id)} · ID: ${escHtml(d.denunciante_id)} · 📅 ${cvFecha(d.created_at)}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a2 2 0 002 2h1l4 4V5L6 9H5a2 2 0 00-2 2z"/><path d="M15 8a4 4 0 010 8"/><path d="M18 5a8 8 0 010 14"/></svg> ${escHtml(d.denunciante_nombre || d.denunciante_id)} · ID: ${escHtml(d.denunciante_id)} · <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> ${cvFecha(d.created_at)}</div>
               </div>
               <button onclick="cvEliminarDenuncia(${d.id}, this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:5px 12px;color:#f87171;font-size:12px;cursor:pointer;flex-shrink:0;">Eliminar</button>
             </div>
             <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.5;">${escHtml(d.descripcion)}</p>
-            ${d.evidencia_url ? `<a href="${escHtml(d.evidencia_url)}" target="_blank" style="color:#38bdf8;font-size:12px;">🔗 Ver evidencia</a>` : ''}
+            ${d.evidencia_url ? `<a href="${escHtml(d.evidencia_url)}" target="_blank" style="color:#38bdf8;font-size:12px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.07 0l1.93-1.93a5 5 0 00-7.07-7.07L10.5 5.5"/><path d="M14 11a5 5 0 00-7.07 0L5 12.93a5 5 0 007.07 7.07L13.5 18.5"/></svg> Ver evidencia</a>` : ''}
           `;
           lista.appendChild(card);
         });
@@ -472,7 +472,7 @@
             <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:200px;">
               <span style="font-size:13px;font-weight:700;color:${accionColor};">${escHtml(l.accion)}</span>
               <span style="font-size:12px;color:rgba(255,255,255,0.55);">${escHtml(l.detalle || '')}</span>
-              <span style="font-size:11px;color:rgba(255,255,255,0.25);">👤 ${escHtml(l.usuario_nombre || l.usuario_id)} · ID: ${escHtml(l.usuario_id)}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.25);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 016-6h4a6 6 0 016 6v1"/></svg> ${escHtml(l.usuario_nombre || l.usuario_id)} · ID: ${escHtml(l.usuario_id)}</span>
             </div>
             <span style="font-size:11px;color:rgba(255,255,255,0.3);white-space:nowrap;">${cvFecha(l.created_at)}</span>
           `;
@@ -541,7 +541,7 @@
         });
         const data = await r.json();
         if (!r.ok) { msg.style.color = '#f87171'; msg.textContent = data.error || 'Error.'; return; }
-        msg.style.color = '#4ade80'; msg.textContent = '✓ Policía Virtual autorizado.';
+        msg.style.color = '#4ade80'; msg.textContent = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Policía Virtual autorizado.';
         document.getElementById('gp-input-id').value = '';
         document.getElementById('gp-input-nombre').value = '';
         gpCargarPolicias();
@@ -616,7 +616,7 @@
         });
         const data = await r.json();
         if (!r.ok) { msg.style.color = '#f87171'; msg.textContent = data.error || 'Error.'; return; }
-        msg.style.color = '#4ade80'; msg.textContent = '✓ Policía Virtual autorizado.';
+        msg.style.color = '#4ade80'; msg.textContent = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Policía Virtual autorizado.';
         document.getElementById('sgp-input-id').value = '';
         document.getElementById('sgp-input-nombre').value = '';
         sgpCargarPolicias();
