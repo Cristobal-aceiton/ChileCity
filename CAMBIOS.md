@@ -1,4 +1,52 @@
-# Cambios aplicados — ChileCity RP v25 (Logs de Staff)
+# Cambios aplicados — ChileCity RP v26 (Rediseño completo del Perfil Público)
+
+## 🪪 Perfil Público — reconstrucción completa (layout maestro-detalle)
+
+Se rediseñó la sección **Perfil Público** de punta a punta, tanto en
+estructura como en estilo visual. El motivo: el diseño anterior era un
+acordeón de cards que se estiraban verticalmente al abrirse (una card más,
+igual a las demás secciones de la app), y esa combinación de scroller +
+contenido que crece de golpe era la causa raíz del bug de scroll trabado en
+iOS que ya se venía parchando (`ppDespertarScroll`).
+
+**Nueva estructura — maestro/detalle:**
+- **Lista compacta** a la izquierda: filas delgadas con nombre, RUT, franja
+  de color de estado y badges de multas/antecedentes — ya no es un feed de
+  cards altas, sino algo más parecido a un listado de expediente.
+- **Panel de detalle** aparte, no un acordeón que empuja el layout:
+  - **Desktop** (>900px): columna fija (`sticky`) al lado de la lista.
+    Se hace clic en una fila y el detalle se actualiza al lado, sin mover
+    nada del scroll.
+  - **Mobile** (≤900px): el detalle se abre como una pantalla completa que
+    se desliza encima (con botón "Volver a la lista"), en vez de crecer
+    dentro del mismo scroller. Esto resuelve el bug de iOS de raíz, no con
+    un parche: ya no existe el escenario que lo gatillaba.
+
+**Estilo visual — línea "expediente/dossier":**
+- Franja de color lateral en cada fila y barra superior en el detalle según
+  el estado del ciudadano (sin registros / con multas / con antecedentes).
+- Encabezado del expediente con jerarquía tipográfica más marcada (RUT
+  destacado tipo "número de expediente").
+- Pestañas de Inventario / Multas / Antecedentes / Logros rediseñadas con
+  estilo de pestañas de carpeta (folder tabs), no botones genéricos.
+- Búsqueda y stat de "Ciudadanos registrados" rediseñados con la misma
+  línea visual.
+
+**Sin emojis, solo íconos:** todo el módulo (badges, pestañas, categorías
+de inventario, logros, estados de multas/antecedentes) usa íconos SVG
+propios en vez de emojis — incluyendo los logros, que en el resto de la
+app siguen mostrando el emoji original de `lib/logros.js` (ese archivo es
+compartido con la sección "Logros" personal y no se tocó), pero acá se
+mapean a un set de íconos SVG nuevo por código de logro.
+
+Nota técnica: existía un archivo suelto `public/js/perfil-publico.js` que
+no estaba enlazado desde `index.html` (el código real vivía duplicado en un
+`<script>` inline). Se actualizó también ese archivo para que quede
+sincronizado con el nuevo diseño, por si en el futuro se decide separarlo.
+
+---
+
+
 
 ## ⚠️ Variables de entorno requeridas
 
