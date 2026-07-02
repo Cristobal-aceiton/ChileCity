@@ -59,6 +59,9 @@
       document.getElementById('carnet-nac').textContent       = dni.nacionalidad || 'Chilena';
       document.getElementById('carnet-fnac').textContent      = formatearFecha(dni.fecha_nac);
       document.getElementById('carnet-rut').textContent       = dni.rut;
+      document.getElementById('carnet-run-val').textContent   = dni.rut;
+      document.getElementById('carnet-femision').textContent  = dni.created_at ? formatearFecha(dni.created_at.slice(0,10)) : '—';
+      document.getElementById('carnet-firma').textContent     = `${dni.nombre1} ${dni.apellido1}`;
 
       if (currentUser?.avatar) {
         const img   = document.getElementById('carnet-avatar');
