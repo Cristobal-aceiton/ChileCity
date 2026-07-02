@@ -266,23 +266,37 @@
       }
 
       document.getElementById('ps-contenido').style.display = 'flex';
+      if (typeof sgpCargarPolicias === 'function') sgpCargarPolicias();
     }
 
-    // Openers de las herramientas agrupadas dentro del Panel Admin. Cada una
-    // navega a su pantalla y dispara la carga de datos correspondiente.
-    function abrirAdminBanco() {
+    // Openers de las herramientas agrupadas dentro del Panel Admin (y ahora
+    // también del Panel Staff, para Admin Banco y Admin Empresas). Cada una
+    // navega a su pantalla, dispara la carga de datos correspondiente, y
+    // recuerda desde dónde se entró para que el botón "Volver" regrese al
+    // panel correcto (Admin o Staff).
+    let _herramientaOrigen = 'admin';
+
+    function abrirAdminBanco(origen) {
+      _herramientaOrigen = origen === 'staff' ? 'staff' : 'admin';
       abrirSeccion('admin-screen');
       if (typeof cargarAdminUsuarios === 'function') cargarAdminUsuarios();
     }
 
     function abrirAdminTiendaPanel() {
+      _herramientaOrigen = 'admin';
       abrirSeccion('admin-tienda-screen');
       if (typeof cargarAdminProductos === 'function') cargarAdminProductos();
     }
 
-    function abrirAdminEmpresasPanel() {
+    function abrirAdminEmpresasPanel(origen) {
+      _herramientaOrigen = origen === 'staff' ? 'staff' : 'admin';
       abrirSeccion('admin-empresas-screen');
       if (typeof cargarAdminEmpresas === 'function') cargarAdminEmpresas();
+    }
+
+    function volverDesdeHerramienta() {
+      if (_herramientaOrigen === 'staff') abrirPanelStaff();
+      else abrirPanelAdmin();
     }
 
     // Interceptar botón atrás del navegador/celular

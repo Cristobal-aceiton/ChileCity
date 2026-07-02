@@ -135,3 +135,98 @@
         mostrarToast('Error de conexión.', true);
       }
     }
+
+    // ── Mismas funciones, pero para Gestión de Logros dentro del Panel
+    // Staff (elementos con prefijo "sal-" en vez de "al-", para no chocar
+    // con los del Panel Admin). Pegan a las mismas rutas de /api/admin, que
+    // ahora aceptan tanto admins como staff.
+    let salUltimaBusqueda = null;
+
+    async function salBuscarUsuario() {
+      const idInput = document.getElementById('sal-buscar-id');
+      const errEl   = document.getElementById('sal-buscar-error');
+      const loading = document.getElementById('sal-loading');
+      const lista   = document.getElementById('sal-lista');
+      errEl.classList.remove('visible');
+
+      const targetId = idInput.value.trim();
+      if (!targetId || !/^\d{15,25}$/.test(targetId)) {
+        errEl.textContent = 'Ingresa un Discord ID válido.';
+        errEl.classList.add('visible');
+        return;
+      }
+
+      salUltimaBusqueda = targetId;
+      loading.style.display = 'flex';
+      lista.innerHTML = '';
+
+      try {
+        const res = await fetch(`/api/admin?action=logros_admin_usuario&target_id=${targetId}`);
+        const data = await res.json();
+        loading.style.display = 'none';
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error al buscar.';
+          errEl.classList.add('visible');
+          return;
+        }
+        renderStaffLogros(targetId, data.logros || []);
+      } catch (e) {
+        loading.style.display = 'none';
+        errEl.textContent = 'Error de conexión.';
+        errEl.classList.add('visible');
+      }
+    }
+
+    function renderStaffLogros(targetId, logros) {
+      const lista = document.getElementById('sal-lista');
+      lista.innerHTML = `
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;font-family:monospace;">Usuario: ${escHtml(targetId)}</div>
+        <div class="logros-admin-lista">
+          ${logros.map(l => `
+            <div class="usuario-row" id="sal-row-${l.codigo}">
+              <div style="font-size:22px;flex-shrink:0;">${l.icono}</div>
+              <div class="ur-info">
+                <div class="ur-nombre">${escHtml(l.nombre)}</div>
+                <div class="ur-rut">${escHtml(l.descripcion)}</div>
+              </div>
+              <div class="ur-acciones">
+                ${l.obtenido
+                  ? `<span style="font-size:11px;color:#4ade80;font-weight:700;margin-right:4px;">✓ Obtenido</span>
+                     <button class="btn-small red" onclick="salQuitarLogro('${l.codigo}')">Quitar</button>`
+                  : `<button class="btn-small green" onclick="salOtorgarLogro('${l.codigo}')">Otorgar</button>`}
+              </div>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    async function salOtorgarLogro(codigo) {
+      if (!salUltimaBusqueda) return;
+      try {
+        const res = await fetch('/api/admin?action=logros_admin_otorgar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_id: salUltimaBusqueda, codigo }),
+        });
+        const data = await res.json();
+        if (!res.ok) { mostrarToast(data.error || 'Error al otorgar el logro.', true); return; }
+        mostrarToast('Logro otorgado.');
+        salBuscarUsuario();
+      } catch (e) {
+        mostrarToast('Error de conexión.', true);
+      }
+    }
+
+    async function salQuitarLogro(codigo) {
+      if (!salUltimaBusqueda) return;
+      if (!confirm('¿Quitar este logro al usuario?')) return;
+      try {
+        const res = await fetch(`/api/admin?action=logros_admin_quitar&target_id=${salUltimaBusqueda}&codigo=${codigo}`, {
+          method: 'DELETE',
+        });
+        if (!res.ok) { mostrarToast('Error al quitar el logro.', true); return; }
+        mostrarToast('Logro quitado.');
+        salBuscarUsuario();
+      } catch (e) {
+        mostrarToast('Error de conexión.', true);
+      }
+    }

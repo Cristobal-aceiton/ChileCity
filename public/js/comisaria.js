@@ -559,6 +559,81 @@
       } catch { alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Revocar'; }
     }
 
+    // ── Mismas funciones, pero para la Gestión de Policías dentro del Panel
+    // Staff (elementos con prefijo "sgp-" en vez de "gp-", para no chocar
+    // con los del Panel Admin, que pueden coexistir en el DOM). Pegan a las
+    // mismas rutas de /api/comisaria, que ahora aceptan tanto admins como
+    // staff.
+    async function sgpCargarPolicias() {
+      const q       = document.getElementById('sgp-buscar-q')?.value?.trim() || '';
+      const loading = document.getElementById('sgp-loading');
+      const lista   = document.getElementById('sgp-lista');
+      if (!loading || !lista) return;
+      loading.style.display = 'flex'; lista.innerHTML = '';
+      try {
+        const url = q
+          ? `/api/comisaria?action=buscarPolicia&q=${encodeURIComponent(q)}`
+          : '/api/comisaria?action=listarPolicias';
+        const r    = await fetch(url);
+        const data = await r.json();
+        loading.style.display = 'none';
+        const policias = data.policias || [];
+        if (policias.length === 0) {
+          lista.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:13px;padding:16px 0;">Sin policías autorizados.</p>';
+          return;
+        }
+        policias.forEach(p => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.15);border-radius:10px;gap:12px;flex-wrap:wrap;';
+          row.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <b style="color:#38bdf8;">${escHtml(p.nombre || '—')}</b>
+              <span style="font-size:12px;color:rgba(255,255,255,0.4);">ID: ${escHtml(p.discord_id)}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.25);">Autorizado por: ${escHtml(p.autorizado_por_nombre || p.autorizado_por_id)} · ${cvFecha(p.created_at)}</span>
+            </div>
+            <button onclick="sgpRevocar('${escHtml(p.discord_id)}', this)" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:7px;padding:6px 14px;color:#f87171;font-size:12px;cursor:pointer;flex-shrink:0;">Revocar</button>
+          `;
+          lista.appendChild(row);
+        });
+      } catch {
+        loading.style.display = 'none';
+        lista.innerHTML = '<p style="color:#f87171;font-size:13px;">Error al cargar.</p>';
+      }
+    }
+
+    async function sgpAutorizar() {
+      const targetId = document.getElementById('sgp-input-id')?.value?.trim();
+      const nombre   = document.getElementById('sgp-input-nombre')?.value?.trim();
+      const msg      = document.getElementById('sgp-msg');
+      if (!msg) return;
+      if (!targetId) { msg.style.color = '#f87171'; msg.textContent = 'Ingresa un Discord ID.'; return; }
+      msg.style.color = '#9ca3af'; msg.textContent = 'Autorizando...';
+      try {
+        const r = await fetch('/api/comisaria?action=autorizarPolicia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_id: targetId, nombre: nombre || null })
+        });
+        const data = await r.json();
+        if (!r.ok) { msg.style.color = '#f87171'; msg.textContent = data.error || 'Error.'; return; }
+        msg.style.color = '#4ade80'; msg.textContent = '✓ Policía Virtual autorizado.';
+        document.getElementById('sgp-input-id').value = '';
+        document.getElementById('sgp-input-nombre').value = '';
+        sgpCargarPolicias();
+      } catch { msg.style.color = '#f87171'; msg.textContent = 'Error de conexión.'; }
+    }
+
+    async function sgpRevocar(targetId, btn) {
+      if (!confirm('¿Revocar los permisos de este Policía Virtual?')) return;
+      btn.disabled = true; btn.textContent = '...';
+      try {
+        const r = await fetch(`/api/comisaria?action=revocarPolicia&target_id=${encodeURIComponent(targetId)}`, { method: 'DELETE' });
+        const data = await r.json();
+        if (!r.ok) { alert(data.error || 'Error.'); btn.disabled = false; btn.textContent = 'Revocar'; return; }
+        sgpCargarPolicias();
+      } catch { alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Revocar'; }
+    }
+
     // Helpers
     function cvFecha(iso) {
       if (!iso) return '—';
