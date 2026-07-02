@@ -294,11 +294,11 @@
           <span class="card-arrow">›</span>
         </div>
 
-        <div class="nav-card" onclick="abrirComisaria()" style="--card-color:#38bdf8; --card-glow:rgba(56,189,248,0.12)">
+        <div class="nav-card" onclick="abrirComisaria()" style="--card-color:#1e8a4c; --card-glow:rgba(30,138,76,0.14)">
           <div class="card-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/><circle cx="17" cy="17" r="3" fill="rgba(14,165,233,0.3)" stroke="#38bdf8"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z" fill="rgba(30,138,76,0.22)" stroke="#1e8a4c" stroke-width="1.6"/><path d="M9 12l2 2 4-4" stroke="#c9a227" stroke-width="1.8"/></svg>
           </div>
-          <div><div class="card-title" style="color:#38bdf8">Comisaría Virtual</div><div class="card-sub">Multas, antecedentes y denuncias</div></div>
+          <div><div class="card-title" style="color:#3fb673">Comisaría Virtual</div><div class="card-sub">Carabineros de Chile — Multas, antecedentes y denuncias</div></div>
           <span class="card-arrow">›</span>
         </div>
 
@@ -1867,14 +1867,14 @@
 
 
       <!-- Gestión de Policías Virtuales -->
-      <div id="pa-policia-wrap" style="margin-top:32px;border-top:1px solid rgba(14,165,233,0.15);padding-top:28px;">
+      <div id="pa-policia-wrap" style="margin-top:32px;border-top:1px solid rgba(30,138,76,0.15);padding-top:28px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#38bdf8;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#1e8a4c;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8a4c" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Gestión de Policías Virtuales
           </h3>
         </div>
-        <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;">
+        <div style="background:rgba(30,138,76,0.07);border:1px solid rgba(30,138,76,0.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;">
           <p style="color:#7dd3fc;font-size:13px;margin:0;line-height:1.6;">Desde aquí puedes autorizar IDs de Discord para acceder al panel policial de la Comisaría Virtual. Los permisos de Policía Virtual son independientes de los permisos de Administrador.</p>
         </div>
         <!-- Agregar policía -->
@@ -1885,14 +1885,14 @@
             <input id="gp-input-nombre" type="text" placeholder="Nombre (opcional)" style="flex:1;min-width:180px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;outline:none;">
           </div>
           <div id="gp-msg" style="font-size:13px;color:rgba(255,255,255,0.4);min-height:18px;margin-top:10px;"></div>
-          <button onclick="gpAutorizar()" style="margin-top:10px;background:rgba(14,165,233,0.2);border:1px solid rgba(14,165,233,0.35);border-radius:10px;padding:12px 20px;color:#38bdf8;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
+          <button onclick="gpAutorizar()" style="margin-top:10px;background:rgba(30,138,76,0.2);border:1px solid rgba(30,138,76,0.35);border-radius:10px;padding:12px 20px;color:#1e8a4c;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
             ✦ Autorizar como Policía Virtual
           </button>
         </div>
         <!-- Búsqueda y lista -->
         <div style="display:flex;gap:8px;margin-bottom:14px;">
           <input type="text" id="gp-buscar-q" placeholder="Buscar por nombre o Discord ID" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;outline:none;">
-          <button onclick="gpCargarPolicias()" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:0 16px;color:#38bdf8;cursor:pointer;font-size:13px;white-space:nowrap;">Buscar</button>
+          <button onclick="gpCargarPolicias()" style="background:rgba(30,138,76,0.15);border:1px solid rgba(30,138,76,0.3);border-radius:10px;padding:0 16px;color:#1e8a4c;cursor:pointer;font-size:13px;white-space:nowrap;">Buscar</button>
         </div>
         <div class="rc-loading" id="gp-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
         <div id="gp-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -2030,14 +2030,14 @@
       </div>
 
       <!-- Gestión de Policías Virtuales (Staff) -->
-      <div id="ps-policia-wrap" style="margin-top:8px;border-top:1px solid rgba(14,165,233,0.15);padding-top:28px;">
+      <div id="ps-policia-wrap" style="margin-top:8px;border-top:1px solid rgba(30,138,76,0.15);padding-top:28px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#38bdf8;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#1e8a4c;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8a4c" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Gestión de Policías Virtuales
           </h3>
         </div>
-        <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;">
+        <div style="background:rgba(30,138,76,0.07);border:1px solid rgba(30,138,76,0.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;">
           <p style="color:#7dd3fc;font-size:13px;margin:0;line-height:1.6;">Desde aquí puedes autorizar IDs de Discord para acceder al panel policial de la Comisaría Virtual.</p>
         </div>
         <!-- Agregar policía -->
@@ -2048,14 +2048,14 @@
             <input id="sgp-input-nombre" type="text" placeholder="Nombre (opcional)" style="flex:1;min-width:180px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;outline:none;">
           </div>
           <div id="sgp-msg" style="font-size:13px;color:rgba(255,255,255,0.4);min-height:18px;margin-top:10px;"></div>
-          <button onclick="sgpAutorizar()" style="margin-top:10px;background:rgba(14,165,233,0.2);border:1px solid rgba(14,165,233,0.35);border-radius:10px;padding:12px 20px;color:#38bdf8;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
+          <button onclick="sgpAutorizar()" style="margin-top:10px;background:rgba(30,138,76,0.2);border:1px solid rgba(30,138,76,0.35);border-radius:10px;padding:12px 20px;color:#1e8a4c;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
             ✦ Autorizar como Policía Virtual
           </button>
         </div>
         <!-- Búsqueda y lista -->
         <div style="display:flex;gap:8px;margin-bottom:14px;">
           <input type="text" id="sgp-buscar-q" placeholder="Buscar por nombre o Discord ID" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;outline:none;">
-          <button onclick="sgpCargarPolicias()" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:0 16px;color:#38bdf8;cursor:pointer;font-size:13px;white-space:nowrap;">Buscar</button>
+          <button onclick="sgpCargarPolicias()" style="background:rgba(30,138,76,0.15);border:1px solid rgba(30,138,76,0.3);border-radius:10px;padding:0 16px;color:#1e8a4c;cursor:pointer;font-size:13px;white-space:nowrap;">Buscar</button>
         </div>
         <div class="rc-loading" id="sgp-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
         <div id="sgp-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -2087,24 +2087,32 @@
   <!-- ══════════════════════════════════════════════════════════
        COMISARÍA VIRTUAL
        ═══════════════════════════════════════════════════════ -->
-  <section class="screen seccion-screen" id="comisaria-screen">
+  <section class="screen seccion-screen cv-carabineros" id="comisaria-screen">
     <div class="seccion-container" style="max-width:860px;">
+
+      <div class="cv-banner">
+        <div class="cv-banner-emblema">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z" fill="rgba(30,138,76,0.35)" stroke="#c9a227" stroke-width="1.4"/><path d="M9 12l2 2 4-4" stroke="#c9a227" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="9.2" r="1.15" fill="#c9a227"/></svg>
+        </div>
+        <div class="cv-banner-texto">
+          <div class="cv-banner-eyebrow">Carabineros de Chile</div>
+          <div class="cv-banner-titulo">Comisaría Virtual</div>
+          <div class="cv-banner-sub">Orden y Patria — Trámites, denuncias y registro policial</div>
+        </div>
+      </div>
+
       <div class="seccion-header">
         <button class="sec-back" onclick="volverDashboard()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
           Volver
         </button>
-        <div class="seccion-title" style="color:#38bdf8;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
-          Comisaría Virtual
-        </div>
       </div>
 
       <!-- Loading de acceso -->
       <div id="cv-acceso-loading" style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:60px 0;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#38bdf8;">Analizando tu acceso...</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#3fb673;">Analizando tu acceso...</div>
         <div style="width:100%;max-width:360px;background:rgba(255,255,255,0.06);border-radius:99px;height:8px;overflow:hidden;">
-          <div id="cv-barra-progreso" style="height:100%;width:0%;background:linear-gradient(90deg,#0ea5e9,#38bdf8);border-radius:99px;transition:width 1.2s cubic-bezier(0.16,1,0.3,1);"></div>
+          <div id="cv-barra-progreso" style="height:100%;width:0%;background:linear-gradient(90deg,#15803d,#c9a227);border-radius:99px;transition:width 1.2s cubic-bezier(0.16,1,0.3,1);"></div>
         </div>
         <p style="color:rgba(255,255,255,0.35);font-size:13px;">Verificando identidad de Discord...</p>
       </div>
@@ -2238,7 +2246,7 @@
         <div class="admin-seccion cv-policia-tab" id="cv-tab-bd-multas" style="gap:14px;">
           <div style="display:flex;gap:8px;">
             <input type="text" id="bd-multas-q" placeholder="Buscar por nombre, DNI o Discord ID" style="flex:1;">
-            <button onclick="cvCargarBDMultas()" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:0 14px;color:#38bdf8;cursor:pointer;font-size:13px;">Buscar</button>
+            <button onclick="cvCargarBDMultas()" style="background:rgba(30,138,76,0.15);border:1px solid rgba(30,138,76,0.3);border-radius:10px;padding:0 14px;color:#1e8a4c;cursor:pointer;font-size:13px;">Buscar</button>
           </div>
           <div class="rc-loading" id="cv-bd-multas-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
           <div id="cv-bd-multas-lista"></div>
@@ -2293,7 +2301,7 @@
         <div class="admin-seccion cv-policia-tab" id="cv-tab-bd-antec" style="gap:14px;">
           <div style="display:flex;gap:8px;">
             <input type="text" id="bd-antec-q" placeholder="Buscar por nombre, DNI o Discord ID" style="flex:1;">
-            <button onclick="cvCargarBDAntecedentes()" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:0 14px;color:#38bdf8;cursor:pointer;font-size:13px;">Buscar</button>
+            <button onclick="cvCargarBDAntecedentes()" style="background:rgba(30,138,76,0.15);border:1px solid rgba(30,138,76,0.3);border-radius:10px;padding:0 14px;color:#1e8a4c;cursor:pointer;font-size:13px;">Buscar</button>
           </div>
           <div class="rc-loading" id="cv-bd-antec-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
           <div id="cv-bd-antec-lista"></div>
@@ -2303,7 +2311,7 @@
         <div class="admin-seccion cv-policia-tab" id="cv-tab-bd-denuncias" style="gap:14px;">
           <div style="display:flex;gap:8px;">
             <input type="text" id="bd-den-q" placeholder="Buscar por nombre, Discord ID o motivo" style="flex:1;">
-            <button onclick="cvCargarBDDenuncias()" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:0 14px;color:#38bdf8;cursor:pointer;font-size:13px;">Buscar</button>
+            <button onclick="cvCargarBDDenuncias()" style="background:rgba(30,138,76,0.15);border:1px solid rgba(30,138,76,0.3);border-radius:10px;padding:0 14px;color:#1e8a4c;cursor:pointer;font-size:13px;">Buscar</button>
           </div>
           <div class="rc-loading" id="cv-bd-den-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
           <div id="cv-bd-den-lista"></div>
@@ -2313,7 +2321,7 @@
         <div class="admin-seccion cv-policia-tab" id="cv-tab-logs" style="gap:14px;">
           <div style="display:flex;gap:8px;">
             <input type="text" id="cv-logs-q" placeholder="Buscar por usuario, ID o acción" style="flex:1;">
-            <button onclick="cvCargarLogs()" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:0 14px;color:#38bdf8;cursor:pointer;font-size:13px;">Buscar</button>
+            <button onclick="cvCargarLogs()" style="background:rgba(30,138,76,0.15);border:1px solid rgba(30,138,76,0.3);border-radius:10px;padding:0 14px;color:#1e8a4c;cursor:pointer;font-size:13px;">Buscar</button>
           </div>
           <div class="rc-loading" id="cv-logs-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
           <div id="cv-logs-lista"></div>

@@ -64,3 +64,91 @@
   .profile-bio-edit-btn{position:static;margin-top:8px}
   .balance-hero-value{font-size:32px}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   COMISARÍA VIRTUAL — Tema institucional Carabineros de Chile
+   Verde carabinero + dorado metálico. Scope: #comisaria-screen
+   ══════════════════════════════════════════════════════════════ */
+#comisaria-screen{--cv-green-dark:#0b3d24;--cv-green:#1e8a4c;--cv-green-light:#3fb673;--cv-gold:#c9a227;--cv-gold-light:#e6c34a;}
+
+#comisaria-screen .seccion-container{max-width:900px;gap:22px;}
+
+/* Banner institucional superior */
+#comisaria-screen .cv-banner{
+  width:100%;display:flex;align-items:center;gap:18px;
+  padding:22px 26px;border-radius:18px;margin-top:8px;
+  background:linear-gradient(120deg,rgba(11,61,36,0.55) 0%,rgba(30,138,76,0.16) 55%,rgba(201,162,39,0.10) 100%);
+  border:1px solid rgba(63,182,115,0.28);
+  box-shadow:0 10px 34px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05);
+  position:relative;overflow:hidden;
+}
+#comisaria-screen .cv-banner::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cv-gold),transparent);
+}
+#comisaria-screen .cv-banner-emblema{
+  flex-shrink:0;width:64px;height:64px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(11,61,36,0.9) 0%,rgba(11,61,36,0.55) 100%);
+  border:1.5px solid rgba(201,162,39,0.45);
+  box-shadow:0 0 22px rgba(30,138,76,0.35);
+}
+#comisaria-screen .cv-banner-texto{display:flex;flex-direction:column;gap:2px;}
+#comisaria-screen .cv-banner-eyebrow{
+  font-size:10.5px;font-weight:800;letter-spacing:3px;text-transform:uppercase;
+  color:var(--cv-gold-light);opacity:.9;
+}
+#comisaria-screen .cv-banner-titulo{
+  font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:1px;line-height:1;
+  background:linear-gradient(135deg,#fff 35%,var(--cv-green-light) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-top:4px;
+}
+#comisaria-screen .cv-banner-sub{font-size:12.5px;color:rgba(255,255,255,.45);margin-top:4px;letter-spacing:.2px;}
+
+@media (max-width:540px){
+  #comisaria-screen .cv-banner{padding:16px 18px;gap:12px;}
+  #comisaria-screen .cv-banner-emblema{width:50px;height:50px;}
+  #comisaria-screen .cv-banner-emblema svg{width:34px;height:34px;}
+  #comisaria-screen .cv-banner-titulo{font-size:26px;}
+  #comisaria-screen .cv-banner-sub{display:none;}
+}
+
+/* Tabs de navegación interna */
+#comisaria-screen .admin-tab{
+  border-color:rgba(255,255,255,.09);
+  background:rgba(255,255,255,.03);
+  text-transform:none;letter-spacing:.3px;
+}
+#comisaria-screen .admin-tab.active{
+  background:linear-gradient(135deg,rgba(30,138,76,0.28),rgba(201,162,39,0.16));
+  border-color:rgba(63,182,115,0.55);
+  color:var(--cv-gold-light);
+  box-shadow:0 0 16px rgba(30,138,76,0.18);
+}
+
+/* Formularios y paneles */
+#comisaria-screen .rc-form{
+  border-color:rgba(63,182,115,0.16);
+  background:rgba(30,138,76,0.035);
+  position:relative;
+}
+#comisaria-screen .rc-form::before{
+  content:'';position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;
+  background:linear-gradient(180deg,var(--cv-green),var(--cv-gold));opacity:.55;
+}
+#comisaria-screen .rc-form h2{color:#fff;}
+#comisaria-screen .form-group input:focus,
+#comisaria-screen .form-group select:focus,
+#comisaria-screen textarea:focus{
+  border-color:rgba(63,182,115,0.55)!important;
+}
+#comisaria-screen .btn-green{
+  background:linear-gradient(135deg,var(--cv-green-dark),var(--cv-green));
+  box-shadow:0 0 22px rgba(30,138,76,0.35);
+}
+#comisaria-screen .btn-green:hover{background:linear-gradient(135deg,var(--cv-green),var(--cv-green-light));}
+
+/* Loading / skeleton */
+#comisaria-screen .spinner{border-top-color:var(--cv-gold);}
+
