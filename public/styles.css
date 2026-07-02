@@ -28,7 +28,11 @@
 .profile-card::before{content:'';position:absolute;top:-80px;right:-80px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 70%);opacity:.5;pointer-events:none}
 .profile-card-top{display:flex;align-items:center;gap:18px;position:relative;z-index:1}
 .profile-avatar-wrap{position:relative;flex-shrink:0}
-.profile-avatar-wrap img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2.5px solid var(--neon);box-shadow:0 0 24px var(--glow);background:rgba(255,255,255,.06)}
+.profile-avatar-wrap{padding:5px}
+.profile-avatar-wrap img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #0a0a0f;box-shadow:0 0 18px var(--glow);background:rgba(255,255,255,.06);position:relative;z-index:2}
+.profile-ring{position:absolute;inset:0;border-radius:50%;padding:3px;background:conic-gradient(from 0deg,var(--neon2),var(--gold),var(--neon2),var(--discord2),var(--neon2));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:profileRingSpin 5s linear infinite;filter:drop-shadow(0 0 8px var(--glow));z-index:1}
+@keyframes profileRingSpin{to{transform:rotate(360deg)}}
+.profile-status-dot{z-index:3}
 .profile-status-dot{position:absolute;bottom:2px;right:2px;width:15px;height:15px;border-radius:50%;background:#10b981;border:3px solid #0a0a0f;box-shadow:0 0 8px rgba(16,185,129,.7)}
 .profile-info{flex:1;min-width:0}
 .profile-info h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,4vw,34px);letter-spacing:.5px;background:linear-gradient(135deg,#fff 50%,var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
@@ -38,17 +42,14 @@
 .profile-badge.pb-rut{background:rgba(16,185,129,.13);border-color:rgba(16,185,129,.28);color:#6ee7b7}
 .profile-badge.pb-sin-rut{background:rgba(245,158,11,.13);border-color:rgba(245,158,11,.28);color:#fbbf24;cursor:pointer}
 .profile-badge.pb-logros{background:rgba(251,191,36,.13);border-color:rgba(251,191,36,.28);color:#fcd34d;cursor:pointer}
-.profile-bio-wrap{position:relative;border-top:1px solid rgba(255,255,255,.07);padding-top:16px}
-.profile-bio-text{font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.55);padding-right:70px;min-height:20px}
-.profile-bio-edit-btn{position:absolute;top:16px;right:0;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:.2s;font-family:Inter,sans-serif}
-.profile-bio-edit-btn:hover{background:rgba(255,255,255,.12);color:#fff}
-.profile-bio-edit{display:none;flex-direction:column;gap:10px;margin-top:4px}
-.profile-bio-wrap.editing .profile-bio-edit{display:flex}
-.profile-bio-wrap.editing .profile-bio-text,.profile-bio-wrap.editing .profile-bio-edit-btn{display:none}
-.profile-bio-edit textarea{width:100%;resize:none;min-height:64px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:0;transition:border-color .2s}
-.profile-bio-edit textarea:focus{border-color:var(--neon2);background:rgba(255,255,255,.09)}
-.profile-bio-edit-actions{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-.profile-bio-count{font-size:11px;color:rgba(255,255,255,.3);margin-right:auto}
+.profile-badge.pb-civil{background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.28);color:#6ee7b7}
+.profile-badge.pb-staff{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.32);color:#c4b5fd}
+.profile-badge.pb-admin{background:rgba(248,113,113,.16);border-color:rgba(248,113,113,.34);color:#fca5a5}
+
+
+
+
+
 .balance-hero-card{background:linear-gradient(160deg,rgba(16,185,129,.09),rgba(16,185,129,.02));border:1px solid rgba(16,185,129,.22);border-radius:22px;padding:24px 26px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
 .balance-hero-card::before{content:'';position:absolute;bottom:-60px;left:-60px;width:180px;height:180px;border-radius:50%;background:rgba(16,185,129,.1);pointer-events:none}
 .balance-hero-label{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.4)}
@@ -60,8 +61,8 @@
   .profile-hero{grid-template-columns:1fr;gap:14px}
   .profile-card{padding:20px}
   .profile-avatar-wrap img{width:60px;height:60px}
-  .profile-bio-text{padding-right:0}
-  .profile-bio-edit-btn{position:static;margin-top:8px}
+  
+  
   .balance-hero-value{font-size:32px}
 }
 
