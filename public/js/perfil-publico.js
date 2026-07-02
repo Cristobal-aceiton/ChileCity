@@ -24,6 +24,7 @@
     const PP_ICON_TROFEO    = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/><path d="M8 21h8M12 17v4"/></svg>';
     const PP_ICON_RELOJ     = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3.2 1.8"/></svg>';
     const PP_ICON_CARPETA   = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4l2 2.2h9A1.5 1.5 0 0 1 21 8.7V17a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17z"/></svg>';
+    const PP_ICON_AUTO      = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 13l1.6-4.6A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.4L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.4" r="1.5"/><circle cx="17" cy="18.4" r="1.5"/></svg>';
 
     function ppEstadoInfo(r) {
       const multas = r.multas.length, ants = r.antecedentes.length;
@@ -110,6 +111,13 @@
         ppHasMore   = !!data.hasMore;
         renderPerfilPublico(ppRegistros, data.total ?? ppRegistros.length);
         actualizarBotonCargarMasPP();
+
+        // Si la búsqueda calza con el formato de una patente y hay
+        // resultados, se abre automáticamente el perfil del propietario
+        // vinculado a ese vehículo.
+        if (data.matchPatente && ppRegistros.length > 0) {
+          ppSeleccionar(ppRegistros[0].discord_id);
+        }
       } catch(e) {
         document.getElementById('pp-loading').style.display = 'none';
         document.getElementById('pp-wrap').classList.remove('pp2-hidden');
@@ -265,8 +273,24 @@
       const invCount  = r.inventario.length;
       const multCount = r.multas.length;
       const antCount  = r.antecedentes.length;
+      const vehLista  = r.vehiculos || [];
+      const vehCount  = vehLista.length;
       const logrosLista = r.logros || [];
       const logCount  = logrosLista.filter(l => l.obtenido).length;
+
+      // Vehículos registrados
+      const vehHtml = vehCount === 0
+        ? ppEmptySlot('Sin vehículos registrados', PP_ICON_AUTO.replace('width="13" height="13"', 'width="22" height="22"'))
+        : vehLista.map(v => `
+            <div class="pp2-record-row">
+              <div class="pp2-record-main">
+                <div class="pp2-record-titulo">${escHtml(v.modelo)} · ${escHtml(v.patente)}</div>
+                <div class="pp2-record-meta">Color: ${escHtml(v.color)} · Año: ${escHtml(v.anio)} · Estado: ${escHtml(v.estado)}</div>
+              </div>
+              <div class="pp2-record-right">
+                <button class="btn-small green" onclick="verRegistroVehiculo(${v.id})">📄 Ver Registro</button>
+              </div>
+            </div>`).join('');
 
       // Inventario
       const invHtml = invCount === 0
@@ -375,6 +399,9 @@
             <button class="pp2-folder-tab" data-tab="ants" onclick="ppSwitchTab('ants',this)">
               ${PP_ICON_ESCUDO} Antecedentes <span class="pp2-folder-count ${antCount>0?'alert':''}">${antCount}</span>
             </button>
+            <button class="pp2-folder-tab" data-tab="vehiculos" onclick="ppSwitchTab('vehiculos',this)">
+              ${PP_ICON_AUTO} Registros Vehiculares <span class="pp2-folder-count">${vehCount}</span>
+            </button>
             <button class="pp2-folder-tab" data-tab="logros" onclick="ppSwitchTab('logros',this)">
               ${PP_ICON_TROFEO} Logros <span class="pp2-folder-count">${logCount}</span>
             </button>
@@ -383,6 +410,7 @@
             <div class="pp2-panel active" data-panel="inv"><div class="pp2-inv-grid">${invHtml}</div></div>
             <div class="pp2-panel" data-panel="multas"><div class="pp2-records-list">${multasHtml}</div></div>
             <div class="pp2-panel" data-panel="ants"><div class="pp2-records-list">${antsHtml}</div></div>
+            <div class="pp2-panel" data-panel="vehiculos"><div class="pp2-records-list">${vehHtml}</div></div>
             <div class="pp2-panel" data-panel="logros">${logrosHtml}</div>
           </div>
         </div>`;

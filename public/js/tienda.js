@@ -214,8 +214,14 @@
           grid.innerHTML = '<div class="tienda-empty" style="grid-column:1/-1;">Tu inventario está vacío.<br>¡Visita la tienda para comprar!</div>';
           return;
         }
+        // Se guarda en cache global para que vehiculos.js pueda referenciar
+        // los ítems (modelo, id, etc.) al abrir los modales de registro y
+        // transferencia sin tener que volver a pedirlos al servidor.
+        window._invItemsCache = data.items;
+
         grid.innerHTML = data.items.map(item => {
           const fecha = new Date(item.comprado_at).toLocaleDateString('es-CL', {day:'2-digit',month:'2-digit',year:'2-digit'});
+          const esVehiculo = item.categoria === 'vehiculos';
           return `
             <div class="inv-card">
               <div class="inv-img">
@@ -228,6 +234,7 @@
                 <span class="producto-cat cat-${item.categoria}">${catLabel(item.categoria)}</span>
                 <div class="inv-precio">Pagado: ${formatCLP(item.precio_pagado)}</div>
                 <div class="inv-fecha">${fecha}</div>
+                ${esVehiculo ? vehRenderAcciones(item) : ''}
               </div>
             </div>`;
         }).join('');
