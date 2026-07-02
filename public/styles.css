@@ -211,6 +211,7 @@
    COMISARÍA VIRTUAL — Rediseño: Hero + Trámites (v26)
    ══════════════════════════════════════════════════════════════ */
 #comisaria-screen{padding:0;}
+body.oculta-logo-corner .logo-corner{display:none;}
 #comisaria-screen .seccion-header{display:none;} /* header antiguo ya no se usa */
 
 /* Barra superior fija (Volver / Panel Policial) */
