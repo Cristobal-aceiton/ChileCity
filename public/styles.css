@@ -109,7 +109,7 @@
 @media (max-width:540px){
   #comisaria-screen .cv-banner{padding:16px 18px;gap:12px;}
   #comisaria-screen .cv-banner-emblema{width:50px;height:50px;}
-  #comisaria-screen .cv-banner-emblema svg{width:34px;height:34px;}
+  #comisaria-screen .cv-banner-emblema img{width:36px;height:36px;}
   #comisaria-screen .cv-banner-titulo{font-size:26px;}
   #comisaria-screen .cv-banner-sub{display:none;}
 }
