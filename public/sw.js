@@ -11,12 +11,12 @@
 // Subir CACHE_VERSION cuando cambien JS/CSS importantes para forzar que los
 // clientes viejos descarten el cache anterior.
 
-const CACHE_VERSION = "v18";
+const CACHE_VERSION = "v19";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   "/",
-  "/styles.css?v=18",
+  "/styles.css?v=19",
   "/favicon.svg",
   "/js/app.js",
   "/js/notificaciones.js",
@@ -35,13 +35,26 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .catch(() => {
-        // Si falla el precache (ej. sin red en el install), no bloqueamos
-        // la instalación del SW — igual sirve para lo que ya se cachee después.
-      })
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        // cache:"reload" ignora el cache HTTP del navegador (Cache-Control:
+        // max-age de /js/*.js y /styles.css) y va directo a la red, así el
+        // precache siempre agarra la versión real más nueva y no una que el
+        // navegador ya tenía guardada de antes (esto era lo que causaba que
+        // un dispositivo quedara con JS/CSS viejo y otro no, dependiendo de
+        // si ya había pedido esos archivos en la última hora).
+        PRECACHE_URLS.map((url) =>
+          fetch(url, { cache: "reload" })
+            .then((res) => {
+              if (res.ok) return cache.put(url, res);
+            })
+            .catch(() => {
+              // Si un archivo puntual falla (sin red, etc.) no bloqueamos
+              // el resto del precache.
+            })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
