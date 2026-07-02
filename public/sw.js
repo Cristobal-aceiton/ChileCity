@@ -4,19 +4,21 @@
 //                         son datos en vivo y cachearlos sería mostrar info vieja
 //                         o de otro usuario).
 //   - HTML (navegación) → network-first con fallback a cache si no hay señal.
-//   - JS/CSS/íconos     → cache-first con actualización en segundo plano
-//                         (stale-while-revalidate), para que la app cargue
-//                         instantáneo y de paso quede medio-funcional offline.
+//   - JS/CSS/íconos     → network-first con fallback a cache: siempre intenta
+//                         traer la versión más nueva del servidor primero, y
+//                         solo usa lo cacheado si no hay conexión. Así los
+//                         cambios de CSS/JS se ven al toque sin depender de que
+//                         alguien recuerde subir CACHE_VERSION en cada deploy.
 //
-// Subir CACHE_VERSION cuando cambien JS/CSS importantes para forzar que los
-// clientes viejos descarten el cache anterior.
+// Subir CACHE_VERSION cuando quieras forzar que los clientes descarten TODO
+// el cache anterior de una (por ejemplo si cambiaste muchos archivos a la vez).
 
-const CACHE_VERSION = "v19";
+const CACHE_VERSION = "v6";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   "/",
-  "/styles.css?v=19",
+  "/styles.css",
   "/favicon.svg",
   "/js/app.js",
   "/js/notificaciones.js",
@@ -35,26 +37,13 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.all(
-        // cache:"reload" ignora el cache HTTP del navegador (Cache-Control:
-        // max-age de /js/*.js y /styles.css) y va directo a la red, así el
-        // precache siempre agarra la versión real más nueva y no una que el
-        // navegador ya tenía guardada de antes (esto era lo que causaba que
-        // un dispositivo quedara con JS/CSS viejo y otro no, dependiendo de
-        // si ya había pedido esos archivos en la última hora).
-        PRECACHE_URLS.map((url) =>
-          fetch(url, { cache: "reload" })
-            .then((res) => {
-              if (res.ok) return cache.put(url, res);
-            })
-            .catch(() => {
-              // Si un archivo puntual falla (sin red, etc.) no bloqueamos
-              // el resto del precache.
-            })
-        )
-      )
-    )
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .catch(() => {
+        // Si falla el precache (ej. sin red en el install), no bloqueamos
+        // la instalación del SW — igual sirve para lo que ya se cachee después.
+      })
   );
   self.skipWaiting();
 });
@@ -100,18 +89,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Estáticos (JS/CSS/íconos) → stale-while-revalidate.
+  // Estáticos (JS/CSS/íconos) → network-first: intenta traer lo último del
+  // servidor y actualiza el cache; si no hay red, recién ahí usa lo cacheado.
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.match(request).then((cached) => {
-        const fetchPromise = fetch(request)
-          .then((res) => {
-            if (res.ok) cache.put(request, res.clone());
-            return res;
-          })
-          .catch(() => cached);
-        return cached || fetchPromise;
+    fetch(request)
+      .then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
+        return res;
       })
-    )
+      .catch(() => caches.match(request))
   );
 });
