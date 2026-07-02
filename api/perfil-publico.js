@@ -22,6 +22,29 @@ async function ensureSchema(sql) {
   `;
   await sql`ALTER TABLE dni ADD COLUMN IF NOT EXISTS discord_username TEXT`;
   await ensureLogrosSchema(sql);
+
+  // Tabla de vehículos registrados (compartida con api/tienda.js y
+  // api/comisaria.js). Se declara acá también por si este endpoint corre
+  // antes que exista.
+  await sql`
+    CREATE TABLE IF NOT EXISTS vehiculos_registrados (
+      id                          SERIAL PRIMARY KEY,
+      inventario_id               INTEGER NOT NULL UNIQUE,
+      patente                     TEXT NOT NULL UNIQUE,
+      modelo                      TEXT NOT NULL,
+      color                       TEXT NOT NULL,
+      anio                        INTEGER NOT NULL,
+      estado                      TEXT NOT NULL DEFAULT 'Activo',
+      propietario_actual_id       TEXT NOT NULL,
+      propietario_actual_nombre   TEXT,
+      duenos_anteriores           JSONB NOT NULL DEFAULT '[]',
+      fecha_inscripcion           TIMESTAMPTZ DEFAULT NOW(),
+      created_at                  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_vehiculos_propietario ON vehiculos_registrados(propietario_actual_id)
+  `;
   schemaReady = true;
 }
 
@@ -70,6 +93,10 @@ export default async function handler(req, res) {
              OR LOWER(apellido2) LIKE ${busq}
              OR LOWER(rut)       LIKE ${busq}
              OR LOWER(discord_username) LIKE ${busq}
+             OR discord_id IN (
+                  SELECT propietario_actual_id FROM vehiculos_registrados
+                  WHERE LOWER(patente) LIKE ${busq}
+                )
           ORDER BY apellido1, nombre1
           LIMIT ${limit} OFFSET ${offset}
         `,
@@ -81,6 +108,10 @@ export default async function handler(req, res) {
              OR LOWER(apellido2) LIKE ${busq}
              OR LOWER(rut)       LIKE ${busq}
              OR LOWER(discord_username) LIKE ${busq}
+             OR discord_id IN (
+                  SELECT propietario_actual_id FROM vehiculos_registrados
+                  WHERE LOWER(patente) LIKE ${busq}
+                )
         `,
       ]);
     } else {
@@ -92,19 +123,24 @@ export default async function handler(req, res) {
     const total = totalRow[0]?.total || 0;
 
     const ids = dnis.map(d => d.discord_id);
-    let inventarios = [], multas = [], antecedentes = [], logrosRows = [];
+    let inventarios = [], multas = [], antecedentes = [], logrosRows = [], vehiculos = [];
 
     if (ids.length > 0) {
-      [inventarios, multas, antecedentes, logrosRows] = await Promise.all([
+      [inventarios, multas, antecedentes, logrosRows, vehiculos] = await Promise.all([
         sql`SELECT * FROM inventario WHERE discord_id = ANY(${ids}) ORDER BY comprado_at DESC`,
         sql`SELECT * FROM multas WHERE ciudadano_id = ANY(${ids}) ORDER BY created_at DESC`,
         sql`SELECT * FROM antecedentes WHERE ciudadano_id = ANY(${ids}) ORDER BY created_at DESC`,
         sql`SELECT discord_id, codigo, created_at FROM logros_usuario WHERE discord_id = ANY(${ids})`,
+        sql`SELECT * FROM vehiculos_registrados WHERE propietario_actual_id = ANY(${ids}) ORDER BY created_at DESC`,
       ]);
     }
 
     // Construir mapas por discord_id
-    const invMap = {}, multaMap = {}, antMap = {}, logroMap = {};
+    const invMap = {}, multaMap = {}, antMap = {}, logroMap = {}, vehMap = {};
+    for (const v of vehiculos) {
+      if (!vehMap[v.propietario_actual_id]) vehMap[v.propietario_actual_id] = [];
+      vehMap[v.propietario_actual_id].push(v);
+    }
     for (const item of inventarios) {
       if (!invMap[item.discord_id]) invMap[item.discord_id] = [];
       invMap[item.discord_id].push({ ...item, precio_pagado: toNumber(item.precio_pagado) });
@@ -147,9 +183,14 @@ export default async function handler(req, res) {
           inventario:   invMap[d.discord_id]   || [],
           multas:       multaMap[d.discord_id]  || [],
           antecedentes: antMap[d.discord_id]    || [],
+          vehiculos:    vehMap[d.discord_id]    || [],
           logros,
         };
       }),
+      // Si la búsqueda calza con el formato de una patente (ABC-123), el
+      // front puede usar esta bandera para abrir automáticamente el perfil
+      // del propietario vinculado a ese vehículo.
+      matchPatente: !!(q && /^[A-Za-z0-9]{3}-[A-Za-z0-9]{3}$/.test(q.trim())),
     });
   } catch (err) {
     console.error("Error en /api/perfil-publico:", err);

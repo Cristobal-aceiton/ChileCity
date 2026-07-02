@@ -73,6 +73,30 @@ async function initTables(sql) {
     )
   `;
 
+  // Tabla de vehículos registrados (compartida con api/tienda.js, donde se
+  // crean/transfieren los registros; acá el Panel Policial solo lee y
+  // actualiza el campo "estado"). Se declara también aquí por si esta
+  // función corre antes que /api/tienda haya creado la tabla alguna vez.
+  await sql`
+    CREATE TABLE IF NOT EXISTS vehiculos_registrados (
+      id                          SERIAL PRIMARY KEY,
+      inventario_id               INTEGER NOT NULL UNIQUE,
+      patente                     TEXT NOT NULL UNIQUE,
+      modelo                      TEXT NOT NULL,
+      color                       TEXT NOT NULL,
+      anio                        INTEGER NOT NULL,
+      estado                      TEXT NOT NULL DEFAULT 'Activo',
+      propietario_actual_id       TEXT NOT NULL,
+      propietario_actual_nombre   TEXT,
+      duenos_anteriores           JSONB NOT NULL DEFAULT '[]',
+      fecha_inscripcion           TIMESTAMPTZ DEFAULT NOW(),
+      created_at                  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_vehiculos_propietario ON vehiculos_registrados(propietario_actual_id)
+  `;
+
   // Tabla de logs de comisaría
   await sql`
     CREATE TABLE IF NOT EXISTS comisaria_logs (
@@ -455,6 +479,48 @@ export default async function handler(req, res) {
         rows = await sql`SELECT * FROM comisaria_logs ORDER BY created_at DESC LIMIT 200`;
       }
       return res.status(200).json({ logs: rows });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // VEHÍCULOS (estado, solo policía)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Listar los vehículos registrados de un ciudadano (policía)
+    if (req.method === "GET" && action === "vehiculosUsuario") {
+      const esPolicia = await esPoliciaVirtual(sql, discord_id);
+      if (!esPolicia) return res.status(403).json({ error: "No autorizado" });
+
+      const { target_id } = req.query;
+      if (!target_id) return res.status(400).json({ error: "Falta target_id" });
+
+      const rows = await sql`
+        SELECT * FROM vehiculos_registrados
+        WHERE propietario_actual_id = ${target_id}
+        ORDER BY created_at DESC
+      `;
+      return res.status(200).json({ vehiculos: rows });
+    }
+
+    // Cambiar el estado de un vehículo (policía)
+    if (req.method === "POST" && action === "actualizarEstadoVehiculo") {
+      const esPolicia = await esPoliciaVirtual(sql, discord_id);
+      if (!esPolicia) return res.status(403).json({ error: "No autorizado" });
+
+      const { vehiculo_id, estado } = req.body;
+      if (!vehiculo_id || !estado)
+        return res.status(400).json({ error: "Faltan campos requeridos" });
+
+      const rows = await sql`
+        UPDATE vehiculos_registrados SET estado = ${estado} WHERE id = ${vehiculo_id}
+        RETURNING *
+      `;
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Vehículo no encontrado" });
+
+      await registrarLog(sql, discord_id, discord_name, "ACTUALIZAR_ESTADO_VEHICULO",
+        `Cambió el estado del vehículo ${rows[0].patente} (${rows[0].modelo}) a "${estado}"`);
+
+      return res.status(200).json({ vehiculo: rows[0] });
     }
 
     // ═══════════════════════════════════════════════════════════════════════

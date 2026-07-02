@@ -26,6 +26,14 @@ function toNumber(value) {
 
 const CATEGORIAS_VALIDAS = ["vehiculos", "armas", "licencias", "otros"];
 
+// Formato de patente exigido: 3 caracteres (letras o números) + guion + 3
+// caracteres (letras o números). Ej: ABC-123, A3V-VSD.
+const PATENTE_REGEX = /^[A-Z0-9]{3}-[A-Z0-9]{3}$/;
+
+function randomAnio() {
+  return Math.floor(Math.random() * (2026 - 2000 + 1)) + 2000;
+}
+
 let schemaReady = false;
 async function initTables(sql) {
   if (schemaReady) return;
@@ -57,6 +65,29 @@ async function initTables(sql) {
   `;
   await sql`
     CREATE INDEX IF NOT EXISTS idx_inventario_discord_id ON inventario(discord_id)
+  `;
+
+  // Tabla de vehículos registrados (Registro Civil vehicular). Vive ligada
+  // 1:1 a un ítem del inventario (inventario_id) mediante el registro de
+  // patente que hace el propietario desde su inventario.
+  await sql`
+    CREATE TABLE IF NOT EXISTS vehiculos_registrados (
+      id                          SERIAL PRIMARY KEY,
+      inventario_id               INTEGER NOT NULL UNIQUE,
+      patente                     TEXT NOT NULL UNIQUE,
+      modelo                      TEXT NOT NULL,
+      color                       TEXT NOT NULL,
+      anio                        INTEGER NOT NULL,
+      estado                      TEXT NOT NULL DEFAULT 'Activo',
+      propietario_actual_id       TEXT NOT NULL,
+      propietario_actual_nombre   TEXT,
+      duenos_anteriores           JSONB NOT NULL DEFAULT '[]',
+      fecha_inscripcion           TIMESTAMPTZ DEFAULT NOW(),
+      created_at                  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_vehiculos_propietario ON vehiculos_registrados(propietario_actual_id)
   `;
   schemaReady = true;
 }
@@ -153,6 +184,7 @@ export default async function handler(req, res) {
     const session = requireSession(req, res);
     if (!session) return;
     const discord_id = session.id;
+    const discord_name = session.name || session.tag || discord_id;
 
     const ADMIN_IDS_TIENDA = await getAdminIds(sql);
     const esAdmin = ADMIN_IDS_TIENDA.includes(discord_id);
@@ -235,13 +267,164 @@ export default async function handler(req, res) {
     // ── GET: mi propio inventario ────────────────────────────────────────────
     if (req.method === "GET" && action === "inventario") {
       const rows = await sql`
-        SELECT * FROM inventario
-        WHERE discord_id = ${discord_id}
-        ORDER BY comprado_at DESC
+        SELECT i.*, v.id AS vehiculo_id, v.patente, v.color AS v_color,
+               v.anio AS v_anio, v.estado AS v_estado,
+               v.fecha_inscripcion AS v_fecha_inscripcion
+        FROM inventario i
+        LEFT JOIN vehiculos_registrados v ON v.inventario_id = i.id
+        WHERE i.discord_id = ${discord_id}
+        ORDER BY i.comprado_at DESC
       `;
       return res.status(200).json({
-        items: rows.map(i => ({ ...i, precio_pagado: toNumber(i.precio_pagado) })),
+        items: rows.map(i => ({
+          ...i,
+          precio_pagado: toNumber(i.precio_pagado),
+          vehiculo: i.vehiculo_id ? {
+            id: i.vehiculo_id,
+            patente: i.patente,
+            color: i.v_color,
+            anio: i.v_anio,
+            estado: i.v_estado,
+            fecha_inscripcion: i.v_fecha_inscripcion,
+          } : null,
+        })),
       });
+    }
+
+    // ── POST: registrar vehículo (Registro Civil vehicular) ──────────────────
+    if (req.method === "POST" && action === "registrarVehiculo") {
+      const { item_id, patente, color } = req.body;
+      if (!item_id || !patente || !color)
+        return res.status(400).json({ error: "Faltan campos requeridos" });
+
+      const patenteNorm = String(patente).trim().toUpperCase();
+      if (!PATENTE_REGEX.test(patenteNorm))
+        return res.status(400).json({ error: "Formato de patente inválido. Debe ser ABC-123." });
+
+      const colorTrim = String(color).trim();
+      if (!colorTrim) return res.status(400).json({ error: "Debes indicar un color." });
+
+      const items = await sql`
+        SELECT * FROM inventario WHERE id = ${item_id} AND discord_id = ${discord_id}
+      `;
+      if (items.length === 0)
+        return res.status(404).json({ error: "Ese ítem no existe en tu inventario." });
+      const item = items[0];
+      if (item.categoria !== "vehiculos")
+        return res.status(400).json({ error: "Solo los vehículos se pueden registrar." });
+
+      const yaRegistrado = await sql`
+        SELECT id FROM vehiculos_registrados WHERE inventario_id = ${item_id}
+      `;
+      if (yaRegistrado.length > 0)
+        return res.status(409).json({ error: "Este vehículo ya está registrado." });
+
+      const patenteOcupada = await sql`
+        SELECT id FROM vehiculos_registrados WHERE patente = ${patenteNorm}
+      `;
+      if (patenteOcupada.length > 0)
+        return res.status(409).json({ error: "Esa patente ya está en uso." });
+
+      // Nombre del propietario: se prioriza el nombre real de su cédula
+      const dniRows = await sql`SELECT nombre1, apellido1 FROM dni WHERE discord_id = ${discord_id}`;
+      const propietarioNombre = dniRows.length > 0
+        ? `${dniRows[0].nombre1} ${dniRows[0].apellido1}`
+        : discord_name;
+
+      const anio = randomAnio();
+      const rows = await sql`
+        INSERT INTO vehiculos_registrados
+          (inventario_id, patente, modelo, color, anio, estado, propietario_actual_id, propietario_actual_nombre, duenos_anteriores)
+        VALUES
+          (${item_id}, ${patenteNorm}, ${item.nombre}, ${colorTrim}, ${anio}, 'Activo', ${discord_id}, ${propietarioNombre}, '[]')
+        RETURNING *
+      `;
+      return res.status(201).json({ vehiculo: rows[0] });
+    }
+
+    // ── GET: obtener un registro vehicular (por item_id o vehiculo_id) ───────
+    if (req.method === "GET" && action === "vehiculo") {
+      const { item_id, vehiculo_id } = req.query;
+      let rows;
+      if (vehiculo_id) {
+        rows = await sql`SELECT * FROM vehiculos_registrados WHERE id = ${vehiculo_id}`;
+      } else if (item_id) {
+        rows = await sql`SELECT * FROM vehiculos_registrados WHERE inventario_id = ${item_id}`;
+      } else {
+        return res.status(400).json({ error: "Falta item_id o vehiculo_id" });
+      }
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Vehículo no encontrado" });
+      return res.status(200).json({ vehiculo: rows[0] });
+    }
+
+    // ── GET: buscar posible nuevo propietario para transferencia ─────────────
+    // Busca por ID de Discord, RUT/DNI, nombre de Discord o nombre de personaje.
+    if (req.method === "GET" && action === "buscarPropietario") {
+      const { q } = req.query;
+      if (!q || !q.trim()) return res.status(400).json({ error: "Falta parámetro de búsqueda" });
+      const busq = `%${q.trim().replace(/^@/, "").toLowerCase()}%`;
+      const rows = await sql`
+        SELECT discord_id, rut, discord_username, nombre1, apellido1
+        FROM dni
+        WHERE LOWER(discord_id) LIKE ${busq}
+           OR LOWER(rut) LIKE ${busq}
+           OR LOWER(discord_username) LIKE ${busq}
+           OR LOWER(nombre1 || ' ' || apellido1) LIKE ${busq}
+        LIMIT 10
+      `;
+      return res.status(200).json({
+        usuarios: rows.map(r => ({
+          discord_id: r.discord_id,
+          rut: r.rut,
+          discord_username: r.discord_username,
+          nombre_completo: `${r.nombre1} ${r.apellido1}`,
+        })),
+      });
+    }
+
+    // ── POST: transferir vehículo a un nuevo propietario ──────────────────────
+    if (req.method === "POST" && action === "transferirVehiculo") {
+      const { vehiculo_id, nuevo_propietario_id } = req.body;
+      if (!vehiculo_id || !nuevo_propietario_id)
+        return res.status(400).json({ error: "Faltan campos requeridos" });
+
+      const vehiculos = await sql`SELECT * FROM vehiculos_registrados WHERE id = ${vehiculo_id}`;
+      if (vehiculos.length === 0)
+        return res.status(404).json({ error: "Vehículo no encontrado" });
+      const vehiculo = vehiculos[0];
+
+      if (vehiculo.propietario_actual_id !== discord_id)
+        return res.status(403).json({ error: "No eres el propietario actual de este vehículo." });
+
+      if (nuevo_propietario_id === discord_id)
+        return res.status(400).json({ error: "El nuevo propietario debe ser distinto al actual." });
+
+      const nuevoDni = await sql`SELECT nombre1, apellido1 FROM dni WHERE discord_id = ${nuevo_propietario_id}`;
+      if (nuevoDni.length === 0)
+        return res.status(404).json({ error: "El nuevo propietario no tiene cédula registrada." });
+      const nuevoNombre = `${nuevoDni[0].nombre1} ${nuevoDni[0].apellido1}`;
+
+      const historial = Array.isArray(vehiculo.duenos_anteriores) ? vehiculo.duenos_anteriores : [];
+      historial.push({
+        discord_id: vehiculo.propietario_actual_id,
+        nombre: vehiculo.propietario_actual_nombre,
+        fecha_hasta: new Date().toISOString(),
+      });
+
+      const rows = await sql`
+        UPDATE vehiculos_registrados
+        SET propietario_actual_id = ${nuevo_propietario_id},
+            propietario_actual_nombre = ${nuevoNombre},
+            duenos_anteriores = ${JSON.stringify(historial)}::jsonb
+        WHERE id = ${vehiculo_id}
+        RETURNING *
+      `;
+
+      // Mover el ítem de inventario al nuevo propietario
+      await sql`UPDATE inventario SET discord_id = ${nuevo_propietario_id} WHERE id = ${vehiculo.inventario_id}`;
+
+      return res.status(200).json({ vehiculo: rows[0] });
     }
 
     // ── ADMIN: listar todos los productos (incluyendo inactivos) ─────────────
