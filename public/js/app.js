@@ -571,10 +571,10 @@
         if (data.existe && data.dni) {
           currentDNI = data.dni;
           badgesWrap.insertAdjacentHTML('beforeend',
-            `<span class="profile-badge pb-rut">🪪 ${escHtml(data.dni.rut || '')}</span>`);
+            `<span class="profile-badge pb-rut"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg> ${escHtml(data.dni.rut || '')}</span>`);
         } else {
           badgesWrap.insertAdjacentHTML('beforeend',
-            `<span class="profile-badge pb-sin-rut" onclick="abrirSeccion('registro-civil'); cargarDNI()">Sin cédula — crear</span>`);
+            `<span class="profile-badge pb-sin-rut" onclick="abrirSeccion('registro-civil'); cargarDNI()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg> Sin cédula — crear</span>`);
         }
       } catch (e) {
         // Sin RUT visible si falla la carga; no bloquea el resto del perfil.
