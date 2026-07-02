@@ -554,31 +554,51 @@
     window.addEventListener('offline', ccActualizarBannerOffline);
     document.addEventListener('DOMContentLoaded', ccActualizarBannerOffline);
 
-    // ── Card de Perfil del dashboard (avatar, badges, bio, saldo) ────────────
-    // Se llama al entrar al dashboard. Reutiliza /api/dni y /api/banco (no se
-    // crean endpoints nuevos, ya se llegó al límite de 12 funciones serverless
-    // del plan gratuito de Vercel).
+    // ── Card de Perfil del dashboard (avatar, badges de RUT/cargo, saldo) ────
+    // Se llama al entrar al dashboard. Reutiliza /api/dni, /api/admin y
+    // /api/banco (no se crean endpoints nuevos, ya se llegó al límite de 12
+    // funciones serverless del plan gratuito de Vercel).
     async function cargarPerfilDashboard() {
       const badgesWrap = document.getElementById('profile-badges');
-      const bioText     = document.getElementById('profile-bio-text');
       if (!badgesWrap || !currentUser?.id) return;
 
       badgesWrap.innerHTML = `<span class="profile-badge pb-discord">@${escHtml(currentUser.tag || currentUser.name)}</span>`;
 
-      // DNI (solo para biografía; el badge de RUT ya no se muestra en el perfil)
+      // RUT (badge clickeable si aún no tiene cédula creada)
       try {
         const res = await fetch('/api/dni');
         const data = await res.json();
         if (data.existe && data.dni) {
           currentDNI = data.dni;
-          bioText.textContent = data.dni.bio && data.dni.bio.trim()
-            ? data.dni.bio
-            : 'Sin biografía todavía. ¡Cuéntale a la ciudad quién eres!';
+          badgesWrap.insertAdjacentHTML('beforeend',
+            `<span class="profile-badge pb-rut">🪪 ${escHtml(data.dni.rut || '')}</span>`);
         } else {
-          bioText.textContent = 'Crea tu cédula de identidad para poder editar tu biografía.';
+          badgesWrap.insertAdjacentHTML('beforeend',
+            `<span class="profile-badge pb-sin-rut" onclick="abrirSeccion('registro-civil'); cargarDNI()">Sin cédula — crear</span>`);
         }
       } catch (e) {
-        bioText.textContent = 'No se pudo cargar tu biografía.';
+        // Sin RUT visible si falla la carga; no bloquea el resto del perfil.
+      }
+
+      // Cargo (civil / staff / admin). Se resuelve contra el servidor, igual
+      // que en abrirPanelAdmin/abrirPanelStaff — nunca se confía en el cliente.
+      try {
+        const [rAdmin, rStaff] = await Promise.all([
+          fetch('/api/admin?action=verificar'),
+          fetch('/api/admin?action=verificarStaff')
+        ]);
+        const [dAdmin, dStaff] = await Promise.all([rAdmin.json(), rStaff.json()]);
+        let cargoHtml;
+        if (dAdmin.esAdmin) {
+          cargoHtml = `<span class="profile-badge pb-admin">🛡️ Admin</span>`;
+        } else if (dStaff.esStaff) {
+          cargoHtml = `<span class="profile-badge pb-staff">⭐ Staff</span>`;
+        } else {
+          cargoHtml = `<span class="profile-badge pb-civil">👤 Civil</span>`;
+        }
+        badgesWrap.insertAdjacentHTML('beforeend', cargoHtml);
+      } catch (e) {
+        badgesWrap.insertAdjacentHTML('beforeend', `<span class="profile-badge pb-civil">👤 Civil</span>`);
       }
 
       // Saldo bancario
@@ -606,53 +626,3 @@
       }
     }
 
-    // ── Edición de biografía ──────────────────────────────────────────────────
-    (function initBioEdit() {
-      const wrap    = document.getElementById('profile-bio-wrap');
-      const editBtn = document.getElementById('profile-bio-edit-btn');
-      const cancel  = document.getElementById('profile-bio-cancel');
-      const save    = document.getElementById('profile-bio-save');
-      const input   = document.getElementById('profile-bio-input');
-      const count   = document.getElementById('profile-bio-count');
-      if (!wrap || !editBtn) return;
-
-      function abrirEdicion() {
-        input.value = (currentDNI?.bio) || '';
-        count.textContent = `${input.value.length}/160`;
-        wrap.classList.add('editing');
-        input.focus();
-      }
-      function cerrarEdicion() { wrap.classList.remove('editing'); }
-
-      editBtn.addEventListener('click', () => {
-        if (!currentDNI) { abrirSeccion('registro-civil'); cargarDNI(); return; }
-        abrirEdicion();
-      });
-      cancel.addEventListener('click', cerrarEdicion);
-      input.addEventListener('input', () => { count.textContent = `${input.value.length}/160`; });
-
-      save.addEventListener('click', async () => {
-        save.disabled = true;
-        try {
-          const res = await fetch('/api/dni', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bio: input.value })
-          });
-          const data = await res.json();
-          if (res.ok && data.dni) {
-            currentDNI = data.dni;
-            document.getElementById('profile-bio-text').textContent =
-              data.dni.bio && data.dni.bio.trim() ? data.dni.bio : 'Sin biografía todavía. ¡Cuéntale a la ciudad quién eres!';
-            if (typeof mostrarToast === 'function') mostrarToast('Biografía actualizada.');
-            cerrarEdicion();
-          } else if (typeof mostrarToast === 'function') {
-            mostrarToast(data.error || 'No se pudo guardar la biografía.', true);
-          }
-        } catch (e) {
-          if (typeof mostrarToast === 'function') mostrarToast('Error de conexión.', true);
-        } finally {
-          save.disabled = false;
-        }
-      });
-    })();
