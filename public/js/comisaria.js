@@ -115,31 +115,31 @@
         const data = await r.json();
         loading.style.display = 'none';
         if (!data.multas || data.multas.length === 0) {
-          lista.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:14px;text-align:center;padding:32px 0;">No tienes multas registradas.</p>';
+          lista.innerHTML = '<p style="color:rgba(11,61,36,0.4);font-size:14px;text-align:center;padding:32px 0;">No tienes multas registradas.</p>';
           return;
         }
         data.multas.forEach(m => {
           const card = document.createElement('div');
-          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;';
-          const estadoColor = m.estado === 'pagada' ? '#4ade80' : '#fbbf24';
+          card.style.cssText = 'background:#fff;border:1px solid rgba(11,61,36,0.1);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(11,61,36,0.05);';
+          const estadoColor = m.estado === 'pagada' ? '#15803d' : '#b8860b';
           card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-              <span style="font-weight:700;color:#fff;font-size:15px;">${escHtml(m.motivo)}</span>
-              <span style="background:rgba(0,0,0,0.3);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:600;color:${estadoColor};">${m.estado.toUpperCase()}</span>
+              <span style="font-weight:700;color:#0b3d24;font-size:15px;">${escHtml(m.motivo)}</span>
+              <span style="background:rgba(11,61,36,0.08);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:600;color:${estadoColor};">${m.estado.toUpperCase()}</span>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:13px;color:rgba(255,255,255,0.55);">
-              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a1.5 1.5 0 011.5-1.5h3M9 14.5a1.5 1.5 0 001.5 1.5h3a1.5 1.5 0 000-3h-3a1.5 1.5 0 010-3M12 6v2M12 16v2"/></svg> Valor: <b style="color:#fbbf24;">$${Number(m.valor).toLocaleString('es-CL')}</b></span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:13px;color:rgba(11,61,36,0.6);">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a1.5 1.5 0 011.5-1.5h3M9 14.5a1.5 1.5 0 001.5 1.5h3a1.5 1.5 0 000-3h-3a1.5 1.5 0 010-3M12 6v2M12 16v2"/></svg> Valor: <b style="color:#b8860b;">$${Number(m.valor).toLocaleString('es-CL')}</b></span>
               <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Emitida: ${cvFecha(m.created_at)}</span>
               <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M5 3L2 6M19 3l3 3"/></svg> Vence: ${m.fecha_limite}</span>
               <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg> ${escHtml(m.funcionario_nombre || m.funcionario_id)}</span>
             </div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${escHtml(m.funcionario_id)}</div>
+            <div style="font-size:11px;color:rgba(11,61,36,0.35);">ID Funcionario: ${escHtml(m.funcionario_id)}</div>
           `;
           lista.appendChild(card);
         });
       } catch {
         loading.style.display = 'none';
-        lista.innerHTML = '<p style="color:#f87171;font-size:13px;">Error al cargar multas.</p>';
+        lista.innerHTML = '<p style="color:#c0392b;font-size:13px;">Error al cargar multas.</p>';
       }
     }
 
@@ -154,33 +154,33 @@
         const data = await r.json();
         loading.style.display = 'none';
         if (!data.antecedentes || data.antecedentes.length === 0) {
-          lista.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:14px;text-align:center;padding:32px 0;">No existen antecedentes registrados.</p>';
+          lista.innerHTML = '<p style="color:rgba(11,61,36,0.4);font-size:14px;text-align:center;padding:32px 0;">No existen antecedentes registrados.</p>';
           return;
         }
         data.antecedentes.forEach(a => {
           const card = document.createElement('div');
-          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;display:flex;gap:16px;';
+          card.style.cssText = 'background:#fff;border:1px solid rgba(11,61,36,0.1);border-radius:12px;padding:16px;display:flex;gap:16px;box-shadow:0 2px 10px rgba(11,61,36,0.05);';
           const fotoHtml = a.foto_url
-            ? `<img src="${escHtml(a.foto_url)}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">`
-            : `<div style="width:72px;height:72px;background:rgba(255,255,255,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+            ? `<img src="${escHtml(a.foto_url)}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(11,61,36,0.12);flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">`
+            : `<div style="width:72px;height:72px;background:rgba(11,61,36,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;color:rgba(11,61,36,0.45);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
           card.innerHTML = `
             ${fotoHtml}
             <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
-              <span style="font-weight:700;color:#f87171;font-size:15px;">${escHtml(a.motivo)}</span>
-              <div style="font-size:13px;color:rgba(255,255,255,0.55);display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
+              <span style="font-weight:700;color:#c0392b;font-size:15px;">${escHtml(a.motivo)}</span>
+              <div style="font-size:13px;color:rgba(11,61,36,0.6);display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
                 <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Artículos: ${escHtml(a.articulos || '—')}</span>
                 <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg> Cárcel: ${escHtml(a.tiempo_carcel || '—')}</span>
                 <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Fecha: ${cvFecha(a.created_at)}</span>
                 <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 5-3 8.5-7 10-4-1.5-7-5-7-10V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg> ${escHtml(a.funcionario_nombre || a.funcionario_id)}</span>
               </div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.25);">ID Funcionario: ${escHtml(a.funcionario_id)}</div>
+              <div style="font-size:11px;color:rgba(11,61,36,0.35);">ID Funcionario: ${escHtml(a.funcionario_id)}</div>
             </div>
           `;
           lista.appendChild(card);
         });
       } catch {
         loading.style.display = 'none';
-        lista.innerHTML = '<p style="color:#f87171;font-size:13px;">Error al cargar antecedentes.</p>';
+        lista.innerHTML = '<p style="color:#c0392b;font-size:13px;">Error al cargar antecedentes.</p>';
       }
     }
 
@@ -304,7 +304,7 @@
         }
         data.multas.forEach(m => {
           const card = document.createElement('div');
-          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;';
+          card.style.cssText = 'background:rgba(30,138,76,0.05);border:1px solid rgba(63,182,115,0.16);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;';
           const estadoColor = m.estado === 'pagada' ? '#4ade80' : '#fbbf24';
           card.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:200px;">
@@ -382,7 +382,7 @@
         }
         data.antecedentes.forEach(a => {
           const card = document.createElement('div');
-          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;gap:14px;flex-wrap:wrap;';
+          card.style.cssText = 'background:rgba(30,138,76,0.05);border:1px solid rgba(63,182,115,0.16);border-radius:10px;padding:14px;display:flex;gap:14px;flex-wrap:wrap;';
           const fotoHtml = a.foto_url
             ? `<img src="${escHtml(a.foto_url)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">`
             : '';
@@ -434,7 +434,7 @@
         }
         data.denuncias.forEach(d => {
           const card = document.createElement('div');
-          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;';
+          card.style.cssText = 'background:rgba(30,138,76,0.05);border:1px solid rgba(63,182,115,0.16);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;';
           card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
               <div>
