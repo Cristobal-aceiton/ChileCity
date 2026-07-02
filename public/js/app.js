@@ -590,15 +590,15 @@
         const [dAdmin, dStaff] = await Promise.all([rAdmin.json(), rStaff.json()]);
         let cargoHtml;
         if (dAdmin.esAdmin) {
-          cargoHtml = `<span class="profile-badge pb-admin">🛡️ Admin</span>`;
+          cargoHtml = `<span class="profile-badge pb-admin"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg> Admin</span>`;
         } else if (dStaff.esStaff) {
-          cargoHtml = `<span class="profile-badge pb-staff">⭐ Staff</span>`;
+          cargoHtml = `<span class="profile-badge pb-staff"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Staff</span>`;
         } else {
-          cargoHtml = `<span class="profile-badge pb-civil">👤 Civil</span>`;
+          cargoHtml = `<span class="profile-badge pb-civil"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Civil</span>`;
         }
         badgesWrap.insertAdjacentHTML('beforeend', cargoHtml);
       } catch (e) {
-        badgesWrap.insertAdjacentHTML('beforeend', `<span class="profile-badge pb-civil">👤 Civil</span>`);
+        badgesWrap.insertAdjacentHTML('beforeend', `<span class="profile-badge pb-civil"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Civil</span>`);
       }
 
       // Saldo bancario
