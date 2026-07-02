@@ -170,7 +170,8 @@
 }
 #comisaria-screen .cv-vista-blanca .sec-back:hover{background:#eef2ec;}
 #comisaria-screen .cv-vista-blanca .seccion-title{
-  background:none;-webkit-text-fill-color:initial;color:#0b3d24;
+  background:none;-webkit-background-clip:initial;background-clip:initial;
+  -webkit-text-fill-color:#0b3d24;color:#0b3d24;
 }
 #comisaria-screen .cv-vista-blanca .seccion-title svg{filter:none;color:#1e8a4c;}
 #comisaria-screen .cv-vista-blanca .rc-loading{color:rgba(11,61,36,.5);}
