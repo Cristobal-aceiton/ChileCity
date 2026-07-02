@@ -2185,7 +2185,7 @@
       </div>
 
       <!-- ══ VISTA: MIS MULTAS ═══════════════════════════════════ -->
-      <div class="cv-vista" id="cv-vista-mis-multas">
+      <div class="cv-vista cv-vista-blanca" id="cv-vista-mis-multas">
         <div class="seccion-container" style="max-width:680px;">
           <button class="sec-back" onclick="cvSetVista('inicio')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -2214,7 +2214,7 @@
       </div>
 
       <!-- ══ VISTA: MIS ANTECEDENTES ═════════════════════════════ -->
-      <div class="cv-vista" id="cv-vista-mis-antecedentes">
+      <div class="cv-vista cv-vista-blanca" id="cv-vista-mis-antecedentes">
         <div class="seccion-container" style="max-width:680px;">
           <button class="sec-back" onclick="cvSetVista('inicio')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -2247,7 +2247,7 @@
       </div>
 
       <!-- ══ VISTA: REALIZAR DENUNCIA ════════════════════════════ -->
-      <div class="cv-vista" id="cv-vista-denuncia">
+      <div class="cv-vista cv-vista-blanca" id="cv-vista-denuncia">
         <div class="seccion-container" style="max-width:680px;">
           <button class="sec-back" onclick="cvSetVista('inicio')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -2264,7 +2264,7 @@
             </div>
             <div class="form-group">
               <label>Descripción</label>
-              <textarea id="den-descripcion" rows="4" placeholder="Describe detalladamente lo ocurrido..." style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:#fff;font-family:Inter,sans-serif;font-size:14px;resize:vertical;width:100%;"></textarea>
+              <textarea id="den-descripcion" rows="4" placeholder="Describe detalladamente lo ocurrido..." style="background:#f4f5f1;border:1px solid rgba(11,61,36,0.14);border-radius:10px;padding:12px;color:#0b3d24;font-family:Inter,sans-serif;font-size:14px;resize:vertical;width:100%;"></textarea>
             </div>
             <div class="form-group">
               <label>URL de Evidencia (imagen/video)</label>
@@ -2275,7 +2275,7 @@
               <input type="text" id="den-fecha" readonly style="opacity:0.5;">
             </div>
             <div class="rc-error" id="den-error"></div>
-            <div class="rc-error" id="den-ok" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#4ade80;display:none;"></div>
+            <div class="rc-error" id="den-ok" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#15803d;display:none;"></div>
             <button class="btn-green" onclick="cvEnviarDenuncia()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               Enviar Denuncia

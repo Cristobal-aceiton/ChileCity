@@ -149,6 +149,47 @@
 }
 #comisaria-screen .btn-green:hover{background:linear-gradient(135deg,var(--cv-green),var(--cv-green-light));}
 
+/* ── Vistas con fondo blanco (Trámites, Denuncia, Mis Multas, Mis Antecedentes) ── */
+/* Mantiene la temática blanco + verde también dentro de estas vistas, en vez de
+   caer en el tema oscuro genérico del resto del sitio. */
+#comisaria-screen .cv-vista-blanca .sec-back{
+  background:#fff;border:1px solid rgba(11,61,36,.14);color:#0b3d24;
+  box-shadow:0 2px 8px rgba(11,61,36,.06);
+}
+#comisaria-screen .cv-vista-blanca .sec-back:hover{background:#eef2ec;}
+#comisaria-screen .cv-vista-blanca .seccion-title{
+  background:none;-webkit-text-fill-color:initial;color:#0b3d24;
+}
+#comisaria-screen .cv-vista-blanca .seccion-title svg{filter:none;color:#1e8a4c;}
+#comisaria-screen .cv-vista-blanca .rc-loading{color:rgba(11,61,36,.5);}
+#comisaria-screen .cv-vista-blanca .spinner{border-color:rgba(11,61,36,.12);border-top-color:#1e8a4c;}
+#comisaria-screen .cv-vista-blanca .skeleton-card{background:#fff;border-color:rgba(11,61,36,.1);}
+#comisaria-screen .cv-vista-blanca .skeleton-line{
+  background:linear-gradient(90deg,rgba(11,61,36,.06) 25%,rgba(11,61,36,.12) 50%,rgba(11,61,36,.06) 75%);
+  background-size:200% 100%;
+}
+#comisaria-screen .cv-vista-blanca .rc-form{
+  background:#fff;border:1px solid rgba(11,61,36,.1);box-shadow:0 4px 20px rgba(11,61,36,.06);
+}
+#comisaria-screen .cv-vista-blanca .rc-form h2{color:#0b3d24;}
+#comisaria-screen .cv-vista-blanca .rc-form p{color:rgba(11,61,36,.5);}
+#comisaria-screen .cv-vista-blanca .form-group label{color:rgba(11,61,36,.55);}
+#comisaria-screen .cv-vista-blanca .form-group input,
+#comisaria-screen .cv-vista-blanca .form-group select,
+#comisaria-screen .cv-vista-blanca .form-group textarea{
+  background:#f4f5f1;border:1px solid rgba(11,61,36,.14);color:#0b3d24;
+}
+#comisaria-screen .cv-vista-blanca .form-group input::placeholder,
+#comisaria-screen .cv-vista-blanca .form-group textarea::placeholder{color:rgba(11,61,36,.32);}
+#comisaria-screen .cv-vista-blanca .form-group input:focus,
+#comisaria-screen .cv-vista-blanca .form-group select:focus,
+#comisaria-screen .cv-vista-blanca .form-group textarea:focus{
+  border-color:rgba(30,138,76,.55)!important;background:#fff;
+}
+#comisaria-screen .cv-vista-blanca .rc-error{
+  background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#c0392b;
+}
+
 /* Loading / skeleton */
 #comisaria-screen .spinner{border-top-color:var(--cv-gold);}
 
