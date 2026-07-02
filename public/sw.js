@@ -11,12 +11,12 @@
 // Subir CACHE_VERSION cuando cambien JS/CSS importantes para forzar que los
 // clientes viejos descarten el cache anterior.
 
-const CACHE_VERSION = "v14";
+const CACHE_VERSION = "v15";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   "/",
-  "/styles.css?v=14",
+  "/styles.css?v=15",
   "/favicon.svg",
   "/js/app.js",
   "/js/notificaciones.js",
