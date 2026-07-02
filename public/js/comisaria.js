@@ -2,13 +2,9 @@
     // ══════════════════════════════════════════════════════════════════════
 
     let cvEsPolicia = false;
+    let cvTabsPoliciaListas = false;
 
-    // Tabs de comisaría
-    const CV_TABS_USUARIO = [
-      { id: 'mis-multas',     label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.24L3 3v6.59a2 2 0 00.59 1.41l9.59 9.59a2 2 0 002.82 0l4.59-4.59a2 2 0 000-2.82z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg> Mis Multas' },
-      { id: 'mis-antecedentes', label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/></svg> Mis Antecedentes' },
-      { id: 'denuncia',       label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a2 2 0 002 2h1l4 4V5L6 9H5a2 2 0 00-2 2z"/><path d="M15 8a4 4 0 010 8"/><path d="M18 5a8 8 0 010 14"/></svg> Realizar Denuncia' },
-    ];
+    // Tabs del Panel Policial (solo policías)
     const CV_TABS_POLICIA = [
       { id: 'agregar-multa',  label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar Multa' },
       { id: 'bd-multas',      label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg> BD Multas' },
@@ -18,32 +14,52 @@
       { id: 'logs',           label: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align:-2px;margin-right:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Logs' },
     ];
 
+    // ── Navegación entre vistas principales (hero / trámites / panel) ────
+    function cvSetVista(id) {
+      document.querySelectorAll('#cv-contenido .cv-vista').forEach(v => v.classList.remove('cv-vista-activa'));
+      const vista = document.getElementById(`cv-vista-${id}`);
+      if (vista) vista.classList.add('cv-vista-activa');
+      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+
+      if (id === 'mis-multas')       cvCargarMisMultas();
+      if (id === 'mis-antecedentes') cvCargarMisAntecedentes();
+      if (id === 'denuncia')         document.getElementById('den-fecha').value = new Date().toLocaleDateString('es-CL');
+      if (id === 'panel')            cvAbrirPanelInterno();
+    }
+
+    // Botón "Panel Policial" de la barra superior
+    function cvAbrirPanel() {
+      if (!cvEsPolicia) return;
+      cvSetVista('panel');
+    }
+
+    function cvAbrirPanelInterno() {
+      if (!cvTabsPoliciaListas) {
+        cvConstruirTabsPolicia();
+        cvTabsPoliciaListas = true;
+      }
+    }
+
+    // ── Tabs internos del Panel Policial ─────────────────────────────────
     function cvSetTab(id) {
       document.querySelectorAll('#cv-tabs .admin-tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#cv-contenido .admin-seccion').forEach(s => s.classList.remove('visible'));
+      document.querySelectorAll('#cv-vista-panel .admin-seccion').forEach(s => s.classList.remove('visible'));
       const btn = document.querySelector(`#cv-tabs [data-tab="${id}"]`);
       if (btn) btn.classList.add('active');
       const sec = document.getElementById(`cv-tab-${id}`);
       if (sec) sec.classList.add('visible');
 
       // Auto-cargar al cambiar de tab
-      if (id === 'mis-multas')       cvCargarMisMultas();
-      if (id === 'mis-antecedentes') cvCargarMisAntecedentes();
-      if (id === 'denuncia')         document.getElementById('den-fecha').value = new Date().toLocaleDateString('es-CL');
       if (id === 'bd-multas')        cvCargarBDMultas();
       if (id === 'bd-antec')         cvCargarBDAntecedentes();
       if (id === 'bd-denuncias')     cvCargarBDDenuncias();
       if (id === 'logs')             cvCargarLogs();
     }
 
-    function cvConstruirTabs() {
+    function cvConstruirTabsPolicia() {
       const container = document.getElementById('cv-tabs');
       container.innerHTML = '';
-      const todos = cvEsPolicia
-        ? [...CV_TABS_USUARIO, ...CV_TABS_POLICIA]
-        : CV_TABS_USUARIO;
-
-      todos.forEach((t, i) => {
+      CV_TABS_POLICIA.forEach((t, i) => {
         const btn = document.createElement('button');
         btn.className = 'admin-tab' + (i === 0 ? ' active' : '');
         btn.dataset.tab = t.id;
@@ -51,11 +67,7 @@
         btn.onclick = () => cvSetTab(t.id);
         container.appendChild(btn);
       });
-
-      // Mostrar/ocultar secciones policiales
-      document.querySelectorAll('.cv-policia-tab').forEach(el => {
-        el.style.display = cvEsPolicia ? '' : 'none';
-      });
+      cvSetTab(CV_TABS_POLICIA[0].id);
     }
 
     async function abrirComisaria() {
@@ -65,6 +77,7 @@
       document.getElementById('cv-contenido').style.display = 'none';
       const barra = document.getElementById('cv-barra-progreso');
       barra.style.width = '0%';
+      cvTabsPoliciaListas = false;
 
       // Animación barra progreso
       setTimeout(() => { barra.style.width = '60%'; }, 100);
@@ -85,8 +98,10 @@
       const contenido = document.getElementById('cv-contenido');
       contenido.style.display = 'flex';
 
-      cvConstruirTabs();
-      cvSetTab('mis-multas');
+      const btnPanel = document.getElementById('cv-btn-panel');
+      if (btnPanel) btnPanel.style.display = cvEsPolicia ? 'flex' : 'none';
+
+      cvSetVista('landing');
     }
 
     // ── Mis Multas ─────────────────────────────────────────────────────
