@@ -140,7 +140,7 @@
 
 /* Vistas de fondo blanco (trámites, mis multas, mis antecedentes, denuncia) */
 .cv-vista-blanca{min-height:100vh;background:linear-gradient(180deg,#f4f6f1 0%,#e9ede3 100%);color:#0b3d24;padding-top:64px}
-.cv-vista-blanca .seccion-container{color:#0b3d24}
+.cv-vista-blanca .seccion-container{color:#0b3d24;margin:0 auto}
 .cv-vista-blanca .seccion-title{background:none;-webkit-text-fill-color:#0b3d24;color:#0b3d24}
 .cv-vista-blanca .sec-back{background:rgba(11,61,36,.06);border-color:rgba(11,61,36,.14);color:#0b3d24}
 .cv-vista-blanca .sec-back:hover{background:rgba(11,61,36,.12)}
