@@ -71,7 +71,19 @@
    ══════════════════════════════════════════════════════════════ */
 #comisaria-screen{--cv-green-dark:#0b3d24;--cv-green:#1e8a4c;--cv-green-light:#3fb673;--cv-gold:#c9a227;--cv-gold-light:#e6c34a;}
 
-#comisaria-screen .seccion-container{max-width:900px;gap:22px;}
+#comisaria-screen .seccion-container{max-width:900px;gap:22px;margin:0 auto;}
+
+/* Panel Policial: fondo institucional (antes quedaba negro plano, sin relación
+   visual con el resto de la comisaría) */
+#comisaria-screen #cv-vista-panel{
+  min-height:100vh;min-height:100dvh;
+  background:
+    radial-gradient(ellipse 900px 500px at 50% 0%, rgba(30,138,76,0.14), transparent 65%),
+    linear-gradient(180deg, rgba(11,61,36,0.22) 0%, rgba(5,12,8,0.98) 45%);
+}
+#comisaria-screen #cv-logs-lista > div{
+  border-bottom-color:rgba(63,182,115,0.12)!important;
+}
 
 /* Banner institucional superior */
 #comisaria-screen .cv-banner{
@@ -241,7 +253,7 @@
 
 /* ── Hero (foto Carabineros de fondo) ─────────────────────────── */
 #comisaria-screen .cv-hero{
-  position:relative;width:100%;min-height:100vh;display:flex;align-items:flex-end;overflow:hidden;
+  position:relative;width:100%;min-height:100vh;min-height:100dvh;display:flex;align-items:flex-end;overflow:hidden;
 }
 #comisaria-screen .cv-hero-img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
@@ -288,7 +300,17 @@
 
 /* ── Trámites: sección con fondo blanco ───────────────────────── */
 #comisaria-screen .cv-vista-blanca{
-  background:#f4f5f1;min-height:100vh;padding-top:78px;
+  background:#f4f5f1;min-height:100vh;min-height:100dvh;padding-top:78px;
+}
+/* Denuncia / Mis Multas / Mis Antecedentes usan .seccion-container, que YA
+   trae 100px de padding-top propio para despejar la barra fija. Sumado a los
+   78px de arriba quedaban 178px de espacio vacío antes de cualquier
+   contenido — en celulares eso ocupaba casi toda la pantalla y parecía que
+   "no cargaba nada". Se anula el padding-top duplicado solo en estas vistas. */
+#comisaria-screen #cv-vista-denuncia.cv-vista-blanca,
+#comisaria-screen #cv-vista-mis-multas.cv-vista-blanca,
+#comisaria-screen #cv-vista-mis-antecedentes.cv-vista-blanca{
+  padding-top:0;
 }
 #comisaria-screen .cv-white-section{
   max-width:640px;margin:0 auto;padding:52px 24px 80px;
