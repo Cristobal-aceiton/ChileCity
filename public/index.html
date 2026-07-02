@@ -1035,6 +1035,54 @@
     </div>
   </div>
 
+  <!-- MODAL: Registrar Vehículo -->
+  <div class="admin-modal-overlay" id="modal-veh-registrar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-veh-registrar')">✕</button>
+      <h3>🚗 Registrar Vehículo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:13px;">Modelo: <b id="veh-reg-modelo" style="color:#fff;"></b></p>
+      <div class="form-group">
+        <label>Patente (formato ABC-123)</label>
+        <input type="text" id="veh-reg-patente" placeholder="ABC-123" maxlength="7" oninput="vehFormatearPatenteInput(this)">
+      </div>
+      <div class="form-group">
+        <label>Color del vehículo</label>
+        <input type="text" id="veh-reg-color" placeholder="Ej: Rojo">
+      </div>
+      <div class="rc-error" id="veh-reg-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="veh-reg-btn" onclick="vehConfirmarRegistro()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar Registro
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-veh-registrar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Transferir Vehículo -->
+  <div class="admin-modal-overlay" id="modal-veh-transferir">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-veh-transferir')">✕</button>
+      <h3>🔄 Transferir Vehículo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:13px;">Vehículo: <b id="veh-tr-vehiculo" style="color:#fff;"></b></p>
+      <div class="form-group">
+        <label>Buscar nuevo propietario</label>
+        <input type="text" id="veh-tr-buscar" placeholder="ID Discord, RUT, DNI, nombre de Discord o de personaje" oninput="vehTrBuscarInput()">
+        <div id="veh-tr-resultados" style="margin-top:8px;display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;max-height:220px;overflow-y:auto;"></div>
+      </div>
+      <p id="veh-tr-seleccionado" style="display:none;color:#4ade80;font-size:13px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:10px 14px;"></p>
+      <div class="rc-error" id="veh-tr-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="veh-tr-btn" onclick="vehConfirmarTransferencia()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar Transferencia
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-veh-transferir')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast container -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -1538,7 +1586,7 @@
       <div class="pp2-toolbar">
         <div class="pp2-search-wrap">
           <svg class="pp2-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="pp2-search-input" id="pp-search" type="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Buscar por nombre, apellidos, RUT o usuario de Discord…">
+          <input class="pp2-search-input" id="pp-search" type="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Buscar por nombre, apellidos, RUT, usuario de Discord o patente…">
           <button class="pp2-clear-btn" id="pp-clear" onclick="limpiarBusquedaPP()" style="opacity:0" aria-label="Limpiar búsqueda">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -2463,6 +2511,42 @@
             <div id="cv-bd-den-lista"></div>
           </div>
 
+          <!-- ── VEHÍCULOS (cambiar estado) ─────────────────────────── -->
+          <div class="admin-seccion" id="cv-tab-vehiculos" style="gap:14px;">
+            <div class="rc-form" style="gap:16px;">
+              <h2 style="font-size:18px;display:flex;align-items:center;gap:8px;color:#34d399;">
+                🚗 Estado de Vehículos
+              </h2>
+              <div class="form-group">
+                <label>Buscar Ciudadano</label>
+                <div style="display:flex;gap:8px;">
+                  <input type="text" id="veh-cv-buscar" placeholder="Nombre, DNI o Discord ID" style="flex:1;">
+                  <button onclick="cvBuscarCiudadanoVeh()" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:0 16px;color:#34d399;cursor:pointer;font-size:13px;white-space:nowrap;">Buscar</button>
+                </div>
+                <div id="veh-cv-buscar-resultados" style="margin-top:8px;display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;"></div>
+              </div>
+              <div class="form-group">
+                <label>Ciudadano seleccionado</label>
+                <input type="text" id="veh-cv-ciudadano-nombre" placeholder="— Selecciona desde la búsqueda —" readonly style="opacity:0.7;">
+              </div>
+              <div id="veh-cv-lista"></div>
+              <div class="form-group" id="veh-cv-estado-wrap" style="display:none;">
+                <label>Vehículo: <span id="veh-cv-estado-label" style="color:#fff;font-weight:600;"></span></label>
+                <select class="cat-select" id="veh-cv-estado-select">
+                  <option value="Activo">Activo</option>
+                  <option value="Encargo por Robo">Encargo por Robo</option>
+                  <option value="Recuperado">Recuperado</option>
+                  <option value="Incautado">Incautado</option>
+                </select>
+                <div class="rc-error" id="veh-cv-estado-error"></div>
+                <div class="rc-error" id="veh-cv-estado-ok" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#4ade80;display:none;"></div>
+                <button onclick="cvActualizarEstadoVehiculo()" style="background:linear-gradient(135deg,rgba(52,211,153,0.2),rgba(52,211,153,0.1));border:1px solid rgba(52,211,153,0.35);border-radius:12px;padding:13px;color:#34d399;font-weight:700;font-size:14px;cursor:pointer;letter-spacing:0.5px;margin-top:10px;">
+                  Actualizar Estado
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- ── LOGS ─────────────────────────────────────────────── -->
           <div class="admin-seccion" id="cv-tab-logs" style="gap:14px;">
             <div style="display:flex;gap:8px;">
@@ -2511,7 +2595,9 @@
   <script src="/js/pull-to-refresh.js"></script>
   <script src="/js/registro-civil.js"></script>
   <script src="/js/banco.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="/js/tienda.js"></script>
+  <script src="/js/vehiculos.js"></script>
   <script src="/js/admin-tienda.js"></script>
   <script src="/js/empresas.js"></script>
   <script src="/js/logros.js"></script>

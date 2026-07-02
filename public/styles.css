@@ -68,41 +68,45 @@
 /* ════════════════════════════════════════════════════════════════════════
    REGISTRO CIVIL — Cédula de Identidad chilena (clases cid-*)
    ════════════════════════════════════════════════════════════════════════ */
-.cid-card{position:relative;width:100%;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,#f6f6f1 0%,#e9e9e1 100%);box-shadow:0 10px 50px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);color:#111;font-family:Inter,sans-serif;animation:fadeUp .5s var(--ease) both}
-.cid-watermark{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;opacity:.07;pointer-events:none}
-.cid-watermark svg{width:62%;height:auto}
-.cid-topbar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:linear-gradient(120deg,#081b57 0%,#0a2472 45%,#1a4fc4 100%)}
-.cid-tipo-box{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.cid-flag{width:26px;flex-shrink:0;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.3)}
+.cid-card{position:relative;width:100%;border-radius:14px;overflow:hidden;background:linear-gradient(160deg,#eef3f8 0%,#e4eaf2 55%,#dce4ee 100%);box-shadow:0 10px 50px rgba(0,0,0,.5),0 0 0 1px rgba(10,36,114,.12);color:#16233b;font-family:Inter,sans-serif;animation:fadeUp .5s var(--ease) both;border:1px solid rgba(10,36,114,.08)}
+.cid-watermark{position:absolute;inset:0;z-index:0;display:flex;align-items:flex-end;justify-content:center;opacity:.08;pointer-events:none}
+.cid-watermark svg{width:80%;height:auto}
+.cid-topbar{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px 20px 8px}
+.cid-tipo-box{display:flex;align-items:flex-start;gap:8px;flex-shrink:0}
+.cid-flag{width:22px;flex-shrink:0;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(10,36,114,.18);margin-top:1px}
 .cid-flag svg{display:block;width:100%;height:auto}
-.cid-tipo-text{font-size:9.5px;font-weight:800;line-height:1.35;color:#fff;text-transform:uppercase;letter-spacing:.4px}
-.cid-titulo-wrap{flex:1;min-width:0;text-align:center}
-.cid-titulo{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1.2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cid-subtitulo{font-size:7.5px;letter-spacing:.6px;color:rgba(255,255,255,.72);text-transform:uppercase;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cid-estrella{flex-shrink:0;display:flex;filter:drop-shadow(0 0 6px rgba(201,162,39,.6))}
-.cid-body{position:relative;z-index:1;display:flex;gap:18px;padding:22px 20px 18px}
-.cid-foto{width:92px;height:112px;flex-shrink:0;border:2px solid #0a2472;border-radius:6px;background:linear-gradient(160deg,#c8d8e8 0%,#a0b8cc 100%);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.cid-foto img{width:100%;height:100%;object-fit:cover;display:block}
-.cid-datos{flex:1;min-width:0;display:flex;flex-direction:column;gap:11px}
-.cid-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
-.cid-campo{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cid-tipo-text{font-size:10px;font-weight:800;line-height:1.3;color:#16233b;text-transform:uppercase;letter-spacing:.3px}
+.cid-titulo-wrap{flex:1;min-width:0;text-align:center;padding-top:1px}
+.cid-titulo{font-family:Inter,sans-serif;font-weight:800;font-size:15px;letter-spacing:.3px;color:#12295c;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cid-subtitulo{font-size:7.5px;letter-spacing:.4px;color:#5b6b80;text-transform:uppercase;margin-top:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cid-estrella{flex-shrink:0;display:flex;filter:drop-shadow(0 0 4px rgba(201,162,39,.5))}
+.cid-body{position:relative;z-index:1;display:flex;gap:16px;padding:8px 20px 12px}
+.cid-foto-col{display:flex;align-items:stretch;gap:5px;flex-shrink:0}
+.cid-foto{width:88px;height:108px;flex-shrink:0;border:1.5px solid rgba(10,36,114,.4);border-radius:4px;background:linear-gradient(160deg,#c8d4e0 0%,#9fb2c4 100%);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cid-foto img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.15) contrast(1.02)}
+.cid-doc-mini{writing-mode:vertical-rl;transform:rotate(180deg);font-size:8px;font-weight:700;letter-spacing:1.5px;color:rgba(10,36,114,.4);font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;padding:2px 0}
+.cid-datos{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px;padding-top:2px}
+.cid-row{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px}
+.cid-campo{display:flex;flex-direction:column;gap:1px;min-width:0}
 .cid-campo-full{grid-column:1/-1}
-.cid-label{font-size:8px;font-weight:800;letter-spacing:1.3px;color:#0a2472;text-transform:uppercase}
-.cid-valor{font-size:13.5px;font-weight:700;color:#111;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cid-rut{font-size:16px;font-weight:800;color:#0a2472;letter-spacing:1px}
-.cid-firma-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 20px;border-top:1px dashed rgba(10,36,114,.28)}
-.cid-firma-label{font-size:8px;font-weight:800;letter-spacing:1.2px;color:rgba(10,36,114,.55);text-transform:uppercase;flex-shrink:0}
-.cid-firma-texto{font-size:16px;font-style:italic;font-weight:600;color:#0a2472;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cid-footer{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 20px;background:linear-gradient(120deg,#0a2472 0%,#1a4fc4 100%)}
-.cid-run{font-size:12.5px;font-weight:800;color:#fff;letter-spacing:1px}
-.cid-run span{color:#e8c766}
-.cid-footer-mini{font-size:9px;color:rgba(255,255,255,.55);letter-spacing:1.6px;text-transform:uppercase}
+.cid-label{font-size:7.5px;font-weight:800;letter-spacing:1px;color:#5b6b80;text-transform:uppercase}
+.cid-valor{font-size:13px;font-weight:700;color:#16233b;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cid-rut{font-size:14px;font-weight:800;color:#12295c;letter-spacing:.5px}
+.cid-firma-row{position:relative;z-index:1;display:flex;flex-direction:column;gap:3px;padding:4px 20px 10px;margin-left:104px}
+.cid-firma-label{font-size:7.5px;font-weight:800;letter-spacing:1px;color:#5b6b80;text-transform:uppercase}
+.cid-firma-texto{font-size:18px;font-style:italic;font-weight:600;color:#12295c;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Brush Script MT',cursive}
+.cid-footer{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px 16px;border-top:1px solid rgba(10,36,114,.14)}
+.cid-run{font-size:13px;font-weight:800;color:#16233b;letter-spacing:.6px}
+.cid-run span{color:#12295c}
+.cid-footer-badge{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#12295c,#1a4fc4);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(18,41,92,.35)}
 @media (max-width:540px){
-  .cid-body{flex-direction:column;align-items:center;text-align:center;gap:14px;padding:20px 18px 16px}
-  .cid-foto{width:82px;height:100px}
+  .cid-body{flex-direction:column;align-items:center;text-align:center;gap:12px;padding:6px 18px 10px}
+  .cid-foto-col{flex-direction:row-reverse}
+  .cid-foto{width:80px;height:98px}
   .cid-row{grid-template-columns:1fr}
-  .cid-titulo{font-size:14px}
+  .cid-titulo{font-size:13px}
   .cid-subtitulo{font-size:7px}
+  .cid-firma-row{margin-left:0;align-items:center;text-align:center}
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -321,3 +325,5 @@
   .pp2-toolbar{flex-direction:column;align-items:stretch}
   .pp2-stat-bar{justify-content:center}
 }
+.veh-acciones{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.veh-acciones button{margin-top:0!important}
