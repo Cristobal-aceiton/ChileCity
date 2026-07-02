@@ -13,7 +13,7 @@
 // Subir CACHE_VERSION cuando quieras forzar que los clientes descarten TODO
 // el cache anterior de una (por ejemplo si cambiaste muchos archivos a la vez).
 
-const CACHE_VERSION = "v6";
+const CACHE_VERSION = "v7";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
