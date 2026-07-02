@@ -19,7 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=11">
+  <link rel="stylesheet" href="/styles.css?v=12">
   <link rel="preload" as="image" href="https://i.imgur.com/yH4wCVJ.png" fetchpriority="high">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
@@ -360,50 +360,85 @@
         </div>
       </div>
 
-      <div id="rc-carnet-wrap" style="display:none; width:100%; max-width:540px;">
-        <div class="carnet" id="rc-carnet">
-          <div class="carnet-header">
-            <div class="carnet-pais">
-              <div class="carnet-pais-nombre">República de Chile</div>
-              <div class="carnet-pais-nombre2">Cédula de Identidad</div>
-            </div>
-            <div class="carnet-escudo">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div class="carnet-tipo">IDENTITY CARD</div>
+      <div id="rc-carnet-wrap" style="display:none; width:100%; max-width:560px;">
+        <div class="cid-card" id="rc-carnet">
+          <div class="cid-watermark">
+            <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="0,260 20,180 45,220 70,140 100,200 130,120 160,190 180,150 200,260" fill="#0a2472"/>
+              <polygon points="10,260 40,175 15,175" fill="#e8e8e0" opacity=".5"/>
+              <polygon points="105,195 135,110 155,150 125,150" fill="#e8e8e0" opacity=".5"/>
+              <polygon points="100,50 108,74 133,74 113,88 121,112 100,97 79,112 87,88 67,74 92,74" fill="#0a2472"/>
+            </svg>
           </div>
-          <div class="carnet-banda"></div>
-          <div class="carnet-body">
-            <div class="carnet-foto" id="carnet-foto-wrap">
+
+          <div class="cid-topbar">
+            <div class="cid-tipo-box">
+              <div class="cid-flag">
+                <svg viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="16" fill="#fff"/>
+                  <rect y="8" width="24" height="8" fill="#D52B1E"/>
+                  <rect width="8" height="8" fill="#0039A6"/>
+                  <polygon points="4,1.3 4.95,4.15 7.9,4.15 5.5,5.9 6.4,8.7 4,6.95 1.6,8.7 2.5,5.9 0.1,4.15 3.05,4.15" fill="#fff"/>
+                </svg>
+              </div>
+              <div class="cid-tipo-text">Cédula de<br>Identidad</div>
+            </div>
+            <div class="cid-titulo-wrap">
+              <div class="cid-titulo">República de Chile</div>
+              <div class="cid-subtitulo">Servicio de Registro Civil e Identificación</div>
+            </div>
+            <div class="cid-estrella">
+              <svg width="26" height="26" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="12,1 15,9 23,9 16.5,14 19,22 12,17 5,22 7.5,14 1,9 9,9" fill="#c9a227"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="cid-body">
+            <div class="cid-foto" id="carnet-foto-wrap">
               <img id="carnet-avatar" src="" alt="Foto" style="display:none;">
-              <svg id="carnet-foto-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <svg id="carnet-foto-icon" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#0a2472" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             </div>
-            <div class="carnet-datos">
-              <div class="carnet-campo">
-                <div class="carnet-label">Apellidos</div>
-                <div class="carnet-valor" id="carnet-apellidos">—</div>
+            <div class="cid-datos">
+              <div class="cid-campo cid-campo-full">
+                <div class="cid-label">Apellidos</div>
+                <div class="cid-valor" id="carnet-apellidos">—</div>
               </div>
-              <div class="carnet-campo">
-                <div class="carnet-label">Nombres</div>
-                <div class="carnet-valor" id="carnet-nombres">—</div>
+              <div class="cid-campo cid-campo-full">
+                <div class="cid-label">Nombres</div>
+                <div class="cid-valor" id="carnet-nombres">—</div>
               </div>
-              <div class="carnet-campo">
-                <div class="carnet-label">Nacionalidad</div>
-                <div class="carnet-valor" id="carnet-nac">Chilena</div>
+              <div class="cid-row">
+                <div class="cid-campo">
+                  <div class="cid-label">Nacionalidad</div>
+                  <div class="cid-valor" id="carnet-nac">Chilena</div>
+                </div>
+                <div class="cid-campo">
+                  <div class="cid-label">Fecha de Nacimiento</div>
+                  <div class="cid-valor" id="carnet-fnac">—</div>
+                </div>
               </div>
-              <div class="carnet-campo">
-                <div class="carnet-label">Fecha de Nacimiento</div>
-                <div class="carnet-valor" id="carnet-fnac">—</div>
-              </div>
-              <div class="carnet-campo">
-                <div class="carnet-label">R.U.N.</div>
-                <div class="carnet-valor rut" id="carnet-rut">—</div>
+              <div class="cid-row">
+                <div class="cid-campo">
+                  <div class="cid-label">Número Documento</div>
+                  <div class="cid-valor cid-rut" id="carnet-rut">—</div>
+                </div>
+                <div class="cid-campo">
+                  <div class="cid-label">Fecha de Emisión</div>
+                  <div class="cid-valor" id="carnet-femision">—</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="carnet-footer">
-            <div class="carnet-footer-texto">Registro Civil e Identificación</div>
-            <div class="carnet-footer-valido">ChileCity RP</div>
+
+          <div class="cid-firma-row">
+            <div class="cid-firma-label">Firma del Titular</div>
+            <div class="cid-firma-texto" id="carnet-firma">—</div>
+          </div>
+
+          <div class="cid-footer">
+            <div class="cid-run">RUN <span id="carnet-run-val">—</span></div>
+            <div class="cid-footer-mini">ChileCity RP</div>
           </div>
         </div>
       </div>
