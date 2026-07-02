@@ -88,7 +88,7 @@
         }
       });
       mostrarIndicadorSeccion(id);
-      document.body.classList.toggle('oculta-logo-corner', id === 'comisaria-screen');
+      document.body.classList.toggle('oculta-logo-corner', id === 'comisaria-screen' || id === 'perfil-publico-screen');
     }
 
     function volverDashboard() { mostrarPantalla('dashboard'); _navegandoProgramaticamente = true; window.history.pushState({ screen: 'dashboard' }, '', '/'); setTimeout(() => { _navegandoProgramaticamente = false; }, 50); }
