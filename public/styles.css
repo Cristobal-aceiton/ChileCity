@@ -468,3 +468,50 @@
 .btn-discord,.btn-crear,.btn-green,.balance-hero-btn{position:relative;overflow:hidden}
 .btn-discord::after,.btn-crear::after,.btn-green::after,.balance-hero-btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .55s var(--ease);pointer-events:none}
 .btn-discord:hover::after,.btn-crear:hover::after,.btn-green:hover::after,.balance-hero-btn:hover::after{left:150%}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CONCESIONARIO — showroom de vehículos
+   ══════════════════════════════════════════════════════════════════════ */
+.conc-subtitulo{width:100%;margin-top:-14px;font-size:13px;color:rgba(255,255,255,.4);line-height:1.5}
+.concesionario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;width:100%}
+.conc-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:.3s cubic-bezier(.16,1,.3,1)}
+.conc-card:hover{transform:translateY(-6px);border-color:rgba(16,185,129,.35);box-shadow:0 16px 44px rgba(0,0,0,.35),0 0 0 1px rgba(16,185,129,.12)}
+.conc-img{position:relative;width:100%;aspect-ratio:16/10;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));display:flex;align-items:center;justify-content:center;font-size:56px;overflow:hidden}
+.conc-img img{width:100%;height:100%;object-fit:cover;display:block}
+.conc-sticker{position:absolute;top:12px;right:12px;background:#f5d90a;color:#111;border-radius:6px;padding:6px 10px;transform:rotate(-4deg);box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;flex-direction:column;line-height:1.15;border:1px solid rgba(0,0,0,.15)}
+.conc-sticker-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;opacity:.7}
+.conc-sticker-valor{font-size:15px;font-weight:900;font-family:'JetBrains Mono',monospace}
+.conc-info{padding:16px 18px 18px;display:flex;flex-direction:column;gap:4px;flex:1}
+.conc-marca{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#34d399}
+.conc-nombre{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:.5px;margin-bottom:8px}
+.btn-comprar-showroom{margin-top:auto;width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#10B981,#059669);border:none;color:#fff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;transition:.2s cubic-bezier(.16,1,.3,1);box-shadow:0 0 0 1px rgba(16,185,129,.25)}
+.btn-comprar-showroom:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 26px rgba(16,185,129,.4)}
+.btn-comprar-showroom:active:not(:disabled){transform:scale(.97)}
+.btn-comprar-showroom:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+@media (max-width:600px){.concesionario-grid{grid-template-columns:1fr}}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TUS AUTOS — garage con tarjetas tipo patente, expandibles
+   ══════════════════════════════════════════════════════════════════════ */
+.mis-autos-lista{display:flex;flex-direction:column;gap:12px;width:100%}
+.auto-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;transition:border-color .2s}
+.auto-card.open{border-color:rgba(63,182,115,.35)}
+.auto-card-header{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;transition:background .2s;flex-wrap:wrap}
+.auto-card-header:hover{background:rgba(255,255,255,.03)}
+.auto-placa{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f4f4f5;border:2px solid #003087;border-radius:6px;padding:5px 12px;min-width:104px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.auto-placa-pais{font-size:7px;font-weight:800;letter-spacing:2px;color:#003087;text-transform:uppercase}
+.auto-placa-num{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#003087;letter-spacing:1.5px}
+.auto-card-info{flex:1;min-width:120px}
+.auto-nombre{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:.5px}
+.auto-meta{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;display:flex;align-items:center;gap:6px}
+.auto-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.3)}
+.auto-badge{font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.auto-badge-ok{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.auto-badge-pend{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.auto-chevron{color:rgba(255,255,255,.3);flex-shrink:0;transition:transform .25s}
+.auto-card.open .auto-chevron{transform:rotate(180deg)}
+.auto-card-body{display:none;padding:0 16px 16px}
+.auto-card.open .auto-card-body{display:block}
+.auto-acciones{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px;border-top:1px solid rgba(255,255,255,.06);margin-top:2px;padding-top:12px}
+.auto-acciones .btn-small{flex:1;min-width:130px;justify-content:center;display:flex;align-items:center;gap:6px}
+@media (max-width:540px){.auto-placa{min-width:88px;padding:4px 8px}.auto-placa-num{font-size:14px}.auto-card-header{gap:10px}}
