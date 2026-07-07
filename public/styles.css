@@ -395,3 +395,62 @@
   transition:opacity .3s var(--ease);
 }
 .producto-card:hover::before,.empresa-card:hover::before{opacity:.7}
+
+/* ════════════════════════════════════════════════════════════════════════
+   v10 — MEJORAS VISUALES: identidad de color por módulo,
+   estados vacíos con ícono, glow consistente en chrome superior
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── 5. Identidad de color por módulo ───────────────────────────────────── */
+:root{
+  --mod-banco:var(--green);
+  --mod-casino:var(--gold);
+  --mod-apuestas:#6366f1;
+  --mod-empresas:#06b6d4;
+  --mod-admin:#a855f7;
+}
+#casino-screen .seccion-title,#admin-casino-screen .seccion-title{
+  background:linear-gradient(135deg,#fff,var(--mod-casino))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+#apuestas-screen .seccion-title{
+  background:linear-gradient(135deg,#fff,var(--mod-apuestas))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+#empresas-screen .seccion-title,#admin-empresas-screen .seccion-title{
+  background:linear-gradient(135deg,#fff,var(--mod-empresas))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+#banco-screen .seccion-title,#admin-screen .seccion-title{
+  background:linear-gradient(135deg,#fff,var(--mod-banco))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+#panel-admin-screen .seccion-title,#staff-panel-screen .seccion-title{
+  background:linear-gradient(135deg,#fff,var(--mod-admin))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+/* La barra de acento de empresa-card pasa a usar su propio color de módulo */
+.empresa-card::before{background:var(--mod-empresas)!important}
+.empresa-logo{box-shadow:0 0 0 1px rgba(6,182,212,.12)}
+
+/* ── 6b. Estados vacíos con ícono ────────────────────────────────────────── */
+.historial-vacio,.tienda-empty,.ranking-empty,.bd-inv-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;
+}
+.historial-vacio::before,.tienda-empty::before,.ranking-empty::before{
+  content:'';display:block;width:38px;height:38px;flex-shrink:0;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+  opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l1.5-5h15L21 9'/%3E%3Cpath d='M3 9v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9'/%3E%3Cpath d='M3 9h18'/%3E%3Cpath d='M9 13a3 3 0 0 0 6 0'/%3E%3C/svg%3E");
+}
+
+/* ── 6c. Glow consistente en el chrome superior (campana, avatar) ──────── */
+.notif-bell-btn:hover{box-shadow:0 0 20px var(--glow)}
+.user-avatar{transition:box-shadow .3s var(--ease)}
+.user-pill:hover .user-avatar{box-shadow:0 0 16px var(--glow)}
