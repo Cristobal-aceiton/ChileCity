@@ -19,7 +19,8 @@
         const dataP = await resP.json();
         const dataI = await resI.json();
 
-        todosLosProductos = dataP.productos || [];
+        // La Tienda ya no vende vehículos — eso vive en el Concesionario.
+        todosLosProductos = (dataP.productos || []).filter(p => p.categoria !== 'vehiculos');
         misProductosIds   = new Set((dataI.items || []).map(i => i.producto_id));
 
         document.getElementById('tienda-loading').style.display = 'none';
@@ -128,8 +129,13 @@
             if (saldoEl) saldoEl.textContent = formatCLP(data.nuevoSaldo);
           }
           mostrarToast(`Compra exitosa. Nuevo saldo: ${formatCLP(data.nuevoSaldo)}`);
+          misProductosIds.add(productoId);
           btn.disabled = false;
           btn.textContent = 'Comprar';
+          // Refresca otras vistas que puedan depender de lo que se acaba de
+          // comprar (la propia tienda, el concesionario o el garage).
+          if (typeof aplicarFiltros === 'function') aplicarFiltros();
+          if (typeof aplicarFiltrosConcesionario === 'function') aplicarFiltrosConcesionario();
         }
       } catch(e) {
         mostrarToast('Error de conexión.', true);
@@ -185,6 +191,7 @@
     // ── PÁGINAS DE ERROR ───────────────────────────────────────────────────
     function mostrarError(tipo) {
       ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen',
+       'concesionario-screen','mis-autos-screen',
        'inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen',
        'casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'].forEach(s => {
         const el = document.getElementById(s);
@@ -210,18 +217,20 @@
         document.getElementById('inventario-wrap').style.display = 'block';
 
         const grid = document.getElementById('inventario-grid');
-        if (!data.items?.length) {
+        // El Inventario ya no muestra vehículos — esos viven en "Tus Autos".
+        const items = (data.items || []).filter(item => item.categoria !== 'vehiculos');
+
+        // Cache global por si algún otro módulo necesita referenciar los
+        // ítems del inventario (id, nombre, etc.) sin volver a pedirlos.
+        window._invItemsCache = data.items;
+
+        if (!items.length) {
           grid.innerHTML = '<div class="tienda-empty" style="grid-column:1/-1;">Tu inventario está vacío.<br>¡Visita la tienda para comprar!</div>';
           return;
         }
-        // Se guarda en cache global para que vehiculos.js pueda referenciar
-        // los ítems (modelo, id, etc.) al abrir los modales de registro y
-        // transferencia sin tener que volver a pedirlos al servidor.
-        window._invItemsCache = data.items;
 
-        grid.innerHTML = data.items.map(item => {
+        grid.innerHTML = items.map(item => {
           const fecha = new Date(item.comprado_at).toLocaleDateString('es-CL', {day:'2-digit',month:'2-digit',year:'2-digit'});
-          const esVehiculo = item.categoria === 'vehiculos';
           return `
             <div class="inv-card">
               <div class="inv-img">
@@ -234,7 +243,6 @@
                 <span class="producto-cat cat-${item.categoria}">${catLabel(item.categoria)}</span>
                 <div class="inv-precio">Pagado: ${formatCLP(item.precio_pagado)}</div>
                 <div class="inv-fecha">${fecha}</div>
-                ${esVehiculo ? vehRenderAcciones(item) : ''}
               </div>
             </div>`;
         }).join('');

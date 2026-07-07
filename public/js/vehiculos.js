@@ -12,26 +12,6 @@
     let vehTransferActual = null;  // { vehiculoId, modelo, patente } en transferencia
     let vehPropietarioSel = null;  // usuario elegido en el buscador de transferencia
 
-    function vehRenderAcciones(item) {
-      if (item.vehiculo) {
-        return `
-          <div class="veh-acciones">
-            <button class="btn-small green" style="width:100%;justify-content:center;display:flex;align-items:center;gap:6px;" onclick="verRegistroVehiculo(${item.vehiculo.id})">
-              📄 Ver Registro
-            </button>
-            <button class="btn-small purple" style="width:100%;justify-content:center;display:flex;align-items:center;gap:6px;margin-top:6px;" onclick="vehAbrirModalTransferencia(${item.vehiculo.id}, '${escJs(item.nombre)}', '${escJs(item.vehiculo.patente)}')">
-              🔄 Transferir Vehículo
-            </button>
-          </div>`;
-      }
-      return `
-        <div class="veh-acciones">
-          <button class="btn-small orange" style="width:100%;justify-content:center;display:flex;align-items:center;gap:6px;" onclick="vehAbrirModalRegistro(${item.id}, '${escJs(item.nombre)}')">
-            🚗 Registrar Vehículo
-          </button>
-        </div>`;
-    }
-
     function escJs(str) {
       return String(str == null ? '' : str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     }
@@ -91,6 +71,7 @@
         cerrarModal('modal-veh-registrar');
         mostrarToast('Vehículo registrado correctamente.');
         btn.disabled = false; btn.textContent = 'Confirmar Registro';
+        if (typeof cargarMisAutos === 'function') cargarMisAutos();
         if (typeof cargarInventario === 'function') cargarInventario();
       } catch (e) {
         errEl.textContent = 'Error de conexión.';
@@ -293,6 +274,7 @@
         cerrarModal('modal-veh-transferir');
         mostrarToast('Vehículo transferido correctamente.');
         btn.disabled = false; btn.textContent = 'Confirmar Transferencia';
+        if (typeof cargarMisAutos === 'function') cargarMisAutos();
         if (typeof cargarInventario === 'function') cargarInventario();
       } catch (e) {
         errEl.textContent = 'Error de conexión.';

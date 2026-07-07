@@ -20,7 +20,7 @@
     }
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','concesionario-screen','mis-autos-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
 
     // ── Indicador de sección activa ──────────────────────────────────────────
     let _sectionIndicatorTimer = null;
@@ -32,6 +32,8 @@
         'banco-screen': 'Banco',
         'admin-screen': 'Admin Banco',
         'tienda-screen': 'Tienda',
+        'concesionario-screen': 'Concesionario',
+        'mis-autos-screen': 'Tus Autos',
         'inventario-screen': 'Inventario',
         'admin-tienda-screen': 'Admin Tienda',
         'perfil-publico-screen': 'Perfil Público',
