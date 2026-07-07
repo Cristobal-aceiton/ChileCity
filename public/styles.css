@@ -515,3 +515,4 @@
 .auto-acciones{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px;border-top:1px solid rgba(255,255,255,.06);margin-top:2px;padding-top:12px}
 .auto-acciones .btn-small{flex:1;min-width:130px;justify-content:center;display:flex;align-items:center;gap:6px}
 @media (max-width:540px){.auto-placa{min-width:88px;padding:4px 8px}.auto-placa-num{font-size:14px}.auto-card-header{gap:10px}}
+body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:scale(.85);transition:opacity .25s var(--ease),transform .25s var(--ease)}
