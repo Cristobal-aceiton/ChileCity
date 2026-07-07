@@ -552,8 +552,27 @@
     // ── Service Worker (PWA: cache de estáticos + soporte offline básico) ──
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {
+        navigator.serviceWorker.register('/sw.js').then((reg) => {
+          // Chequea si hay un sw.js nuevo apenas carga la página...
+          reg.update().catch(() => {});
+          // ...y también cada vez que la pestaña/app vuelve a primer plano
+          // (clave en celular: la app queda "abierta" en background días
+          // enteras sin recargar, así que sin esto nunca se entera de updates).
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') reg.update().catch(() => {});
+          });
+        }).catch(() => {
           // Si falla el registro (ej. navegador raro), la app sigue funcionando normal sin SW.
+        });
+
+        // Cuando el SW nuevo toma el control, recargamos una sola vez para
+        // que se vea el CSS/JS actualizado sin que el usuario tenga que
+        // cerrar la app o hacer nada manual.
+        let ccSwYaRecargo = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (ccSwYaRecargo) return;
+          ccSwYaRecargo = true;
+          window.location.reload();
         });
       });
     }
