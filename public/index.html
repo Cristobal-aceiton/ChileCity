@@ -19,7 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=22">
+  <link rel="stylesheet" href="/styles.css?v=23">
   <link rel="preload" as="image" href="https://i.imgur.com/yH4wCVJ.png" fetchpriority="high">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
@@ -936,6 +936,16 @@
       </div>
       <p class="conc-subtitulo">Elige tu próximo vehículo. Todos vienen 0KM, listos para registrar a tu nombre.</p>
 
+      <div class="search-bar-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="conc-search" type="text" placeholder="Buscar por marca o modelo...">
+      </div>
+      <div class="tienda-filtros">
+        <button class="filtro-btn active" id="conc-sort-default" onclick="ordenarConcesionario('default', this)">Todos</button>
+        <button class="filtro-btn" id="conc-sort-asc" onclick="ordenarConcesionario('asc', this)">Más barato primero</button>
+        <button class="filtro-btn" id="conc-sort-desc" onclick="ordenarConcesionario('desc', this)">Más caro primero</button>
+      </div>
+
       <div class="rc-loading" id="concesionario-loading">
         <div class="skeleton-wrap" style="width:100%;">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;width:100%;">
@@ -1194,7 +1204,7 @@
         <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:14px;">Elige un juego</div>
         <div class="casino-lobby">
           <div class="casino-lobby-card" onclick="casinoAbrirJuego('ruleta')"
-               style="--clc:rgba(220,30,30,0.12);--clc-border:rgba(220,30,30,0.4);--clc-shadow:rgba(220,30,30,0.15);">
+               style="--clc:rgba(220,30,30,0.12);--clc-border:rgba(220,30,30,0.4);--clc-shadow:rgba(220,30,30,0.15);--tile-a:#7c3aed;--tile-b:#a855f7;">
             <div class="clc-emoji" style="color:#ef4444;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
                 <circle cx="12" cy="12" r="9"/>
@@ -1208,7 +1218,7 @@
             <div class="clc-badge">Disponible</div>
           </div>
           <div class="casino-lobby-card" onclick="casinoAbrirJuego('moneda')"
-               style="--clc:rgba(245,158,11,0.12);--clc-border:rgba(245,158,11,0.4);--clc-shadow:rgba(245,158,11,0.15);">
+               style="--clc:rgba(245,158,11,0.12);--clc-border:rgba(245,158,11,0.4);--clc-shadow:rgba(245,158,11,0.15);--tile-a:#db2777;--tile-b:#ec4899;">
             <div class="clc-emoji" style="color:#F59E0B;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="9"/>
@@ -1222,7 +1232,7 @@
             <div class="clc-badge">Disponible</div>
           </div>
           <div class="casino-lobby-card" onclick="casinoAbrirJuego('avion')"
-               style="--clc:rgba(6,182,212,0.12);--clc-border:rgba(6,182,212,0.4);--clc-shadow:rgba(6,182,212,0.15);">
+               style="--clc:rgba(6,182,212,0.12);--clc-border:rgba(6,182,212,0.4);--clc-shadow:rgba(6,182,212,0.15);--tile-a:#0891b2;--tile-b:#22d3ee;">
             <div class="clc-emoji" style="color:#06B6D4;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
@@ -1233,7 +1243,7 @@
             <div class="clc-badge nuevo">Nuevo</div>
           </div>
           <div class="casino-lobby-card" onclick="abrirSeccion('apuestas-screen'); cargarApuestas()"
-               style="--clc:rgba(99,102,241,0.12);--clc-border:rgba(99,102,241,0.4);--clc-shadow:rgba(99,102,241,0.15);">
+               style="--clc:rgba(99,102,241,0.12);--clc-border:rgba(99,102,241,0.4);--clc-shadow:rgba(99,102,241,0.15);--tile-a:#4338ca;--tile-b:#6366f1;">
             <div class="clc-emoji" style="color:#818cf8;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 4h8v4a4 4 0 0 1-8 0V4z"/>

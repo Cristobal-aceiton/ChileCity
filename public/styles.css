@@ -516,3 +516,17 @@
 .auto-acciones .btn-small{flex:1;min-width:130px;justify-content:center;display:flex;align-items:center;gap:6px}
 @media (max-width:540px){.auto-placa{min-width:88px;padding:4px 8px}.auto-placa-num{font-size:14px}.auto-card-header{gap:10px}}
 body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:scale(.85);transition:opacity .25s var(--ease),transform .25s var(--ease)}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASINO — restyle "tipo Stake": panel oscuro + tiles de juego a color sólido
+   ══════════════════════════════════════════════════════════════════════════ */
+.casino-container{background:linear-gradient(180deg,rgba(16,26,36,.55) 0,rgba(9,15,20,.4) 100%)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:24px!important;box-shadow:0 24px 70px rgba(0,0,0,.5)!important;margin-top:20px!important}
+.casino-lobby{gap:14px!important}
+.casino-lobby-card{background:linear-gradient(155deg,var(--tile-a,#1a2c38) 0%,var(--tile-b,#0f212e) 100%)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:16px!important;padding:24px 14px 18px!important;box-shadow:0 10px 28px -10px var(--tile-a,rgba(0,0,0,.5))!important}
+.casino-lobby-card:hover{transform:translateY(-6px) scale(1.015)!important;box-shadow:0 20px 44px -10px var(--tile-a,rgba(0,0,0,.6))!important;border-color:rgba(255,255,255,.22)!important}
+.casino-lobby-card .clc-emoji{background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.28)!important;width:54px!important;height:54px!important;border-radius:14px!important;color:#fff!important}
+.casino-lobby-card .clc-title{color:#fff!important;font-weight:800!important;text-transform:uppercase!important;font-size:13.5px!important;letter-spacing:.4px!important}
+.casino-lobby-card .clc-sub{color:rgba(255,255,255,.78)!important;font-size:10.5px!important}
+.casino-lobby-card .clc-badge{background:rgba(0,0,0,.28)!important;border:1px solid rgba(255,255,255,.28)!important;color:#fff!important}
+.casino-lobby-card::before{display:none!important}
+@media (max-width:540px){.casino-lobby-card{padding:20px 10px 16px!important}}
