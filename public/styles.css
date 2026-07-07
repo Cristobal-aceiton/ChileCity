@@ -518,15 +518,91 @@
 body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:scale(.85);transition:opacity .25s var(--ease),transform .25s var(--ease)}
 
 /* ══════════════════════════════════════════════════════════════════════════
-   CASINO — restyle "tipo Stake": panel oscuro + tiles de juego a color sólido
+   CASINO — remodelación completa "tipo Stake": fuera el look elegante
+   (dorado, Bebas Neue, glows, gradientes ornamentales) — entra un panel
+   plano, oscuro, con tipografía de palo recta y tiles de color sólido.
    ══════════════════════════════════════════════════════════════════════════ */
-.casino-container{background:linear-gradient(180deg,rgba(16,26,36,.55) 0,rgba(9,15,20,.4) 100%)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:24px!important;box-shadow:0 24px 70px rgba(0,0,0,.5)!important;margin-top:20px!important}
-.casino-lobby{gap:14px!important}
-.casino-lobby-card{background:linear-gradient(155deg,var(--tile-a,#1a2c38) 0%,var(--tile-b,#0f212e) 100%)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:16px!important;padding:24px 14px 18px!important;box-shadow:0 10px 28px -10px var(--tile-a,rgba(0,0,0,.5))!important}
-.casino-lobby-card:hover{transform:translateY(-6px) scale(1.015)!important;box-shadow:0 20px 44px -10px var(--tile-a,rgba(0,0,0,.6))!important;border-color:rgba(255,255,255,.22)!important}
-.casino-lobby-card .clc-emoji{background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.28)!important;width:54px!important;height:54px!important;border-radius:14px!important;color:#fff!important}
-.casino-lobby-card .clc-title{color:#fff!important;font-weight:800!important;text-transform:uppercase!important;font-size:13.5px!important;letter-spacing:.4px!important}
-.casino-lobby-card .clc-sub{color:rgba(255,255,255,.78)!important;font-size:10.5px!important}
-.casino-lobby-card .clc-badge{background:rgba(0,0,0,.28)!important;border:1px solid rgba(255,255,255,.28)!important;color:#fff!important}
-.casino-lobby-card::before{display:none!important}
-@media (max-width:540px){.casino-lobby-card{padding:20px 10px 16px!important}}
+:root{--stk-bg:#0f212e;--stk-bg2:#1a2c38;--stk-bg3:#213743;--stk-line:rgba(255,255,255,.08);--stk-text:#b1bad3;--stk-green:#00e701;--stk-green-dark:#00c001;--stk-red:#fb4b4b}
+
+/* Panel general: chau glow rojo/negro elegante, entra panel plano navy */
+#casino-screen{background:radial-gradient(ellipse 70% 40% at 50% 0,rgba(0,231,1,.04),transparent 60%),var(--stk-bg)!important}
+.casino-container{background:var(--stk-bg2)!important;border:1px solid var(--stk-line)!important;border-radius:12px!important;box-shadow:none!important;margin-top:16px!important}
+#casino-screen .seccion-header{margin-bottom:4px}
+#casino-screen .seccion-title{color:#fff!important;background:none!important;-webkit-text-fill-color:#fff!important;font-family:Inter,sans-serif!important;font-weight:800!important;font-size:20px!important;letter-spacing:.2px!important;text-transform:none!important}
+#casino-screen .seccion-title svg{filter:none!important;color:var(--stk-green)!important}
+#casino-screen .sec-back{background:var(--stk-bg3)!important;border-color:var(--stk-line)!important}
+
+/* Saldo: de banner-vitrina dorado con brillo a pill plana tipo Stake */
+.casino-saldo-banner{background:var(--stk-bg3)!important;border:1px solid var(--stk-line)!important;border-radius:10px!important;box-shadow:none!important}
+.casino-saldo-banner::before{display:none!important}
+.csb-label{color:var(--stk-text)!important;font-family:Inter,sans-serif!important}
+.csb-valor{font-family:Inter,sans-serif!important;font-weight:800!important;font-size:22px!important;letter-spacing:0!important;text-shadow:none!important;color:#fff!important}
+.csb-mono{background:rgba(0,231,1,.12)!important;border:1px solid rgba(0,231,1,.25)!important;color:var(--stk-green)!important;font-family:Inter,sans-serif!important}
+
+/* "Elige un juego" eyebrow */
+#casino-lobby-section>div:first-child{color:var(--stk-text)!important;font-family:Inter,sans-serif!important}
+
+/* Tiles del lobby: color sólido plano, sin glow ornamental */
+.casino-lobby{gap:12px!important}
+.casino-lobby-card{background:var(--tile-a,var(--stk-bg3))!important;border:none!important;border-radius:10px!important;padding:20px 12px 16px!important;box-shadow:none!important;transition:transform .15s ease,filter .15s ease!important}
+.casino-lobby-card:hover{transform:translateY(-3px)!important;box-shadow:none!important;filter:brightness(1.08)!important;border-color:transparent!important}
+.casino-lobby-card::before,.casino-lobby-card::after{display:none!important}
+.casino-lobby-card .clc-emoji{background:rgba(0,0,0,.2)!important;border:none!important;width:48px!important;height:48px!important;border-radius:10px!important;color:#fff!important}
+.casino-lobby-card .clc-title{color:#fff!important;font-family:Inter,sans-serif!important;font-weight:700!important;text-transform:none!important;font-size:14px!important;letter-spacing:0!important}
+.casino-lobby-card .clc-sub{color:rgba(255,255,255,.72)!important;font-family:Inter,sans-serif!important;font-size:10.5px!important}
+.casino-lobby-card .clc-badge{background:rgba(0,0,0,.25)!important;border:none!important;color:#fff!important;font-family:Inter,sans-serif!important;font-weight:700!important}
+
+/* Tabs: de segmented-control ambar a tabs planas tipo Stake */
+.casino-tabs{background:var(--stk-bg)!important;border:1px solid var(--stk-line)!important;border-radius:10px!important;padding:4px!important}
+.casino-tab{color:var(--stk-text)!important;font-family:Inter,sans-serif!important;font-size:12px!important;letter-spacing:0!important;text-transform:none!important;background:none!important;border:none!important}
+.casino-tab.active{background:var(--stk-bg3)!important;color:#fff!important;box-shadow:none!important}
+.casino-tab:hover:not(.active){background:rgba(255,255,255,.05)!important;color:#fff!important}
+
+/* Ruleta: aguja/centro de oro a verde/blanco plano */
+.ruleta-aguja{border-top-color:var(--stk-green)!important;filter:none!important}
+.ruleta-centro{background:var(--stk-bg3)!important;border-color:var(--stk-green)!important;box-shadow:none!important;color:var(--stk-green)!important}
+
+/* Moneda: de dorado joya a disco plano bicolor */
+.moneda-cara{background:var(--stk-bg3)!important;box-shadow:none!important;border:2px solid var(--stk-green)!important}
+.moneda-cruz{background:var(--stk-bg)!important;box-shadow:none!important;border:2px solid rgba(255,255,255,.25)!important}
+
+/* Multiplicadores / info: planos */
+.casino-mult-info{background:var(--stk-bg)!important;border:1px solid var(--stk-line)!important;border-radius:8px!important}
+.cmi-item{color:var(--stk-text)!important;font-family:Inter,sans-serif!important}
+.cmi-badge{border-radius:4px!important}
+
+/* Formulario de apuesta: inputs planos, sin glow ambar */
+.casino-bet-form label{color:var(--stk-text)!important;font-family:Inter,sans-serif!important;text-transform:none!important;letter-spacing:0!important;font-size:12px!important}
+.casino-bet-form input[type=number]{background:var(--stk-bg)!important;border:1px solid var(--stk-line)!important;border-radius:8px!important;color:#fff!important;font-family:Inter,sans-serif!important}
+.casino-bet-form input[type=number]:focus{border-color:var(--stk-green)!important;box-shadow:0 0 0 3px rgba(0,231,1,.12)!important;background:var(--stk-bg)!important}
+
+/* Opciones (rojo/negro/verde, cara/cruz): swatch plano */
+.casino-opcion{background:var(--stk-bg)!important;border:1px solid var(--stk-line)!important;border-radius:8px!important;font-family:Inter,sans-serif!important;font-weight:700!important;letter-spacing:0!important}
+.casino-opcion:hover:not([class*=sel-]){background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.2)!important}
+.casino-opcion.sel-rojo{border-color:var(--stk-red)!important;background:rgba(251,75,75,.12)!important;color:#ff8080!important}
+.casino-opcion.sel-negro{border-color:rgba(255,255,255,.5)!important;background:rgba(255,255,255,.08)!important}
+.casino-opcion.sel-verde,.casino-opcion.sel-cara,.casino-opcion.sel-cruz{border-color:var(--stk-green)!important;background:rgba(0,231,1,.12)!important;color:#7dffb0!important}
+
+/* Botón principal: de gradiente dorado con brillo a botón verde plano Stake */
+.btn-casino{background:var(--stk-green)!important;color:#04160c!important;border-radius:8px!important;font-family:Inter,sans-serif!important;letter-spacing:0!important;text-transform:none!important;font-weight:800!important;box-shadow:none!important}
+.btn-casino::after{display:none!important}
+.btn-casino:hover{background:var(--stk-green-dark)!important;transform:none!important;box-shadow:none!important;filter:brightness(1.05)}
+.btn-casino:disabled{background:var(--stk-bg3)!important;color:rgba(255,255,255,.3)!important}
+
+/* Resultado gano/perdio: de gradiente-glow a bloque plano */
+.casino-resultado.gano{background:rgba(0,231,1,.12)!important;border:1px solid rgba(0,231,1,.35)!important;box-shadow:none!important;color:#7dffb0!important}
+.casino-resultado.perdio{background:rgba(251,75,75,.12)!important;border:1px solid rgba(251,75,75,.35)!important;box-shadow:none!important;color:#ff8080!important}
+
+/* Avión: mantiene el cian pero sin glow de fondo elegante */
+#avion-display{box-shadow:none!important}
+
+/* Ranking / historial: paneles planos, títulos ya no en Bebas Neue dorado */
+.casino-ranking,.casino-historial{background:var(--stk-bg3)!important;border:1px solid var(--stk-line)!important;border-radius:10px!important}
+.casino-ranking-titulo{color:#fff!important;font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:0!important;font-size:15px!important}
+.casino-ranking-titulo svg{color:var(--stk-green)!important;stroke:var(--stk-green)!important}
+.casino-historial-titulo{color:var(--stk-text)!important;font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:0!important;font-size:15px!important}
+.ranking-item:hover{background:rgba(255,255,255,.04)!important}
+.ranking-nombre{color:rgba(255,255,255,.85)!important;font-family:Inter,sans-serif!important}
+.ranking-ganado{color:var(--stk-green)!important}
+
+@media (max-width:540px){.casino-lobby-card{padding:16px 8px 14px!important}}
