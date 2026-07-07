@@ -36,7 +36,7 @@
         } catch(e){}
 
         mostrarTarjeta(data.cuenta, dniData.dni);
-        document.getElementById('bank-saldo').textContent = formatCLP(data.cuenta.saldo);
+        ccAnimateNumber(document.getElementById('bank-saldo'), data.cuenta.saldo, formatCLP);
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
 
         // Próximo sueldo

@@ -44,7 +44,7 @@
         const data = await res.json();
         if (data.existe) {
           casinoSaldo = data.cuenta.saldo;
-          document.getElementById('casino-saldo-val').textContent = formatCLP(casinoSaldo);
+          ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
         }
       } catch {}
       dibujarRuleta(0);

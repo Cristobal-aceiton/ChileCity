@@ -373,6 +373,27 @@
       return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
     }
 
+    // ── Contador animado (mejora visual v9) ──────────────────────────────────
+    // Anima un número desde 0 hasta targetValue, formateando cada frame con
+    // formatFn (ej: formatCLP). Uso: ccAnimateNumber(el, 15000, formatCLP)
+    // Respeta prefers-reduced-motion (setea el valor final de una vez).
+    function ccAnimateNumber(el, targetValue, formatFn, duration = 700) {
+      if (!el) return;
+      const target = Number(targetValue) || 0;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.textContent = formatFn(target);
+        return;
+      }
+      const startTime = performance.now();
+      function tick(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = formatFn(Math.round(target * eased));
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
     // ── Feedback de victoria/derrota (sonido + microanimación) ───────────────
     // Compartido entre Casino y Apuestas para que la sensación de "ganaste"
     // o "perdiste" sea consistente en toda la app. No reemplaza los sonidos
@@ -614,7 +635,7 @@
         const data = await res.json();
         if (res.ok && data.cuenta) {
           currentCuenta = data.cuenta;
-          balEl.textContent = formatCLP(data.cuenta.saldo);
+          ccAnimateNumber(balEl, data.cuenta.saldo, formatCLP);
           balSubEl.textContent = `Cuenta N° ${data.cuenta.numero_cuenta}`;
         } else {
           balEl.textContent = '—';
