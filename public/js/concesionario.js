@@ -9,6 +9,7 @@
 
     let concesionarioVehiculos = [];
     let concesionarioMisIds    = new Set();
+    let concesionarioOrdenActual = 'default'; // 'default' | 'asc' (más barato primero) | 'desc' (más caro primero)
 
     async function cargarConcesionario() {
       if (!currentUser?.id) return;
@@ -28,6 +29,13 @@
 
         document.getElementById('concesionario-loading').style.display = 'none';
         document.getElementById('concesionario-wrap').style.display = 'block';
+
+        // Resetea búsqueda/orden cada vez que se entra a la sección.
+        const sq = document.getElementById('conc-search');
+        if (sq) sq.value = '';
+        concesionarioOrdenActual = 'default';
+        document.querySelectorAll('#concesionario-screen .filtro-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+
         renderConcesionario();
       } catch (e) {
         document.getElementById('concesionario-loading').style.display = 'none';
@@ -35,6 +43,33 @@
         document.getElementById('concesionario-grid').innerHTML = '<div class="tienda-empty">Error al cargar el concesionario.</div>';
       }
     }
+
+    // Cambia el criterio de orden por precio (llamado desde los botones).
+    function ordenarConcesionario(orden, btn) {
+      concesionarioOrdenActual = orden;
+      if (btn) {
+        document.querySelectorAll('#concesionario-screen .filtro-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      renderConcesionario();
+    }
+
+    // Aplica la búsqueda por texto (marca/modelo) + el orden por precio elegido,
+    // sin tocar el arreglo original concesionarioVehiculos.
+    function conFiltrarYOrdenar() {
+      const q = (document.getElementById('conc-search')?.value || '').trim().toLowerCase();
+      let lista = concesionarioVehiculos.slice();
+      if (q) lista = lista.filter(p => (p.nombre || '').toLowerCase().includes(q));
+      if (concesionarioOrdenActual === 'asc')  lista.sort((a, b) => (a.precio || 0) - (b.precio || 0));
+      if (concesionarioOrdenActual === 'desc') lista.sort((a, b) => (b.precio || 0) - (a.precio || 0));
+      return lista;
+    }
+
+    // Listener de búsqueda — se registra una sola vez al cargar la página.
+    (function() {
+      const s = document.getElementById('conc-search');
+      if (s) s.addEventListener('input', renderConcesionario);
+    })();
 
     // Se llama después de cualquier compra (ver tienda.js: comprarProducto)
     // para que un auto recién comprado pase a mostrarse como "Ya es tuyo".
@@ -59,7 +94,13 @@
         return;
       }
 
-      grid.innerHTML = concesionarioVehiculos.map(p => {
+      const lista = conFiltrarYOrdenar();
+      if (!lista.length) {
+        grid.innerHTML = '<div class="tienda-empty">Ningún vehículo coincide con tu búsqueda.</div>';
+        return;
+      }
+
+      grid.innerHTML = lista.map(p => {
         const yaComprado = concesionarioMisIds.has(p.id);
         const marca = concMarca(p.nombre);
         return `
