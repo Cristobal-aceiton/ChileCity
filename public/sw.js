@@ -13,7 +13,7 @@
 // Subir CACHE_VERSION cuando quieras forzar que los clientes descarten TODO
 // el cache anterior de una (por ejemplo si cambiaste muchos archivos a la vez).
 
-const CACHE_VERSION = "v11";
+const CACHE_VERSION = "v12";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
@@ -81,7 +81,7 @@ self.addEventListener("fetch", (event) => {
   // Navegación (HTML) → network-first, fallback a cache si no hay señal.
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: "no-store" })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put("/", copy));
@@ -94,8 +94,13 @@ self.addEventListener("fetch", (event) => {
 
   // Estáticos (JS/CSS/íconos) → network-first: intenta traer lo último del
   // servidor y actualiza el cache; si no hay red, recién ahí usa lo cacheado.
+  // OJO: cache:"no-store" es clave acá — sin esto, el navegador puede servir
+  // la respuesta desde su cache HTTP (según Cache-Control/max-age del server)
+  // sin siquiera tocar la red, haciendo que este "network-first" en realidad
+  // sirva contenido viejo. Esto se notaba sobre todo en celular, donde no hay
+  // hard-reload/DevTools para saltarse ese cache como en PC.
   event.respondWith(
-    fetch(request)
+    fetch(request, { cache: "no-store" })
       .then((res) => {
         if (res.ok) {
           const copy = res.clone();
