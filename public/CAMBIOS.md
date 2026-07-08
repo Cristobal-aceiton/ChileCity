@@ -1,3 +1,46 @@
+# Cambios aplicados — ChileCity RP v14 (Casino: reskin "Stake" + Limbo/Plinko + Provably Fair)
+
+## 🎰 Casino — reskin visual estilo Stake + juegos nuevos
+
+- **Paleta**: todo `#casino-screen` pasa a navy oscuro (#0f1923/#1a2c38) +
+  verde neón (#00e701) en vez del rojo/dorado genérico — lobby, tabs, botón
+  de apostar, ruleta. El podio de Top Ganadores se mantiene dorado a
+  propósito (jerarquía de logro, no acento de juego).
+- **Juegos nuevos**: **Limbo** (elige multiplicador objetivo, misma familia
+  matemática que Dice) y **Plinko** (8/12/16 filas, riesgo bajo/medio/alto,
+  tablero canvas con animación de caída).
+- **Provably Fair real**: cada apuesta de ruleta/moneda/avión/dice/limbo/
+  plinko ahora se resuelve con `HMAC-SHA256(server_seed, client_seed:nonce)`
+  en vez de `Math.random()`. El server seed queda comprometido (solo se
+  muestra su hash) hasta que el jugador lo rota, momento en que se revela en
+  texto plano para verificar cualquier apuesta pasada. Nuevo módulo
+  `lib/casinoSeed.js`, tablas `casino_seeds` / `casino_seeds_revelados`.
+- **Feed de apuestas en vivo**: nuevo endpoint público `feed_global` +
+  ticker en el lobby con las últimas apuestas de todos los jugadores.
+- Mines queda con su `Math.random()` original por ahora (su generación de
+  posiciones es más compleja de portar a seed determinístico) — pendiente
+  para una próxima pasada si se quiere unificar el 100% de los juegos.
+
+## 🛠️ Service Worker — fix real del problema de caché
+
+Causa raíz: `styles.css` sí se pedía con `?v=N`, pero **ningún** `/js/*.js`
+tenía versión en la URL — el Service Worker nunca tenía forma de saber que
+un JS había cambiado si no se subía manualmente `CACHE_VERSION` en `sw.js`.
+Ahora **todos** los `<script src="/js/...">` en `index.html` llevan `?v=25`,
+y el propio `sw.js` cambió de estrategia:
+- HTML (navegación) → network-first (con timeout y fallback a cache).
+- Estáticos con `?v=` → cache-first (la URL cambia por versión, es
+  inmutable e instantáneo).
+- Estáticos sin versión (íconos, manifest) → stale-while-revalidate, como
+  antes.
+
+Checklist agregado como comentario en la cabecera de `sw.js`: de ahora en
+más, cada deploy que toque CSS/JS debe subir el número en dos lugares (el
+`CACHE_VERSION` de `sw.js` y los `?v=` de `index.html`) — ambos con el mismo
+número para que sea fácil de auditar.
+
+---
+
 # Cambios aplicados — ChileCity RP v13
 
 ## ⚠️ Variables de entorno requeridas

@@ -19,7 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=24">
+  <link rel="stylesheet" href="/styles.css?v=25">
   <link rel="preload" as="image" href="https://i.imgur.com/yH4wCVJ.png" fetchpriority="high">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
@@ -1201,8 +1201,40 @@
 
       <!-- Lobby de juegos -->
       <div id="casino-lobby-section">
+        <!-- Feed de apuestas en vivo -->
+        <div class="casino-live-feed">
+          <div class="clf-header"><span class="clf-dot"></span> Apuestas en vivo</div>
+          <div class="clf-list" id="casino-live-feed-list">
+            <div class="ranking-empty" style="padding:12px 0;">Cargando...</div>
+          </div>
+        </div>
+
         <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:14px;">Elige un juego</div>
         <div class="casino-lobby">
+          <div class="casino-lobby-card" onclick="casinoAbrirJuego('limbo')"
+               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);">
+            <div class="clc-emoji" style="color:#00e701;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>
+              </svg>
+            </div>
+            <div class="clc-title">Limbo</div>
+            <div class="clc-sub">Elige tu multiplicador objetivo</div>
+            <div class="clc-badge nuevo">Nuevo</div>
+          </div>
+          <div class="casino-lobby-card" onclick="casinoAbrirJuego('plinko')"
+               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);">
+            <div class="clc-emoji" style="color:#00e701;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="9" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+                <path d="M4 21l5-8M20 21l-5-8"/>
+              </svg>
+            </div>
+            <div class="clc-title">Plinko</div>
+            <div class="clc-sub">Suelta la bolita, elige el riesgo</div>
+            <div class="clc-badge nuevo">Nuevo</div>
+          </div>
           <div class="casino-lobby-card" onclick="casinoAbrirJuego('ruleta')"
                style="--clc:rgba(220,30,30,0.12);--clc-border:rgba(220,30,30,0.4);--clc-shadow:rgba(220,30,30,0.15);--tile-a:#7c3aed;--tile-b:#a855f7;">
             <div class="clc-emoji" style="color:#ef4444;">
@@ -1242,6 +1274,37 @@
             <div class="clc-sub">Retira antes que explote</div>
             <div class="clc-badge nuevo">Nuevo</div>
           </div>
+          <div class="casino-lobby-card" onclick="casinoAbrirJuego('dice')"
+               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);--tile-a:#1a2c38;--tile-b:#213743;">
+            <div class="clc-emoji" style="color:#00e701;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="4"/>
+                <circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div class="clc-title">Dice</div>
+            <div class="clc-sub">Elige tu chance, ajusta el multiplicador</div>
+            <div class="clc-badge nuevo">Nuevo</div>
+          </div>
+          <div class="casino-lobby-card" onclick="casinoAbrirJuego('mines')"
+               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);--tile-a:#1a2c38;--tile-b:#213743;">
+            <div class="clc-emoji" style="color:#00e701;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                <circle cx="17.5" cy="17.5" r="1.6" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div class="clc-title">Mines</div>
+            <div class="clc-sub">Evita las minas, retira cuando quieras</div>
+            <div class="clc-badge nuevo">Nuevo</div>
+          </div>
           <div class="casino-lobby-card" onclick="abrirSeccion('apuestas-screen'); cargarApuestas()"
                style="--clc:rgba(99,102,241,0.12);--clc-border:rgba(99,102,241,0.4);--clc-shadow:rgba(99,102,241,0.15);--tile-a:#4338ca;--tile-b:#6366f1;">
             <div class="clc-emoji" style="color:#818cf8;">
@@ -1266,6 +1329,42 @@
         <button class="casino-tab active" id="ctab-ruleta" onclick="casinoTab('ruleta')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:5px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg> Ruleta</button>
         <button class="casino-tab" id="ctab-moneda" onclick="casinoTab('moneda')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:5px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><path d="M9.3 14.2c.4 1 1.5 1.6 2.7 1.6 1.7 0 2.8-.8 2.8-1.9 0-1.2-1.2-1.6-2.8-1.9-1.6-.3-2.8-.7-2.8-1.9 0-1.1 1.1-1.9 2.8-1.9 1.2 0 2.3.6 2.7 1.6"/></svg> Cara o Cruz</button>
         <button class="casino-tab" id="ctab-avion" onclick="casinoTab('avion')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> Avión</button>
+        <button class="casino-tab" id="ctab-dice" onclick="casinoTab('dice')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg> Dice</button>
+        <button class="casino-tab" id="ctab-mines" onclick="casinoTab('mines')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Mines</button>
+        <button class="casino-tab" id="ctab-limbo" onclick="casinoTab('limbo')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> Limbo</button>
+        <button class="casino-tab" id="ctab-plinko" onclick="casinoTab('plinko')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><circle cx="6" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.4" fill="currentColor" stroke="none"/><path d="M4 21l5-8M20 21l-5-8"/></svg> Plinko</button>
+      </div>
+
+      <!-- ── PROVABLY FAIR (compartido por todos los juegos) ─────────────── -->
+      <div class="pf-panel" id="pf-panel">
+        <div class="pf-panel-header" onclick="pfTogglePanel()">
+          <div class="pf-panel-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+            Provably Fair
+          </div>
+          <svg class="pf-panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="pf-panel-body">
+          <div class="pf-row">
+            <label>Server Seed (hash) — comprometido, se revela al rotar</label>
+            <div class="pf-row-value"><input type="text" id="pf-server-hash" readonly value="cargando..."><button class="pf-copy-btn" onclick="pfCopiar('pf-server-hash')">Copiar</button></div>
+          </div>
+          <div class="pf-row">
+            <label>Client Seed (puedes cambiarlo)</label>
+            <div class="pf-row-value"><input type="text" id="pf-client-seed" value=""><button class="pf-copy-btn" onclick="pfCopiar('pf-client-seed')">Copiar</button></div>
+          </div>
+          <div class="pf-row">
+            <label>Nonce actual</label>
+            <div class="pf-row-value"><span id="pf-nonce">0</span></div>
+          </div>
+          <button class="pf-rotate-btn" style="align-self:flex-start;" onclick="pfRotarSeed()">Rotar seed y revelar el anterior</button>
+          <div class="pf-note">Cada apuesta se calcula con <b>HMAC-SHA256(server_seed, client_seed:nonce)</b>. El server seed queda comprometido (solo ves su hash) hasta que rotas — ahí se revela en texto plano y puedes verificar cualquier apuesta pasada hecha con ese seed.</div>
+          <div id="pf-revelados-wrap" style="display:none;">
+            <div class="pf-note" style="margin-top:4px;"><b>Seeds revelados (verificables):</b></div>
+            <div id="pf-revelados-lista" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>
+          </div>
+          <div id="pf-verify-result"></div>
+        </div>
       </div>
 
       <!-- ── RULETA ────────────────────────────────── -->
@@ -1384,6 +1483,160 @@
         </div>
       </div>
 
+      <!-- ── DICE ───────────────────────────────────────────────────────────── -->
+      <div class="casino-juego" id="casino-panel-dice">
+        <div class="dice-display">
+          <div class="dice-track">
+            <div class="dice-track-fill" id="dice-track-fill"></div>
+            <div class="dice-marker" id="dice-marker" style="left:50%;">
+              <div class="dice-marker-val" id="dice-marker-val">50.00</div>
+            </div>
+          </div>
+          <div class="dice-scale">
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+          </div>
+        </div>
+
+        <div class="dice-stats">
+          <div class="dice-stat">
+            <label>Multiplicador</label>
+            <div class="dice-stat-val" id="dice-mult-val">x2.00</div>
+          </div>
+          <div class="dice-stat">
+            <label>Elige bajo / sobre</label>
+            <div class="dice-modo-toggle">
+              <button class="dice-modo-btn active" id="dice-modo-under" onclick="diceSetModo('under')">Bajo</button>
+              <button class="dice-modo-btn" id="dice-modo-over" onclick="diceSetModo('over')">Sobre</button>
+            </div>
+          </div>
+          <div class="dice-stat">
+            <label>Probabilidad</label>
+            <div class="dice-stat-val" id="dice-chance-val">49.50%</div>
+          </div>
+        </div>
+
+        <input type="range" id="dice-slider" min="2" max="98" value="50" step="1" oninput="diceSliderChange()" class="dice-slider-input">
+
+        <div class="casino-bet-form">
+          <label>Monto a apostar (CLP)</label>
+          <input type="number" id="dice-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="diceActualizarInfo()">
+          <div id="dice-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+        </div>
+
+        <div class="casino-resultado" id="dice-resultado"></div>
+
+        <button class="btn-casino" id="btn-dice" onclick="jugarDice()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg> Lanzar Dado
+        </button>
+      </div>
+
+      <!-- ── LIMBO ──────────────────────────────────────────────────────────── -->
+      <div class="casino-juego" id="casino-panel-limbo">
+        <div class="limbo-display">
+          <div class="limbo-mult-display" id="limbo-mult-display">x1.00</div>
+          <div class="limbo-sub" id="limbo-estado">Elige tu objetivo y apuesta</div>
+        </div>
+
+        <div class="casino-bet-form">
+          <label>Multiplicador objetivo</label>
+          <div class="limbo-target-row">
+            <input type="number" id="limbo-target" value="2.00" min="1.01" step="0.01" oninput="limboActualizarInfo()">
+            <div class="limbo-chance-pill" id="limbo-chance-pill">49.50%</div>
+          </div>
+          <label>Monto a apostar (CLP)</label>
+          <input type="number" id="limbo-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="limboActualizarInfo()">
+          <div id="limbo-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+        </div>
+
+        <div class="casino-resultado" id="limbo-resultado"></div>
+
+        <button class="btn-casino" id="btn-limbo" onclick="jugarLimbo()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> Jugar Limbo
+        </button>
+      </div>
+
+      <!-- ── PLINKO ─────────────────────────────────────────────────────────── -->
+      <div class="casino-juego" id="casino-panel-plinko">
+        <div class="plinko-wrap">
+          <canvas id="plinko-canvas" class="plinko-canvas" width="340" height="340"></canvas>
+          <div class="plinko-mults-row" id="plinko-mults-row"></div>
+        </div>
+
+        <div class="plinko-config-row">
+          <div>
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);font-weight:700;display:block;margin-bottom:6px;">Filas</label>
+            <select class="plinko-select" id="plinko-filas" onchange="plinkoActualizarTabla()">
+              <option value="8">8 filas</option>
+              <option value="12" selected>12 filas</option>
+              <option value="16">16 filas</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);font-weight:700;display:block;margin-bottom:6px;">Riesgo</label>
+            <select class="plinko-select" id="plinko-riesgo" onchange="plinkoActualizarTabla()">
+              <option value="bajo">Bajo</option>
+              <option value="medio" selected>Medio</option>
+              <option value="alto">Alto</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="casino-bet-form">
+          <label>Monto a apostar (CLP)</label>
+          <input type="number" id="plinko-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="plinkoActualizarBoton()">
+        </div>
+
+        <div class="casino-resultado" id="plinko-resultado"></div>
+
+        <button class="btn-casino" id="btn-plinko" onclick="jugarPlinko()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><path d="M4 21l5-8M20 21l-5-8"/></svg> Soltar bolita
+        </button>
+      </div>
+
+      <!-- ── MINES ──────────────────────────────────────────────────────────── -->
+      <div class="casino-juego" id="casino-panel-mines">
+
+        <div class="mines-topbar" id="mines-topbar" style="display:none;">
+          <div class="mines-topbar-item">
+            <label>Multiplicador actual</label>
+            <div class="mines-mult-val" id="mines-mult-actual">x1.00</div>
+          </div>
+          <div class="mines-topbar-item">
+            <label>Retiro estimado</label>
+            <div class="mines-mult-val mines-cash" id="mines-cashout-val">$0</div>
+          </div>
+        </div>
+
+        <div class="mines-grid" id="mines-grid"></div>
+
+        <div class="casino-bet-form" id="mines-config-form">
+          <label>Monto a apostar (CLP)</label>
+          <input type="number" id="mines-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="minesActualizarBoton()">
+          <label>Cantidad de minas</label>
+          <div class="mines-select-wrap">
+            <select id="mines-cantidad" onchange="minesActualizarBoton()">
+              <option value="1">1 mina</option>
+              <option value="3" selected>3 minas</option>
+              <option value="5">5 minas</option>
+              <option value="8">8 minas</option>
+              <option value="12">12 minas</option>
+              <option value="16">16 minas</option>
+              <option value="20">20 minas</option>
+              <option value="24">24 minas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="casino-resultado" id="mines-resultado"></div>
+
+        <button class="btn-casino" id="btn-mines-start" onclick="minesIniciar()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Iniciar Partida
+        </button>
+        <button class="btn-casino mines-btn-cashout" id="btn-mines-cashout" onclick="minesRetirar()" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Retirar <span id="mines-cashout-btn-val"></span>
+        </button>
+      </div>
+
       <!-- ── RANKING ─────────────────────────────── -->
       <div class="casino-ranking">
         <div class="casino-ranking-titulo">
@@ -1417,7 +1670,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
           Volver
         </button>
-        <div class="seccion-title" style="color:#6366f1;">⚽ Apuestas Deportivas</div>
+        <div class="seccion-title" style="color:#6366f1;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="9"/><path d="M12 3v3.5L15 9l3.6-1.2M12 21v-3.5L9 15l-3.6 1.2M4.4 8.8 8 11l-1 3.5M19.6 8.8 16 11l1 3.5"/></svg> Apuestas Deportivas</div>
       </div>
 
       <!-- Saldo -->
@@ -1431,7 +1684,7 @@
 
       <!-- Tabs historial / partidos -->
       <div class="casino-tabs" style="margin:0;">
-        <button class="casino-tab active" id="aptab-partidos" onclick="apTab('partidos')">⚽ Partidos</button>
+        <button class="casino-tab active" id="aptab-partidos" onclick="apTab('partidos')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><path d="M12 3v3.5L15 9l3.6-1.2M12 21v-3.5L9 15l-3.6 1.2M4.4 8.8 8 11l-1 3.5M19.6 8.8 16 11l1 3.5"/></svg> Partidos</button>
         <button class="casino-tab" id="aptab-historial" onclick="apTab('historial')">📋 Mi Historial</button>
       </div>
 
@@ -1507,7 +1760,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
           Volver
         </button>
-        <div class="seccion-title" style="color:#f59e0b;">🎲 Admin Casino</div>
+        <div class="seccion-title" style="color:#f59e0b;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg> Admin Casino</div>
       </div>
 
       <!-- Crear partido -->
@@ -1547,7 +1800,7 @@
           <button class="btn-adm ghost" style="padding:5px 12px;font-size:12px;" onclick="admCargarPartidos()">↻ Actualizar</button>
         </div>
         <div id="adm-partidos-lista">
-          <div class="ap-empty"><div class="ap-empty-icon">⚽</div><div class="ap-empty-text">Sin partidos creados</div></div>
+          <div class="ap-empty"><div class="ap-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v3.5L15 9l3.6-1.2M12 21v-3.5L9 15l-3.6 1.2M4.4 8.8 8 11l-1 3.5M19.6 8.8 16 11l1 3.5"/></svg></div><div class="ap-empty-text">Sin partidos creados</div></div>
         </div>
       </div>
 
@@ -2681,25 +2934,25 @@
     </div>
   </div>
 
-  <script defer src="/js/app.js"></script>
-  <script defer src="/js/dashboard-fx.js"></script>
-  <script defer src="/js/notificaciones.js"></script>
-  <script defer src="/js/pull-to-refresh.js"></script>
-  <script defer src="/js/registro-civil.js"></script>
-  <script defer src="/js/banco.js"></script>
+  <script defer src="/js/app.js?v=25"></script>
+  <script defer src="/js/dashboard-fx.js?v=25"></script>
+  <script defer src="/js/notificaciones.js?v=25"></script>
+  <script defer src="/js/pull-to-refresh.js?v=25"></script>
+  <script defer src="/js/registro-civil.js?v=25"></script>
+  <script defer src="/js/banco.js?v=25"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js"></script>
-  <script defer src="/js/vehiculos.js"></script>
-  <script defer src="/js/concesionario.js"></script>
-  <script defer src="/js/mis-autos.js"></script>
-  <script defer src="/js/admin-tienda.js"></script>
-  <script defer src="/js/empresas.js"></script>
-  <script defer src="/js/logros.js"></script>
-  <script defer src="/js/perfil-publico-inline.js"></script>
-  <script defer src="/js/panel-admin.js"></script>
-  <script defer src="/js/comisaria.js"></script>
-  <script defer src="/js/casino.js"></script>
-  <script defer src="/js/apuestas.js"></script>
-  <script defer src="/js/parallax-landing.js"></script>
+  <script defer src="/js/tienda.js?v=25"></script>
+  <script defer src="/js/vehiculos.js?v=25"></script>
+  <script defer src="/js/concesionario.js?v=25"></script>
+  <script defer src="/js/mis-autos.js?v=25"></script>
+  <script defer src="/js/admin-tienda.js?v=25"></script>
+  <script defer src="/js/empresas.js?v=25"></script>
+  <script defer src="/js/logros.js?v=25"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=25"></script>
+  <script defer src="/js/panel-admin.js?v=25"></script>
+  <script defer src="/js/comisaria.js?v=25"></script>
+  <script defer src="/js/casino.js?v=25"></script>
+  <script defer src="/js/apuestas.js?v=25"></script>
+  <script defer src="/js/parallax-landing.js?v=25"></script>
 </body>
 </html>

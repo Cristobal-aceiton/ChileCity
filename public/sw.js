@@ -1,63 +1,59 @@
 // ── Service Worker — ChileCity RP ────────────────────────────────────────────
-// Estrategia:
-//   - /api/*           → SIEMPRE red (nunca cache: saldo, inventario, sesión, etc.
-//                         son datos en vivo y cachearlos sería mostrar info vieja
-//                         o de otro usuario).
-//   - HTML (navegación) → cache-primero-con-carrera: si hay algo cacheado, se
-//                         entrega al toque y la red actualiza el cache de fondo
-//                         para la próxima visita. Si no hay nada cacheado, se
-//                         espera a la red pero con timeout.
-//   - JS/CSS/íconos     → mismo patrón que arriba (stale-while-revalidate con
-//                         carrera corta). Antes esto era "network-first puro":
-//                         esperaba SIEMPRE a la red antes de mostrar algo, y en
-//                         celular con señal mala el fetch podía demorar mucho
-//                         (o nunca resolver) antes de caer al cache — por eso
-//                         a veces el CSS/JS no cargaba. Ahora, si ya existe una
-//                         versión en cache, se muestra de inmediato (carrera de
-//                         solo 300ms contra la red) y se sigue refrescando el
-//                         cache en segundo plano. Los cambios de CSS/JS se ven
-//                         igual "al toque" porque `?v=N` en las URLs genera una
-//                         key de cache nueva apenas subes la versión.
 //
-// Subir CACHE_VERSION cuando quieras forzar que los clientes descarten TODO
-// el cache anterior de una (por ejemplo si cambiaste muchos archivos a la vez).
+// ⚠️ CHECKLIST — LEER ANTES DE CADA DEPLOY QUE TOQUE public/*.css o public/js/*.js:
+//   1) Sube CACHE_VERSION acá abajo (ej: "v25" → "v26").
+//   2) Sube el mismo número en TODOS los `?v=` de <link>/<script> en index.html
+//      (el link de styles.css y CADA <script src="/js/...">).
+//   Si te olvidas de esto, el navegador puede seguir sirviendo JS/CSS viejo
+//   indefinidamente en celulares — no por un bug del SW, sino porque el
+//   navegador solo re-descarga un archivo si su URL cambia o si detecta que
+//   sw.js cambió byte a byte. Este checklist es la única fuente de verdad.
+//
+// ── Por qué el CSS/JS a veces no se actualizaba (causa raíz) ────────────────
+//   Antes, `styles.css` sí tenía `?v=N` en el HTML, pero los `/js/*.js` NO
+//   tenían ningún parámetro de versión: se pedían siempre con la MISMA url
+//   exacta. Eso significa que la cache-key en el Cache Storage nunca cambiaba
+//   aunque el contenido del archivo sí. El SW usaba "stale-while-revalidate"
+//   (mostrar lo cacheado ya mismo, actualizar en segundo plano) — perfecto
+//   para velocidad, pero si la re-descarga en segundo plano nunca alcanzaba a
+//   completarse (señal mala, app en background, pestaña cerrada antes de
+//   tiempo) el usuario podía quedarse días con un JS desactualizado sin
+//   ningún indicio visual de que eso pasaba.
+//
+//   La solución real no es "cachear mejor", es "versionar todo": cada archivo
+//   estático ahora se pide con `?v=N` en la URL. Eso hace que cada versión
+//   sea, para el navegador y el Cache Storage, un recurso *distinto* — nunca
+//   hay ambigüedad entre "la versión vieja cacheada" y "la nueva". Por eso
+//   ahora los estáticos versionados usan cache-first (son inmutables: si la
+//   URL no cambió, el contenido tampoco) y el HTML (que es el que declara
+//   qué `?v=` usar) usa network-first, para que SIEMPRE se sepa cuál es la
+//   última versión disponible en cuanto haya señal.
+//
+// ── Estrategia final ─────────────────────────────────────────────────────────
+//   - /api/*, /auth/*        → SIEMPRE red, nunca cache (saldo, sesión, etc.)
+//   - Navegación (HTML)      → network-first con timeout corto, cae a cache
+//                              solo si no hay red. Así el HTML (que decide
+//                              qué versión de CSS/JS pedir) es lo más fresco
+//                              posible siempre que haya conexión.
+//   - Estáticos CON ?v=      → cache-first (inmutables por versión: si ya
+//                              está cacheada esa versión exacta, se sirve al
+//                              toque sin ir a la red; si es nueva, se pide y
+//                              se cachea de una).
+//   - Estáticos SIN ?v=      → stale-while-revalidate (íconos, manifest,
+//                              favicon: cambian poco y no es crítico que se
+//                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v15";
+const CACHE_VERSION = "v25";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
-// Cuánto esperamos a la red antes de rendirnos del todo cuando NO hay nada
-// cacheado todavía (primera visita, o cache borrado).
+// Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
+// rendirnos y caer a cache (si existe) o fallar.
 const NETWORK_TIMEOUT_MS = 4000;
-
-// Cuando SÍ hay algo cacheado, cuánto esperamos "por si la red es rapidísima"
-// antes de simplemente mostrar lo cacheado y actualizar de fondo.
-const RACE_MS = 300;
 
 const PRECACHE_URLS = [
   "/",
-  "/styles.css",
+  `/styles.css?v=${CACHE_VERSION.replace("v", "")}`,
   "/favicon.svg",
-  "/js/app.js",
-  "/js/dashboard-fx.js",
-  "/js/notificaciones.js",
-  "/js/registro-civil.js",
-  "/js/banco.js",
-  "/js/tienda.js",
-  "/js/vehiculos.js",
-  "/js/concesionario.js",
-  "/js/mis-autos.js",
-  "/js/admin-tienda.js",
-  "/js/empresas.js",
-  "/js/logros.js",
-  "/js/base-datos.js",
-  "/js/perfil-publico.js",
-  "/js/perfil-publico-inline.js",
-  "/js/parallax-landing.js",
-  "/js/panel-admin.js",
-  "/js/comisaria.js",
-  "/js/casino.js",
-  "/js/apuestas.js",
-  "/js/pull-to-refresh.js",
 ];
 
 self.addEventListener("install", (event) => {
@@ -88,7 +84,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Helper: red con timeout duro (se usa cuando NO hay nada en cache todavía).
+// Helper: red con timeout duro.
 function fetchConTimeout(request, ms) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("timeout de red")), ms);
@@ -99,41 +95,46 @@ function fetchConTimeout(request, ms) {
   });
 }
 
-// Estrategia principal: cache-primero-con-carrera + actualización de fondo.
-async function staleWhileRevalidate(request, cacheKey) {
+// Network-first: intenta red primero (con timeout), cae a cache si falla.
+// Se usa para HTML y para estáticos versionados (?v=) que aún no están
+// en cache (la primera vez que se ve esa versión).
+async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(cacheKey || request);
+  try {
+    const res = await fetchConTimeout(request, NETWORK_TIMEOUT_MS);
+    if (res.ok) cache.put(request, res.clone());
+    return res;
+  } catch {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    throw new Error("sin red y sin cache");
+  }
+}
 
-  // Siempre disparamos la red para refrescar el cache, pase lo que pase.
+// Cache-first: para estáticos versionados (?v=N). Como la URL cambia cada
+// vez que cambia el contenido, "ya está en cache" == "es exactamente esta
+// versión" — no hay riesgo de servir algo desactualizado.
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const res = await fetchConTimeout(request, NETWORK_TIMEOUT_MS);
+  if (res.ok) cache.put(request, res.clone());
+  return res;
+}
+
+// Stale-while-revalidate: para estáticos sin versión (íconos, manifest).
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
   const networkPromise = fetch(request, { cache: "no-store" })
     .then((res) => {
-      if (res.ok) cache.put(cacheKey || request, res.clone());
+      if (res.ok) cache.put(request, res.clone());
       return res;
     })
     .catch(() => null);
-
-  if (cached) {
-    // Ya hay algo que mostrar: le damos a la red solo RACE_MS por si es
-    // rapidísima, si no, mostramos lo cacheado ya mismo. Nunca dejamos al
-    // usuario esperando por una red lenta/inestable cuando ya hay algo útil.
-    const rapido = await Promise.race([
-      networkPromise,
-      new Promise((resolve) => setTimeout(() => resolve(null), RACE_MS)),
-    ]);
-    return rapido || cached;
-  }
-
-  // No hay nada cacheado (primera visita): hay que esperar a la red sí o sí,
-  // pero con timeout para no colgar la pestaña indefinidamente.
-  try {
-    const res = await fetchConTimeout(request, NETWORK_TIMEOUT_MS);
-    if (res.ok) cache.put(cacheKey || request, res.clone());
-    return res;
-  } catch {
-    const fallback = await cache.match(cacheKey || request);
-    if (fallback) return fallback;
-    throw new Error("sin red y sin cache");
-  }
+  if (cached) return cached;
+  return (await networkPromise) || cache.match(request);
 }
 
 self.addEventListener("fetch", (event) => {
@@ -148,17 +149,28 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Navegación (HTML) → cache-primero-con-carrera, usando "/" como key fija
-  // (SPA de una sola página).
+  // Navegación (HTML) → network-first, usando "/" como key fija (SPA).
   if (request.mode === "navigate") {
     event.respondWith(
-      staleWhileRevalidate(request, "/").catch(() => caches.match("/"))
+      networkFirst(new Request("/", { cache: "no-store" })).catch(() => caches.match("/"))
     );
     return;
   }
 
-  // Estáticos (JS/CSS/íconos) → mismo patrón.
-  event.respondWith(
-    staleWhileRevalidate(request).catch(() => caches.match(request))
-  );
+  const tieneVersion = url.searchParams.has("v");
+
+  if (tieneVersion) {
+    event.respondWith(cacheFirst(request).catch(() => caches.match(request)));
+  } else {
+    event.respondWith(staleWhileRevalidate(request).catch(() => caches.match(request)));
+  }
+});
+
+// Permite forzar la activación inmediata del SW en espera desde la página
+// (ej. un botón "Actualizar ahora" en el banner de nueva versión) enviando
+// { type: "SKIP_WAITING" } vía postMessage.
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });

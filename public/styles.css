@@ -606,3 +606,207 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .ranking-ganado{color:var(--stk-green)!important}
 
 @media (max-width:540px){.casino-lobby-card{padding:16px 8px 14px!important}}
+
+/* ══════════════════════════════════════════════════════════════════
+   DICE
+══════════════════════════════════════════════════════════════════ */
+.dice-display{width:100%;padding:8px 4px 0}
+.dice-track{position:relative;width:100%;height:14px;background:var(--stk-bg);border-radius:8px;overflow:visible;border:1px solid var(--stk-line)}
+.dice-track-fill{position:absolute;top:0;bottom:0;border-radius:8px;transition:left .15s ease,width .15s ease,background .2s ease}
+.dice-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #0f212e;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:3;transition:left .1s linear}
+.dice-marker-val{position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:#fff;background:#0f212e;border:1px solid var(--stk-line);border-radius:6px;padding:2px 6px;white-space:nowrap}
+.dice-roll-marker{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:26px;border-radius:3px;background:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.8);z-index:4;opacity:0;transition:left .6s cubic-bezier(.16,1,.3,1),opacity .2s}
+.dice-roll-marker.show{opacity:1}
+.dice-scale{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--font-mono)}
+.dice-stats{display:flex;gap:10px;width:100%;margin-top:6px}
+.dice-stat{flex:1;background:var(--stk-bg);border:1px solid var(--stk-line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+.dice-stat label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);font-weight:700}
+.dice-stat-val{font-size:16px;font-weight:800;color:#fff;font-family:var(--font-mono)}
+.dice-modo-toggle{display:flex;gap:4px;background:var(--stk-bg3);border-radius:8px;padding:3px;width:100%}
+.dice-modo-btn{flex:1;padding:6px 4px;border:none;background:transparent;color:rgba(255,255,255,.5);font-size:11px;font-weight:700;border-radius:6px;cursor:pointer;transition:.2s;font-family:Inter,sans-serif}
+.dice-modo-btn.active{background:var(--stk-green);color:#04160c}
+.dice-slider-input{width:100%;-webkit-appearance:none;appearance:none;height:4px;background:transparent;margin:4px 0;cursor:pointer}
+.dice-slider-input::-webkit-slider-thumb{-webkit-appearance:none;width:1px;height:1px;opacity:0}
+.dice-slider-input::-moz-range-thumb{width:1px;height:1px;opacity:0;border:none}
+
+/* ══════════════════════════════════════════════════════════════════
+   MINES
+══════════════════════════════════════════════════════════════════ */
+.mines-topbar{width:100%;display:flex;gap:10px}
+.mines-topbar-item{flex:1;background:var(--stk-bg);border:1px solid var(--stk-line);border-radius:10px;padding:10px 14px;text-align:center}
+.mines-topbar-item label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);font-weight:700;display:block;margin-bottom:4px}
+.mines-mult-val{font-size:18px;font-weight:800;color:#fff;font-family:var(--font-mono)}
+.mines-mult-val.mines-cash{color:var(--stk-green)}
+.mines-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:340px;margin:0 auto}
+.mines-tile{aspect-ratio:1;border-radius:8px;background:var(--stk-bg3);border:none;border-bottom:3px solid var(--stk-line);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .12s ease,background .2s ease,border-color .2s ease;padding:0}
+.mines-tile:hover:not(.revelada){background:#2a4351;transform:translateY(-1px)}
+.mines-tile:active:not(.revelada){transform:scale(.94)}
+.mines-tile svg{position:absolute;opacity:0;transition:opacity .15s ease,transform .3s cubic-bezier(.34,1.56,.64,1);transform:scale(.5)}
+.mines-tile.gema{background:rgba(0,231,1,.14);border-color:var(--stk-green);animation:minesPop .35s cubic-bezier(.34,1.56,.64,1)}
+.mines-tile.gema .mines-icon-gema{opacity:1;transform:scale(1);color:var(--stk-green)}
+.mines-tile.mina{background:rgba(251,75,75,.18);border-color:var(--stk-red);animation:minesShakeMina .4s ease}
+.mines-tile.mina .mines-icon-mina{opacity:1;transform:scale(1);color:var(--stk-red)}
+.mines-tile.mina-otra{opacity:.55;animation:none}
+.mines-tile.gema-perdida{opacity:.3}
+.mines-tile.revelada{cursor:default;pointer-events:none}
+@keyframes minesPop{0%{transform:scale(.85)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes minesShakeMina{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.mines-select-wrap select{width:100%;padding:12px 14px;border-radius:10px;background:var(--stk-bg);border:1px solid var(--stk-line);color:#fff;font-size:14px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer}
+.mines-select-wrap select:focus{outline:0;border-color:var(--stk-green)}
+.mines-select-wrap select option{background:#0f212e}
+.mines-btn-cashout{background:linear-gradient(135deg,#00e701,#00c001)!important;color:#04160c!important}
+
+/* ══════════════════════════════════════════════════════════════════
+   POPUP DE VICTORIA + CONFETTI (reusable en todos los juegos)
+══════════════════════════════════════════════════════════════════ */
+.cc-win-popup{position:fixed;top:38%;left:50%;transform:translate(-50%,-40%) scale(.8);z-index:9998;background:rgba(15,33,46,.97);border:1px solid var(--stk-green);border-radius:18px;padding:22px 34px;text-align:center;opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(0,231,1,.25)}
+.cc-win-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.cc-win-popup.grande{border-color:#fbbf24;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 60px rgba(251,191,36,.35)}
+.cc-win-mult{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--stk-green);letter-spacing:1px;line-height:1}
+.cc-win-popup.grande .cc-win-mult{color:#fbbf24}
+.cc-win-label{font-size:12px;font-weight:800;letter-spacing:3px;color:rgba(255,255,255,.6);text-transform:uppercase;margin-top:4px}
+.cc-win-monto{font-size:20px;font-weight:800;color:#fff;margin-top:8px;font-family:var(--font-mono)}
+.cc-confetti-wrap{position:fixed;inset:0;z-index:9997;pointer-events:none;overflow:hidden}
+.cc-confetti-piece{position:absolute;top:-20px;width:9px;height:9px;border-radius:2px;animation-name:ccConfettiFall;animation-timing-function:ease-in;animation-fill-mode:forwards}
+@keyframes ccConfettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:.2}}
+
+@media (max-width:540px){
+  .mines-grid{max-width:280px;gap:6px}
+  .dice-stats{flex-wrap:wrap}
+  .cc-win-popup{padding:18px 24px}
+  .cc-win-mult{font-size:34px}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASINO — RESKIN "STAKE" (v25)
+   Paleta: navy oscuro (#0f1923 / #1a2c38 / #213743) + verde neón (#00e701).
+   Todo escopado a #casino-screen para no tocar el resto de la app (banco,
+   tienda, etc. siguen con su paleta roja/dorada original).
+   ══════════════════════════════════════════════════════════════════════════ */
+#casino-screen{
+  --sk-bg:#0f1923; --sk-bg2:#1a2c38; --sk-card:#213743; --sk-card2:#2f4553;
+  --sk-green:#00e701; --sk-green-dim:rgba(0,231,1,.14); --sk-green-glow:rgba(0,231,1,.35);
+  --sk-red:#ff4d4d;
+}
+#casino-screen .casino-saldo-banner{
+  background:linear-gradient(135deg,var(--sk-bg) 0%,var(--sk-bg2) 100%)!important;
+  border:1px solid rgba(0,231,1,.25)!important;
+}
+#casino-screen .csb-valor{ color:var(--sk-green)!important; text-shadow:0 0 20px var(--sk-green-glow)!important; }
+#casino-screen .csb-mono{ background:var(--sk-green-dim)!important; border-color:rgba(0,231,1,.3)!important; color:rgba(0,231,1,.75)!important; }
+
+/* Lobby: cards mas "producto", thumbnail-style, glow verde al hover */
+#casino-screen .casino-lobby-card{
+  background:linear-gradient(160deg,var(--sk-card) 0%,var(--sk-bg2) 100%)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+  border-radius:16px!important;
+  padding:22px 14px!important;
+  position:relative;
+}
+#casino-screen .casino-lobby-card:hover{
+  transform:translateY(-4px) scale(1.015)!important;
+  border-color:rgba(0,231,1,.45)!important;
+  box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 1px rgba(0,231,1,.25)!important;
+}
+#casino-screen .clc-badge{ background:var(--sk-green-dim)!important; color:var(--sk-green)!important; border:1px solid rgba(0,231,1,.35)!important; }
+#casino-screen .clc-badge.nuevo{ background:rgba(99,102,241,.15)!important; color:#a5b4fc!important; border-color:rgba(99,102,241,.3)!important; }
+
+/* Tabs y boton principal de apuesta: acento verde consistente */
+#casino-screen .casino-tab.active{
+  background:linear-gradient(135deg,rgba(0,231,1,.22),rgba(0,180,1,.14))!important;
+  color:var(--sk-green)!important;
+}
+#casino-screen .btn-casino{
+  background:linear-gradient(135deg,#00b301 0,#00d101 45%,#00e701 75%,#3dff3d 100%)!important;
+  box-shadow:0 4px 24px rgba(0,231,1,.3),0 0 0 1px rgba(0,231,1,.2)!important;
+}
+#casino-screen .btn-casino:hover{ box-shadow:0 8px 36px rgba(0,231,1,.45),0 0 0 1px rgba(0,231,1,.3)!important; }
+#casino-screen .ruleta-aguja{ border-top-color:var(--sk-green)!important; filter:drop-shadow(0 2px 6px rgba(0,231,1,.9))!important; }
+#casino-screen .ruleta-centro{ border-color:rgba(0,231,1,.6)!important; box-shadow:0 0 16px rgba(0,231,1,.4),inset 0 0 10px rgba(0,0,0,.8)!important; color:rgba(0,231,1,.85)!important; }
+
+/* ── LIMBO ─────────────────────────────────────────────────────────────── */
+.limbo-display{
+  background:linear-gradient(180deg,rgba(0,231,1,.07) 0%,rgba(0,0,0,0) 100%);
+  border:1px solid rgba(0,231,1,.2); border-radius:16px;
+  padding:32px 20px 24px; text-align:center; margin-bottom:18px; position:relative; overflow:hidden;
+}
+.limbo-mult-display{
+  font-family:'Bebas Neue',sans-serif; font-size:52px; font-weight:800; letter-spacing:1px;
+  color:#00e701; text-shadow:0 0 30px rgba(0,231,1,.5); font-variant-numeric:tabular-nums;
+  transition:color .15s;
+}
+.limbo-mult-display.perdio{ color:#ff4d4d; text-shadow:0 0 30px rgba(255,77,77,.5); }
+.limbo-sub{ font-size:12px; color:rgba(255,255,255,.4); margin-top:6px; }
+.limbo-target-row{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.limbo-target-row input[type=number]{
+  flex:1; background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.1); border-radius:10px;
+  padding:12px 14px; color:#fff; font-size:16px; font-weight:700; outline:0;
+}
+.limbo-target-row input[type=number]:focus{ border-color:rgba(0,231,1,.55); box-shadow:0 0 0 3px rgba(0,231,1,.1); }
+.limbo-chance-pill{
+  background:rgba(0,231,1,.1); border:1px solid rgba(0,231,1,.25); border-radius:10px;
+  padding:11px 16px; font-size:13px; font-weight:700; color:#00e701; white-space:nowrap;
+}
+
+/* ── PLINKO ────────────────────────────────────────────────────────────── */
+.plinko-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; }
+.plinko-canvas{
+  display:block; width:100%; max-width:340px; height:340px; border-radius:16px;
+  background:linear-gradient(180deg,#0d1620 0%,#0a0f16 100%); border:1px solid rgba(255,255,255,.06);
+}
+.plinko-config-row{ display:flex; gap:10px; width:100%; }
+.plinko-config-row > *{ flex:1; }
+.plinko-select{
+  width:100%; padding:11px 12px; border-radius:10px; background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.1); color:#fff; font-size:13px; font-weight:700; cursor:pointer;
+}
+.plinko-select:focus{ outline:0; border-color:rgba(0,231,1,.5); }
+.plinko-mults-row{ display:flex; gap:3px; width:100%; max-width:340px; flex-wrap:nowrap; overflow:hidden; }
+.plinko-mult-cell{
+  flex:1; text-align:center; padding:5px 2px; border-radius:6px; font-size:9.5px; font-weight:800;
+  background:rgba(255,255,255,.05); color:rgba(255,255,255,.5); transition:.25s;
+}
+.plinko-mult-cell.hit{ background:rgba(0,231,1,.28); color:#00e701; transform:scale(1.15); box-shadow:0 0 12px rgba(0,231,1,.4); }
+.plinko-mult-cell.low{ color:#ff8080; background:rgba(255,77,77,.08); }
+
+/* ── PANEL PROVABLY FAIR ──────────────────────────────────────────────────
+   Caja colapsable bajo el formulario de apuesta: muestra el hash del server
+   seed comprometido de antemano, el client seed (editable) y el nonce. */
+.pf-panel{
+  width:100%; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; overflow:hidden; margin-top:2px;
+}
+.pf-panel-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 14px; cursor:pointer; user-select:none; }
+.pf-panel-header:hover{ background:rgba(255,255,255,.03); }
+.pf-panel-title{ display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; letter-spacing:.3px; color:rgba(0,231,1,.85); text-transform:uppercase; }
+.pf-panel-chevron{ color:rgba(255,255,255,.35); transition:transform .25s; flex-shrink:0; }
+.pf-panel.open .pf-panel-chevron{ transform:rotate(180deg); }
+.pf-panel-body{ display:none; padding:0 14px 14px; flex-direction:column; gap:10px; }
+.pf-panel.open .pf-panel-body{ display:flex; }
+.pf-row{ display:flex; flex-direction:column; gap:4px; }
+.pf-row label{ font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:rgba(255,255,255,.35); }
+.pf-row-value{ display:flex; align-items:center; gap:8px; background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:8px 10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(255,255,255,.75); }
+.pf-row-value input{ flex:1; background:none; border:none; color:inherit; font:inherit; outline:0; min-width:0; }
+.pf-copy-btn, .pf-rotate-btn{ flex-shrink:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:6px; padding:5px 9px; font-size:10px; font-weight:700; color:rgba(255,255,255,.6); cursor:pointer; transition:.2s; font-family:Inter,sans-serif; white-space:nowrap; }
+.pf-copy-btn:hover, .pf-rotate-btn:hover{ background:rgba(255,255,255,.12); color:#fff; }
+.pf-rotate-btn{ background:rgba(0,231,1,.1); border-color:rgba(0,231,1,.25); color:#00e701; }
+.pf-rotate-btn:hover{ background:rgba(0,231,1,.2); }
+.pf-note{ font-size:10.5px; line-height:1.5; color:rgba(255,255,255,.3); }
+.pf-verify-link{ font-size:10.5px; color:rgba(0,231,1,.7); cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+.pf-verify-link:hover{ color:#00e701; }
+.pf-verify-box{ margin-top:8px; padding:10px 12px; border-radius:8px; font-size:11px; line-height:1.6; font-family:'JetBrains Mono',monospace; word-break:break-all; }
+.pf-verify-box.ok{ background:rgba(0,231,1,.1); border:1px solid rgba(0,231,1,.3); color:#7dffb0; }
+.pf-verify-box.fail{ background:rgba(255,77,77,.1); border:1px solid rgba(255,77,77,.3); color:#ff8080; }
+
+/* ── FEED DE APUESTAS EN VIVO (lobby) ─────────────────────────────────────── */
+.casino-live-feed{ width:100%; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:14px 16px; margin-bottom:8px; overflow:hidden; }
+.clf-header{ display:flex; align-items:center; gap:8px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:rgba(255,255,255,.4); margin-bottom:10px; }
+.clf-dot{ width:7px; height:7px; border-radius:50%; background:#00e701; box-shadow:0 0 8px rgba(0,231,1,.8); animation:2s ease-in-out infinite pulse-dot; }
+.clf-list{ display:flex; flex-direction:column; gap:6px; max-height:168px; overflow-y:auto; scrollbar-width:thin; }
+.clf-item{ display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:8px; background:rgba(255,255,255,.02); font-size:12px; animation:fadeUp .35s ease both; }
+.clf-juego{ font-weight:700; color:rgba(255,255,255,.55); min-width:60px; }
+.clf-user{ flex:1; color:rgba(255,255,255,.7); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.clf-monto{ font-weight:800; white-space:nowrap; }
+.clf-monto.gano{ color:#00e701; }
+.clf-monto.perdio{ color:#ff6b6b; }
+@media (max-width:540px){ .plinko-canvas{ height:280px; } .limbo-mult-display{ font-size:40px; } }
