@@ -9,17 +9,37 @@
       if (card.dataset.fxBound) return;
       card.dataset.fxBound = '1';
 
+      // OJO: antes esto llamaba getBoundingClientRect() en CADA mousemove,
+      // lo que fuerza un recálculo de layout del navegador cientos de veces
+      // por segundo (layout thrashing) — carísimo en PCs de bajos recursos.
+      // Ahora: el rect se mide una sola vez al entrar el mouse (mouseenter) y
+      // se reutiliza mientras el mouse se mueve encima; además el update de
+      // las variables CSS se agrupa con requestAnimationFrame para no pintar
+      // más rápido de lo que la pantalla puede mostrar.
+      let cardRect = null;
+      let pendingX = 50, pendingY = 30, rafId = null;
+
+      function flush() {
+        rafId = null;
+        card.style.setProperty('--mx', pendingX + '%');
+        card.style.setProperty('--my', pendingY + '%');
+      }
+
+      card.addEventListener('mouseenter', function () {
+        cardRect = card.getBoundingClientRect();
+      });
+
       card.addEventListener('mousemove', function (e) {
-        const rect = card.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty('--mx', x + '%');
-        card.style.setProperty('--my', y + '%');
+        if (!cardRect) cardRect = card.getBoundingClientRect();
+        pendingX = ((e.clientX - cardRect.left) / cardRect.width) * 100;
+        pendingY = ((e.clientY - cardRect.top) / cardRect.height) * 100;
+        if (rafId === null) rafId = requestAnimationFrame(flush);
       });
 
       card.addEventListener('mouseleave', function () {
-        card.style.setProperty('--mx', '50%');
-        card.style.setProperty('--my', '30%');
+        cardRect = null;
+        pendingX = 50; pendingY = 30;
+        if (rafId === null) rafId = requestAnimationFrame(flush);
       });
 
       card.addEventListener('click', function (e) {
