@@ -102,14 +102,6 @@ function minesMultiplicador(cantidadMinas, reveladas) {
   return Math.round(justo * MINES_HOUSE_EDGE * 10000) / 10000;
 }
 
-/* ── DICE: config ─────────────────────────────────────────────────────────── */
-const DICE_HOUSE_EDGE = 0.97; // 3% de margen de casa
-
-function diceMultiplicador(objetivo, modo) {
-  const chance = modo === "under" ? objetivo : (100 - objetivo);
-  return Math.round((DICE_HOUSE_EDGE * 100 / chance) * 10000) / 10000;
-}
-
 /* ── Resultado Ruleta ─────────────────────────────────────────────────────── */
 // 38 slots: 18 red, 18 black, 2 green (similar to American roulette)
 // `rand` es un float determinístico en [0,1) generado con HMAC(server_seed,
@@ -127,9 +119,8 @@ function lanzarMoneda(rand) {
 }
 
 /* ── LIMBO: config y matemática ───────────────────────────────────────────── */
-// Igual familia que Dice: el jugador elige un multiplicador objetivo, gana si
-// el "crash" generado lo iguala o supera. Fórmula estándar de Limbo/Crash con
-// margen de casa aplicado.
+// El jugador elige un multiplicador objetivo, gana si el "crash" generado lo
+// iguala o supera. Fórmula estándar de Limbo/Crash con margen de casa aplicado.
 function limboResultado(rand) {
   // Evita división por cero / infinitos: rand nunca es exactamente 0.
   const r = Math.max(rand, 1e-9);
@@ -279,12 +270,6 @@ export default async function handler(req, res) {
         if (isNaN(mult) || mult < 1.1 || mult > 100)
           return res.status(400).json({ error: "Multiplicador inválido (entre 1.1x y 100x)." });
       }
-      if (juego === "dice") {
-        const [modo, objetivoStr] = String(eleccion).split(":");
-        const objetivo = parseInt(objetivoStr);
-        if (!["under","over"].includes(modo) || isNaN(objetivo) || objetivo < 2 || objetivo > 98)
-          return res.status(400).json({ error: "Elección inválida para dados." });
-      }
       if (juego === "limbo") {
         const mult = parseFloat(eleccion);
         if (isNaN(mult) || mult < 1.01 || mult > LIMBO_MAX_MULT)
@@ -296,7 +281,7 @@ export default async function handler(req, res) {
         if (!PLINKO_FILAS_VALIDAS.includes(filas) || !PLINKO_RIESGOS_VALIDOS.includes(riesgo))
           return res.status(400).json({ error: "Configuración de Plinko inválida." });
       }
-      if (!["ruleta","moneda","avion","dice","limbo","plinko"].includes(juego))
+      if (!["ruleta","moneda","avion","limbo","plinko"].includes(juego))
         return res.status(400).json({ error: "Juego inválido." });
 
       // Verificar cuenta bancaria
@@ -353,14 +338,6 @@ export default async function handler(req, res) {
         gano = crashMultiplier >= multObjetivo;
         resultado = crashMultiplier.toFixed(2);
         premio = gano ? Math.floor(montoNum * multObjetivo) : 0;
-      } else if (juego === "dice") {
-        const [modo, objetivoStr] = eleccion.split(":");
-        const objetivo = parseInt(objetivoStr);
-        const roll = Math.round(rand * 10000) / 100; // 0.00 – 100.00
-        gano = modo === "under" ? roll < objetivo : roll > objetivo;
-        resultado = roll.toFixed(2);
-        const mult = diceMultiplicador(objetivo, modo);
-        premio = gano ? Math.floor(montoNum * mult) : 0;
       } else if (juego === "limbo") {
         const multObjetivo = parseFloat(eleccion);
         const crash = limboResultado(rand);
