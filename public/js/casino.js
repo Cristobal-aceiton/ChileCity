@@ -50,6 +50,8 @@
       dibujarRuleta(0);
       await cargarRanking();
       await cargarHistorialCasino();
+      if (typeof iniciarLiveFeedPolling === 'function') iniciarLiveFeedPolling();
+      if (typeof pfCargarEstado === 'function') { pfCargarEstado(); pfCargarRevelados(); }
     }
 
     // ── Tabs ─────────────────────────────────────────────────────────────
@@ -735,3 +737,757 @@
       }
       avionAnimFrame = requestAnimationFrame(animarVuelo);
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SONIDOS GENERALES DEL CASINO (hover/click/win/lose reusables)
+    ═══════════════════════════════════════════════════════════════ */
+    function casinoSonidoClick() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 320; osc.type = 'square';
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.start(); osc.stop(ctx.currentTime + 0.05);
+    }
+    function casinoSonidoHover() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 900; osc.type = 'sine';
+      gain.gain.setValueAtTime(0.025, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+      osc.start(); osc.stop(ctx.currentTime + 0.06);
+    }
+    function casinoSonidoWinChica() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      [523, 659, 784].forEach((f, i) => {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = f; osc.type = 'triangle';
+        const st = t + i * 0.08;
+        gain.gain.setValueAtTime(0.09, st);
+        gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
+        osc.start(st); osc.stop(st + 0.35);
+      });
+    }
+    function casinoSonidoWinGrande() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      [523, 659, 784, 1047, 1319].forEach((f, i) => {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = f; osc.type = 'triangle';
+        const st = t + i * 0.09;
+        gain.gain.setValueAtTime(0.11, st);
+        gain.gain.exponentialRampToValueAtTime(0.001, st + 0.5);
+        osc.start(st); osc.stop(st + 0.5);
+      });
+    }
+    function casinoSonidoLose() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.4);
+      osc.type = 'sawtooth';
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.42);
+      osc.start(); osc.stop(ctx.currentTime + 0.42);
+    }
+    function casinoSonidoReveal() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 700 + Math.random() * 120; osc.type = 'sine';
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      osc.start(); osc.stop(ctx.currentTime + 0.18);
+    }
+    function casinoSonidoMina() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      const t = ctx.currentTime;
+      const bufferSize = ctx.sampleRate * 0.3;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+      const src = ctx.createBufferSource(); src.buffer = buffer;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      src.connect(gain); gain.connect(ctx.destination);
+      src.start(t);
+      const osc = ctx.createOscillator(), oGain = ctx.createGain();
+      osc.frequency.setValueAtTime(140, t);
+      osc.frequency.exponentialRampToValueAtTime(40, t + 0.35);
+      osc.type = 'sawtooth';
+      oGain.gain.setValueAtTime(0.15, t);
+      oGain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc.connect(oGain); oGain.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.35);
+    }
+    function casinoSonidoDado() {
+      const ctx = getAudioCtx(); if (!ctx) return;
+      let t = ctx.currentTime;
+      for (let i = 0; i < 6; i++) {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 300 + Math.random() * 500;
+        osc.type = 'triangle';
+        const st = t + i * 0.045;
+        gain.gain.setValueAtTime(0.06, st);
+        gain.gain.exponentialRampToValueAtTime(0.001, st + 0.04);
+        osc.start(st); osc.stop(st + 0.04);
+      }
+    }
+
+    // Delega sonido de hover a cualquier botón/opción del casino (event delegation,
+    // así funciona también para elementos que se crean dinámicamente como las
+    // casillas de Mines).
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest?.('.casino-lobby-card, .casino-opcion, .btn-casino, .mines-tile:not(.revelada), .dice-modo-btn')) {
+        casinoSonidoHover();
+      }
+    }, { passive: true });
+
+    /* ═══════════════════════════════════════════════════════════════
+       EFECTO DE GRAN VICTORIA — confetti + popup, reusable en cualquier juego
+    ═══════════════════════════════════════════════════════════════ */
+    function casinoCelebrarWin(multiplicador, montoGanado) {
+      const esGrande = multiplicador >= 5;
+      if (esGrande) casinoSonidoWinGrande(); else casinoSonidoWinChica();
+
+      const popup = document.createElement('div');
+      popup.className = 'cc-win-popup' + (esGrande ? ' grande' : '');
+      popup.innerHTML = `
+        <div class="cc-win-mult">x${multiplicador.toFixed(2)}</div>
+        <div class="cc-win-label">${esGrande ? 'GRAN VICTORIA' : 'GANASTE'}</div>
+        <div class="cc-win-monto">+${formatCLP(montoGanado)}</div>
+      `;
+      document.body.appendChild(popup);
+      requestAnimationFrame(() => popup.classList.add('show'));
+      setTimeout(() => { popup.classList.remove('show'); setTimeout(() => popup.remove(), 400); }, esGrande ? 2200 : 1400);
+
+      if (esGrande) {
+        const wrap = document.createElement('div');
+        wrap.className = 'cc-confetti-wrap';
+        const colores = ['#00e701', '#fbbf24', '#ffffff', '#00c001'];
+        for (let i = 0; i < 40; i++) {
+          const piece = document.createElement('div');
+          piece.className = 'cc-confetti-piece';
+          piece.style.left = Math.random() * 100 + 'vw';
+          piece.style.background = colores[Math.floor(Math.random() * colores.length)];
+          piece.style.animationDelay = (Math.random() * 0.3) + 's';
+          piece.style.animationDuration = (1.6 + Math.random() * 1.2) + 's';
+          piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+          wrap.appendChild(piece);
+        }
+        document.body.appendChild(wrap);
+        setTimeout(() => wrap.remove(), 3200);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DICE
+    ═══════════════════════════════════════════════════════════════ */
+    let diceModo = 'under';
+    const DICE_HOUSE_EDGE = 0.97;
+
+    function diceMultiplicador(objetivo, modo) {
+      const chance = modo === 'under' ? objetivo : (100 - objetivo);
+      return Math.round((DICE_HOUSE_EDGE * 100 / chance) * 10000) / 10000;
+    }
+
+    function diceSetModo(modo) {
+      diceModo = modo;
+      casinoSonidoClick();
+      document.getElementById('dice-modo-under').classList.toggle('active', modo === 'under');
+      document.getElementById('dice-modo-over').classList.toggle('active', modo === 'over');
+      diceRedibujar();
+    }
+
+    function diceSliderChange() { diceRedibujar(); }
+
+    function diceRedibujar() {
+      const objetivo = parseInt(document.getElementById('dice-slider').value);
+      const mult = diceMultiplicador(objetivo, diceModo);
+      const chance = diceModo === 'under' ? objetivo : (100 - objetivo);
+
+      document.getElementById('dice-mult-val').textContent = 'x' + mult.toFixed(2);
+      document.getElementById('dice-chance-val').textContent = chance.toFixed(2) + '%';
+      document.getElementById('dice-marker-val').textContent = objetivo.toFixed(2);
+
+      const marker = document.getElementById('dice-marker');
+      const fill = document.getElementById('dice-track-fill');
+      marker.style.left = objetivo + '%';
+      if (diceModo === 'under') {
+        fill.style.left = '0%'; fill.style.width = objetivo + '%';
+        fill.style.background = 'var(--stk-red, #fb4b4b)';
+      } else {
+        fill.style.left = objetivo + '%'; fill.style.width = (100 - objetivo) + '%';
+        fill.style.background = 'var(--stk-green, #00e701)';
+      }
+      diceActualizarInfo();
+    }
+
+    function diceActualizarInfo() {
+      const monto = parseInt(document.getElementById('dice-monto').value) || 0;
+      const objetivo = parseInt(document.getElementById('dice-slider').value);
+      const mult = diceMultiplicador(objetivo, diceModo);
+      const el = document.getElementById('dice-ganancia-info');
+      const btn = document.getElementById('btn-dice');
+      if (monto > MONTO_MAXIMO_CASINO) {
+        el.innerHTML = `<span style="color:#f87171;">La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.</span>`;
+        btn.disabled = true;
+      } else if (monto > 0) {
+        el.innerHTML = `Si aciertas ganas <b style="color:#00e701">${formatCLP(Math.floor(monto * mult))}</b>`;
+        btn.disabled = false;
+      } else {
+        el.textContent = '';
+        btn.disabled = true;
+      }
+    }
+
+    let diceJugando = false;
+    async function jugarDice() {
+      if (diceJugando) return;
+      const monto = parseInt(document.getElementById('dice-monto').value);
+      const objetivo = parseInt(document.getElementById('dice-slider').value);
+      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > MONTO_MAXIMO_CASINO) { mostrarToast(`La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.`, true); return; }
+      if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
+
+      diceJugando = true;
+      document.getElementById('btn-dice').disabled = true;
+      const resEl = document.getElementById('dice-resultado');
+      resEl.className = 'casino-resultado';
+      casinoSonidoDado();
+
+      let data;
+      try {
+        const r = await fetch('/api/casino?action=jugar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ juego: 'dice', monto, eleccion: `${diceModo}:${objetivo}` })
+        });
+        data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error al apostar.', true); diceJugando = false; diceActualizarInfo(); return; }
+      } catch {
+        mostrarToast('Error de conexión.', true); diceJugando = false; diceActualizarInfo(); return;
+      }
+
+      const roll = parseFloat(data.resultado);
+      const marker = document.getElementById('dice-marker');
+      marker.style.transition = 'left .6s cubic-bezier(.16,1,.3,1)';
+      const rollMarker = document.createElement('div');
+      rollMarker.className = 'dice-roll-marker';
+      document.querySelector('.dice-track').appendChild(rollMarker);
+      requestAnimationFrame(() => { rollMarker.style.left = roll + '%'; rollMarker.classList.add('show'); });
+
+      setTimeout(() => {
+        casinoSaldo = data.nuevoSaldo;
+        ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
+        const mult = diceMultiplicador(objetivo, diceModo);
+
+        if (data.gano) {
+          resEl.className = 'casino-resultado gano visible';
+          resEl.innerHTML = `Salió <b>${roll.toFixed(2)}</b> — ¡ganaste! <br><span style="font-size:18px;color:#00e701;">+${formatCLP(data.premio - monto)}</span>`;
+          if (typeof feedbackResultado === 'function') feedbackResultado(resEl, true);
+          casinoCelebrarWin(mult, data.premio - monto);
+        } else {
+          resEl.className = 'casino-resultado perdio visible';
+          resEl.innerHTML = `Salió <b>${roll.toFixed(2)}</b>. Perdiste ${formatCLP(monto)}.`;
+          if (typeof feedbackResultado === 'function') feedbackResultado(resEl, false);
+          casinoSonidoLose();
+        }
+
+        setTimeout(() => { rollMarker.remove(); marker.style.transition = ''; }, 900);
+        diceJugando = false;
+        diceActualizarInfo();
+        cargarRanking();
+        cargarHistorialCasino();
+      }, 650);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MINES
+    ═══════════════════════════════════════════════════════════════ */
+    const MINES_TOTAL = 25;
+    let minesActiva = false;
+    let minesReveladas = [];
+    let minesCantidadMinas = 3;
+    let minesMonto = 0;
+    let minesBloqueado = false;
+
+    function minesConstruirGrid() {
+      const grid = document.getElementById('mines-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < MINES_TOTAL; i++) {
+        const tile = document.createElement('button');
+        tile.className = 'mines-tile';
+        tile.type = 'button';
+        tile.dataset.i = i;
+        tile.innerHTML = `<svg class="mines-icon-gema" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M6 3h12l3 5-9 13L3 8l3-5z"/><path d="M3 8h18M9 3l3 5 3-5M12 8l-3 13M12 8l3 13"/></svg>
+                          <svg class="mines-icon-mina" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 2v3M4.2 6.2l2 2M19.8 6.2l-2 2M2 13h3M19 13h3"/></svg>`;
+        tile.onclick = () => minesRevelarCasilla(i);
+        grid.appendChild(tile);
+      }
+    }
+    minesConstruirGrid();
+
+    function minesActualizarBoton() {
+      const monto = parseInt(document.getElementById('mines-monto').value) || 0;
+      document.getElementById('btn-mines-start').disabled = !(monto > 0 && monto <= MONTO_MAXIMO_CASINO && !minesActiva);
+    }
+
+    async function minesIniciar() {
+      const monto = parseInt(document.getElementById('mines-monto').value);
+      const minas = parseInt(document.getElementById('mines-cantidad').value);
+      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
+      if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
+
+      casinoSonidoClick();
+      document.getElementById('btn-mines-start').disabled = true;
+      let data;
+      try {
+        const r = await fetch('/api/casino?action=mines_start', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ monto, minas })
+        });
+        data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error al iniciar.', true); minesActualizarBoton(); return; }
+      } catch { mostrarToast('Error de conexión.', true); minesActualizarBoton(); return; }
+
+      casinoSaldo = data.nuevoSaldo;
+      ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
+
+      minesActiva = true;
+      minesReveladas = [];
+      minesCantidadMinas = minas;
+      minesMonto = monto;
+      minesBloqueado = false;
+
+      document.getElementById('mines-config-form').style.display = 'none';
+      document.getElementById('btn-mines-start').style.display = 'none';
+      document.getElementById('btn-mines-cashout').style.display = 'flex';
+      document.getElementById('mines-topbar').style.display = 'flex';
+      document.getElementById('mines-resultado').className = 'casino-resultado';
+      minesConstruirGrid();
+      minesActualizarTopbar();
+    }
+
+    function minesActualizarTopbar() {
+      const mult = minesReveladas.length === 0 ? 1 : minesMultiplicadorLocal(minesCantidadMinas, minesReveladas.length);
+      document.getElementById('mines-mult-actual').textContent = 'x' + mult.toFixed(2);
+      const cashVal = Math.floor(minesMonto * mult);
+      document.getElementById('mines-cashout-val').textContent = formatCLP(cashVal);
+      document.getElementById('mines-cashout-btn-val').textContent = minesReveladas.length > 0 ? formatCLP(cashVal) : '';
+      document.getElementById('btn-mines-cashout').style.opacity = minesReveladas.length > 0 ? '1' : '.5';
+      document.getElementById('btn-mines-cashout').disabled = minesReveladas.length === 0;
+    }
+
+    function minesMultiplicadorLocal(minas, reveladas) {
+      const seguras = MINES_TOTAL - minas;
+      let prob = 1;
+      for (let i = 0; i < reveladas; i++) prob *= (seguras - i) / (MINES_TOTAL - i);
+      return Math.round((1 / prob) * 0.95 * 10000) / 10000;
+    }
+
+    async function minesRevelarCasilla(i) {
+      if (!minesActiva || minesBloqueado) return;
+      if (minesReveladas.includes(i)) return;
+      minesBloqueado = true;
+
+      const tile = document.querySelector(`.mines-tile[data-i="${i}"]`);
+      let data;
+      try {
+        const r = await fetch('/api/casino?action=mines_reveal', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ casilla: i })
+        });
+        data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error.', true); minesBloqueado = false; return; }
+      } catch { mostrarToast('Error de conexión.', true); minesBloqueado = false; return; }
+
+      if (data.esMina) {
+        casinoSonidoMina();
+        tile.classList.add('mina', 'revelada');
+        data.posiciones.forEach(p => {
+          const t2 = document.querySelector(`.mines-tile[data-i="${p}"]`);
+          if (t2 && p !== i) t2.classList.add('mina', 'revelada', 'mina-otra');
+        });
+        document.querySelectorAll('.mines-tile:not(.revelada)').forEach(t => t.classList.add('gema-perdida', 'revelada'));
+
+        const resEl = document.getElementById('mines-resultado');
+        resEl.className = 'casino-resultado perdio visible';
+        resEl.innerHTML = `Pisaste una mina en la casilla ${i + 1}. Perdiste ${formatCLP(minesMonto)}.`;
+        if (typeof feedbackResultado === 'function') feedbackResultado(resEl, false);
+
+        minesFinalizarUI();
+        cargarRanking(); cargarHistorialCasino();
+        return;
+      }
+
+      casinoSonidoReveal();
+      tile.classList.add('gema', 'revelada');
+      minesReveladas = data.reveladas;
+      minesActualizarTopbar();
+      minesBloqueado = false;
+
+      if (data.tableroCompleto) {
+        casinoSaldo = data.nuevoSaldo;
+        ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
+        const resEl = document.getElementById('mines-resultado');
+        resEl.className = 'casino-resultado gano visible';
+        resEl.innerHTML = `¡Tablero completo! Ganaste <b>${formatCLP(data.premio)}</b> (x${data.multiplicador.toFixed(2)})`;
+        if (typeof feedbackResultado === 'function') feedbackResultado(resEl, true);
+        casinoCelebrarWin(data.multiplicador, data.premio - minesMonto);
+        minesFinalizarUI();
+        cargarRanking(); cargarHistorialCasino();
+      }
+    }
+
+    async function minesRetirar() {
+      if (!minesActiva || minesReveladas.length === 0) return;
+      casinoSonidoClick();
+      document.getElementById('btn-mines-cashout').disabled = true;
+      let data;
+      try {
+        const r = await fetch('/api/casino?action=mines_cashout', { method: 'POST' });
+        data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error.', true); return; }
+      } catch { mostrarToast('Error de conexión.', true); return; }
+
+      casinoSaldo = data.nuevoSaldo;
+      ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
+
+      const resEl = document.getElementById('mines-resultado');
+      resEl.className = 'casino-resultado gano visible';
+      resEl.innerHTML = `Retiraste a tiempo. Ganaste <b>${formatCLP(data.premio)}</b> (x${data.multiplicador.toFixed(2)})`;
+      if (typeof feedbackResultado === 'function') feedbackResultado(resEl, true);
+      casinoCelebrarWin(data.multiplicador, data.premio - minesMonto);
+
+      document.querySelectorAll('.mines-tile:not(.revelada)').forEach(t => t.classList.add('gema-perdida', 'revelada'));
+      minesFinalizarUI();
+      cargarRanking(); cargarHistorialCasino();
+    }
+
+    function minesFinalizarUI() {
+      minesActiva = false;
+      minesReveladas = [];
+      document.getElementById('btn-mines-cashout').style.display = 'none';
+      document.getElementById('mines-topbar').style.display = 'none';
+      setTimeout(() => {
+        document.getElementById('mines-config-form').style.display = 'flex';
+        document.getElementById('btn-mines-start').style.display = 'flex';
+        minesActualizarBoton();
+        minesConstruirGrid();
+      }, 2200);
+    }
+
+    if (document.getElementById('dice-slider')) diceRedibujar();
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  LIMBO
+    // ══════════════════════════════════════════════════════════════════════
+    function limboActualizarInfo() {
+      const target = parseFloat(document.getElementById('limbo-target').value) || 0;
+      const monto = parseInt(document.getElementById('limbo-monto').value) || 0;
+      const chancePct = target > 1 ? (0.99 / target * 100) : 0;
+      document.getElementById('limbo-chance-pill').textContent = target >= 1.01 ? `${chancePct.toFixed(2)}%` : '—';
+      const el = document.getElementById('limbo-ganancia-info');
+      if (monto > MONTO_MAXIMO_CASINO) {
+        el.innerHTML = `<span style="color:#f87171;">La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.</span>`;
+      } else if (monto > 0 && target >= 1.01) {
+        el.innerHTML = `Si aciertas ganas <b style="color:#00e701">${formatCLP(Math.floor(monto * target))}</b>`;
+      } else el.textContent = '';
+      document.getElementById('btn-limbo').disabled = !(monto > 0 && monto <= MONTO_MAXIMO_CASINO && target >= 1.01 && !limboJugando);
+    }
+
+    let limboJugando = false;
+    async function jugarLimbo() {
+      const target = parseFloat(document.getElementById('limbo-target').value) || 0;
+      const monto = parseInt(document.getElementById('limbo-monto').value) || 0;
+      if (!(monto > 0 && target >= 1.01)) return;
+      limboJugando = true;
+      casinoSonidoClick();
+      document.getElementById('btn-limbo').disabled = true;
+      const displayEl = document.getElementById('limbo-mult-display');
+      const estadoEl = document.getElementById('limbo-estado');
+      displayEl.className = 'limbo-mult-display';
+      estadoEl.textContent = 'Jugando...';
+
+      let data;
+      try {
+        const r = await fetch('/api/casino?action=jugar', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ juego: 'limbo', monto, eleccion: target }),
+        });
+        data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error.', true); limboJugando = false; limboActualizarInfo(); estadoEl.textContent = 'Elige tu objetivo y apuesta'; return; }
+      } catch { mostrarToast('Error de conexión.', true); limboJugando = false; limboActualizarInfo(); return; }
+
+      const crash = parseFloat(data.resultado);
+      // Animación corta: cuenta ascendente hasta el crash real.
+      const inicio = performance.now();
+      const duracion = Math.min(1800, 400 + crash * 60);
+      function anim(t) {
+        const p = Math.min(1, (t - inicio) / duracion);
+        const val = 1 + (crash - 1) * (1 - Math.pow(1 - p, 3));
+        displayEl.textContent = `x${val.toFixed(2)}`;
+        if (p < 1) requestAnimationFrame(anim);
+        else finalizar();
+      }
+      requestAnimationFrame(anim);
+
+      function finalizar() {
+        displayEl.textContent = `x${crash.toFixed(2)}`;
+        displayEl.classList.toggle('perdio', !data.gano);
+        casinoSaldo = data.nuevoSaldo;
+        ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
+        const resEl = document.getElementById('limbo-resultado');
+        resEl.className = `casino-resultado ${data.gano ? 'gano' : 'perdio'} visible`;
+        resEl.innerHTML = data.gano
+          ? `¡Ganaste! Crash x${crash.toFixed(2)} ≥ objetivo x${target.toFixed(2)} — <b>${formatCLP(data.premio)}</b>`
+          : `Perdiste. Crash en x${crash.toFixed(2)} (objetivo x${target.toFixed(2)})`;
+        if (typeof feedbackResultado === 'function') feedbackResultado(resEl, data.gano);
+        if (data.gano) casinoCelebrarWin(target, data.premio - monto);
+        estadoEl.textContent = 'Elige tu objetivo y apuesta';
+        limboJugando = false;
+        limboActualizarInfo();
+        cargarRanking(); cargarHistorialCasino(); pfCargarEstado();
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  PLINKO
+    // ══════════════════════════════════════════════════════════════════════
+    let plinkoJugando = false;
+    const PLINKO_TABLAS_CLIENTE = {
+      "8-bajo":   [5.6, 2.1, 1.1, 1, 0.5, 1, 1.1, 2.1, 5.6],
+      "8-medio":  [13, 3, 1.3, 0.7, 0.4, 0.7, 1.3, 3, 13],
+      "8-alto":   [29, 4, 1.5, 0.3, 0.2, 0.3, 1.5, 4, 29],
+      "12-bajo":  [10, 3, 1.6, 1.4, 1.1, 1, 0.5, 1, 1.1, 1.4, 1.6, 3, 10],
+      "12-medio": [24, 7, 2, 1.3, 0.7, 0.4, 0.2, 0.4, 0.7, 1.3, 2, 7, 24],
+      "12-alto":  [58, 9, 2, 0.7, 0.3, 0.2, 0.1, 0.2, 0.3, 0.7, 2, 9, 58],
+      "16-bajo":  [16, 9, 2, 1.4, 1.2, 1.1, 1, 0.5, 0.3, 0.5, 1, 1.1, 1.2, 1.4, 2, 9, 16],
+      "16-medio": [110, 41, 10, 5, 3, 1.5, 1, 0.3, 0.2, 0.3, 1, 1.5, 3, 5, 10, 41, 110],
+      "16-alto":  [1000, 130, 26, 9, 4, 2, 0.5, 0.2, 0.1, 0.2, 0.5, 2, 4, 9, 26, 130, 1000],
+    };
+
+    function plinkoActualizarTabla() {
+      const filas = document.getElementById('plinko-filas').value;
+      const riesgo = document.getElementById('plinko-riesgo').value;
+      const tabla = PLINKO_TABLAS_CLIENTE[`${filas}-${riesgo}`] || [];
+      const row = document.getElementById('plinko-mults-row');
+      row.innerHTML = tabla.map(m => `<div class="plinko-mult-cell ${m < 1 ? 'low' : ''}" data-mult="${m}">${m}x</div>`).join('');
+      plinkoDibujarTablero(parseInt(filas));
+    }
+    function plinkoActualizarBoton() {
+      const monto = parseInt(document.getElementById('plinko-monto').value) || 0;
+      document.getElementById('btn-plinko').disabled = !(monto > 0 && monto <= MONTO_MAXIMO_CASINO && !plinkoJugando);
+    }
+
+    function plinkoDibujarTablero(filas, bolaPos) {
+      const canvas = document.getElementById('plinko-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const padTop = 24, padBottom = 20, padSide = 18;
+      const usableH = h - padTop - padBottom;
+      const rowGap = usableH / filas;
+      for (let row = 0; row < filas; row++) {
+        const pinsEnFila = row + 3;
+        const y = padTop + row * rowGap;
+        const totalWidth = w - padSide * 2;
+        const gap = totalWidth / (pinsEnFila - 1 || 1);
+        for (let i = 0; i < pinsEnFila; i++) {
+          const x = padSide + i * gap;
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,0.35)';
+          ctx.fill();
+        }
+      }
+      if (bolaPos) {
+        ctx.beginPath();
+        ctx.arc(bolaPos.x, bolaPos.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#00e701';
+        ctx.shadowColor = 'rgba(0,231,1,0.8)';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    async function jugarPlinko() {
+      const monto = parseInt(document.getElementById('plinko-monto').value) || 0;
+      const filas = parseInt(document.getElementById('plinko-filas').value);
+      const riesgo = document.getElementById('plinko-riesgo').value;
+      if (!(monto > 0)) return;
+      plinkoJugando = true;
+      casinoSonidoClick();
+      document.getElementById('btn-plinko').disabled = true;
+
+      let data;
+      try {
+        const r = await fetch('/api/casino?action=jugar', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ juego: 'plinko', monto, eleccion: `${filas}:${riesgo}` }),
+        });
+        data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error.', true); plinkoJugando = false; plinkoActualizarBoton(); return; }
+      } catch { mostrarToast('Error de conexión.', true); plinkoJugando = false; plinkoActualizarBoton(); return; }
+
+      const match = /bucket:(\d+)\|x([\d.]+)/.exec(data.resultado);
+      const bucket = match ? parseInt(match[1]) : 0;
+      const mult = match ? parseFloat(match[2]) : 0;
+
+      // Generamos un camino visual aleatorio de L/R que termine en el bucket
+      // correcto (el resultado real ya fue decidido por el servidor; esto
+      // es solo la animación de la bolita cayendo).
+      const rights = bucket, lefts = filas - bucket;
+      let camino = Array(rights).fill(1).concat(Array(lefts).fill(-1));
+      for (let i = camino.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [camino[i], camino[j]] = [camino[j], camino[i]];
+      }
+
+      const canvas = document.getElementById('plinko-canvas');
+      const w = canvas.width, h = canvas.height;
+      const padTop = 24, padBottom = 20, padSide = 18;
+      const usableH = h - padTop - padBottom;
+      const rowGap = usableH / filas;
+      let xPos = w / 2, colOffset = 0;
+      let paso = 0;
+
+      function animarPaso() {
+        if (paso >= filas) {
+          plinkoDibujarTablero(filas);
+          const row = document.getElementById('plinko-mults-row');
+          const cells = row.querySelectorAll('.plinko-mult-cell');
+          cells.forEach((c, i) => c.classList.toggle('hit', i === bucket));
+          setTimeout(() => cells.forEach(c => c.classList.remove('hit')), 2200);
+
+          casinoSaldo = data.nuevoSaldo;
+          ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
+          const resEl = document.getElementById('plinko-resultado');
+          const gano = mult >= 1;
+          resEl.className = `casino-resultado ${gano ? 'gano' : 'perdio'} visible`;
+          resEl.innerHTML = gano
+            ? `¡Cayó en x${mult}! Ganaste <b>${formatCLP(data.premio)}</b>`
+            : `Cayó en x${mult}. Perdiste parte de la apuesta.`;
+          if (typeof feedbackResultado === 'function') feedbackResultado(resEl, gano);
+          if (gano && data.premio > monto) casinoCelebrarWin(mult, data.premio - monto);
+          plinkoJugando = false;
+          plinkoActualizarBoton();
+          cargarRanking(); cargarHistorialCasino(); pfCargarEstado();
+          return;
+        }
+        colOffset += camino[paso];
+        const pinsEnFila = paso + 3;
+        const totalWidth = w - padSide * 2;
+        const gap = totalWidth / (pinsEnFila - 1 || 1);
+        const y = padTop + (paso + 1) * rowGap;
+        xPos = w / 2 + colOffset * (gap / 2);
+        plinkoDibujarTablero(filas, { x: xPos, y });
+        paso++;
+        setTimeout(animarPaso, 140);
+      }
+      plinkoDibujarTablero(filas, { x: xPos, y: padTop });
+      setTimeout(animarPaso, 140);
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  PROVABLY FAIR
+    // ══════════════════════════════════════════════════════════════════════
+    function pfTogglePanel() {
+      document.getElementById('pf-panel').classList.toggle('open');
+    }
+    function pfCopiar(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      navigator.clipboard?.writeText(el.value || el.textContent).then(() => {
+        if (typeof mostrarToast === 'function') mostrarToast('Copiado.', false);
+      }).catch(() => {});
+    }
+    async function pfCargarEstado() {
+      try {
+        const r = await fetch('/api/casino?action=seed_estado');
+        const data = await r.json();
+        if (!r.ok) return;
+        document.getElementById('pf-server-hash').value = data.server_seed_hash;
+        document.getElementById('pf-client-seed').value = data.client_seed;
+        document.getElementById('pf-nonce').textContent = data.nonce;
+      } catch {}
+    }
+    async function pfRotarSeed() {
+      const nuevoClientSeed = document.getElementById('pf-client-seed').value.trim();
+      try {
+        const r = await fetch('/api/casino?action=seed_rotar', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ client_seed: nuevoClientSeed || undefined }),
+        });
+        const data = await r.json();
+        if (!r.ok) { mostrarToast(data.error || 'Error.', true); return; }
+        mostrarToast('Seed rotado. El anterior ya se puede verificar.', false);
+        document.getElementById('pf-server-hash').value = data.nuevo.server_seed_hash;
+        document.getElementById('pf-client-seed').value = data.nuevo.client_seed;
+        document.getElementById('pf-nonce').textContent = data.nuevo.nonce;
+        pfCargarRevelados();
+      } catch { mostrarToast('Error de conexión.', true); }
+    }
+    async function pfCargarRevelados() {
+      try {
+        const r = await fetch('/api/casino?action=seed_revelados');
+        const data = await r.json();
+        if (!r.ok || !data.seeds?.length) return;
+        const wrap = document.getElementById('pf-revelados-wrap');
+        const lista = document.getElementById('pf-revelados-lista');
+        wrap.style.display = 'block';
+        lista.innerHTML = data.seeds.map(s => `
+          <div class="pf-row-value" style="flex-direction:column;align-items:flex-start;gap:3px;">
+            <div style="opacity:.5;font-size:9.5px;">Hash: ${s.server_seed_hash.slice(0, 24)}...</div>
+            <div>Seed: ${s.server_seed.slice(0, 24)}...</div>
+            <div style="opacity:.5;font-size:9.5px;">Client seed: ${s.client_seed} · ${s.nonce_final} apuestas</div>
+          </div>
+        `).join('');
+      } catch {}
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  FEED DE APUESTAS EN VIVO
+    // ══════════════════════════════════════════════════════════════════════
+    let casinoLiveFeedTimer = null;
+    async function cargarLiveFeed() {
+      const list = document.getElementById('casino-live-feed-list');
+      if (!list) return;
+      try {
+        const r = await fetch('/api/casino?action=feed_global');
+        const data = await r.json();
+        if (!r.ok || !data.apuestas) return;
+        if (data.apuestas.length === 0) {
+          list.innerHTML = '<div class="ranking-empty" style="padding:12px 0;">Nadie ha apostado todavía</div>';
+          return;
+        }
+        list.innerHTML = data.apuestas.map(a => `
+          <div class="clf-item">
+            <span class="clf-juego">${a.juego}</span>
+            <span class="clf-user">${a.nombre}</span>
+            <span class="clf-monto ${a.gano ? 'gano' : 'perdio'}">${a.gano ? '+' : '-'}${formatCLP(a.gano ? a.premio : a.monto)}</span>
+          </div>
+        `).join('');
+      } catch {}
+    }
+    function iniciarLiveFeedPolling() {
+      cargarLiveFeed();
+      if (casinoLiveFeedTimer) clearInterval(casinoLiveFeedTimer);
+      casinoLiveFeedTimer = setInterval(cargarLiveFeed, 6000);
+    }
+
+    // Inicialización de los nuevos módulos al cargar el casino.
+    if (document.getElementById('casino-live-feed-list')) iniciarLiveFeedPolling();
+    if (document.getElementById('pf-panel')) { pfCargarEstado(); pfCargarRevelados(); }
+    if (document.getElementById('plinko-canvas')) plinkoActualizarTabla();
