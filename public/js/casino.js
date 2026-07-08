@@ -846,7 +846,7 @@
     // así funciona también para elementos que se crean dinámicamente como las
     // casillas de Mines).
     document.addEventListener('mouseover', (e) => {
-      if (e.target.closest?.('.casino-lobby-card, .casino-opcion, .btn-casino, .mines-tile:not(.revelada), .dice-modo-btn')) {
+      if (e.target.closest?.('.casino-lobby-card, .casino-opcion, .btn-casino, .mines-tile:not(.revelada)')) {
         casinoSonidoHover();
       }
     }, { passive: true });
@@ -888,129 +888,6 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       DICE
-    ═══════════════════════════════════════════════════════════════ */
-    let diceModo = 'under';
-    const DICE_HOUSE_EDGE = 0.97;
-
-    function diceMultiplicador(objetivo, modo) {
-      const chance = modo === 'under' ? objetivo : (100 - objetivo);
-      return Math.round((DICE_HOUSE_EDGE * 100 / chance) * 10000) / 10000;
-    }
-
-    function diceSetModo(modo) {
-      diceModo = modo;
-      casinoSonidoClick();
-      document.getElementById('dice-modo-under').classList.toggle('active', modo === 'under');
-      document.getElementById('dice-modo-over').classList.toggle('active', modo === 'over');
-      diceRedibujar();
-    }
-
-    function diceSliderChange() { diceRedibujar(); }
-
-    function diceRedibujar() {
-      const objetivo = parseInt(document.getElementById('dice-slider').value);
-      const mult = diceMultiplicador(objetivo, diceModo);
-      const chance = diceModo === 'under' ? objetivo : (100 - objetivo);
-
-      document.getElementById('dice-mult-val').textContent = 'x' + mult.toFixed(2);
-      document.getElementById('dice-chance-val').textContent = chance.toFixed(2) + '%';
-      document.getElementById('dice-marker-val').textContent = objetivo.toFixed(2);
-
-      const marker = document.getElementById('dice-marker');
-      const fill = document.getElementById('dice-track-fill');
-      marker.style.left = objetivo + '%';
-      if (diceModo === 'under') {
-        fill.style.left = '0%'; fill.style.width = objetivo + '%';
-        fill.style.background = 'var(--stk-red, #fb4b4b)';
-      } else {
-        fill.style.left = objetivo + '%'; fill.style.width = (100 - objetivo) + '%';
-        fill.style.background = 'var(--stk-green, #00e701)';
-      }
-      diceActualizarInfo();
-    }
-
-    function diceActualizarInfo() {
-      const monto = parseInt(document.getElementById('dice-monto').value) || 0;
-      const objetivo = parseInt(document.getElementById('dice-slider').value);
-      const mult = diceMultiplicador(objetivo, diceModo);
-      const el = document.getElementById('dice-ganancia-info');
-      const btn = document.getElementById('btn-dice');
-      if (monto > MONTO_MAXIMO_CASINO) {
-        el.innerHTML = `<span style="color:#f87171;">La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.</span>`;
-        btn.disabled = true;
-      } else if (monto > 0) {
-        el.innerHTML = `Si aciertas ganas <b style="color:#00e701">${formatCLP(Math.floor(monto * mult))}</b>`;
-        btn.disabled = false;
-      } else {
-        el.textContent = '';
-        btn.disabled = true;
-      }
-    }
-
-    let diceJugando = false;
-    async function jugarDice() {
-      if (diceJugando) return;
-      const monto = parseInt(document.getElementById('dice-monto').value);
-      const objetivo = parseInt(document.getElementById('dice-slider').value);
-      if (!monto || monto <= 0) { mostrarToast('Ingresa un monto válido.', true); return; }
-      if (monto > MONTO_MAXIMO_CASINO) { mostrarToast(`La apuesta máxima es ${formatCLP(MONTO_MAXIMO_CASINO)}.`, true); return; }
-      if (monto > casinoSaldo) { mostrarToast('Saldo insuficiente.', true); return; }
-
-      diceJugando = true;
-      document.getElementById('btn-dice').disabled = true;
-      const resEl = document.getElementById('dice-resultado');
-      resEl.className = 'casino-resultado';
-      casinoSonidoDado();
-
-      let data;
-      try {
-        const r = await fetch('/api/casino?action=jugar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ juego: 'dice', monto, eleccion: `${diceModo}:${objetivo}` })
-        });
-        data = await r.json();
-        if (!r.ok) { mostrarToast(data.error || 'Error al apostar.', true); diceJugando = false; diceActualizarInfo(); return; }
-      } catch {
-        mostrarToast('Error de conexión.', true); diceJugando = false; diceActualizarInfo(); return;
-      }
-
-      const roll = parseFloat(data.resultado);
-      const marker = document.getElementById('dice-marker');
-      marker.style.transition = 'left .6s cubic-bezier(.16,1,.3,1)';
-      const rollMarker = document.createElement('div');
-      rollMarker.className = 'dice-roll-marker';
-      document.querySelector('.dice-track').appendChild(rollMarker);
-      requestAnimationFrame(() => { rollMarker.style.left = roll + '%'; rollMarker.classList.add('show'); });
-
-      setTimeout(() => {
-        casinoSaldo = data.nuevoSaldo;
-        ccAnimateNumber(document.getElementById('casino-saldo-val'), casinoSaldo, formatCLP);
-        const mult = diceMultiplicador(objetivo, diceModo);
-
-        if (data.gano) {
-          resEl.className = 'casino-resultado gano visible';
-          resEl.innerHTML = `Salió <b>${roll.toFixed(2)}</b> — ¡ganaste! <br><span style="font-size:18px;color:#00e701;">+${formatCLP(data.premio - monto)}</span>`;
-          if (typeof feedbackResultado === 'function') feedbackResultado(resEl, true);
-          casinoCelebrarWin(mult, data.premio - monto);
-        } else {
-          resEl.className = 'casino-resultado perdio visible';
-          resEl.innerHTML = `Salió <b>${roll.toFixed(2)}</b>. Perdiste ${formatCLP(monto)}.`;
-          if (typeof feedbackResultado === 'function') feedbackResultado(resEl, false);
-          casinoSonidoLose();
-        }
-
-        setTimeout(() => { rollMarker.remove(); marker.style.transition = ''; }, 900);
-        diceJugando = false;
-        diceActualizarInfo();
-        cargarRanking();
-        cargarHistorialCasino();
-      }, 650);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
        MINES
     ═══════════════════════════════════════════════════════════════ */
     const MINES_TOTAL = 25;
@@ -1185,8 +1062,6 @@
         minesConstruirGrid();
       }, 2200);
     }
-
-    if (document.getElementById('dice-slider')) diceRedibujar();
 
     // ══════════════════════════════════════════════════════════════════════
     //  LIMBO
