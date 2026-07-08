@@ -608,28 +608,6 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 @media (max-width:540px){.casino-lobby-card{padding:16px 8px 14px!important}}
 
 /* ══════════════════════════════════════════════════════════════════
-   DICE
-══════════════════════════════════════════════════════════════════ */
-.dice-display{width:100%;padding:8px 4px 0}
-.dice-track{position:relative;width:100%;height:14px;background:var(--stk-bg);border-radius:8px;overflow:visible;border:1px solid var(--stk-line)}
-.dice-track-fill{position:absolute;top:0;bottom:0;border-radius:8px;transition:left .15s ease,width .15s ease,background .2s ease}
-.dice-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #0f212e;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:3;transition:left .1s linear}
-.dice-marker-val{position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:#fff;background:#0f212e;border:1px solid var(--stk-line);border-radius:6px;padding:2px 6px;white-space:nowrap}
-.dice-roll-marker{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:26px;border-radius:3px;background:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.8);z-index:4;opacity:0;transition:left .6s cubic-bezier(.16,1,.3,1),opacity .2s}
-.dice-roll-marker.show{opacity:1}
-.dice-scale{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--font-mono)}
-.dice-stats{display:flex;gap:10px;width:100%;margin-top:6px}
-.dice-stat{flex:1;background:var(--stk-bg);border:1px solid var(--stk-line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
-.dice-stat label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);font-weight:700}
-.dice-stat-val{font-size:16px;font-weight:800;color:#fff;font-family:var(--font-mono)}
-.dice-modo-toggle{display:flex;gap:4px;background:var(--stk-bg3);border-radius:8px;padding:3px;width:100%}
-.dice-modo-btn{flex:1;padding:6px 4px;border:none;background:transparent;color:rgba(255,255,255,.5);font-size:11px;font-weight:700;border-radius:6px;cursor:pointer;transition:.2s;font-family:Inter,sans-serif}
-.dice-modo-btn.active{background:var(--stk-green);color:#04160c}
-.dice-slider-input{width:100%;-webkit-appearance:none;appearance:none;height:4px;background:transparent;margin:4px 0;cursor:pointer}
-.dice-slider-input::-webkit-slider-thumb{-webkit-appearance:none;width:1px;height:1px;opacity:0}
-.dice-slider-input::-moz-range-thumb{width:1px;height:1px;opacity:0;border:none}
-
-/* ══════════════════════════════════════════════════════════════════
    MINES
 ══════════════════════════════════════════════════════════════════ */
 .mines-topbar{width:100%;display:flex;gap:10px}
@@ -672,7 +650,6 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 
 @media (max-width:540px){
   .mines-grid{max-width:280px;gap:6px}
-  .dice-stats{flex-wrap:wrap}
   .cc-win-popup{padding:18px 24px}
   .cc-win-mult{font-size:34px}
 }
