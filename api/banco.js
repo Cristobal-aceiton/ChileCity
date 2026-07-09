@@ -10,7 +10,7 @@ const SALDO_INICIAL = 1000000;
 // ── Config de Préstamos ──────────────────────────────────────────────────────
 const PRESTAMO_MONTO_MAX      = 50000000; // tope de monto solicitable
 const PRESTAMO_CUOTAS_MIN     = 1;
-const PRESTAMO_CUOTAS_MAX     = 24;
+const PRESTAMO_CUOTAS_MAX     = 12;
 const PRESTAMO_INTERVALO_DIAS = 2; // cada cuántos días se cobra automáticamente
 
 function generarNumeroCuenta() {
