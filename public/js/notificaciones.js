@@ -119,6 +119,9 @@
       } else if (it.tipo === 'antecedente') {
         abrirSeccion('comisaria-screen');
         if (typeof abrirComisaria === 'function') abrirComisaria();
+      } else if (it.tipo === 'prestamo') {
+        abrirSeccion('banco-screen');
+        if (typeof cargarBanco === 'function') cargarBanco();
       } else if (it.tipo === 'admin') {
         // Aviso de administración: no tiene una sección propia a la cual ir,
         // solo se marca como leído al abrir el panel.

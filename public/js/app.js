@@ -283,6 +283,7 @@
       _herramientaOrigen = origen === 'staff' ? 'staff' : 'admin';
       abrirSeccion('admin-screen');
       if (typeof cargarAdminUsuarios === 'function') cargarAdminUsuarios();
+      if (typeof actualizarBadgePrestamos === 'function') actualizarBadgePrestamos();
     }
 
     function abrirAdminTiendaPanel() {

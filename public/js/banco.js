@@ -26,6 +26,7 @@
 
         const data = await res.json();
         currentCuenta = data.cuenta;
+        _prestamoActivo = data.prestamoActivo || null;
 
         // Buscar DNI para nombre completo
         let dniData = { existe: false };
@@ -231,15 +232,201 @@
       }
     }
 
+    // ── Préstamos ─────────────────────────────────────────────────────────────
+    // currentCuenta.prestamoActivo se guarda desde cargarBanco() (viene en la
+    // respuesta de /api/banco?action=cuenta) para no tener que pedirlo aparte.
+    let _prestamoActivo = null;
+
+    function actualizarPreviewCuota() {
+      const monto  = parseInt(document.getElementById('prestamo-monto').value, 10);
+      const cuotas = parseInt(document.getElementById('prestamo-cuotas').value, 10);
+      const preview = document.getElementById('prestamo-preview');
+      if (!monto || monto <= 0 || !cuotas || cuotas <= 0) {
+        preview.style.display = 'none';
+        return;
+      }
+      const cuotaMonto = Math.ceil(monto / cuotas);
+      preview.style.display = 'block';
+      preview.innerHTML = `Pagarías <strong style="color:#fbbf24;">${formatCLP(cuotaMonto)}</strong> cada 2 días, durante ${cuotas} cuota${cuotas === 1 ? '' : 's'} (~${cuotas * 2} días en total).`;
+    }
+
+    async function mostrarPrestamo() {
+      ocultarSecciones();
+      document.getElementById('prestamo-wrap').style.display = 'block';
+      renderEstadoPrestamo();
+      await cargarHistorialPrestamos();
+    }
+
+    function renderEstadoPrestamo() {
+      const form = document.getElementById('prestamo-form');
+      const card = document.getElementById('prestamo-estado-card');
+
+      if (!_prestamoActivo) {
+        form.style.display = 'flex';
+        card.style.display = 'none';
+        document.getElementById('prestamo-monto').value = '';
+        document.getElementById('prestamo-razon').value = '';
+        document.getElementById('prestamo-cuotas').value = '';
+        document.getElementById('prestamo-acepta').checked = false;
+        document.getElementById('prestamo-preview').style.display = 'none';
+        document.getElementById('prestamo-error').classList.remove('visible');
+        document.getElementById('prestamo-success').classList.remove('visible');
+        return;
+      }
+
+      form.style.display = 'none';
+      card.style.display = 'block';
+      const p = _prestamoActivo;
+
+      if (p.estado === 'pendiente') {
+        card.innerHTML = `
+          <div class="rc-form" style="gap:14px;">
+            <h2 style="font-size:18px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Solicitud en revisión
+            </h2>
+            <p>Tu solicitud de <strong style="color:#fff;">${formatCLP(p.monto)}</strong> (${p.cuotas_totales} cuotas) está esperando la aprobación de un administrador.</p>
+            <p style="margin-top:-8px; font-style:italic;">"${escHtml(p.razon)}"</p>
+            <div class="rc-error" id="prestamo-cancel-error"></div>
+            <button class="sec-back" onclick="cancelarSolicitudPrestamo(${p.id})">Cancelar solicitud</button>
+          </div>`;
+      } else if (p.estado === 'aprobado') {
+        const pagado = p.monto - p.saldo_pendiente;
+        const pct = p.monto > 0 ? Math.round((pagado / p.monto) * 100) : 0;
+        let tiempoTxt = 'Calculando…';
+        if (p.proximoCobroMs != null) {
+          const ms = p.proximoCobroMs;
+          if (ms <= 0) tiempoTxt = 'Se cobrará en tu próxima visita';
+          else {
+            const d = Math.floor(ms / 86400000);
+            const h = Math.floor((ms % 86400000) / 3600000);
+            tiempoTxt = d > 0 ? `${d}d ${h}h` : `${h}h`;
+          }
+        }
+        card.innerHTML = `
+          <div class="rc-form" style="gap:14px;">
+            <h2 style="font-size:18px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Préstamo activo
+            </h2>
+            <p style="margin-top:-8px; font-style:italic;">"${escHtml(p.razon)}"</p>
+            <div style="display:flex; justify-content:space-between; font-size:13px; color:rgba(255,255,255,.55);">
+              <span>Pagado</span><span>${formatCLP(pagado)} / ${formatCLP(p.monto)}</span>
+            </div>
+            <div style="width:100%; height:8px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden;">
+              <div style="width:${pct}%; height:100%; background:linear-gradient(90deg,#10B981,#34d399); transition:width .4s ease;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12.5px; color:rgba(255,255,255,.45);">
+              <span>Cuota: ${formatCLP(p.cuota_monto)} cada 2 días</span>
+              <span>Próximo cobro: ${tiempoTxt}</span>
+            </div>
+            ${p.deuda_ciclo > 0 ? `<div class="rc-error visible">Quedó un saldo pendiente de ${formatCLP(p.deuda_ciclo)} de la última cuota por falta de saldo. Se volverá a intentar cobrar en el próximo ciclo.</div>` : ''}
+          </div>`;
+      }
+    }
+
+    async function solicitarPrestamo() {
+      const monto  = document.getElementById('prestamo-monto').value.trim();
+      const razon  = document.getElementById('prestamo-razon').value.trim();
+      const cuotas = document.getElementById('prestamo-cuotas').value.trim();
+      const acepta = document.getElementById('prestamo-acepta').checked;
+      const errEl  = document.getElementById('prestamo-error');
+      const okEl   = document.getElementById('prestamo-success');
+      errEl.classList.remove('visible'); okEl.classList.remove('visible');
+
+      if (!monto || !razon || !cuotas) {
+        errEl.textContent = 'Completa el monto, la razón y las cuotas.';
+        errEl.classList.add('visible'); return;
+      }
+      if (!acepta) {
+        errEl.textContent = 'Debes aceptar el cobro automático de las cuotas para continuar.';
+        errEl.classList.add('visible'); return;
+      }
+
+      const btn = document.getElementById('btn-solicitar-prestamo');
+      btn.disabled = true; btn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('/api/banco?action=prestamo_solicitar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ monto, razon, cuotas, acepta_cobro_auto: acepta }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error al enviar la solicitud.';
+          errEl.classList.add('visible');
+        } else {
+          _prestamoActivo = { ...data.prestamo, proximoCobroMs: null };
+          renderEstadoPrestamo();
+          await cargarHistorialPrestamos();
+        }
+      } catch (e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Solicitar Préstamo`;
+    }
+
+    async function cancelarSolicitudPrestamo(id) {
+      try {
+        const res = await fetch('/api/banco?action=prestamo_cancelar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prestamo_id: id }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const errEl = document.getElementById('prestamo-cancel-error');
+          if (errEl) { errEl.textContent = data.error || 'Error.'; errEl.classList.add('visible'); }
+          return;
+        }
+        _prestamoActivo = null;
+        renderEstadoPrestamo();
+        await cargarHistorialPrestamos();
+      } catch (e) {}
+    }
+
+    async function cargarHistorialPrestamos() {
+      const lista = document.getElementById('prestamo-historial-lista');
+      lista.innerHTML = '<div class="historial-vacio">Cargando...</div>';
+      try {
+        const res = await fetch('/api/banco?action=prestamos_mios');
+        const data = await res.json();
+        const prestamos = (data.prestamos || []).filter(p => p.estado !== 'pendiente' && (!_prestamoActivo || p.id !== _prestamoActivo.id));
+        if (!prestamos.length) {
+          lista.innerHTML = '<div class="historial-vacio">Sin préstamos anteriores</div>';
+          return;
+        }
+        const estadoTxt = { aprobado: 'En curso', pagado: 'Pagado', rechazado: 'Rechazado' };
+        const estadoColor = { aprobado: '#fbbf24', pagado: '#34d399', rechazado: '#ff8080' };
+        lista.innerHTML = prestamos.map(p => `
+          <div class="historial-item" style="cursor:default;">
+            <div class="hi-icono" style="background:rgba(245,158,11,.12); color:${estadoColor[p.estado] || '#fff'};">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="hi-desc">
+              <div class="hi-desc-titulo">${escHtml(p.razon)}</div>
+              <div class="hi-desc-fecha">${estadoTxt[p.estado] || p.estado}${p.estado === 'rechazado' && p.motivo_rechazo ? ' · ' + escHtml(p.motivo_rechazo) : ''}</div>
+            </div>
+            <div class="hi-monto" style="color:${estadoColor[p.estado] || '#fff'};">${formatCLP(p.monto)}</div>
+          </div>
+        `).join('');
+      } catch (e) {
+        lista.innerHTML = '<div class="historial-vacio">Error al cargar historial</div>';
+      }
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
     // ADMIN
     // ══════════════════════════════════════════════════════════════════════════
     function adminTab(tab) {
       document.querySelectorAll('.admin-tab').forEach((t,i) => {
-        const ids = ['usuarios','sueldos'];
+        const ids = ['usuarios','sueldos','prestamos'];
         t.classList.toggle('active', ids[i] === tab);
         document.getElementById(`admin-tab-${ids[i]}`).classList.toggle('visible', ids[i] === tab);
       });
+      if (tab === 'prestamos') cargarAdminPrestamos();
     }
 
     async function cargarAdminUsuarios() {
@@ -430,6 +617,125 @@
       } catch(e) {}
     }
 
+    // ── ADMIN: Préstamos ─────────────────────────────────────────────────────
+    let _adminPrestamoFiltroActual = 'pendiente';
+    let _adminPrestamoRechazoTarget = null;
+
+    function adminPrestamoFiltro(estado, btnEl) {
+      _adminPrestamoFiltroActual = estado;
+      document.querySelectorAll('#admin-tab-prestamos .ta-tab').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      cargarAdminPrestamos();
+    }
+
+    async function actualizarBadgePrestamos() {
+      const badge = document.getElementById('admin-prestamos-badge');
+      if (!badge) return;
+      try {
+        const res = await fetch('/api/banco?action=admin_prestamos&estado=pendiente');
+        const data = await res.json();
+        const n = (data.prestamos || []).length;
+        if (n > 0) {
+          badge.textContent = ` (${n})`;
+          badge.style.display = 'inline';
+          badge.style.color = '#fbbf24';
+        } else {
+          badge.style.display = 'none';
+        }
+      } catch (e) {}
+    }
+
+    async function cargarAdminPrestamos() {
+      const loading = document.getElementById('admin-loading-prestamos');
+      const lista = document.getElementById('admin-prestamos-lista');
+      loading.style.display = 'flex'; lista.innerHTML = '';
+
+      try {
+        const res = await fetch(`/api/banco?action=admin_prestamos&estado=${_adminPrestamoFiltroActual}`);
+        const data = await res.json();
+        loading.style.display = 'none';
+
+        const prestamos = data.prestamos || [];
+        if (!prestamos.length) {
+          lista.innerHTML = '<div class="historial-vacio">No hay préstamos en este estado.</div>';
+          return;
+        }
+
+        lista.innerHTML = prestamos.map(p => {
+          const nombre = p.nombre1 ? `${escHtml(p.nombre1)} ${escHtml(p.apellido1 || '')}` : escHtml(p.discord_id);
+          const pagado = p.monto - p.saldo_pendiente;
+          let extra = '';
+          if (p.estado === 'aprobado' || p.estado === 'pagado') {
+            extra = `<div class="ur-rut" style="margin-top:2px;">Pagado ${formatCLP(pagado)} / ${formatCLP(p.monto)} · cuota ${formatCLP(p.cuota_monto)} c/2 días</div>`;
+          } else if (p.estado === 'rechazado' && p.motivo_rechazo) {
+            extra = `<div class="ur-rut" style="margin-top:2px;">Motivo: ${escHtml(p.motivo_rechazo)}</div>`;
+          }
+          const acciones = p.estado === 'pendiente'
+            ? `<button class="btn-small green" onclick="adminAprobarPrestamo(${p.id})">Aprobar</button>
+               <button class="btn-small red" onclick="abrirModalRechazoPrestamo(${p.id}, '${escHtml(nombre)}')">Rechazar</button>`
+            : '';
+          return `
+            <div class="usuario-row">
+              <div class="ur-info">
+                <div class="ur-nombre">${nombre} <span style="color:rgba(255,255,255,.35); font-weight:500;">· ${p.cuotas_totales} cuotas</span></div>
+                <div class="ur-rut">"${escHtml(p.razon)}"</div>
+                ${extra}
+              </div>
+              <div class="ur-saldo">${formatCLP(p.monto)}</div>
+              <div class="ur-acciones">${acciones}</div>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        loading.style.display = 'none';
+        lista.innerHTML = '<div class="historial-vacio">Error al cargar préstamos.</div>';
+      }
+    }
+
+    async function adminAprobarPrestamo(id) {
+      try {
+        const res = await fetch('/api/banco?action=admin_prestamo_aprobar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prestamo_id: id }),
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.error || 'Error al aprobar el préstamo.'); return; }
+        cargarAdminPrestamos();
+        actualizarBadgePrestamos();
+      } catch (e) {}
+    }
+
+    function abrirModalRechazoPrestamo(id, nombre) {
+      _adminPrestamoRechazoTarget = id;
+      document.getElementById('modal-prestamo-rechazar-label').textContent = `Préstamo de: ${nombre}`;
+      document.getElementById('modal-prestamo-rechazar-motivo').value = '';
+      document.getElementById('modal-prestamo-rechazar-error').classList.remove('visible');
+      document.getElementById('modal-prestamo-rechazar').classList.add('visible');
+    }
+
+    async function adminConfirmarRechazoPrestamo() {
+      const motivo = document.getElementById('modal-prestamo-rechazar-motivo').value.trim();
+      const errEl = document.getElementById('modal-prestamo-rechazar-error');
+      errEl.classList.remove('visible');
+
+      try {
+        const res = await fetch('/api/banco?action=admin_prestamo_rechazar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prestamo_id: _adminPrestamoRechazoTarget, motivo }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.'; errEl.classList.add('visible'); return;
+        }
+        cerrarModal('modal-prestamo-rechazar');
+        cargarAdminPrestamos();
+        actualizarBadgePrestamos();
+      } catch (e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
     function cerrarModal(id) {
       document.getElementById(id).classList.remove('visible');
     }
@@ -449,6 +755,7 @@
       document.getElementById('transfer-form').style.display = 'none';
       document.getElementById('historial-wrap').style.display = 'none';
       document.getElementById('contactos-wrap').style.display = 'none';
+      document.getElementById('prestamo-wrap').style.display = 'none';
     }
 
     async function mostrarContactos() {
