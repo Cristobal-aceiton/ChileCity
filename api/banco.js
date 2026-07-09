@@ -7,6 +7,12 @@ import { ensureStaffLogsSchema, registrarStaffLog } from "../lib/staffLogs.js";
 
 const SALDO_INICIAL = 1000000;
 
+// ── Config de Préstamos ──────────────────────────────────────────────────────
+const PRESTAMO_MONTO_MAX      = 50000000; // tope de monto solicitable
+const PRESTAMO_CUOTAS_MIN     = 1;
+const PRESTAMO_CUOTAS_MAX     = 24;
+const PRESTAMO_INTERVALO_DIAS = 2; // cada cuántos días se cobra automáticamente
+
 function generarNumeroCuenta() {
   const seg = () => Math.floor(Math.random() * 9000 + 1000).toString();
   return `${seg()}-${seg()}-${seg()}-${seg()}`;
@@ -109,6 +115,40 @@ async function initTables(sql) {
       UNIQUE(discord_id, rut)
     )
   `;
+  // Préstamos: el usuario los solicita desde el Banco (monto, razón, cuotas
+  // y aceptación explícita del cobro automático). Quedan en 'pendiente'
+  // hasta que un admin/staff los aprueba o rechaza desde el Panel Admin.
+  // Una vez aprobados, se cobra automáticamente cada PRESTAMO_INTERVALO_DIAS
+  // días: si no hay saldo suficiente, se cobra lo que haya y la diferencia
+  // (deuda_ciclo) se suma al monto a cobrar en el siguiente ciclo.
+  await sql`
+    CREATE TABLE IF NOT EXISTS prestamos (
+      id                   SERIAL PRIMARY KEY,
+      discord_id           TEXT NOT NULL,
+      monto                BIGINT NOT NULL,
+      razon                TEXT NOT NULL,
+      cuotas_totales       INTEGER NOT NULL,
+      cuota_monto          BIGINT NOT NULL,
+      saldo_pendiente      BIGINT NOT NULL,
+      deuda_ciclo          BIGINT NOT NULL DEFAULT 0,
+      cuotas_pagadas       INTEGER NOT NULL DEFAULT 0,
+      acepta_cobro_auto    BOOLEAN NOT NULL DEFAULT FALSE,
+      estado               TEXT NOT NULL DEFAULT 'pendiente', -- pendiente|aprobado|rechazado|pagado
+      ultimo_cobro         TIMESTAMPTZ,
+      revisado_por         TEXT,
+      revisado_por_nombre  TEXT,
+      revisado_en          TIMESTAMPTZ,
+      motivo_rechazo       TEXT,
+      created_at           TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_prestamos_discord_id ON prestamos(discord_id)
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_prestamos_estado ON prestamos(estado)
+  `;
+
   // La tabla "staff" vive originalmente en api/admin.js. Se re-declara acá
   // (misma definición, CREATE TABLE IF NOT EXISTS) porque Admin Banco ahora
   // también es accesible para el rol Staff, no solo para admins.
@@ -205,12 +245,68 @@ export default async function handler(req, res) {
         }
       }
 
+      // ── Cobro automático de cuotas de préstamos aprobados ──────────────────
+      // Mismo patrón que los sueldos: se revisa cada vez que se consulta la
+      // cuenta. Si pasaron >= PRESTAMO_INTERVALO_DIAS desde el último cobro,
+      // se intenta cobrar la cuota (más cualquier deuda arrastrada del ciclo
+      // anterior). Si no alcanza el saldo, se cobra lo que haya y la
+      // diferencia se acumula en "deuda_ciclo" para el próximo intento.
+      const prestamosActivos = await sql`
+        SELECT * FROM prestamos
+        WHERE discord_id = ${targetId} AND estado = 'aprobado' AND saldo_pendiente > 0
+      `;
+
+      for (const prestamo of prestamosActivos) {
+        if (!prestamo.ultimo_cobro) continue;
+        const ultimoCobroP = new Date(prestamo.ultimo_cobro);
+        const diasDesdeP = (ahora - ultimoCobroP) / (1000 * 60 * 60 * 24);
+        if (diasDesdeP < PRESTAMO_INTERVALO_DIAS) continue;
+
+        const saldoPendienteActual = toNumber(prestamo.saldo_pendiente);
+        const deudaCicloActual = toNumber(prestamo.deuda_ciclo);
+        const montoObjetivo = Math.min(toNumber(prestamo.cuota_monto) + deudaCicloActual, saldoPendienteActual);
+        const montoCobrado = Math.max(0, Math.min(saldoActualizado, montoObjetivo));
+        const nuevaDeudaCiclo = montoObjetivo - montoCobrado;
+        const nuevoSaldoPendiente = saldoPendienteActual - montoCobrado;
+        const nuevoEstadoPrestamo = nuevoSaldoPendiente <= 0 ? 'pagado' : 'aprobado';
+        const nuevasCuotasPagadas = Math.min(
+          toNumber(prestamo.cuotas_totales),
+          toNumber(prestamo.cuotas_pagadas) + (nuevaDeudaCiclo === 0 ? 1 : 0)
+        );
+
+        if (montoCobrado > 0) {
+          saldoActualizado -= montoCobrado;
+          await sql`UPDATE banco SET saldo = saldo - ${montoCobrado} WHERE discord_id = ${targetId}`;
+          const descCuota = `Cuota préstamo: ${prestamo.razon}` +
+            (nuevaDeudaCiclo > 0 ? ` (pago parcial, quedan $${nuevaDeudaCiclo.toLocaleString('es-CL')} pendientes)` : '');
+          await sql`
+            INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+            VALUES (${targetId}, 'egreso', ${montoCobrado}, ${descCuota}, ${saldoActualizado})
+          `;
+        }
+
+        await sql`
+          UPDATE prestamos
+          SET saldo_pendiente = ${nuevoSaldoPendiente},
+              deuda_ciclo = ${nuevaDeudaCiclo},
+              cuotas_pagadas = ${nuevasCuotasPagadas},
+              ultimo_cobro = ${ahora.toISOString()},
+              estado = ${nuevoEstadoPrestamo}
+          WHERE id = ${prestamo.id}
+        `;
+      }
+
       // Revisa logros de saldo (3M/20M/50M/100M/1000M) con el saldo final
       await checkLogrosSaldo(sql, targetId, saldoActualizado);
 
       const updated = await sql`SELECT * FROM banco WHERE discord_id = ${targetId}`;
       const sueldosActivos = await sql`
         SELECT * FROM sueldos WHERE discord_id = ${targetId} AND activo = TRUE
+      `;
+      const prestamoActivo = await sql`
+        SELECT * FROM prestamos
+        WHERE discord_id = ${targetId} AND estado IN ('pendiente','aprobado')
+        ORDER BY created_at DESC LIMIT 1
       `;
 
       let proximoSueldo = null;
@@ -227,11 +323,34 @@ export default async function handler(req, res) {
         }
       }
 
+      let prestamoActivoOut = null;
+      if (prestamoActivo.length > 0) {
+        const p = prestamoActivo[0];
+        let proximoCobroMs = null;
+        if (p.estado === 'aprobado' && p.ultimo_cobro) {
+          const fechaProximo = new Date(new Date(p.ultimo_cobro).getTime() + PRESTAMO_INTERVALO_DIAS * 24 * 60 * 60 * 1000);
+          proximoCobroMs = fechaProximo - ahora;
+        }
+        prestamoActivoOut = {
+          id: p.id,
+          monto: toNumber(p.monto),
+          razon: p.razon,
+          cuotas_totales: p.cuotas_totales,
+          cuota_monto: toNumber(p.cuota_monto),
+          saldo_pendiente: toNumber(p.saldo_pendiente),
+          deuda_ciclo: toNumber(p.deuda_ciclo),
+          cuotas_pagadas: p.cuotas_pagadas,
+          estado: p.estado,
+          proximoCobroMs,
+        };
+      }
+
       return res.status(200).json({
         existe: true,
         cuenta: { ...updated[0], saldo: toNumber(updated[0].saldo) },
         sueldos: sueldosActivos.map(s => ({ ...s, monto: toNumber(s.monto) })),
         proximoSueldo,
+        prestamoActivo: prestamoActivoOut,
       });
     }
 
@@ -342,6 +461,183 @@ export default async function handler(req, res) {
       return res.status(200).json({
         transacciones: rows.map(t => ({ ...t, monto: toNumber(t.monto), saldo_after: toNumber(t.saldo_after) })),
       });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // PRÉSTAMOS
+    // ══════════════════════════════════════════════════════════════════════
+
+    // ── POST: solicitar préstamo ─────────────────────────────────────────────
+    if (req.method === "POST" && action === "prestamo_solicitar") {
+      const cuenta = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      if (cuenta.length === 0)
+        return res.status(404).json({ error: "No tienes cuenta bancaria" });
+
+      let { monto, razon, cuotas, acepta_cobro_auto } = req.body || {};
+      const montoNum = parseMonto(monto);
+      const cuotasNum = parseMonto(cuotas);
+      razon = (razon || "").toString().trim().slice(0, 200);
+
+      if (montoNum === null || montoNum <= 0)
+        return res.status(400).json({ error: "Ingresa un monto válido." });
+      if (montoNum > PRESTAMO_MONTO_MAX)
+        return res.status(400).json({ error: `El monto máximo por préstamo es $${PRESTAMO_MONTO_MAX.toLocaleString('es-CL')}.` });
+      if (!razon)
+        return res.status(400).json({ error: "Indica la razón del préstamo." });
+      if (cuotasNum === null || cuotasNum < PRESTAMO_CUOTAS_MIN || cuotasNum > PRESTAMO_CUOTAS_MAX)
+        return res.status(400).json({ error: `Las cuotas deben ser entre ${PRESTAMO_CUOTAS_MIN} y ${PRESTAMO_CUOTAS_MAX}.` });
+      if (acepta_cobro_auto !== true)
+        return res.status(400).json({ error: "Debes aceptar el cobro automático de las cuotas para solicitar el préstamo." });
+
+      // Solo se permite un préstamo activo (pendiente o aprobado sin pagar) a la vez
+      const existente = await sql`
+        SELECT id FROM prestamos WHERE discord_id = ${discord_id} AND estado IN ('pendiente','aprobado')
+      `;
+      if (existente.length > 0)
+        return res.status(409).json({ error: "Ya tienes un préstamo pendiente o activo. Debes terminar de pagarlo (o esperar la respuesta del admin) antes de pedir otro." });
+
+      const cuotaMonto = Math.ceil(montoNum / cuotasNum);
+
+      const rows = await sql`
+        INSERT INTO prestamos (discord_id, monto, razon, cuotas_totales, cuota_monto, saldo_pendiente, acepta_cobro_auto, estado)
+        VALUES (${discord_id}, ${montoNum}, ${razon}, ${cuotasNum}, ${cuotaMonto}, ${montoNum}, TRUE, 'pendiente')
+        RETURNING *
+      `;
+
+      return res.status(201).json({
+        ok: true,
+        prestamo: { ...rows[0], monto: toNumber(rows[0].monto), cuota_monto: toNumber(rows[0].cuota_monto), saldo_pendiente: toNumber(rows[0].saldo_pendiente) },
+      });
+    }
+
+    // ── GET: mis préstamos ───────────────────────────────────────────────────
+    if (req.method === "GET" && action === "prestamos_mios") {
+      const rows = await sql`
+        SELECT * FROM prestamos WHERE discord_id = ${discord_id}
+        ORDER BY created_at DESC LIMIT 30
+      `;
+      return res.status(200).json({
+        prestamos: rows.map(p => ({
+          ...p,
+          monto: toNumber(p.monto),
+          cuota_monto: toNumber(p.cuota_monto),
+          saldo_pendiente: toNumber(p.saldo_pendiente),
+          deuda_ciclo: toNumber(p.deuda_ciclo),
+        })),
+      });
+    }
+
+    // ── POST: cancelar solicitud de préstamo (solo si sigue pendiente) ──────
+    if (req.method === "POST" && action === "prestamo_cancelar") {
+      const { prestamo_id } = req.body || {};
+      const rows = await sql`
+        SELECT * FROM prestamos WHERE id = ${prestamo_id} AND discord_id = ${discord_id}
+      `;
+      if (rows.length === 0) return res.status(404).json({ error: "Préstamo no encontrado." });
+      if (rows[0].estado !== 'pendiente')
+        return res.status(400).json({ error: "Solo puedes cancelar una solicitud que aún está pendiente de revisión." });
+
+      await sql`UPDATE prestamos SET estado = 'rechazado', motivo_rechazo = 'Cancelado por el usuario', revisado_en = NOW() WHERE id = ${prestamo_id}`;
+      return res.status(200).json({ ok: true });
+    }
+
+    // ── ADMIN: listar préstamos ──────────────────────────────────────────────
+    if (req.method === "GET" && action === "admin_prestamos") {
+      if (!puedeAdminBanco)
+        return res.status(403).json({ error: "No autorizado" });
+
+      const { estado: estadoFiltro } = req.query;
+      const rows = estadoFiltro
+        ? await sql`
+            SELECT p.*, d.nombre1, d.apellido1, d.rut
+            FROM prestamos p
+            LEFT JOIN dni d ON p.discord_id = d.discord_id
+            WHERE p.estado = ${estadoFiltro}
+            ORDER BY p.created_at DESC
+            LIMIT 100
+          `
+        : await sql`
+            SELECT p.*, d.nombre1, d.apellido1, d.rut
+            FROM prestamos p
+            LEFT JOIN dni d ON p.discord_id = d.discord_id
+            ORDER BY p.created_at DESC
+            LIMIT 100
+          `;
+
+      return res.status(200).json({
+        prestamos: rows.map(p => ({
+          ...p,
+          monto: toNumber(p.monto),
+          cuota_monto: toNumber(p.cuota_monto),
+          saldo_pendiente: toNumber(p.saldo_pendiente),
+          deuda_ciclo: toNumber(p.deuda_ciclo),
+        })),
+      });
+    }
+
+    // ── ADMIN: aprobar préstamo ──────────────────────────────────────────────
+    if (req.method === "POST" && action === "admin_prestamo_aprobar") {
+      if (!puedeAdminBanco)
+        return res.status(403).json({ error: "No autorizado" });
+
+      const { prestamo_id } = req.body || {};
+      const rows = await sql`SELECT * FROM prestamos WHERE id = ${prestamo_id}`;
+      if (rows.length === 0) return res.status(404).json({ error: "Préstamo no encontrado." });
+      const prestamo = rows[0];
+      if (prestamo.estado !== 'pendiente')
+        return res.status(400).json({ error: "Este préstamo ya fue revisado." });
+
+      const cuentaDest = await sql`SELECT * FROM banco WHERE discord_id = ${prestamo.discord_id}`;
+      if (cuentaDest.length === 0) return res.status(404).json({ error: "El usuario ya no tiene cuenta bancaria." });
+
+      const montoNum = toNumber(prestamo.monto);
+      const nuevoSaldo = toNumber(cuentaDest[0].saldo) + montoNum;
+
+      await sql`UPDATE banco SET saldo = ${nuevoSaldo} WHERE discord_id = ${prestamo.discord_id}`;
+      await sql`
+        INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+        VALUES (${prestamo.discord_id}, 'ingreso', ${montoNum}, ${'Préstamo aprobado: ' + prestamo.razon}, ${nuevoSaldo})
+      `;
+      await sql`
+        UPDATE prestamos
+        SET estado = 'aprobado', ultimo_cobro = NOW(), revisado_por = ${discord_id},
+            revisado_por_nombre = ${discord_name}, revisado_en = NOW()
+        WHERE id = ${prestamo_id}
+      `;
+
+      await checkLogrosSaldo(sql, prestamo.discord_id, nuevoSaldo);
+
+      const etiquetaPrestamo = await etiquetaUsuario(sql, prestamo.discord_id);
+      await registrarStaffLog(sql, discord_id, discord_name, "PRESTAMO_APROBAR",
+        `Aprobó un préstamo de $${montoNum.toLocaleString('es-CL')} (${prestamo.cuotas_totales} cuotas) a ${etiquetaPrestamo} — "${prestamo.razon}"`);
+
+      return res.status(200).json({ ok: true, nuevoSaldo });
+    }
+
+    // ── ADMIN: rechazar préstamo ─────────────────────────────────────────────
+    if (req.method === "POST" && action === "admin_prestamo_rechazar") {
+      if (!puedeAdminBanco)
+        return res.status(403).json({ error: "No autorizado" });
+
+      const { prestamo_id, motivo } = req.body || {};
+      const rows = await sql`SELECT * FROM prestamos WHERE id = ${prestamo_id}`;
+      if (rows.length === 0) return res.status(404).json({ error: "Préstamo no encontrado." });
+      const prestamo = rows[0];
+      if (prestamo.estado !== 'pendiente')
+        return res.status(400).json({ error: "Este préstamo ya fue revisado." });
+
+      await sql`
+        UPDATE prestamos
+        SET estado = 'rechazado', motivo_rechazo = ${(motivo || '').toString().trim().slice(0, 200) || null},
+            revisado_por = ${discord_id}, revisado_por_nombre = ${discord_name}, revisado_en = NOW()
+        WHERE id = ${prestamo_id}
+      `;
+
+      const etiquetaRechazo = await etiquetaUsuario(sql, prestamo.discord_id);
+      await registrarStaffLog(sql, discord_id, discord_name, "PRESTAMO_RECHAZAR",
+        `Rechazó un préstamo de $${toNumber(prestamo.monto).toLocaleString('es-CL')} a ${etiquetaRechazo}${motivo ? ` — "${motivo}"` : ""}`);
+
+      return res.status(200).json({ ok: true });
     }
 
     // ── GET: top 10 más ricos ────────────────────────────────────────────────

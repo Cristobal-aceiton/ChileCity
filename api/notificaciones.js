@@ -156,7 +156,7 @@ export default async function handler(req, res) {
 
     const LIMITE_POR_TIPO = 12;
 
-    const [multas, transferencias, apuestas, antecedentes, avisosAdmin] = await Promise.all([
+    const [multas, transferencias, apuestas, antecedentes, avisosAdmin, prestamos] = await Promise.all([
       sql`
         SELECT id, motivo, valor, estado, created_at
         FROM multas
@@ -196,6 +196,13 @@ export default async function handler(req, res) {
         FROM notif_admin
         WHERE destinatario IS NULL OR destinatario = ${discordId}
         ORDER BY created_at DESC
+        LIMIT ${LIMITE_POR_TIPO}
+      `,
+      sql`
+        SELECT id, monto, razon, estado, motivo_rechazo, revisado_en
+        FROM prestamos
+        WHERE discord_id = ${discordId} AND estado IN ('aprobado','rechazado') AND revisado_en IS NOT NULL
+        ORDER BY revisado_en DESC
         LIMIT ${LIMITE_POR_TIPO}
       `,
     ]);
@@ -245,6 +252,20 @@ export default async function handler(req, res) {
         detalle: `${an.motivo}` + (an.tiempo_carcel ? ` · ${an.tiempo_carcel}` : ""),
         fecha: an.created_at,
         icono: "🚓",
+      });
+    }
+
+    for (const p of prestamos) {
+      const aprobado = p.estado === "aprobado";
+      items.push({
+        tipo: "prestamo",
+        id: `prestamo-${p.id}`,
+        titulo: aprobado ? "¡Préstamo aprobado!" : "Préstamo rechazado",
+        detalle: aprobado
+          ? `${p.razon} · +$${toNumber(p.monto).toLocaleString("es-CL")}`
+          : `${p.razon}${p.motivo_rechazo ? ` · ${p.motivo_rechazo}` : ""}`,
+        fecha: p.revisado_en,
+        icono: aprobado ? "🏦" : "🚫",
       });
     }
 
