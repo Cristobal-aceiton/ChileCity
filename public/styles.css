@@ -787,3 +787,33 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .clf-monto.gano{ color:#00e701; }
 .clf-monto.perdio{ color:#ff6b6b; }
 @media (max-width:540px){ .plinko-canvas{ height:280px; } .limbo-mult-display{ font-size:40px; } }
+
+/* ── Top 10 Más Ricos (banco) ─────────────────────────────────────────── */
+.tr-modal{ max-width:min(480px,90vw); }
+.tr-titulo{ color:#fff; }
+.tr-titulo svg{ filter:drop-shadow(0 0 8px rgba(212,175,55,.5)); }
+.tr-lista{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow-y:auto; padding-right:4px; }
+.tr-lista::-webkit-scrollbar{ width:6px; }
+.tr-lista::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.15); border-radius:10px; }
+.tr-row{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); transition:background .2s, transform .2s; animation:fadeUp .4s var(--ease) both; }
+.tr-row:hover{ background:rgba(255,255,255,.06); }
+.tr-row.tr-yo{ border-color:rgba(88,101,242,.5); background:rgba(88,101,242,.08); box-shadow:0 0 0 1px rgba(88,101,242,.2) inset; }
+.tr-row.tr-top1{ background:linear-gradient(135deg,rgba(212,175,55,.14),rgba(212,175,55,.04)); border-color:rgba(212,175,55,.35); }
+.tr-pos{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+.tr-pos.gold{ background:rgba(212,175,55,.2); color:#f5d06b; border:1px solid rgba(212,175,55,.35); }
+.tr-pos.silver{ background:rgba(192,192,192,.15); color:#d4d4d4; border:1px solid rgba(192,192,192,.3); }
+.tr-pos.bronze{ background:rgba(205,127,50,.15); color:#cd7f32; border:1px solid rgba(205,127,50,.3); }
+.tr-pos.other{ background:rgba(255,255,255,.05); color:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.08); }
+.tr-avatar{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; font-weight:800; color:rgba(255,255,255,.65); border:1px solid rgba(255,255,255,.1); }
+.tr-row.tr-top1 .tr-avatar{ border-color:rgba(212,175,55,.5); color:#f5d06b; box-shadow:0 0 14px rgba(212,175,55,.25); }
+.tr-row.tr-top2 .tr-avatar{ border-color:rgba(192,192,192,.5); color:#d4d4d4; }
+.tr-row.tr-top3 .tr-avatar{ border-color:rgba(205,127,50,.5); color:#e0a168; }
+.tr-info{ flex:1; min-width:0; }
+.tr-nombre{ font-size:13.5px; font-weight:700; color:rgba(255,255,255,.9); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tr-yo .tr-nombre::after{ content:'Tú'; margin-left:8px; font-size:10px; font-weight:800; letter-spacing:.5px; color:#a5b4fc; background:rgba(88,101,242,.18); border:1px solid rgba(88,101,242,.3); border-radius:20px; padding:1px 8px; text-transform:uppercase; }
+.tr-saldo{ font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:700; color:var(--green); white-space:nowrap; flex-shrink:0; }
+.tr-empty{ text-align:center; color:rgba(255,255,255,.3); font-size:13px; padding:24px 0; }
+.tr-mi-posicion{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding:12px 16px; border-radius:12px; background:rgba(255,255,255,.03); border:1px dashed rgba(255,255,255,.15); }
+.tr-mp-label{ font-size:11px; color:rgba(255,255,255,.4); font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+.tr-mp-valor{ font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:800; color:#fff; }
+@media (max-width:480px){ .tr-nombre{ max-width:120px; } .tr-yo .tr-nombre::after{ display:none; } }

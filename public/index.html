@@ -590,6 +590,10 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Contactos</span>
           </button>
+          <button class="bank-action-btn" style="border-color:rgba(212,175,55,0.35); background:rgba(212,175,55,0.08);" onclick="abrirModalTopRicos()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/></svg>
+            <span>Top Ricos</span>
+          </button>
         </div>
 
         <!-- Formulario transferencia (oculto) -->
@@ -691,6 +695,26 @@
           Listo
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Top 10 Más Ricos -->
+  <div class="admin-modal-overlay" id="modal-top-ricos">
+    <div class="admin-modal tr-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-top-ricos')">✕</button>
+      <h3 class="tr-titulo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/></svg>
+        Top 10 Más Ricos
+      </h3>
+      <div class="tr-lista" id="tr-lista">
+        <div class="skeleton-wrap">
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+        </div>
+      </div>
+      <div class="tr-mi-posicion" id="tr-mi-posicion" style="display:none;"></div>
     </div>
   </div>
 
