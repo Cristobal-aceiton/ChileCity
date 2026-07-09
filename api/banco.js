@@ -344,6 +344,51 @@ export default async function handler(req, res) {
       });
     }
 
+    // ── GET: top 10 más ricos ────────────────────────────────────────────────
+    // Ranking público (cualquier usuario con sesión puede verlo, no requiere
+    // ser admin/staff). Se trae el top 10 por saldo y, aparte, la posición
+    // del usuario que consulta (aunque no esté en el top 10) para mostrarla
+    // en el footer del ranking.
+    if (req.method === "GET" && action === "top10") {
+      const top = await sql`
+        SELECT discord_id, saldo FROM banco ORDER BY saldo DESC LIMIT 10
+      `;
+
+      // Nombres de Discord vía la tabla dni (si no existe o falla, se sigue
+      // sin nombres: el front cae a "Ciudadano" + discord_id truncado).
+      let nombresPorId = {};
+      try {
+        const ids = top.map(r => r.discord_id);
+        if (ids.length > 0) {
+          const dnis = await sql`
+            SELECT discord_id, discord_username FROM dni WHERE discord_id = ANY(${ids})
+          `;
+          nombresPorId = Object.fromEntries(dnis.map(d => [d.discord_id, d.discord_username]));
+        }
+      } catch {}
+
+      const ranking = top.map((r, i) => ({
+        posicion: i + 1,
+        discord_id: r.discord_id,
+        discord_username: nombresPorId[r.discord_id] || null,
+        saldo: toNumber(r.saldo),
+      }));
+
+      // Posición del usuario que consulta (para mostrar "Tu posición: #47"
+      // si no aparece en el top 10).
+      let miPosicion = null;
+      const yaEstaEnTop = ranking.some(r => r.discord_id === discord_id);
+      if (!yaEstaEnTop) {
+        const cuenta = await sql`SELECT saldo FROM banco WHERE discord_id = ${discord_id}`;
+        if (cuenta.length > 0) {
+          const mejores = await sql`SELECT COUNT(*)::int AS n FROM banco WHERE saldo > ${cuenta[0].saldo}`;
+          miPosicion = { posicion: mejores[0].n + 1, saldo: toNumber(cuenta[0].saldo) };
+        }
+      }
+
+      return res.status(200).json({ ranking, miPosicion });
+    }
+
     // ── ADMIN: listar usuarios con cuenta ────────────────────────────────────
     if (req.method === "GET" && action === "admin_usuarios") {
       if (!puedeAdminBanco)
