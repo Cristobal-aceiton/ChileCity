@@ -438,6 +438,9 @@
     document.getElementById('modal-editar-prod').addEventListener('click', function(e) {
       if (e.target === this) cerrarModal('modal-editar-prod');
     });
+    document.getElementById('modal-top-ricos').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal('modal-top-ricos');
+    });
 
     // ══════════════════════════════════════════════════════════════════════════
 
@@ -545,4 +548,72 @@
       document.getElementById('transfer-form').style.display = 'flex';
       document.getElementById('transfer-rut').value = rut;
       document.getElementById('transfer-monto').focus();
+    }
+
+    // ── Top 10 Más Ricos ──────────────────────────────────────────────────────
+    function claseRango(pos) {
+      if (pos === 1) return 'gold';
+      if (pos === 2) return 'silver';
+      if (pos === 3) return 'bronze';
+      return 'other';
+    }
+
+    function iniciales(nombre) {
+      if (!nombre) return '?';
+      return nombre.trim().charAt(0).toUpperCase();
+    }
+
+    async function abrirModalTopRicos() {
+      document.getElementById('modal-top-ricos').classList.add('visible');
+      document.getElementById('tr-mi-posicion').style.display = 'none';
+      const lista = document.getElementById('tr-lista');
+      lista.innerHTML = `
+        <div class="skeleton-wrap">
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+        </div>`;
+
+      try {
+        const res = await fetch(`/api/banco?action=top10&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        const ranking = data.ranking || [];
+
+        if (ranking.length === 0) {
+          lista.innerHTML = '<div class="tr-empty">Todavía no hay cuentas bancarias registradas.</div>';
+          return;
+        }
+
+        lista.innerHTML = ranking.map((r, i) => {
+          const esYo = r.discord_id === currentUser.id;
+          const nombre = r.discord_username ? `@${escHtml(r.discord_username)}` : `Ciudadano ${r.discord_id.slice(-4)}`;
+          return `
+            <div class="tr-row ${esYo ? 'tr-yo' : ''} tr-top${r.posicion <= 3 ? r.posicion : ''}" style="animation-delay:${i * 40}ms;">
+              <div class="tr-pos ${claseRango(r.posicion)}">${r.posicion}</div>
+              <div class="tr-avatar">${iniciales(r.discord_username || 'C')}</div>
+              <div class="tr-info">
+                <div class="tr-nombre">${nombre}</div>
+              </div>
+              <div class="tr-saldo" id="tr-monto-${i}">$0</div>
+            </div>`;
+        }).join('');
+
+        ranking.forEach((r, i) => {
+          const el = document.getElementById(`tr-monto-${i}`);
+          ccAnimateNumber(el, r.saldo, formatCLP, 700 + i * 60);
+        });
+
+        const mp = document.getElementById('tr-mi-posicion');
+        if (data.miPosicion) {
+          mp.style.display = 'flex';
+          mp.innerHTML = `
+            <span class="tr-mp-label">Tu posición</span>
+            <span class="tr-mp-valor">#${data.miPosicion.posicion} · ${formatCLP(data.miPosicion.saldo)}</span>`;
+        } else {
+          mp.style.display = 'none';
+        }
+      } catch (e) {
+        lista.innerHTML = '<div class="tr-empty">Error al cargar el ranking.</div>';
+      }
     }
