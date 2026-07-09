@@ -534,7 +534,7 @@
       // Panel de notificaciones
       if (typeof notifCerrar === 'function') notifCerrar();
       // Modales de banco/admin (clase admin-modal-overlay con toggle 'visible')
-      ['modal-saldo', 'modal-reset', 'modal-editar-prod', 'modal-recibo-transferencia'].forEach(id => {
+      ['modal-saldo', 'modal-reset', 'modal-editar-prod', 'modal-recibo-transferencia', 'modal-top-ricos'].forEach(id => {
         const el = document.getElementById(id);
         if (el && el.classList.contains('visible')) el.classList.remove('visible');
       });
@@ -651,20 +651,53 @@
         if (res.status === 404) {
           balEl.textContent = '—';
           balSubEl.textContent = 'Aún no tienes cuenta bancaria';
-          return;
-        }
-        const data = await res.json();
-        if (res.ok && data.cuenta) {
-          currentCuenta = data.cuenta;
-          ccAnimateNumber(balEl, data.cuenta.saldo, formatCLP);
-          balSubEl.textContent = `Cuenta N° ${data.cuenta.numero_cuenta}`;
         } else {
-          balEl.textContent = '—';
-          balSubEl.textContent = 'No se pudo cargar el saldo';
+          const data = await res.json();
+          if (res.ok && data.cuenta) {
+            currentCuenta = data.cuenta;
+            ccAnimateNumber(balEl, data.cuenta.saldo, formatCLP);
+            balSubEl.textContent = `Cuenta N° ${data.cuenta.numero_cuenta}`;
+          } else {
+            balEl.textContent = '—';
+            balSubEl.textContent = 'No se pudo cargar el saldo';
+          }
         }
       } catch (e) {
         balEl.textContent = '—';
         balSubEl.textContent = 'Sin conexión';
+      }
+
+      cargarTopRicosHero();
+    }
+
+    // ── Mini-ranking Top Ricos en la card de primera plana ────────────────────
+    // Muestra solo el top 3 (vista rápida); el detalle completo (top 10 +
+    // "tu posición") vive en el modal que abre abrirModalTopRicos() (banco.js).
+    async function cargarTopRicosHero() {
+      const lista = document.getElementById('top-hero-lista');
+      if (!lista || !currentUser?.id) return;
+      try {
+        const res = await fetch(`/api/banco?action=top10&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        const top3 = (data.ranking || []).slice(0, 3);
+
+        if (top3.length === 0) {
+          lista.innerHTML = '<div class="top-hero-empty">Aún no hay cuentas bancarias</div>';
+          return;
+        }
+
+        const claseRango = (pos) => pos === 1 ? 'gold' : pos === 2 ? 'silver' : 'bronze';
+        lista.innerHTML = top3.map(r => {
+          const nombre = r.discord_username ? `@${escHtml(r.discord_username)}` : `Ciudadano ${r.discord_id.slice(-4)}`;
+          return `
+            <div class="top-hero-row">
+              <div class="top-hero-pos ${claseRango(r.posicion)}">${r.posicion}</div>
+              <div class="top-hero-nombre">${nombre}</div>
+              <div class="top-hero-monto">${formatCLP(r.saldo)}</div>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        lista.innerHTML = '<div class="top-hero-empty">Error al cargar</div>';
       }
     }
 
