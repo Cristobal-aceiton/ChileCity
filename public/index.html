@@ -607,6 +607,10 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Contactos</span>
           </button>
+          <button class="bank-action-btn" style="border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.08);" onclick="mostrarPrestamo()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Préstamo</span>
+          </button>
         </div>
 
         <!-- Formulario transferencia (oculto) -->
@@ -672,6 +676,53 @@
           </div>
           <div class="historial-lista" id="contactos-lista">
             <div class="historial-vacio">Cargando contactos...</div>
+          </div>
+        </div>
+
+        <!-- Panel Préstamo -->
+        <div class="historial-wrap" id="prestamo-wrap" style="display:none;">
+          <div class="historial-titulo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Préstamo
+          </div>
+
+          <!-- Formulario de solicitud (se muestra si no hay préstamo activo) -->
+          <div class="rc-form" id="prestamo-form" style="display:none; gap:16px;">
+            <p style="margin-top:0;">Elige el monto, cuéntanos para qué lo necesitas y en cuántas cuotas quieres pagarlo. Un administrador debe aprobar la solicitud antes de que recibas el dinero.</p>
+            <div class="form-group">
+              <label>Monto solicitado (CLP)</label>
+              <input type="number" id="prestamo-monto" placeholder="Ej: 500000" min="1" oninput="actualizarPreviewCuota()">
+            </div>
+            <div class="form-group">
+              <label>Razón del préstamo</label>
+              <input type="text" id="prestamo-razon" placeholder="Ej: Comprar un auto" maxlength="200">
+            </div>
+            <div class="form-group">
+              <label>Cantidad de cuotas</label>
+              <input type="number" id="prestamo-cuotas" placeholder="Ej: 4" min="1" max="24" oninput="actualizarPreviewCuota()">
+            </div>
+            <div id="prestamo-preview" style="display:none; font-size:12.5px; color:rgba(255,255,255,.65); background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.22); border-radius:10px; padding:12px 14px; line-height:1.6;"></div>
+            <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:12.5px; color:rgba(255,255,255,.6); line-height:1.55; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px 14px;">
+              <input type="checkbox" id="prestamo-acepta" style="margin-top:2px; width:16px; height:16px; accent-color:var(--green); flex-shrink:0; cursor:pointer;">
+              <span>Acepto que las cuotas se cobren <strong style="color:rgba(255,255,255,.85);">automáticamente de mi saldo cada 2 días</strong>. Si no tengo saldo suficiente en ese momento, se cobrará lo que tenga disponible y la diferencia se sumará al próximo cobro.</span>
+            </label>
+            <div class="rc-error" id="prestamo-error"></div>
+            <div class="rc-success" id="prestamo-success"></div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn-green" id="btn-solicitar-prestamo" onclick="solicitarPrestamo()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Solicitar Préstamo
+              </button>
+            </div>
+          </div>
+
+          <!-- Estado del préstamo activo/pendiente -->
+          <div id="prestamo-estado-card" style="display:none;"></div>
+
+          <!-- Historial de préstamos pasados -->
+          <div id="prestamo-historial-wrap" style="margin-top:18px;">
+            <div style="font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,.35); margin-bottom:10px;">Historial de préstamos</div>
+            <div class="historial-lista" id="prestamo-historial-lista"></div>
           </div>
         </div>
 
@@ -748,6 +799,7 @@
       <div class="admin-tabs">
         <button class="admin-tab active" onclick="adminTab('usuarios')">Usuarios</button>
         <button class="admin-tab" onclick="adminTab('sueldos')">Sueldos</button>
+        <button class="admin-tab" onclick="adminTab('prestamos')">Préstamos<span id="admin-prestamos-badge" style="display:none;"></span></button>
       </div>
 
       <div class="admin-panel" style="width:100%;">
@@ -798,9 +850,48 @@
           </div>
         </div>
 
+        <!-- Tab Préstamos -->
+        <div class="admin-seccion" id="admin-tab-prestamos">
+          <div class="tienda-admin-tabs" style="margin-bottom:0;">
+            <button class="ta-tab active" onclick="adminPrestamoFiltro('pendiente', this)">Pendientes</button>
+            <button class="ta-tab" onclick="adminPrestamoFiltro('aprobado', this)">Aprobados</button>
+            <button class="ta-tab" onclick="adminPrestamoFiltro('pagado', this)">Pagados</button>
+            <button class="ta-tab" onclick="adminPrestamoFiltro('rechazado', this)">Rechazados</button>
+          </div>
+          <div class="rc-loading" id="admin-loading-prestamos">
+            <div class="spinner"></div>
+            <span>Cargando préstamos...</span>
+          </div>
+          <div id="admin-prestamos-lista"></div>
+        </div>
+
       </div>
     </div>
   </section>
+
+  <!-- MODAL: rechazar préstamo -->
+  <div class="admin-modal-overlay" id="modal-prestamo-rechazar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-prestamo-rechazar')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Rechazar Préstamo
+      </h3>
+      <p id="modal-prestamo-rechazar-label" style="color:rgba(255,255,255,.5); font-size:13px;"></p>
+      <div class="form-group">
+        <label>Motivo (opcional)</label>
+        <input type="text" id="modal-prestamo-rechazar-motivo" placeholder="Ej: Ya tiene deudas pendientes" maxlength="200">
+      </div>
+      <div class="rc-error" id="modal-prestamo-rechazar-error"></div>
+      <div class="modal-actions">
+        <button class="btn-crear" onclick="adminConfirmarRechazoPrestamo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Rechazar
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-prestamo-rechazar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: ajustar saldo -->
   <div class="admin-modal-overlay" id="modal-saldo">
@@ -2912,7 +3003,7 @@
   <script defer src="/js/notificaciones.js?v=29"></script>
   <script defer src="/js/pull-to-refresh.js?v=29"></script>
   <script defer src="/js/registro-civil.js?v=29"></script>
-  <script defer src="/js/banco.js?v=29"></script>
+  <script defer src="/js/banco.js?v=30"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script defer src="/js/tienda.js?v=29"></script>
   <script defer src="/js/vehiculos.js?v=29"></script>
