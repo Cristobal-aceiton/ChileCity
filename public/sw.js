@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v32";
+const CACHE_VERSION = "v33";
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
@@ -84,20 +84,20 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Helper: red con timeout duro.
+// Helper: red con timeout duro. Usa AbortController de verdad (no un simple
+// setTimeout que "abandona" la promesa) para no dejar fetches colgados, y
+// para no reventar si `resolve`/`reject` ya se llamó una vez.
 function fetchConTimeout(request, ms) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("timeout de red")), ms);
-    fetch(request, { cache: "no-store" }).then(
-      (res) => { clearTimeout(timer); resolve(res); },
-      (err) => { clearTimeout(timer); reject(err); }
-    );
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return fetch(request, { cache: "no-store", signal: controller.signal }).finally(() =>
+    clearTimeout(timer)
+  );
 }
 
 // Network-first: intenta red primero (con timeout), cae a cache si falla.
-// Se usa para HTML y para estáticos versionados (?v=) que aún no están
-// en cache (la primera vez que se ve esa versión).
+// Tiene sentido cortar acá porque SIEMPRE hay un fallback razonable (el HTML
+// cacheado de la versión anterior).
 async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
@@ -114,11 +114,27 @@ async function networkFirst(request) {
 // Cache-first: para estáticos versionados (?v=N). Como la URL cambia cada
 // vez que cambia el contenido, "ya está en cache" == "es exactamente esta
 // versión" — no hay riesgo de servir algo desactualizado.
+//
+// ⚠️ IMPORTANTE: acá NO se usa timeout. Si hay un cache-miss (primera vez que
+// se pide esta versión, típicamente recién hecho un deploy) no existe ningún
+// fallback razonable — el archivo viejo ya no sirve porque es otra versión.
+// Antes esto usaba el mismo timeout "duro" de 4s que networkFirst: en una
+// conexión de celular lenta, si la descarga tardaba justo un poco más de 4s,
+// la promesa se rechazaba por timeout pero el fetch real seguía en curso en
+// segundo plano — y cuando por fin respondía (incluso con éxito), llamaba a
+// resolve() sobre una promesa que ya había sido rechazada, así que esa
+// respuesta se descartaba y NUNCA se guardaba en cache. El resultado: justo
+// ese archivo (un CSS o algún JS puntual) fallaba esa vez sin reintento,
+// mientras que el resto de los archivos —que sí alcanzaron a bajar a
+// tiempo— se veían bien. Eso es lo que se sentía como "el CSS no se
+// actualiza en algunas partes": no era una versión vieja, era una descarga
+// que fallaba en seco. Ahora simplemente se espera a la red, sin cortar
+// antes de tiempo.
 async function cacheFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
   if (cached) return cached;
-  const res = await fetchConTimeout(request, NETWORK_TIMEOUT_MS);
+  const res = await fetch(request, { cache: "no-store" });
   if (res.ok) cache.put(request, res.clone());
   return res;
 }
