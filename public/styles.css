@@ -989,7 +989,7 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .bank-card-flip{position:relative;width:100%;max-width:440px;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.4,.2,.2,1);cursor:pointer;}
 .bank-card-flip.flipped{transform:rotateY(180deg);}
 .bank-card-flip .bank-card{backface-visibility:hidden;-webkit-backface-visibility:hidden;width:100%;max-width:none;margin:0;}
-.bank-card-flip .bank-card-back{position:absolute;inset:0;transform:rotateY(180deg);display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;}
+#banco-screen .bdc-card-stage .bank-card-flip .bank-card-back{position:absolute!important;inset:0;transform:rotateY(180deg)!important;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;}
 .bank-card-back-banda{width:100%;height:42px;background:repeating-linear-gradient(180deg,#0c0c10,#0c0c10 2px,#18181d 2px,#18181d 4px);margin-top:26px;}
 .bank-card-back-firma{margin:22px 24px 0;display:flex;align-items:stretch;gap:10px;}
 .bank-card-back-firma-strip{flex:1;background:repeating-linear-gradient(135deg,#efeae0,#efeae0 6px,#e5ded0 6px,#e5ded0 12px);border-radius:4px;padding:8px 14px;display:flex;align-items:center;min-height:34px;}
