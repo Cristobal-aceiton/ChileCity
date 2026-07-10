@@ -20,7 +20,7 @@
     }
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','concesionario-screen','mis-autos-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','mercado-screen','concesionario-screen','mis-autos-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
 
     // ── Indicador de sección activa ──────────────────────────────────────────
     let _sectionIndicatorTimer = null;
