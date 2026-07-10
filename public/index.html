@@ -275,6 +275,13 @@
           <div><div class="card-title">Inventario</div><div class="card-sub">Armas, licencias y otros objetos</div></div>
           <span class="card-arrow">›</span>
         </div>
+        <div class="nav-card" onclick="abrirSeccion('mercado-screen'); cargarMercado()" style="--card-color:#fb923c; --card-glow:rgba(251,146,60,0.15)">
+          <div class="card-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="M9 13a3 3 0 0 0 6 0"/></svg>
+          </div>
+          <div><div class="card-title">Mercado</div><div class="card-sub">Compra y vende con otros ciudadanos</div></div>
+          <span class="card-arrow">›</span>
+        </div>
         <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen'); cargarPerfilPublico()">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 11h4M20 9v4" stroke-width="1.8"/></svg>
@@ -1126,6 +1133,98 @@
       </div>
     </div>
   </section>
+
+  <!-- MERCADO -->
+  <section class="screen seccion-screen" id="mercado-screen">
+    <div class="seccion-container" style="max-width:860px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDashboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title" style="color:#fb923c">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="M9 13a3 3 0 0 0 6 0"/></svg>
+          Mercado
+        </div>
+      </div>
+
+      <div class="tienda-admin-tabs">
+        <button class="ta-tab active" onclick="mercadoSetTab('explorar', this)">Explorar</button>
+        <button class="ta-tab" onclick="mercadoSetTab('mis-publicaciones', this)">Mis Publicaciones</button>
+        <button class="ta-tab" onclick="mercadoAbrirModalPublicar()" style="color:#fdba74;border-color:rgba(251,146,60,0.35)">+ Vender Ítem</button>
+      </div>
+
+      <div class="admin-panel">
+        <!-- Tab Explorar -->
+        <div class="admin-ta-seccion visible" id="mercado-tab-explorar">
+          <div class="search-bar-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" id="mercado-search" type="text" placeholder="Buscar en el mercado...">
+          </div>
+          <div class="tienda-filtros">
+            <button class="filtro-btn active" onclick="mercadoFiltrarCategoria('todos', this)">Todos</button>
+            <button class="filtro-btn" onclick="mercadoFiltrarCategoria('vehiculos', this)">Vehículos</button>
+            <button class="filtro-btn" onclick="mercadoFiltrarCategoria('armas', this)">Armas</button>
+            <button class="filtro-btn" onclick="mercadoFiltrarCategoria('licencias', this)">Licencias</button>
+            <button class="filtro-btn" onclick="mercadoFiltrarCategoria('otros', this)">Otros</button>
+          </div>
+
+          <div class="rc-loading" id="mercado-loading">
+            <div class="spinner"></div><span>Cargando publicaciones...</span>
+          </div>
+          <div id="mercado-grid-wrap" style="display:none;width:100%;">
+            <div class="productos-grid mercado-grid" id="mercado-grid"></div>
+          </div>
+        </div>
+
+        <!-- Tab Mis Publicaciones -->
+        <div class="admin-ta-seccion" id="mercado-tab-mis-publicaciones">
+          <div class="rc-loading" id="mercado-mias-loading">
+            <div class="spinner"></div><span>Cargando tus publicaciones...</span>
+          </div>
+          <div id="mercado-mias-wrap" style="display:none;width:100%;">
+            <div class="mercado-mias-lista" id="mercado-mias-lista"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL: Vender ítem en el Mercado -->
+  <div class="admin-modal-overlay" id="modal-mercado-publicar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-mercado-publicar')">✕</button>
+      <h3 style="color:#fdba74;">Vender un Ítem</h3>
+
+      <div class="form-group">
+        <label>Elige un ítem de tu inventario</label>
+        <div id="mercado-pub-items-loading" style="color:rgba(255,255,255,0.4);font-size:13px;">Cargando tu inventario...</div>
+        <div id="mercado-pub-items-lista" class="mercado-pub-items-lista" style="display:none;"></div>
+        <div id="mercado-pub-items-empty" class="tienda-empty" style="display:none;padding:20px 0;">No tienes ítems disponibles para vender.</div>
+      </div>
+
+      <div id="mercado-pub-form" style="display:none;flex-direction:column;gap:18px;">
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;">Vendiendo: <b id="mercado-pub-nombre" style="color:#fff;"></b></p>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="mercado-pub-descripcion" maxlength="300" rows="3" placeholder="Describe el estado, detalles o condiciones de la venta..." style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:Inter,sans-serif;resize:vertical;width:100%;outline:0;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Precio ($)</label>
+          <input type="number" id="mercado-pub-precio" placeholder="Ej: 250000" min="1">
+        </div>
+      </div>
+
+      <div class="rc-error" id="mercado-pub-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="mercado-pub-btn" onclick="mercadoConfirmarPublicar()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Publicar
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-mercado-publicar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- CONCESIONARIO -->
   <section class="screen seccion-screen" id="concesionario-screen">
@@ -3084,6 +3183,7 @@
   <script defer src="/js/banco.js?v=32"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script defer src="/js/tienda.js?v=32"></script>
+  <script defer src="/js/mercado.js?v=32"></script>
   <script defer src="/js/vehiculos.js?v=32"></script>
   <script defer src="/js/concesionario.js?v=32"></script>
   <script defer src="/js/mis-autos.js?v=32"></script>
