@@ -19,7 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=30">
+  <link rel="stylesheet" href="/styles.css?v=31">
   <link rel="preload" as="image" href="https://i.imgur.com/yH4wCVJ.png" fetchpriority="high">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
@@ -553,65 +553,70 @@
       <!-- Vista con cuenta -->
       <div id="banco-cuenta-wrap" style="display:none; width:100%; display:none; flex-direction:column; align-items:center; gap:20px;">
 
-        <!-- Tarjeta -->
-        <div class="bank-card" id="bank-card">
-          <div class="bank-card-top">
-            <div class="bank-logo-text">ChileCity Bank</div>
-            <div class="bank-chip"></div>
-          </div>
-          <div class="bank-numero" id="bank-numero">0000-0000-0000-0000</div>
-          <div class="bank-bottom">
-            <div>
-              <div class="bank-titular-label">Titular</div>
-              <div class="bank-titular-nombre" id="bank-titular">—</div>
-            </div>
-            <div>
-              <div class="bank-rut-label">RUT</div>
-              <div class="bank-rut-valor" id="bank-rut">—</div>
-            </div>
-          </div>
-        </div>
+        <!-- ═══════ VISTA PRINCIPAL (saldo + productos) ═══════ -->
+        <div class="bdc-home" id="bdc-home-view">
 
-        <!-- Saldo -->
-        <div class="bank-saldo-box">
-          <div>
-            <div class="bank-saldo-label">Saldo disponible</div>
+          <!-- Hero de saldo -->
+          <div class="bdc-balance-card">
+            <div class="bdc-balance-top">
+              <div class="bdc-brand">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
+                ChileCity Bank
+              </div>
+              <div class="bdc-account-pill">Cta. •• <span id="bdc-cuenta-corta">0000</span></div>
+            </div>
+            <div class="bdc-balance-label">Saldo disponible</div>
             <div class="bank-saldo-valor" id="bank-saldo">$0</div>
           </div>
-          <div class="bank-saldo-moneda">CLP</div>
-        </div>
 
-        <!-- Próximo sueldo -->
-        <div class="proximo-sueldo" id="proximo-sueldo-box" style="display:none;">
-          <div class="ps-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <!-- Próximo sueldo -->
+          <div class="proximo-sueldo" id="proximo-sueldo-box" style="display:none;">
+            <div class="ps-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="ps-info">
+              <div class="ps-titulo">Próximo sueldo</div>
+              <div class="ps-tiempo" id="ps-tiempo">—</div>
+              <div class="ps-nombre" id="ps-nombre">—</div>
+            </div>
           </div>
-          <div class="ps-info">
-            <div class="ps-titulo">Próximo sueldo</div>
-            <div class="ps-tiempo" id="ps-tiempo">—</div>
-            <div class="ps-nombre" id="ps-nombre">—</div>
-          </div>
-        </div>
 
-        <!-- Acciones -->
-        <div class="bank-actions">
-          <button class="bank-action-btn transfer" onclick="mostrarTransferir()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-            <span>Transferir</span>
-          </button>
-          <button class="bank-action-btn history" onclick="mostrarHistorial()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
-            <span>Historial</span>
-          </button>
-          <button class="bank-action-btn" style="border-color:rgba(139,92,246,0.3); background:rgba(139,92,246,0.08);" onclick="mostrarContactos()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>Contactos</span>
-          </button>
-          <button class="bank-action-btn" style="border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.08);" onclick="mostrarPrestamo()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Préstamo</span>
-          </button>
-        </div>
+          <!-- Mis productos -->
+          <div class="bdc-section-label">Mis productos</div>
+          <div class="bdc-productos-grid">
+            <div class="bdc-prod-card">
+              <div class="bdc-prod-tag">Cuenta Corriente</div>
+              <div class="bdc-prod-num" id="bdc-cuenta-num-mini">0000-0000-0000-0000</div>
+              <div class="bdc-prod-foot"><span>Disponible</span><b id="bdc-disponible-mini">$0</b></div>
+            </div>
+            <div class="bdc-prod-card bdc-prod-tarjeta" onclick="mostrarVistaTarjeta()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')mostrarVistaTarjeta()">
+              <div class="bdc-mini-card">
+                <div class="bdc-mini-chip"></div>
+                <div class="bdc-mini-lines"><span></span><span></span></div>
+              </div>
+              <div class="bdc-prod-foot"><span>Tarjeta</span><b>Ver tarjeta ›</b></div>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="bank-actions">
+            <button class="bank-action-btn transfer" onclick="mostrarTransferir()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              <span>Transferir</span>
+            </button>
+            <button class="bank-action-btn history" onclick="mostrarHistorial()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+              <span>Historial</span>
+            </button>
+            <button class="bank-action-btn" onclick="mostrarContactos()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Contactos</span>
+            </button>
+            <button class="bank-action-btn" onclick="mostrarPrestamo()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Préstamo</span>
+            </button>
+          </div>
 
         <!-- Formulario transferencia (oculto) -->
         <div class="rc-form" id="transfer-form" style="display:none; width:100%; max-width:440px;">
@@ -724,6 +729,45 @@
             <div style="font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,.35); margin-bottom:10px;">Historial de préstamos</div>
             <div class="historial-lista" id="prestamo-historial-lista"></div>
           </div>
+        </div>
+
+        </div><!-- /bdc-home-view -->
+
+        <!-- ═══════ VISTA DE TARJETA ═══════ -->
+        <div class="bdc-card-view" id="bdc-card-view" style="display:none;">
+          <button class="bdc-card-back" onclick="ocultarVistaTarjeta()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+
+          <div class="bdc-card-stage">
+            <div class="bank-card" id="bank-card">
+              <div class="bank-card-top">
+                <div class="bank-logo-text">ChileCity Bank</div>
+                <div class="bdc-card-top-right">
+                  <svg class="bdc-nfc" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 12.3a3.5 3.5 0 0 1 7 0"/><path d="M6 12.3a6 6 0 0 1 12 0"/><path d="M3.5 12.3a8.5 8.5 0 0 1 17 0"/></svg>
+                  <div class="bank-chip"></div>
+                </div>
+              </div>
+              <div class="bank-numero" id="bank-numero">0000-0000-0000-0000</div>
+              <div class="bank-bottom">
+                <div>
+                  <div class="bank-titular-label">Titular</div>
+                  <div class="bank-titular-nombre" id="bank-titular">—</div>
+                  <div class="bank-rut-valor" id="bank-rut">—</div>
+                </div>
+                <div class="bdc-card-network">
+                  <span class="bdc-network-tag">Infinite</span>
+                  <span class="bdc-network-word">CC Pay</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="bdc-copy-btn" onclick="copiarNumeroTarjeta()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar número de cuenta
+          </button>
         </div>
 
       </div>
@@ -2998,25 +3042,25 @@
     </div>
   </div>
 
-  <script defer src="/js/app.js?v=30"></script>
-  <script defer src="/js/dashboard-fx.js?v=30"></script>
-  <script defer src="/js/notificaciones.js?v=30"></script>
-  <script defer src="/js/pull-to-refresh.js?v=30"></script>
-  <script defer src="/js/registro-civil.js?v=30"></script>
-  <script defer src="/js/banco.js?v=30"></script>
+  <script defer src="/js/app.js?v=31"></script>
+  <script defer src="/js/dashboard-fx.js?v=31"></script>
+  <script defer src="/js/notificaciones.js?v=31"></script>
+  <script defer src="/js/pull-to-refresh.js?v=31"></script>
+  <script defer src="/js/registro-civil.js?v=31"></script>
+  <script defer src="/js/banco.js?v=31"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=30"></script>
-  <script defer src="/js/vehiculos.js?v=30"></script>
-  <script defer src="/js/concesionario.js?v=30"></script>
-  <script defer src="/js/mis-autos.js?v=30"></script>
-  <script defer src="/js/admin-tienda.js?v=30"></script>
-  <script defer src="/js/empresas.js?v=30"></script>
-  <script defer src="/js/logros.js?v=30"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=30"></script>
-  <script defer src="/js/panel-admin.js?v=30"></script>
-  <script defer src="/js/comisaria.js?v=30"></script>
-  <script defer src="/js/casino.js?v=30"></script>
-  <script defer src="/js/apuestas.js?v=30"></script>
-  <script defer src="/js/parallax-landing.js?v=30"></script>
+  <script defer src="/js/tienda.js?v=31"></script>
+  <script defer src="/js/vehiculos.js?v=31"></script>
+  <script defer src="/js/concesionario.js?v=31"></script>
+  <script defer src="/js/mis-autos.js?v=31"></script>
+  <script defer src="/js/admin-tienda.js?v=31"></script>
+  <script defer src="/js/empresas.js?v=31"></script>
+  <script defer src="/js/logros.js?v=31"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=31"></script>
+  <script defer src="/js/panel-admin.js?v=31"></script>
+  <script defer src="/js/comisaria.js?v=31"></script>
+  <script defer src="/js/casino.js?v=31"></script>
+  <script defer src="/js/apuestas.js?v=31"></script>
+  <script defer src="/js/parallax-landing.js?v=31"></script>
 </body>
 </html>

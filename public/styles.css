@@ -836,3 +836,114 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .top-hero-btn{ margin-top:14px; display:flex; align-items:center; justify-content:center; gap:6px; background:rgba(212,175,55,.14); border:1px solid rgba(212,175,55,.3); color:#f5d06b; border-radius:12px; padding:11px; font-size:12.5px; font-weight:700; cursor:pointer; transition:.2s; font-family:Inter,sans-serif; position:relative; z-index:1; }
 .top-hero-btn:hover{ background:rgba(212,175,55,.22); transform:translateY(-1px); }
 @media (max-width:768px){ .profile-hero{ grid-template-columns:1fr; } }
+
+/* ══════════════════════════════════════════════════════════════════════
+   BANCO DE CHILE — reskin sección Banco (v1)
+   Paleta: azul profundo #00298F/#0057D9 sobre blanco, tarjeta negro/dorado.
+   ══════════════════════════════════════════════════════════════════════ */
+#banco-screen{background:radial-gradient(1100px 520px at 12% -12%,rgba(0,87,217,.12),transparent 60%),radial-gradient(900px 500px at 105% 0%,rgba(0,41,143,.10),transparent 55%),#f2f5fb;color:#0B1220}
+#banco-screen .seccion-container{gap:20px}
+#banco-screen .sec-back{background:#fff;border:1px solid rgba(11,18,32,.10);color:#0B1220;box-shadow:0 2px 10px rgba(11,18,32,.06)}
+#banco-screen .sec-back:hover{background:#eef4ff;border-color:rgba(0,87,217,.25)}
+#banco-screen .seccion-title{background:linear-gradient(135deg,#0B1220 25%,#0057D9 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#banco-screen .seccion-title svg{stroke:#0057D9;filter:none}
+
+/* — Hero de saldo — */
+.bdc-home{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+.bdc-balance-card{width:100%;max-width:460px;border-radius:24px;padding:28px 28px 24px;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#00227A 0%,#00298F 45%,#0057D9 100%);box-shadow:0 24px 54px -20px rgba(0,41,143,.55);animation:fadeUp .5s var(--ease) both}
+.bdc-balance-card::before{content:'';position:absolute;top:-45%;right:-15%;width:75%;height:190%;background:linear-gradient(115deg,rgba(255,255,255,.14),transparent 55%);transform:rotate(8deg);pointer-events:none}
+.bdc-balance-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;margin-bottom:20px;flex-wrap:wrap}
+.bdc-brand{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px}
+.bdc-account-pill{font-size:11px;font-weight:700;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:5px 12px;border-radius:99px;font-family:var(--font-mono)}
+.bdc-balance-label{font-size:11.5px;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;position:relative;z-index:1}
+.bdc-balance-card .bank-saldo-valor{font-family:var(--font-mono);font-size:clamp(30px,7vw,42px);font-weight:700;letter-spacing:-.5px;margin-top:4px;position:relative;z-index:1;color:#fff}
+
+/* — Banner próximo sueldo (reskin) — */
+#banco-screen .proximo-sueldo{width:100%;max-width:460px;background:#fff;border:1px solid rgba(0,87,217,.18);border-radius:16px;box-shadow:0 8px 24px rgba(11,18,32,.05)}
+#banco-screen .ps-icon{color:#0057D9}
+#banco-screen .ps-titulo{color:#0057D9}
+#banco-screen .ps-tiempo{color:#0B1220}
+#banco-screen .ps-nombre{color:rgba(11,18,32,.45)}
+
+/* — Sección "Mis productos" — */
+.bdc-section-label{width:100%;max-width:460px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:rgba(11,18,32,.4);margin-top:2px}
+.bdc-productos-grid{width:100%;max-width:460px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bdc-prod-card{background:#fff;border:1px solid rgba(11,18,32,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;min-height:118px;box-shadow:0 6px 18px rgba(11,18,32,.05);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.bdc-prod-tag{font-size:11px;font-weight:800;color:#0057D9;text-transform:uppercase;letter-spacing:.5px}
+.bdc-prod-num{font-family:var(--font-mono);font-size:12px;color:rgba(11,18,32,.55);letter-spacing:.5px}
+.bdc-prod-foot{display:flex;align-items:baseline;justify-content:space-between;font-size:11px;color:rgba(11,18,32,.4);gap:6px}
+.bdc-prod-foot b{font-size:13px;color:#0B1220;font-family:var(--font-mono)}
+.bdc-prod-tarjeta{cursor:pointer}
+.bdc-prod-tarjeta:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(11,18,32,.10);border-color:rgba(212,175,55,.4)}
+.bdc-prod-tarjeta .bdc-prod-foot b{color:#8a6d1a}
+.bdc-mini-card{width:100%;aspect-ratio:1.65/1;border-radius:9px;background:linear-gradient(150deg,#17171a 0,#0b0b0d 55%,#1e1e22 100%);border:1px solid rgba(212,175,55,.35);position:relative;overflow:hidden;padding:8px;display:flex;flex-direction:column;justify-content:space-between}
+.bdc-mini-chip{width:16px;height:12px;border-radius:3px;background:linear-gradient(135deg,#d4af37,#f5d06b 45%,#b8860b)}
+.bdc-mini-lines{display:flex;flex-direction:column;gap:3px}
+.bdc-mini-lines span{display:block;height:2px;border-radius:2px;background:rgba(245,208,107,.5)}
+.bdc-mini-lines span:first-child{width:70%}
+.bdc-mini-lines span:last-child{width:45%}
+
+/* — Botones de acción (reskin azul) — */
+#banco-screen .bank-actions{max-width:460px}
+#banco-screen .bank-action-btn{background:#fff;border:1px solid rgba(11,18,32,.08);color:#0B1220;box-shadow:0 6px 16px rgba(11,18,32,.05)}
+#banco-screen .bank-action-btn svg{stroke:#0057D9}
+#banco-screen .bank-action-btn:hover{background:#eef4ff;transform:translateY(-2px);border-color:rgba(0,87,217,.25)}
+#banco-screen .bank-action-btn span{color:#0B1220}
+
+/* — Formularios / paneles (transferir, historial, contactos, préstamo) — */
+#banco-screen .rc-form{background:#fff;border:1px solid rgba(11,18,32,.08);box-shadow:0 8px 24px rgba(11,18,32,.05);max-width:460px}
+#banco-screen .rc-form h2{color:#0B1220}
+#banco-screen .rc-form h2 svg{stroke:#0057D9}
+#banco-screen .rc-form p{color:rgba(11,18,32,.5)}
+#banco-screen .form-group label{color:rgba(11,18,32,.55)}
+#banco-screen .form-group input,#banco-screen .form-group select{background:#f5f8fd;border:1px solid rgba(11,18,32,.12);color:#0B1220}
+#banco-screen .form-group input::placeholder{color:rgba(11,18,32,.3)}
+#banco-screen .form-group input:focus,#banco-screen .form-group select:focus{border-color:#0057D9;background:#fff}
+#banco-screen .btn-green{background:#0057D9;box-shadow:0 8px 20px rgba(0,87,217,.3)}
+#banco-screen .btn-green:hover{background:#0047b3}
+#banco-screen .sec-back{color:#0B1220}
+#banco-screen .historial-wrap,#banco-screen .prestamo-wrap{max-width:460px}
+#banco-screen .historial-titulo{color:rgba(11,18,32,.6)}
+#banco-screen .historial-titulo svg{stroke:#0057D9}
+#banco-screen .historial-item{background:#fff;border:1px solid rgba(11,18,32,.07);box-shadow:0 4px 12px rgba(11,18,32,.04)}
+#banco-screen .hi-desc-titulo{color:#0B1220}
+#banco-screen .hi-desc-fecha{color:rgba(11,18,32,.35)}
+#banco-screen .hi-icono.ingreso{background:rgba(0,87,217,.1);color:#0057D9}
+#banco-screen .hi-icono.egreso{background:rgba(239,68,68,.1)}
+#banco-screen .hi-icono.sueldo{background:rgba(212,175,55,.15);color:#8a6d1a}
+#banco-screen .hi-monto.ingreso{color:#0057D9}
+#banco-screen label[for],#banco-screen .rc-form label span{color:rgba(11,18,32,.6)}
+
+/* — Vista de tarjeta con efecto 3D — */
+.bdc-card-view{display:flex;flex-direction:column;align-items:center;gap:22px;width:100%;padding-top:6px;animation:fadeUp .4s var(--ease) both}
+.bdc-card-back{align-self:flex-start;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(11,18,32,.1);color:#0B1220;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px rgba(11,18,32,.06);font-family:Inter,sans-serif;transition:.2s}
+.bdc-card-back:hover{background:#eef4ff}
+.bdc-card-stage{perspective:1100px;width:100%;max-width:400px}
+#banco-screen .bdc-card-stage .bank-card{width:100%;max-width:400px;aspect-ratio:1.586/1;margin:0 auto;border-radius:20px;padding:24px 26px;background:radial-gradient(130% 150% at 100% 0%,rgba(212,175,55,.18),transparent 55%),linear-gradient(150deg,#17171a 0%,#0b0b0d 55%,#1e1e22 100%);border:1px solid rgba(212,175,55,.4);box-shadow:0 30px 60px -18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;transform:perspective(1100px) rotateX(0) rotateY(0);transition:transform .15s ease-out;will-change:transform;cursor:grab}
+#banco-screen .bdc-card-stage .bank-card::before{content:'C';position:absolute;right:-18px;top:-46px;font-family:'Bebas Neue',sans-serif;font-size:220px;line-height:1;color:rgba(212,175,55,.09);pointer-events:none}
+#banco-screen .bdc-card-stage .bank-card::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(340px circle at var(--glare-x,50%) var(--glare-y,15%),rgba(255,255,255,.16),transparent 62%);opacity:0;transition:opacity .25s}
+#banco-screen .bdc-card-stage .bank-card.bdc-tilting::after{opacity:1}
+#banco-screen .bank-card-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}
+#banco-screen .bank-logo-text{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(135deg,#f5d06b,#d4af37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.bdc-card-top-right{display:flex;align-items:center;gap:10px}
+.bdc-nfc{color:rgba(245,208,107,.65);transform:rotate(90deg)}
+#banco-screen .bank-chip{width:42px;height:32px;border-radius:6px;background:linear-gradient(135deg,#d4af37,#f5d06b 45%,#b8860b);box-shadow:0 2px 6px rgba(0,0,0,.4)}
+#banco-screen .bank-numero{font-family:var(--font-mono);font-size:18px;letter-spacing:3px;color:#f2e6c9;margin:20px 0 22px;position:relative;z-index:1}
+#banco-screen .bank-bottom{position:relative;z-index:1;align-items:flex-end}
+#banco-screen .bank-titular-label{color:rgba(245,208,107,.55);font-size:9px}
+#banco-screen .bank-titular-nombre{color:#fff;font-size:14px}
+#banco-screen .bdc-card-view .bank-rut-valor{color:rgba(255,255,255,.55);font-size:11px;font-family:var(--font-mono);margin-top:2px}
+.bdc-card-network{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.bdc-network-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,208,107,.6)}
+.bdc-network-word{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;color:#f5d06b}
+.bdc-copy-btn{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(11,18,32,.1);color:#0B1220;border-radius:12px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(11,18,32,.06);font-family:Inter,sans-serif;transition:.2s}
+.bdc-copy-btn:hover{background:#f5f8fd;transform:translateY(-1px)}
+.bdc-copy-btn svg{color:#0057D9}
+
+@media (prefers-reduced-motion:reduce){
+  #banco-screen .bdc-card-stage .bank-card{transition:none!important}
+}
+@media (max-width:540px){
+  .bdc-productos-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .bdc-balance-card{padding:22px 20px 20px}
+}
