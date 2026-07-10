@@ -19,7 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=31">
+  <link rel="stylesheet" href="/styles.css?v=32">
   <link rel="preload" as="image" href="https://i.imgur.com/yH4wCVJ.png" fetchpriority="high">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
@@ -649,6 +649,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             Historial
           </div>
+          <div class="hist-donut-card" id="hist-donut-card" style="display:none;"></div>
           <div class="historial-lista" id="historial-lista">
             <div class="historial-vacio">Sin movimientos aún</div>
           </div>
@@ -741,27 +742,50 @@
           </button>
 
           <div class="bdc-card-stage">
-            <div class="bank-card" id="bank-card">
-              <div class="bank-card-top">
-                <div class="bank-logo-text">ChileCity Bank</div>
-                <div class="bdc-card-top-right">
-                  <svg class="bdc-nfc" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 12.3a3.5 3.5 0 0 1 7 0"/><path d="M6 12.3a6 6 0 0 1 12 0"/><path d="M3.5 12.3a8.5 8.5 0 0 1 17 0"/></svg>
-                  <div class="bank-chip"></div>
+            <div class="bank-card-flip" id="bank-card-flip" onclick="bdcToggleFlip(event)" role="button" tabindex="0" aria-label="Girar tarjeta" onkeydown="if(event.key==='Enter')bdcToggleFlip(event)">
+              <div class="bank-card bank-card-front" id="bank-card">
+                <div class="bank-card-top">
+                  <div class="bank-logo-text">ChileCity Bank</div>
+                  <div class="bdc-card-top-right">
+                    <svg class="bdc-nfc" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 12.3a3.5 3.5 0 0 1 7 0"/><path d="M6 12.3a6 6 0 0 1 12 0"/><path d="M3.5 12.3a8.5 8.5 0 0 1 17 0"/></svg>
+                    <div class="bank-chip"></div>
+                  </div>
+                </div>
+                <div class="bank-numero-row">
+                  <div class="bank-numero bn-masked" id="bank-numero" data-full="0000-0000-0000-0000">•••• •••• •••• 0000</div>
+                  <button class="bn-eye-btn" onclick="bdcToggleReveal(event)" aria-label="Mostrar número" title="Mostrar número">
+                    <svg id="bn-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <div class="bank-bottom">
+                  <div>
+                    <div class="bank-titular-label">Titular</div>
+                    <div class="bank-titular-nombre" id="bank-titular">—</div>
+                    <div class="bank-rut-valor" id="bank-rut">—</div>
+                  </div>
+                  <div class="bdc-card-network">
+                    <span class="bdc-network-tag">Infinite</span>
+                    <span class="bdc-network-word">CC Pay</span>
+                  </div>
                 </div>
               </div>
-              <div class="bank-numero" id="bank-numero">0000-0000-0000-0000</div>
-              <div class="bank-bottom">
-                <div>
-                  <div class="bank-titular-label">Titular</div>
-                  <div class="bank-titular-nombre" id="bank-titular">—</div>
-                  <div class="bank-rut-valor" id="bank-rut">—</div>
+              <div class="bank-card bank-card-back">
+                <div class="bank-card-back-banda"></div>
+                <div class="bank-card-back-firma">
+                  <div class="bank-card-back-firma-strip"><span id="bank-firma-nombre">—</span></div>
+                  <div class="bank-card-back-cvv">•••</div>
                 </div>
-                <div class="bdc-card-network">
-                  <span class="bdc-network-tag">Infinite</span>
-                  <span class="bdc-network-word">CC Pay</span>
+                <div class="bank-card-back-info">
+                  <div class="bank-card-back-linea">Esta tarjeta es propiedad de ChileCity Bank. Uso exclusivo dentro de la plataforma.</div>
+                  <div class="bank-card-back-op" id="bank-card-back-op">OP-000000</div>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div class="bdc-flip-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Toca la tarjeta para ver el reverso
           </div>
 
           <button class="bdc-copy-btn" onclick="copiarNumeroTarjeta()">
@@ -779,26 +803,36 @@
   <div class="admin-modal-overlay" id="modal-recibo-transferencia">
     <div class="admin-modal" style="position:relative;">
       <button class="admin-modal-close" onclick="cerrarModal('modal-recibo-transferencia')">✕</button>
-      <div class="tx-receipt-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="tx-receipt" id="tx-receipt-voucher">
+        <div class="tx-receipt-folio">Comprobante N° <span id="recibo-tx-folio">000000</span></div>
+        <div class="tx-receipt-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="tx-receipt-titulo">Transferencia exitosa</div>
+        <div class="tx-receipt-monto" id="recibo-tx-monto">$0</div>
+        <div class="tx-receipt-palabras" id="recibo-tx-palabras">—</div>
+        <div class="tx-receipt-detalle">
+          <div class="tx-receipt-row">
+            <span class="tx-receipt-row-label">Destinatario</span>
+            <span class="tx-receipt-row-val" id="recibo-tx-destino">—</span>
+          </div>
+          <div class="tx-receipt-row">
+            <span class="tx-receipt-row-label">Fecha</span>
+            <span class="tx-receipt-row-val" id="recibo-tx-fecha">—</span>
+          </div>
+          <div class="tx-receipt-row">
+            <span class="tx-receipt-row-label">Tu nuevo saldo</span>
+            <span class="tx-receipt-row-val" id="recibo-tx-saldo">—</span>
+          </div>
+        </div>
+        <div class="tx-receipt-barcode"></div>
+        <div class="tx-receipt-barcode-txt" id="recibo-tx-barcode-txt">CC-000000-000000</div>
       </div>
-      <div class="tx-receipt-titulo">Transferencia exitosa</div>
-      <div class="tx-receipt-monto" id="recibo-tx-monto">$0</div>
-      <div class="tx-receipt-detalle">
-        <div class="tx-receipt-row">
-          <span class="tx-receipt-row-label">Destinatario</span>
-          <span class="tx-receipt-row-val" id="recibo-tx-destino">—</span>
-        </div>
-        <div class="tx-receipt-row">
-          <span class="tx-receipt-row-label">Fecha</span>
-          <span class="tx-receipt-row-val" id="recibo-tx-fecha">—</span>
-        </div>
-        <div class="tx-receipt-row">
-          <span class="tx-receipt-row-label">Tu nuevo saldo</span>
-          <span class="tx-receipt-row-val" id="recibo-tx-saldo">—</span>
-        </div>
-      </div>
-      <div class="modal-actions">
+      <div class="tx-receipt-actions">
+        <button class="btn-descargar-voucher" onclick="descargarVoucher()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar comprobante
+        </button>
         <button class="btn-green" onclick="cerrarModal('modal-recibo-transferencia')" style="flex:1; justify-content:center;">
           Listo
         </button>
@@ -3042,25 +3076,25 @@
     </div>
   </div>
 
-  <script defer src="/js/app.js?v=31"></script>
-  <script defer src="/js/dashboard-fx.js?v=31"></script>
-  <script defer src="/js/notificaciones.js?v=31"></script>
-  <script defer src="/js/pull-to-refresh.js?v=31"></script>
-  <script defer src="/js/registro-civil.js?v=31"></script>
-  <script defer src="/js/banco.js?v=31"></script>
+  <script defer src="/js/app.js?v=32"></script>
+  <script defer src="/js/dashboard-fx.js?v=32"></script>
+  <script defer src="/js/notificaciones.js?v=32"></script>
+  <script defer src="/js/pull-to-refresh.js?v=32"></script>
+  <script defer src="/js/registro-civil.js?v=32"></script>
+  <script defer src="/js/banco.js?v=32"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=31"></script>
-  <script defer src="/js/vehiculos.js?v=31"></script>
-  <script defer src="/js/concesionario.js?v=31"></script>
-  <script defer src="/js/mis-autos.js?v=31"></script>
-  <script defer src="/js/admin-tienda.js?v=31"></script>
-  <script defer src="/js/empresas.js?v=31"></script>
-  <script defer src="/js/logros.js?v=31"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=31"></script>
-  <script defer src="/js/panel-admin.js?v=31"></script>
-  <script defer src="/js/comisaria.js?v=31"></script>
-  <script defer src="/js/casino.js?v=31"></script>
-  <script defer src="/js/apuestas.js?v=31"></script>
-  <script defer src="/js/parallax-landing.js?v=31"></script>
+  <script defer src="/js/tienda.js?v=32"></script>
+  <script defer src="/js/vehiculos.js?v=32"></script>
+  <script defer src="/js/concesionario.js?v=32"></script>
+  <script defer src="/js/mis-autos.js?v=32"></script>
+  <script defer src="/js/admin-tienda.js?v=32"></script>
+  <script defer src="/js/empresas.js?v=32"></script>
+  <script defer src="/js/logros.js?v=32"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=32"></script>
+  <script defer src="/js/panel-admin.js?v=32"></script>
+  <script defer src="/js/comisaria.js?v=32"></script>
+  <script defer src="/js/casino.js?v=32"></script>
+  <script defer src="/js/apuestas.js?v=32"></script>
+  <script defer src="/js/parallax-landing.js?v=32"></script>
 </body>
 </html>
