@@ -5,6 +5,10 @@
       document.getElementById('banco-loading').style.display = 'flex';
       document.getElementById('banco-crear-form').style.display = 'none';
       document.getElementById('banco-cuenta-wrap').style.display = 'none';
+      const _bdcCardView = document.getElementById('bdc-card-view');
+      const _bdcHomeView = document.getElementById('bdc-home-view');
+      if (_bdcCardView) _bdcCardView.style.display = 'none';
+      if (_bdcHomeView) _bdcHomeView.style.display = 'flex';
 
       try {
         const res = await fetch(`/api/banco?action=cuenta&discord_id=${currentUser.id}`);
@@ -924,3 +928,104 @@
         lista.innerHTML = '<div class="tr-empty">Error al cargar el ranking.</div>';
       }
     }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // BANCO DE CHILE — vista de tarjeta con efecto 3D al pasar el cursor
+    // ══════════════════════════════════════════════════════════════════════════
+    let _bdcTiltRaf = null;
+    const _bdcReduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function mostrarVistaTarjeta() {
+      const home = document.getElementById('bdc-home-view');
+      const card = document.getElementById('bdc-card-view');
+      if (!home || !card) return;
+      home.style.display = 'none';
+      card.style.display = 'flex';
+      bdcInitTilt();
+    }
+
+    function ocultarVistaTarjeta() {
+      const home = document.getElementById('bdc-home-view');
+      const card = document.getElementById('bdc-card-view');
+      if (!home || !card) return;
+      card.style.display = 'none';
+      home.style.display = 'flex';
+    }
+
+    function bdcInitTilt() {
+      const el = document.getElementById('bank-card');
+      if (!el || el.dataset.tiltInit === '1' || _bdcReduceMotion) return;
+      el.dataset.tiltInit = '1';
+
+      function posFromEvent(e) {
+        const rect = el.getBoundingClientRect();
+        const point = e.touches ? e.touches[0] : e;
+        return {
+          x: (point.clientX - rect.left) / rect.width,
+          y: (point.clientY - rect.top) / rect.height,
+        };
+      }
+
+      function onMove(e) {
+        const { x, y } = posFromEvent(e);
+        const rotateY = (x - 0.5) * 16;   // izquierda/derecha
+        const rotateX = (0.5 - y) * 12;   // arriba/abajo
+        if (_bdcTiltRaf) cancelAnimationFrame(_bdcTiltRaf);
+        _bdcTiltRaf = requestAnimationFrame(() => {
+          el.style.transform = `perspective(1100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`;
+          el.style.setProperty('--glare-x', `${x * 100}%`);
+          el.style.setProperty('--glare-y', `${y * 100}%`);
+          el.classList.add('bdc-tilting');
+        });
+      }
+
+      function onLeave() {
+        if (_bdcTiltRaf) cancelAnimationFrame(_bdcTiltRaf);
+        el.style.transform = 'perspective(1100px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+        el.classList.remove('bdc-tilting');
+      }
+
+      el.addEventListener('mousemove', onMove);
+      el.addEventListener('mouseleave', onLeave);
+      el.addEventListener('touchmove', onMove, { passive: true });
+      el.addEventListener('touchend', onLeave);
+    }
+
+    async function copiarNumeroTarjeta() {
+      const numero = document.getElementById('bank-numero')?.textContent?.trim();
+      if (!numero) return;
+      try {
+        await navigator.clipboard.writeText(numero.replace(/\s+/g, ''));
+        if (typeof mostrarToast === 'function') mostrarToast('Número de cuenta copiado.', false);
+      } catch (e) {
+        if (typeof mostrarToast === 'function') mostrarToast('No se pudo copiar.', true);
+      }
+    }
+
+    // Mantiene sincronizadas las vistas mini (Mis Productos) con los datos
+    // reales que ya llenan #bank-saldo y #bank-numero (cargarBanco / mostrarTarjeta).
+    (function bdcSetupMiniSync() {
+      function syncSaldo() {
+        const src = document.getElementById('bank-saldo');
+        const dst = document.getElementById('bdc-disponible-mini');
+        if (src && dst) dst.textContent = src.textContent;
+      }
+      function syncNumero() {
+        const src = document.getElementById('bank-numero');
+        if (!src) return;
+        const num = src.textContent.trim();
+        const dstFull = document.getElementById('bdc-cuenta-num-mini');
+        const dstCorta = document.getElementById('bdc-cuenta-corta');
+        if (dstFull) dstFull.textContent = num;
+        if (dstCorta) {
+          const digits = num.replace(/\D/g, '');
+          dstCorta.textContent = digits ? digits.slice(-4) : '0000';
+        }
+      }
+      const saldoEl = document.getElementById('bank-saldo');
+      const numeroEl = document.getElementById('bank-numero');
+      if (saldoEl) new MutationObserver(syncSaldo).observe(saldoEl, { childList: true, characterData: true, subtree: true });
+      if (numeroEl) new MutationObserver(syncNumero).observe(numeroEl, { childList: true, characterData: true, subtree: true });
+      syncSaldo();
+      syncNumero();
+    })();
