@@ -57,12 +57,63 @@
       }
     }
 
+    // Enmascara un número de cuenta dejando solo los últimos 4 dígitos visibles,
+    // igual que hace una tarjeta real (•••• •••• •••• 1234).
+    function maskNumeroCuenta(numero) {
+      const limpio = String(numero || '').replace(/[^0-9]/g, '');
+      if (limpio.length <= 4) return numero;
+      const ultimos4 = limpio.slice(-4);
+      const grupos = Math.max(0, Math.ceil(limpio.length / 4) - 1);
+      return `${'•••• '.repeat(grupos).trim()} ${ultimos4}`.trim();
+    }
+
     function mostrarTarjeta(cuenta, dni) {
-      document.getElementById('bank-numero').textContent = cuenta.numero_cuenta;
-      if (dni) {
-        document.getElementById('bank-titular').textContent = `${dni.nombre1} ${dni.apellido1}`;
-        document.getElementById('bank-rut').textContent = dni.rut;
+      const numeroEl = document.getElementById('bank-numero');
+      numeroEl.dataset.full = cuenta.numero_cuenta;
+      numeroEl.dataset.revealed = '0';
+      numeroEl.classList.add('bn-masked');
+      numeroEl.textContent = maskNumeroCuenta(cuenta.numero_cuenta);
+      // Pseudo-código de operaciones del reverso: no es un CVV real, solo un
+      // identificador decorativo derivado de la propia cuenta.
+      const opEl = document.getElementById('bank-card-back-op');
+      if (opEl) {
+        const digits = String(cuenta.numero_cuenta || '').replace(/[^0-9]/g, '');
+        opEl.textContent = `OP-${digits.slice(-6).padStart(6, '0')}`;
       }
+      if (dni) {
+        const nombreCompleto = `${dni.nombre1} ${dni.apellido1}`;
+        document.getElementById('bank-titular').textContent = nombreCompleto;
+        document.getElementById('bank-rut').textContent = dni.rut;
+        const firmaEl = document.getElementById('bank-firma-nombre');
+        if (firmaEl) firmaEl.textContent = nombreCompleto;
+      }
+    }
+
+    // Muestra/oculta el número completo de la tarjeta (ojo de revelar).
+    function bdcToggleReveal(ev) {
+      if (ev) ev.stopPropagation();
+      const numeroEl = document.getElementById('bank-numero');
+      const eyeIcon = document.getElementById('bn-eye-icon');
+      if (!numeroEl) return;
+      const revelado = numeroEl.dataset.revealed === '1';
+      if (revelado) {
+        numeroEl.textContent = maskNumeroCuenta(numeroEl.dataset.full);
+        numeroEl.dataset.revealed = '0';
+        numeroEl.classList.add('bn-masked');
+        if (eyeIcon) eyeIcon.innerHTML = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>';
+      } else {
+        numeroEl.textContent = numeroEl.dataset.full || numeroEl.textContent;
+        numeroEl.dataset.revealed = '1';
+        numeroEl.classList.remove('bn-masked');
+        if (eyeIcon) eyeIcon.innerHTML = '<path d="M17 2 2 17"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a13.16 13.16 0 0 1-3.16 4.05M6.61 6.61C4.13 8.2 2.5 10.35 1 12c0 0 4 7 11 7 1.5 0 2.8-.31 3.94-.83"/><path d="M12.53 15.53a3 3 0 1 1-4.06-4.06"/>';
+      }
+    }
+
+    // Voltea la tarjeta en 3D para mostrar el reverso (banda magnética, firma).
+    function bdcToggleFlip(ev) {
+      if (ev && ev.target.closest && ev.target.closest('.bn-eye-btn')) return;
+      const el = document.getElementById('bank-card-flip');
+      if (el) el.classList.toggle('flipped');
     }
 
 
@@ -146,15 +197,178 @@
     // modal que el usuario cierra a propósito, con el detalle completo
     // (monto, destinatario, fecha, nuevo saldo) — pensado sobre todo para
     // transferencias grandes donde el usuario quiere confirmar que sí salió.
+    // Folio correlativo del comprobante, persistido en localStorage para que
+    // se vea como un correlativo real de operaciones (no vuelve a 1 cada vez).
+    function siguienteFolioVoucher() {
+      const KEY = 'cc_banco_folio';
+      let n = parseInt(localStorage.getItem(KEY) || '481', 10);
+      n += 1;
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+
+    // Convierte un monto CLP a su expresión en palabras, como en los
+    // documentos bancarios chilenos ("Ciento cincuenta mil pesos").
+    function montoEnPalabras(monto) {
+      const UNIDADES = ['', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+      const DIECIS = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+      // 'veintiún' (no 'veintiuno') porque siempre precede a un sustantivo
+      // (pesos/mil/millones) en este contexto.
+      const VEINTIS = ['veinte', 'veintiún', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve'];
+      const DECENAS = ['', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+      const CENTENAS = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+
+      function trescientos(n) {
+        if (n === 0) return '';
+        if (n === 100) return 'cien';
+        let out = '';
+        const c = Math.floor(n / 100), resto = n % 100;
+        if (c > 0) out += CENTENAS[c] + ' ';
+        if (resto >= 10 && resto < 20) {
+          out += DIECIS[resto - 10];
+        } else if (resto >= 20 && resto < 30) {
+          out += VEINTIS[resto - 20];
+        } else {
+          const d = Math.floor(resto / 10), u = resto % 10;
+          if (d >= 3) {
+            out += DECENAS[d];
+            if (u > 0) out += ' y ' + UNIDADES[u];
+          } else if (resto > 0) {
+            out += UNIDADES[resto];
+          }
+        }
+        return out.trim();
+      }
+
+      let n = Math.floor(Math.abs(monto));
+      if (n === 0) return 'cero pesos';
+      if (n === 1) return 'un peso';
+
+      const millones = Math.floor(n / 1000000);
+      const miles = Math.floor((n % 1000000) / 1000);
+      const resto = n % 1000;
+
+      // "de" solo va pegado a millón/millones cuando no hay miles ni resto
+      // entre medio (p.ej. "un millón de pesos" pero "un millón doscientos mil pesos").
+      const millonSoloAntesDePesos = miles === 0 && resto === 0;
+      let partes = [];
+      if (millones > 0) partes.push((millones === 1 ? 'un millón' : `${trescientos(millones)} millones`) + (millonSoloAntesDePesos ? ' de' : ''));
+      if (miles > 0) partes.push(miles === 1 ? 'mil' : `${trescientos(miles)} mil`);
+      if (resto > 0) partes.push(trescientos(resto));
+
+      return `${partes.join(' ')} pesos`.replace(/\s+/g, ' ').trim();
+    }
+
     function mostrarReciboTransferencia(monto, rutDestino, nuevoSaldo) {
       const nombre = _contactosCache[rutDestino];
+      const folio = siguienteFolioVoucher();
+      document.getElementById('recibo-tx-folio').textContent = String(folio).padStart(6, '0');
       document.getElementById('recibo-tx-monto').textContent = formatCLP(monto);
+      document.getElementById('recibo-tx-palabras').textContent = montoEnPalabras(monto);
       document.getElementById('recibo-tx-destino').textContent = nombre ? `${nombre} (${rutDestino})` : rutDestino;
       document.getElementById('recibo-tx-fecha').textContent = new Date().toLocaleString('es-CL', {
         day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
       });
       document.getElementById('recibo-tx-saldo').textContent = formatCLP(nuevoSaldo);
+      const barcodeTxt = `CC-${String(folio).padStart(6, '0')}-${Date.now().toString().slice(-6)}`;
+      document.getElementById('recibo-tx-barcode-txt').textContent = barcodeTxt;
       document.getElementById('modal-recibo-transferencia').classList.add('visible');
+    }
+
+    // Genera una imagen PNG del voucher usando canvas y la descarga — 100%
+    // client-side, sin backend.
+    function descargarVoucher() {
+      const folio = document.getElementById('recibo-tx-folio').textContent;
+      const monto = document.getElementById('recibo-tx-monto').textContent;
+      const palabras = document.getElementById('recibo-tx-palabras').textContent;
+      const destino = document.getElementById('recibo-tx-destino').textContent;
+      const fecha = document.getElementById('recibo-tx-fecha').textContent;
+      const saldo = document.getElementById('recibo-tx-saldo').textContent;
+      const barcodeTxt = document.getElementById('recibo-tx-barcode-txt').textContent;
+
+      const W = 560, H = 720;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // Fondo tipo papel
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, '#fbfaf6');
+      grad.addColorStop(1, '#f3f1ea');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = '#1a1a1a';
+      ctx.textAlign = 'center';
+
+      // Folio
+      ctx.font = '700 13px monospace';
+      ctx.fillStyle = 'rgba(0,0,0,.45)';
+      ctx.fillText(`COMPROBANTE N° ${folio}`, W / 2, 50);
+
+      // Ícono check
+      ctx.beginPath();
+      ctx.arc(W / 2, 100, 30, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(16,185,129,.15)';
+      ctx.fill();
+      ctx.strokeStyle = '#10B981';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 12, 100); ctx.lineTo(W / 2 - 3, 110); ctx.lineTo(W / 2 + 14, 90);
+      ctx.stroke();
+
+      ctx.font = '600 24px Georgia, serif';
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillText('Transferencia exitosa', W / 2, 160);
+
+      ctx.font = '800 40px Arial';
+      ctx.fillStyle = '#0d8f5f';
+      ctx.fillText(monto, W / 2, 210);
+
+      ctx.font = 'italic 15px Arial';
+      ctx.fillStyle = 'rgba(0,0,0,.5)';
+      ctx.fillText(palabras, W / 2, 235);
+
+      // Detalle
+      const filas = [['Destinatario', destino], ['Fecha', fecha], ['Tu nuevo saldo', saldo]];
+      let y = 290;
+      ctx.textAlign = 'left';
+      ctx.strokeStyle = 'rgba(0,0,0,.1)';
+      filas.forEach(([label, val]) => {
+        ctx.font = '13px Arial';
+        ctx.fillStyle = 'rgba(0,0,0,.45)';
+        ctx.fillText(label, 60, y);
+        ctx.textAlign = 'right';
+        ctx.font = '700 13px Arial';
+        ctx.fillStyle = '#111';
+        ctx.fillText(val, W - 60, y);
+        ctx.textAlign = 'left';
+        ctx.beginPath(); ctx.moveTo(60, y + 16); ctx.lineTo(W - 60, y + 16); ctx.stroke();
+        y += 48;
+      });
+
+      // Código de barras decorativo
+      let bx = 60;
+      const byTop = y + 20, byH = 50;
+      ctx.fillStyle = '#1a1a1a';
+      while (bx < W - 60) {
+        const w = [2, 3, 4][Math.floor(Math.random() * 3)];
+        if (Math.random() > 0.4) ctx.fillRect(bx, byTop, w, byH);
+        bx += w + 2;
+      }
+      ctx.textAlign = 'center';
+      ctx.font = '11px monospace';
+      ctx.fillStyle = 'rgba(0,0,0,.4)';
+      ctx.fillText(barcodeTxt, W / 2, byTop + byH + 20);
+
+      ctx.font = '10px Arial';
+      ctx.fillStyle = 'rgba(0,0,0,.3)';
+      ctx.fillText('ChileCity Bank · comprobante generado digitalmente', W / 2, H - 24);
+
+      const link = document.createElement('a');
+      link.download = `comprobante-${folio}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     }
 
     async function hacerTransferencia() {
@@ -200,11 +414,52 @@
     }
 
     // Historial
+    function etiquetaDia(fecha) {
+      const hoy = new Date();
+      const ayer = new Date(); ayer.setDate(hoy.getDate() - 1);
+      const mismoDia = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+      if (mismoDia(fecha, hoy)) return 'Hoy';
+      if (mismoDia(fecha, ayer)) return 'Ayer';
+      return fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    // Mini gráfico de dona (ingresos vs egresos), 100% client-side sobre los
+    // datos ya cargados del historial — no consulta ninguna API adicional.
+    function renderDonutIngresosEgresos(transacciones) {
+      const card = document.getElementById('hist-donut-card');
+      if (!card) return;
+      let ingresos = 0, egresos = 0;
+      transacciones.forEach(t => {
+        if (t.tipo === 'egreso') egresos += Number(t.monto) || 0;
+        else ingresos += Number(t.monto) || 0;
+      });
+      const total = ingresos + egresos;
+      if (total <= 0) { card.style.display = 'none'; return; }
+
+      const R = 34, C = 2 * Math.PI * R;
+      const pctIn = ingresos / total;
+      const dashIn = pctIn * C;
+
+      card.style.display = 'flex';
+      card.innerHTML = `
+        <svg class="hist-donut-svg" width="88" height="88" viewBox="0 0 88 88">
+          <circle cx="44" cy="44" r="${R}" fill="none" stroke="rgba(255,107,107,.85)" stroke-width="12"/>
+          <circle cx="44" cy="44" r="${R}" fill="none" stroke="var(--green)" stroke-width="12"
+            stroke-dasharray="${dashIn} ${C - dashIn}" stroke-dashoffset="${C * 0.25}" stroke-linecap="round"/>
+        </svg>
+        <div class="hist-donut-legend">
+          <div class="hist-donut-item"><span class="hist-donut-dot in"></span>Ingresos<span class="hist-donut-val">${formatCLP(ingresos)}</span></div>
+          <div class="hist-donut-item"><span class="hist-donut-dot out"></span>Egresos<span class="hist-donut-val">${formatCLP(egresos)}</span></div>
+        </div>`;
+    }
+
     async function mostrarHistorial() {
       const wrap = document.getElementById('historial-wrap');
       const lista = document.getElementById('historial-lista');
+      const donutCard = document.getElementById('hist-donut-card');
       ocultarSecciones();
       wrap.style.display = 'block';
+      if (donutCard) donutCard.style.display = 'none';
       lista.innerHTML = '<div class="historial-vacio">Cargando...</div>';
 
       try {
@@ -214,23 +469,37 @@
           lista.innerHTML = '<div class="historial-vacio">Sin movimientos aún</div>';
           return;
         }
-        lista.innerHTML = data.transacciones.map(t => {
+
+        renderDonutIngresosEgresos(data.transacciones);
+
+        // Agrupa por día ("Hoy", "Ayer", fecha) preservando el orden que ya
+        // trae la API (más reciente primero).
+        let html = '';
+        let grupoActual = null;
+        data.transacciones.forEach(t => {
+          const fechaObj = new Date(t.created_at);
+          const etiqueta = etiquetaDia(fechaObj);
+          if (etiqueta !== grupoActual) {
+            html += `<div class="hist-day-header">${etiqueta}</div>`;
+            grupoActual = etiqueta;
+          }
           const signo = t.tipo === 'egreso' ? '-' : '+';
-          const fecha = new Date(t.created_at).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+          const hora = fechaObj.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
           const icono = t.tipo === 'sueldo'
             ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
             : t.tipo === 'ingreso'
             ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`
             : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
-          return `<div class="historial-item">
+          html += `<div class="historial-item">
             <div class="hi-icono ${t.tipo}">${icono}</div>
             <div class="hi-desc">
               <div class="hi-desc-titulo">${escHtml(t.descripcion || t.tipo)}</div>
-              <div class="hi-desc-fecha">${fecha}</div>
+              <div class="hi-desc-fecha">${hora}</div>
             </div>
             <div class="hi-monto ${t.tipo}">${signo}${formatCLP(t.monto)}</div>
           </div>`;
-        }).join('');
+        });
+        lista.innerHTML = html;
       } catch(e) {
         lista.innerHTML = '<div class="historial-vacio">Error al cargar historial</div>';
       }
@@ -941,6 +1210,8 @@
       if (!home || !card) return;
       home.style.display = 'none';
       card.style.display = 'flex';
+      const flipEl = document.getElementById('bank-card-flip');
+      if (flipEl) flipEl.classList.remove('flipped');
       bdcInitTilt();
     }
 
@@ -973,8 +1244,10 @@
         if (_bdcTiltRaf) cancelAnimationFrame(_bdcTiltRaf);
         _bdcTiltRaf = requestAnimationFrame(() => {
           el.style.transform = `perspective(1100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`;
-          el.style.setProperty('--glare-x', `${x * 100}%`);
-          el.style.setProperty('--glare-y', `${y * 100}%`);
+          // El brillo/holograma se mueve en dirección opuesta al cursor (1 - x,
+          // 1 - y), como el reflejo de luz de una tarjeta real al inclinarla.
+          el.style.setProperty('--glare-x', `${(1 - x) * 100}%`);
+          el.style.setProperty('--glare-y', `${(1 - y) * 100}%`);
           el.classList.add('bdc-tilting');
         });
       }
