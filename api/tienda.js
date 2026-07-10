@@ -89,6 +89,34 @@ async function initTables(sql) {
   await sql`
     CREATE INDEX IF NOT EXISTS idx_vehiculos_propietario ON vehiculos_registrados(propietario_actual_id)
   `;
+
+  // Tabla del Mercado (marketplace entre ciudadanos): cada publicación apunta
+  // a un ítem puntual del inventario del vendedor. El nombre/categoría/foto
+  // se copian desde ese ítem al publicar (no se piden de nuevo), y el
+  // vendedor solo aporta descripción + precio.
+  await sql`
+    CREATE TABLE IF NOT EXISTS mercado_publicaciones (
+      id              SERIAL PRIMARY KEY,
+      vendedor_id     TEXT NOT NULL,
+      vendedor_nombre TEXT,
+      inventario_id   INTEGER NOT NULL,
+      nombre          TEXT NOT NULL,
+      categoria       TEXT NOT NULL,
+      imagen_url      TEXT,
+      descripcion     TEXT NOT NULL,
+      precio          BIGINT NOT NULL,
+      activa          BOOLEAN NOT NULL DEFAULT TRUE,
+      comprador_id    TEXT,
+      vendida_at      TIMESTAMPTZ,
+      created_at      TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_mercado_activa ON mercado_publicaciones(activa)
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_mercado_vendedor ON mercado_publicaciones(vendedor_id)
+  `;
   schemaReady = true;
 }
 
@@ -425,6 +453,194 @@ export default async function handler(req, res) {
       await sql`UPDATE inventario SET discord_id = ${nuevo_propietario_id} WHERE id = ${vehiculo.inventario_id}`;
 
       return res.status(200).json({ vehiculo: rows[0] });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // MERCADO — compraventa de ítems del inventario entre ciudadanos
+    // ══════════════════════════════════════════════════════════════════════
+
+    // ── GET: listado público de publicaciones activas ────────────────────────
+    if (req.method === "GET" && action === "mercado_listado") {
+      const { categoria } = req.query;
+      let rows;
+      if (categoria && CATEGORIAS_VALIDAS.includes(categoria)) {
+        rows = await sql`
+          SELECT * FROM mercado_publicaciones
+          WHERE activa = TRUE AND categoria = ${categoria}
+          ORDER BY created_at DESC
+        `;
+      } else {
+        rows = await sql`
+          SELECT * FROM mercado_publicaciones
+          WHERE activa = TRUE
+          ORDER BY created_at DESC
+        `;
+      }
+      return res.status(200).json({
+        publicaciones: rows.map(p => ({ ...p, precio: toNumber(p.precio) })),
+      });
+    }
+
+    // ── GET: mis publicaciones (activas y vendidas) ───────────────────────────
+    if (req.method === "GET" && action === "mercado_mis_publicaciones") {
+      const rows = await sql`
+        SELECT * FROM mercado_publicaciones
+        WHERE vendedor_id = ${discord_id}
+        ORDER BY activa DESC, created_at DESC
+      `;
+      return res.status(200).json({
+        publicaciones: rows.map(p => ({ ...p, precio: toNumber(p.precio) })),
+      });
+    }
+
+    // ── POST: publicar un ítem del inventario en el mercado ───────────────────
+    if (req.method === "POST" && action === "mercado_publicar") {
+      const { item_id, descripcion, precio } = req.body;
+      if (!item_id || !descripcion || !String(descripcion).trim())
+        return res.status(400).json({ error: "Faltan campos requeridos." });
+
+      const descTrim = String(descripcion).trim();
+      if (descTrim.length > 300)
+        return res.status(400).json({ error: "La descripción no puede superar los 300 caracteres." });
+
+      const precioNum = parseMonto(precio);
+      if (precioNum === null || precioNum <= 0)
+        return res.status(400).json({ error: "El precio debe ser un número entero mayor a 0." });
+
+      const items = await sql`
+        SELECT * FROM inventario WHERE id = ${item_id} AND discord_id = ${discord_id}
+      `;
+      if (items.length === 0)
+        return res.status(404).json({ error: "Ese ítem no existe en tu inventario." });
+      const item = items[0];
+
+      const yaPublicado = await sql`
+        SELECT id FROM mercado_publicaciones WHERE inventario_id = ${item_id} AND activa = TRUE
+      `;
+      if (yaPublicado.length > 0)
+        return res.status(409).json({ error: "Ese ítem ya está publicado en el mercado." });
+
+      const rows = await sql`
+        INSERT INTO mercado_publicaciones
+          (vendedor_id, vendedor_nombre, inventario_id, nombre, categoria, imagen_url, descripcion, precio)
+        VALUES
+          (${discord_id}, ${discord_name}, ${item_id}, ${item.nombre}, ${item.categoria}, ${item.imagen_url}, ${descTrim}, ${precioNum})
+        RETURNING *
+      `;
+      return res.status(201).json({
+        publicacion: { ...rows[0], precio: toNumber(rows[0].precio) },
+      });
+    }
+
+    // ── POST: bajar (despublicar) una publicación propia ──────────────────────
+    if (req.method === "POST" && action === "mercado_despublicar") {
+      const { publicacion_id } = req.body;
+      if (!publicacion_id)
+        return res.status(400).json({ error: "Falta publicacion_id" });
+
+      const pubs = await sql`SELECT * FROM mercado_publicaciones WHERE id = ${publicacion_id}`;
+      if (pubs.length === 0)
+        return res.status(404).json({ error: "Publicación no encontrada." });
+      if (pubs[0].vendedor_id !== discord_id)
+        return res.status(403).json({ error: "No puedes bajar una publicación que no es tuya." });
+      if (!pubs[0].activa)
+        return res.status(409).json({ error: "Esa publicación ya no está activa." });
+
+      await sql`UPDATE mercado_publicaciones SET activa = FALSE WHERE id = ${publicacion_id}`;
+      return res.status(200).json({ ok: true });
+    }
+
+    // ── POST: comprar una publicación del mercado ─────────────────────────────
+    if (req.method === "POST" && action === "mercado_comprar") {
+      const { publicacion_id } = req.body;
+      if (!publicacion_id)
+        return res.status(400).json({ error: "Falta publicacion_id" });
+
+      const pubs = await sql`SELECT * FROM mercado_publicaciones WHERE id = ${publicacion_id}`;
+      if (pubs.length === 0)
+        return res.status(404).json({ error: "Publicación no encontrada." });
+      const pub = pubs[0];
+
+      if (!pub.activa)
+        return res.status(409).json({ error: "Esa publicación ya no está disponible." });
+      if (pub.vendedor_id === discord_id)
+        return res.status(400).json({ error: "No puedes comprar tu propia publicación." });
+
+      const precio = toNumber(pub.precio);
+
+      const cuentasComprador = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      if (cuentasComprador.length === 0)
+        return res.status(403).json({ error: "Necesitas una cuenta bancaria para comprar." });
+      const saldoComprador = toNumber(cuentasComprador[0].saldo);
+      if (saldoComprador < precio)
+        return res.status(400).json({
+          error: "Fondos insuficientes",
+          saldo: saldoComprador,
+          precio,
+          faltante: precio - saldoComprador,
+        });
+
+      const cuentasVendedor = await sql`SELECT * FROM banco WHERE discord_id = ${pub.vendedor_id}`;
+      if (cuentasVendedor.length === 0)
+        return res.status(409).json({ error: "El vendedor ya no tiene una cuenta bancaria activa." });
+      const saldoVendedor = toNumber(cuentasVendedor[0].saldo);
+
+      // El ítem podría haber sido movido/eliminado desde que se publicó
+      const itemRows = await sql`SELECT * FROM inventario WHERE id = ${pub.inventario_id}`;
+      if (itemRows.length === 0 || itemRows[0].discord_id !== pub.vendedor_id) {
+        await sql`UPDATE mercado_publicaciones SET activa = FALSE WHERE id = ${publicacion_id}`;
+        return res.status(409).json({ error: "Ese ítem ya no está disponible." });
+      }
+
+      const nuevoSaldoComprador = saldoComprador - precio;
+      const nuevoSaldoVendedor  = saldoVendedor + precio;
+
+      await sql`UPDATE banco SET saldo = ${nuevoSaldoComprador} WHERE discord_id = ${discord_id}`;
+      await sql`UPDATE banco SET saldo = ${nuevoSaldoVendedor} WHERE discord_id = ${pub.vendedor_id}`;
+
+      await sql`
+        INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+        VALUES (${discord_id}, 'egreso', ${precio}, ${'Compra en mercado: ' + pub.nombre}, ${nuevoSaldoComprador})
+      `;
+      await sql`
+        INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+        VALUES (${pub.vendedor_id}, 'ingreso', ${precio}, ${'Venta en mercado: ' + pub.nombre}, ${nuevoSaldoVendedor})
+      `;
+
+      // Mover el ítem de inventario al comprador
+      await sql`UPDATE inventario SET discord_id = ${discord_id} WHERE id = ${pub.inventario_id}`;
+
+      // Si es un vehículo con patente registrada, actualizar también su
+      // propietario (mismo mecanismo que transferirVehiculo).
+      const vehRows = await sql`SELECT * FROM vehiculos_registrados WHERE inventario_id = ${pub.inventario_id}`;
+      if (vehRows.length > 0) {
+        const veh = vehRows[0];
+        const dniComprador = await sql`SELECT nombre1, apellido1 FROM dni WHERE discord_id = ${discord_id}`;
+        const nombreComprador = dniComprador.length > 0
+          ? `${dniComprador[0].nombre1} ${dniComprador[0].apellido1}`
+          : discord_name;
+        const historial = Array.isArray(veh.duenos_anteriores) ? veh.duenos_anteriores : [];
+        historial.push({
+          discord_id: veh.propietario_actual_id,
+          nombre: veh.propietario_actual_nombre,
+          fecha_hasta: new Date().toISOString(),
+        });
+        await sql`
+          UPDATE vehiculos_registrados
+          SET propietario_actual_id = ${discord_id},
+              propietario_actual_nombre = ${nombreComprador},
+              duenos_anteriores = ${JSON.stringify(historial)}::jsonb
+          WHERE id = ${veh.id}
+        `;
+      }
+
+      await sql`
+        UPDATE mercado_publicaciones
+        SET activa = FALSE, comprador_id = ${discord_id}, vendida_at = NOW()
+        WHERE id = ${publicacion_id}
+      `;
+
+      return res.status(200).json({ ok: true, nuevoSaldo: nuevoSaldoComprador });
     }
 
     // ── ADMIN: listar todos los productos (incluyendo inactivos) ─────────────
