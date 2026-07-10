@@ -192,7 +192,7 @@
     function mostrarError(tipo) {
       ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen',
        'concesionario-screen','mis-autos-screen',
-       'inventario-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen',
+       'inventario-screen','mercado-screen','admin-tienda-screen','base-datos-screen','panel-admin-screen',
        'casino-screen','apuestas-screen','admin-casino-screen','error-403','error-404'].forEach(s => {
         const el = document.getElementById(s);
         if (el) el.classList.remove('active');
