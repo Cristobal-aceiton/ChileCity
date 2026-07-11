@@ -43,3 +43,58 @@ body[data-screen="banco-screen"] #bg-particles {
   background: rgba(34, 232, 138, .1) !important;
   border-color: rgba(34, 232, 138, .28) !important;
 }
+
+/* 3) Tarjeta física con flip 3D real, en verde (antes usaba una foto real
+   de la tarjeta de Tenpo + su logo de marca; ahora es un diseño propio del
+   banco de ChileCity, sin logos ni marcas de terceros). */
+#banco-screen .bdc-card-stage .bank-card {
+  background: radial-gradient(130% 150% at 100% 0%, rgba(34, 232, 138, .16), transparent 55%),
+              linear-gradient(150deg, #12251c 0%, #0b0f0d 55%, #16241c 100%) !important;
+  border-color: rgba(34, 232, 138, .35) !important;
+}
+#banco-screen .bdc-card-stage .bank-card::before {
+  color: rgba(34, 232, 138, .08) !important;
+}
+#banco-screen .bank-logo-text {
+  background: linear-gradient(135deg, #6bf5b6, var(--nbk-green, #22e88a)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+#banco-screen .bdc-nfc { color: rgba(34, 232, 138, .6) !important; }
+#banco-screen .bank-chip {
+  background: linear-gradient(135deg, #cfead9, #8fe0b8 45%, #4fae82) !important;
+}
+#banco-screen .bank-numero { color: #eafff4 !important; }
+#banco-screen .bank-titular-label { color: rgba(34, 232, 138, .55) !important; }
+#banco-screen .bdc-network-tag { color: rgba(34, 232, 138, .6) !important; }
+#banco-screen .bdc-network-word { color: var(--nbk-green, #22e88a) !important; font-family: Inter, sans-serif !important; }
+#banco-screen .bank-card-back-op { color: rgba(34, 232, 138, .55) !important; }
+#banco-screen .bdc-flip-hint svg { color: var(--nbk-green, #22e88a); }
+
+/* Mini tarjeta del banner "Tarjeta física" — reemplaza la foto real por un
+   mini render propio del banco. */
+#banco-screen .nbk-mini-card-cc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(150deg, #16241c 0%, #0b0f0d 100%);
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+#banco-screen .nbk-mini-card-chip {
+  position: absolute;
+  left: 6px;
+  top: 7px;
+  width: 10px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #cfead9, #8fe0b8 45%, #4fae82);
+}
+#banco-screen .nbk-mini-card-brand {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .5px;
+  color: var(--nbk-green, #22e88a);
+}
