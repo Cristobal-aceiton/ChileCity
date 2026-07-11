@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap);*,::after,::before{box-sizing:border-box;margin:0;padding:0}:root{--neon:#e02020;--neon2:#ff4444;--glow:rgba(220,30,30,0.45);--ease:cubic-bezier(0.16, 1, 0.3, 1);--discord:#5865F2;--discord2:#7289da;--discord-glow:rgba(88,101,242,0.5);--gold:#F59E0B;--green:#10B981;--font-mono:'JetBrains Mono',monospace;--font-serif:'Fraunces','Bebas Neue',serif}body,html{height:100%;font-family:Inter,sans-serif;overflow:hidden;background:#000;color:#fff}
+@import url(https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&display=swap);*,::after,::before{box-sizing:border-box;margin:0;padding:0}:root{--neon:#e02020;--neon2:#ff4444;--glow:rgba(220,30,30,0.45);--ease:cubic-bezier(0.16, 1, 0.3, 1);--discord:#5865F2;--discord2:#7289da;--discord-glow:rgba(88,101,242,0.5);--gold:#F59E0B;--green:#10B981;--font-mono:'JetBrains Mono',monospace;--font-serif:'Fraunces','Bebas Neue',serif}body,html{height:100%;font-family:Inter,sans-serif;overflow:hidden;background:#000;color:#fff}
 #bg-fx{position:fixed;inset:0;z-index:0;overflow:hidden;background:#050505}
 #bg-fx::before,#bg-fx::after{content:'';position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
 #bg-fx::before{width:120vmax;height:120vmax;top:-55vmax;left:-45vmax;background:radial-gradient(circle at 30% 30%,rgba(224,32,32,.5),rgba(224,32,32,0) 62%);animation:bgFloatA 36s ease-in-out infinite alternate}
@@ -1311,3 +1311,70 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 /* Tarjeta física: esquinas más grandes, look más limpio */
 #banco-screen .bdc-card-stage .bank-card{border-radius:26px!important}
 #banco-screen .bdc-copy-btn{border-radius:var(--bk-radius-sm)!important;background:rgba(255,255,255,.04)!important;backdrop-filter:blur(10px)}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BANCO — PASADA "FUTURISTA" v43
+   Fix del bug de gradiente-en-texto que dejaba el título como una barra
+   sólida ilegible + fuera el serif "elegante/antiguo" (Fraunces) de todo
+   el módulo → entra Space Grotesk (geométrica, tech) + JetBrains Mono para
+   cifras. Look tipo HUD: anillo animado en el logo, líneas neón finas,
+   acentos cian+dorado.
+   ══════════════════════════════════════════════════════════════════════════ */
+#banco-screen{--bk-cyan:#22D3EE;--bk-cyan-soft:rgba(34,211,238,.16)}
+
+/* Fuera Fraunces (serif "antiguo") en TODO el módulo banco, entra Space Grotesk */
+#banco-screen .bdc-brand,
+#banco-screen .bank-logo-text,
+#banco-screen .historial-titulo,
+#banco-screen .bdc-hero-name{
+  font-family:'Space Grotesk',Inter,sans-serif!important;
+}
+#banco-screen .bdc-brand{font-weight:600!important;letter-spacing:.2px!important}
+#banco-screen .historial-titulo{font-weight:700!important;letter-spacing:.2px!important}
+
+/* ── FIX: el título del hero se veía como una barra sólida ──────────────
+   El gradiente con background-clip:text no renderiza parejo en todos los
+   navegadores/webviews. Se cambia a color sólido con glow — 100% confiable
+   y además encaja más con el look "HUD futurista". */
+.bdc-hero-name{
+  background:none!important;
+  -webkit-background-clip:initial!important;background-clip:initial!important;
+  -webkit-text-fill-color:#fff!important;color:#fff!important;
+  font-weight:700!important;font-size:23px!important;letter-spacing:.2px!important;
+  text-shadow:0 0 18px rgba(212,175,55,.55),0 0 42px rgba(34,211,238,.18);
+}
+.bdc-hero-name b{color:var(--bk-gold-light);font-weight:700}
+.bdc-hero-tag{
+  background:none!important;-webkit-text-fill-color:initial!important;
+  color:var(--bk-cyan)!important;opacity:1;font-family:var(--font-mono);
+  font-weight:500!important;font-size:10px!important;letter-spacing:2.4px!important;
+}
+
+/* ── Anillo tipo HUD girando alrededor del logo ──────────────────────── */
+.bdc-hero-logo{position:relative;overflow:visible!important;background:linear-gradient(160deg,#141d33,#070a14)!important}
+.bdc-hero-logo::before{
+  content:'';position:absolute;inset:-7px;border-radius:32px;padding:1.5px;
+  background:conic-gradient(from 0deg,var(--bk-gold),var(--bk-cyan),transparent 40%,transparent 60%,var(--bk-gold));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:bdcRingSpin 5s linear infinite;opacity:.85;
+}
+@keyframes bdcRingSpin{to{transform:rotate(360deg)}}
+@media (max-width:480px){.bdc-hero-logo::before{inset:-6px;border-radius:26px}}
+
+/* ── Acentos "línea neón" y tipografía técnica en el resto del módulo ──── */
+#banco-screen .seccion-title{background:linear-gradient(135deg,#fff,var(--bk-cyan))!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+#banco-screen .bdc-section-label{font-family:var(--font-mono)!important;letter-spacing:2px!important}
+#banco-screen .bdc-account-pill{font-family:var(--font-mono)!important;color:var(--bk-cyan)!important;background:rgba(34,211,238,.1)!important;border-color:rgba(34,211,238,.28)!important}
+#banco-screen .bdc-balance-label{font-family:var(--font-mono)!important;letter-spacing:1.6px!important}
+#banco-screen .bdc-balance-card::before{background:linear-gradient(115deg,rgba(34,211,238,.06),transparent 55%)!important}
+#banco-screen .bdc-prod-tag{font-family:var(--font-mono)!important;letter-spacing:1px!important}
+#banco-screen .btn-green{font-family:'Space Grotesk',Inter,sans-serif!important;font-weight:700!important}
+
+/* Línea de "scan" sutil recorriendo la card principal — detalle HUD */
+#banco-screen .bdc-balance-card{position:relative}
+#banco-screen .bdc-balance-card:not(.bdc-balance-card-ahorro)::before{
+  content:'';position:absolute;left:0;right:0;top:0;height:1px;width:100%;transform:none;
+  background:linear-gradient(90deg,transparent,var(--bk-cyan),var(--bk-gold),transparent);
+  opacity:.55;z-index:2;
+}
