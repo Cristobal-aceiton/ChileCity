@@ -98,3 +98,88 @@ body[data-screen="banco-screen"] #bg-particles {
   letter-spacing: .5px;
   color: var(--nbk-green, #22e88a);
 }
+
+/* 4) "Última transacción" dentro de la tarjeta de saldo, mismo look que el
+   resto del módulo (borde sutil, texto atenuado, verde para ingresos). */
+#banco-screen .nbk-ultima-tx-wrap {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--nbk-border, rgba(255,255,255,.08));
+  position: relative;
+  z-index: 1;
+}
+#banco-screen .nbk-ultima-tx-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--nbk-text-dim, rgba(255,255,255,.45));
+  margin-bottom: 10px;
+}
+#banco-screen .nbk-ultima-tx-vertodo {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #fff;
+  background: rgba(255,255,255,.06);
+  border: none;
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background .2s;
+}
+#banco-screen .nbk-ultima-tx-vertodo:hover { background: rgba(255,255,255,.12); }
+#banco-screen .nbk-ultima-tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--nbk-bg-card2, #171b21);
+  border: 1px solid var(--nbk-border, rgba(255,255,255,.08));
+  border-radius: 16px;
+  padding: 10px 12px;
+  min-height: 52px;
+}
+#banco-screen .nbk-ultima-tx-icono {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.05);
+  color: var(--nbk-green, #22e88a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+#banco-screen .nbk-ultima-tx-icono.egreso { color: rgba(255,255,255,.55); }
+#banco-screen .nbk-ultima-tx-desc { flex: 1; min-width: 0; }
+#banco-screen .nbk-ultima-tx-titulo {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#banco-screen .nbk-ultima-tx-fecha {
+  font-size: 11px;
+  color: var(--nbk-text-dim, rgba(255,255,255,.45));
+  margin-top: 1px;
+}
+#banco-screen .nbk-ultima-tx-monto {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: rgba(255,255,255,.75);
+}
+#banco-screen .nbk-ultima-tx-monto.ingreso,
+#banco-screen .nbk-ultima-tx-monto.sueldo { color: var(--nbk-green, #22e88a); }
+#banco-screen .nbk-ultima-tx-vacio {
+  font-size: 12.5px;
+  color: var(--nbk-text-dim, rgba(255,255,255,.45));
+  padding: 6px 2px;
+}
