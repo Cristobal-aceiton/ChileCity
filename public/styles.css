@@ -1240,3 +1240,74 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
   #banco-screen .bdc-productos-grid{gap:10px}
   #banco-screen .bank-saldo-valor{font-size:clamp(21px,7vw,28px)!important}
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BANCO — PASADA "MODERNO" v42
+   Menos banca-clásica/ornamental, más fintech actual: glass cards con blur,
+   esquinas grandes, tipografía sans bold para los números, gradientes vivos
+   tipo mesh, chips de ícono a color en vez de bordes finitos por todos lados.
+   ══════════════════════════════════════════════════════════════════════════ */
+#banco-screen{
+  --bk-radius-lg:28px;--bk-radius-md:20px;--bk-radius-sm:14px;
+  --bk-accent2:#8B5CF6;--bk-accent2-soft:rgba(139,92,246,.16);
+}
+#banco-screen{background:
+  radial-gradient(ellipse 55% 30% at 12% 0%,rgba(139,92,246,.10),transparent 60%),
+  radial-gradient(ellipse 55% 32% at 88% 6%,rgba(212,175,55,.10),transparent 60%),
+  var(--bk-bg0)!important
+}
+
+/* ── Hero: más flat/moderno, menos "escudo clásico" ──────────────────── */
+.bdc-hero{gap:14px;padding:10px 0 6px}
+.bdc-hero-glow{width:300px;height:220px;background:radial-gradient(ellipse,rgba(212,175,55,.25),transparent 65%),radial-gradient(ellipse at 70% 30%,rgba(139,92,246,.18),transparent 60%)}
+.bdc-hero-logo{width:88px;height:88px;border-radius:26px;background:rgba(255,255,255,.045);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 50px -18px rgba(0,0,0,.65),0 0 44px rgba(212,175,55,.16);padding:16px}
+.bdc-hero-name{font-family:Inter,sans-serif;font-weight:800;font-size:24px;letter-spacing:-.5px;background:linear-gradient(135deg,#fff 20%,var(--bk-gold-light) 90%)}
+.bdc-hero-name b{font-weight:800}
+.bdc-hero-tag{font-weight:700;letter-spacing:2px;font-size:10.5px;background:linear-gradient(90deg,var(--bk-gold),var(--bk-accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;opacity:.9}
+@media (max-width:480px){.bdc-hero-logo{width:72px;height:72px;border-radius:20px;padding:13px}.bdc-hero-name{font-size:19px}}
+
+/* ── Glass panels: cards, forms, historial, productos ────────────────── */
+#banco-screen .bdc-balance-card{
+  border-radius:var(--bk-radius-lg)!important;
+  background:linear-gradient(155deg,rgba(20,29,51,.85) 0%,rgba(10,17,34,.9) 60%,rgba(7,11,22,.92) 100%)!important;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:0 30px 60px -26px rgba(0,0,0,.7)!important;
+}
+#banco-screen .bdc-balance-card::after{background:radial-gradient(circle,rgba(212,175,55,.28),transparent 70%)}
+#banco-screen .bdc-balance-card-ahorro{border-radius:var(--bk-radius-lg)!important;background:linear-gradient(150deg,rgba(30,20,45,.85) 0%,rgba(14,10,20,.92) 100%)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(139,92,246,.22)!important}
+#banco-screen .bdc-ahorro-card .bdc-brand{color:#c9b6f7}
+#banco-screen .bdc-ahorro-abrir-btn{background:linear-gradient(135deg,var(--bk-accent2),#6d3fd6);color:#fff;box-shadow:0 8px 20px -8px rgba(139,92,246,.6)}
+#banco-screen .bdc-ahorro-abrir-btn:hover{background:linear-gradient(135deg,#a578f9,var(--bk-accent2))}
+#banco-screen .bdc-balance-card .bank-saldo-valor{font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:-1px!important}
+#banco-screen .bdc-brand-mark{border-radius:12px;width:36px;height:36px}
+#banco-screen .bdc-account-pill{border-radius:12px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.85)}
+
+#banco-screen .proximo-sueldo{border-radius:var(--bk-radius-md)!important;background:rgba(212,175,55,.07)!important;backdrop-filter:blur(10px)}
+
+#banco-screen .bdc-prod-card{border-radius:var(--bk-radius-md)!important;background:rgba(255,255,255,.035)!important;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07)!important}
+#banco-screen .bdc-prod-card:hover{background:rgba(255,255,255,.055)!important}
+#banco-screen .bdc-mini-card{border-radius:14px}
+
+/* Botones de acción → chips de ícono a color, más "app moderna" */
+#banco-screen .bank-actions{gap:12px}
+#banco-screen .bank-action-btn{
+  border-radius:var(--bk-radius-md)!important;background:rgba(255,255,255,.035)!important;
+  border:1px solid rgba(255,255,255,.06)!important;padding:16px 10px;gap:10px;
+}
+#banco-screen .bank-action-btn svg{width:20px;height:20px;padding:9px;box-sizing:content-box;border-radius:13px;background:rgba(212,175,55,.14);stroke:var(--bk-gold)!important}
+#banco-screen .bank-action-btn.transfer svg{background:rgba(16,185,129,.15);stroke:var(--bk-green)!important}
+#banco-screen .bank-action-btn.ahorro svg{background:var(--bk-accent2-soft);stroke:var(--bk-accent2)!important}
+#banco-screen .bank-action-btn:hover{background:rgba(255,255,255,.06)!important;transform:translateY(-3px)}
+#banco-screen .bank-action-btn span{font-weight:700;letter-spacing:.3px}
+@media (max-width:480px){#banco-screen .bank-action-btn svg{width:18px;height:18px;padding:8px}}
+
+#banco-screen .rc-form{border-radius:var(--bk-radius-lg)!important;background:rgba(255,255,255,.03)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#banco-screen .form-group input,#banco-screen .form-group select{border-radius:var(--bk-radius-sm)!important}
+#banco-screen .btn-green{border-radius:var(--bk-radius-sm)!important;background:linear-gradient(135deg,var(--bk-gold-light),var(--bk-gold))!important}
+
+#banco-screen .historial-item{border-radius:var(--bk-radius-sm)!important;background:rgba(255,255,255,.03)!important;backdrop-filter:blur(8px)}
+
+/* Tarjeta física: esquinas más grandes, look más limpio */
+#banco-screen .bdc-card-stage .bank-card{border-radius:26px!important}
+#banco-screen .bdc-copy-btn{border-radius:var(--bk-radius-sm)!important;background:rgba(255,255,255,.04)!important;backdrop-filter:blur(10px)}
