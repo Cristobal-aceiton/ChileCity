@@ -19,10 +19,10 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=55">
-  <link rel="stylesheet" href="/page-loader.css?v=55">
-  <link rel="stylesheet" href="/clean-theme.css?v=55">
-  <link rel="stylesheet" href="/banco-theme.css?v=55">
+  <link rel="stylesheet" href="/styles.css?v=56">
+  <link rel="stylesheet" href="/page-loader.css?v=56">
+  <link rel="stylesheet" href="/clean-theme.css?v=56">
+  <link rel="stylesheet" href="/banco-theme.css?v=56">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -125,7 +125,7 @@
 
       <!-- Vista sin cuenta -->
       <div class="rc-form nbk-onboarding" id="banco-crear-form" style="display:none;">
-        <div class="nbk-onboarding-logo"><img src="/logo-x.png?v=55" alt="Logo"></div>
+        <div class="nbk-onboarding-logo"><img src="/logo-x.png?v=56" alt="Logo"></div>
         <h2>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/></svg>
           Abrir Cuenta Bancaria
@@ -149,7 +149,7 @@
             <div class="nbk-balance-topbar nbk-balance-topbar-solo">
               <div class="bdc-account-pill nbk-account-pill">Cta. •• <span id="bdc-cuenta-corta">0000</span></div>
             </div>
-            <span class="bdc-brand-mark nbk-brand-mark"><img src="/logo-x.png?v=55" alt="Logo"></span>
+            <span class="bdc-brand-mark nbk-brand-mark"><img src="/logo-x.png?v=56" alt="Logo"></span>
             <div class="nbk-balance-label">Saldo disponible</div>
             <div class="bank-saldo-valor nbk-balance-value" id="bank-saldo">$0</div>
 
@@ -197,8 +197,9 @@
           <div class="nbk-tarjeta-promo" onclick="mostrarVistaTarjeta()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')mostrarVistaTarjeta()">
             <div class="nbk-tarjeta-promo-left">
               <div class="nbk-tarjeta-promo-label">Tarjeta física</div>
-              <div class="nbk-mini-card-photo">
-                <img src="/tarjeta-tenpo.png?v=55" alt="Tarjeta Tenpo">
+              <div class="nbk-mini-card-photo nbk-mini-card-cc" aria-hidden="true">
+                <span class="nbk-mini-card-chip"></span>
+                <span class="nbk-mini-card-brand">CC</span>
               </div>
               <div class="nbk-tarjeta-promo-num">•••• •••• •••• ••••</div>
             </div>
@@ -434,24 +435,53 @@
           </button>
 
           <div class="bdc-card-stage">
-            <img src="/tarjeta-tenpo.png?v=55" alt="Tarjeta Tenpo" class="bdc-card-photo" id="bank-card">
-          </div>
+            <div class="bank-card-flip" id="bank-card-flip" onclick="bdcToggleFlip(event)" role="button" tabindex="0" aria-label="Girar tarjeta">
 
-          <div class="bdc-card-info">
-            <div class="bdc-card-info-row">
-              <span class="bdc-card-info-label">Titular</span>
-              <span class="bdc-card-info-val" id="bank-titular">—</span>
+              <!-- Frente -->
+              <div class="bank-card" id="bank-card">
+                <div class="bank-card-top">
+                  <span class="bank-logo-text">ChileCity Bank</span>
+                  <div class="bdc-card-top-right">
+                    <svg class="bdc-nfc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a10 10 0 0 1 20 0"/><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                  </div>
+                </div>
+                <div class="bank-chip"></div>
+                <div class="bank-numero-row">
+                  <span class="bank-numero bn-masked" id="bank-numero" data-full="0000-0000-0000-0000">•••• •••• •••• 0000</span>
+                  <button class="bn-eye-btn" onclick="bdcToggleReveal(event)" aria-label="Mostrar número" title="Mostrar número">
+                    <svg id="bn-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <div class="bank-bottom">
+                  <div>
+                    <div class="bank-titular-label">Titular</div>
+                    <div class="bank-titular-nombre" id="bank-titular">—</div>
+                    <div class="bank-rut-valor" id="bank-rut">—</div>
+                  </div>
+                  <div class="bdc-card-network">
+                    <span class="bdc-network-tag">Cuenta</span>
+                    <span class="bdc-network-word">Corriente</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reverso -->
+              <div class="bank-card bank-card-back">
+                <div class="bank-card-back-banda"></div>
+                <div class="bank-card-back-firma">
+                  <div class="bank-card-back-firma-strip"><span id="bank-firma-nombre">—</span></div>
+                  <div class="bank-card-back-cvv">···</div>
+                </div>
+                <div class="bank-card-back-info">
+                  <div class="bank-card-back-linea">Tarjeta virtual de uso exclusivo dentro de ChileCity RP. No representa dinero real.</div>
+                  <div class="bank-card-back-op" id="bank-card-back-op">OP-000000</div>
+                </div>
+              </div>
+
             </div>
-            <div class="bdc-card-info-row">
-              <span class="bdc-card-info-label">RUT</span>
-              <span class="bdc-card-info-val" id="bank-rut">—</span>
-            </div>
-            <div class="bdc-card-info-row">
-              <span class="bdc-card-info-label">N° de cuenta</span>
-              <span class="bdc-card-info-val bn-masked" id="bank-numero" data-full="0000-0000-0000-0000">•••• •••• •••• 0000</span>
-              <button class="bn-eye-btn" onclick="bdcToggleReveal(event)" aria-label="Mostrar número" title="Mostrar número">
-                <svg id="bn-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
+            <div class="bdc-flip-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
+              Toca la tarjeta para ver el reverso
             </div>
           </div>
 
@@ -975,27 +1005,27 @@
   </div>
 
 
-  <script defer src="/js/app.js?v=55"></script>
-  <script defer src="/js/dashboard-fx.js?v=55"></script>
-  <script defer src="/js/notificaciones.js?v=55"></script>
-  <script defer src="/js/pull-to-refresh.js?v=55"></script>
-  <script defer src="/js/registro-civil.js?v=55"></script>
-  <script defer src="/js/banco.js?v=55"></script>
+  <script defer src="/js/app.js?v=56"></script>
+  <script defer src="/js/dashboard-fx.js?v=56"></script>
+  <script defer src="/js/notificaciones.js?v=56"></script>
+  <script defer src="/js/pull-to-refresh.js?v=56"></script>
+  <script defer src="/js/registro-civil.js?v=56"></script>
+  <script defer src="/js/banco.js?v=56"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=55"></script>
-  <script defer src="/js/mercado.js?v=55"></script>
-  <script defer src="/js/vehiculos.js?v=55"></script>
-  <script defer src="/js/concesionario.js?v=55"></script>
-  <script defer src="/js/mis-autos.js?v=55"></script>
-  <script defer src="/js/admin-tienda.js?v=55"></script>
-  <script defer src="/js/empresas.js?v=55"></script>
-  <script defer src="/js/logros.js?v=55"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=55"></script>
-  <script defer src="/js/panel-admin.js?v=55"></script>
-  <script defer src="/js/comisaria.js?v=55"></script>
-  <script defer src="/js/casino.js?v=55"></script>
-  <script defer src="/js/apuestas.js?v=55"></script>
-  <script defer src="/js/parallax-landing.js?v=55"></script>
-  <script defer src="/js/bg-particles.js?v=55"></script>
+  <script defer src="/js/tienda.js?v=56"></script>
+  <script defer src="/js/mercado.js?v=56"></script>
+  <script defer src="/js/vehiculos.js?v=56"></script>
+  <script defer src="/js/concesionario.js?v=56"></script>
+  <script defer src="/js/mis-autos.js?v=56"></script>
+  <script defer src="/js/admin-tienda.js?v=56"></script>
+  <script defer src="/js/empresas.js?v=56"></script>
+  <script defer src="/js/logros.js?v=56"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=56"></script>
+  <script defer src="/js/panel-admin.js?v=56"></script>
+  <script defer src="/js/comisaria.js?v=56"></script>
+  <script defer src="/js/casino.js?v=56"></script>
+  <script defer src="/js/apuestas.js?v=56"></script>
+  <script defer src="/js/parallax-landing.js?v=56"></script>
+  <script defer src="/js/bg-particles.js?v=56"></script>
 </body>
 </html>
