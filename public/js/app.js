@@ -662,11 +662,16 @@
         // realmente tiene el rol (misma verificación que abrirPanelAdmin/
         // abrirPanelStaff, nunca se confía en el cliente para ocultarlas
         // como única barrera, solo para no mostrar ruido a usuarios civiles).
-        const staffCard = document.getElementById('staff-card');
-        const adminCard = document.getElementById('admin-panel-card');
+        // Existen dos copias en el HTML (versión agrupada mobile y versión
+        // plana desktop, ver .nav-mobile-only/.nav-desktop-only en
+        // styles.css), por eso se togglean por clase y no por id único.
+        document.querySelectorAll('.js-staff-card').forEach(el => {
+          el.style.display = dStaff.esStaff ? '' : 'none';
+        });
+        document.querySelectorAll('.js-admin-card').forEach(el => {
+          el.style.display = dAdmin.esAdmin ? '' : 'none';
+        });
         const staffSection = document.getElementById('nav-section-staff');
-        if (staffCard) staffCard.style.display = dStaff.esStaff ? '' : 'none';
-        if (adminCard) adminCard.style.display = dAdmin.esAdmin ? '' : 'none';
         if (staffSection) staffSection.style.display = (dStaff.esStaff || dAdmin.esAdmin) ? '' : 'none';
 
         let cargoHtml;
