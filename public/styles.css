@@ -860,10 +860,10 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .bdc-home{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
 .bdc-balance-card{width:100%;max-width:460px;min-width:0;border-radius:24px;padding:28px 28px 24px;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#00227A 0%,#00298F 45%,#0057D9 100%);box-shadow:0 24px 54px -20px rgba(0,41,143,.55);animation:fadeUp .5s var(--ease) both}
 .bdc-balance-card::before{content:'';position:absolute;top:-45%;right:-15%;width:75%;height:190%;background:linear-gradient(115deg,rgba(255,255,255,.14),transparent 55%);transform:rotate(8deg);pointer-events:none}
-.bdc-balance-card::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#dc1e1e 0%,#ff5252 50%,#dc1e1e 100%);z-index:1}
+.bdc-balance-card::after{content:'';position:absolute;left:-10%;bottom:-30%;width:65%;height:65%;background:radial-gradient(circle,rgba(220,30,30,.35),transparent 70%);pointer-events:none;z-index:0}
 .bdc-balance-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;margin-bottom:20px;flex-wrap:wrap}
 .bdc-brand{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px}
-.bdc-account-pill{font-size:11px;font-weight:700;background:rgba(255,255,255,.16);border:1px solid rgba(255,80,80,.45);padding:5px 12px;border-radius:99px;font-family:var(--font-mono)}
+.bdc-account-pill{font-size:11px;font-weight:700;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:5px 12px;border-radius:99px;font-family:var(--font-mono)}
 .bdc-balance-label{font-size:11.5px;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;position:relative;z-index:1}
 .bdc-balance-card .bank-saldo-valor{font-family:var(--font-mono);font-size:clamp(24px,5.2vw,34px);font-weight:700;letter-spacing:-.5px;margin-top:4px;position:relative;z-index:1;color:#fff;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -1089,9 +1089,10 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .bdc-ahorro-inactiva-txt{font-size:12.5px;color:rgba(255,255,255,.55);margin-top:2px}
 .bdc-ahorro-abrir-btn{margin-top:10px;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;align-self:flex-start;background:var(--bank-gold);color:var(--bank-dark);transition:transform .2s var(--ease)}
 .bdc-ahorro-abrir-btn:hover{transform:translateY(-2px)}
-.bdc-brand-logo{height:44px;width:auto;display:block;object-fit:contain}
-.bdc-brand-chip{background:#fff;padding:6px 12px;border-radius:12px;box-shadow:0 4px 14px rgba(0,10,40,.25)}
-.bdc-brand-chip .bdc-brand-logo{height:26px}
+.bdc-brand-mark{width:32px;height:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;padding:6px;box-shadow:0 3px 10px rgba(0,10,40,.3);flex-shrink:0}
+.bdc-brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
+.bdc-brand-name{color:#fff}
+.bdc-brand-name b{font-weight:800}
 .bank-logo-img{height:22px;display:block;filter:drop-shadow(0 0 6px rgba(212,175,55,.35))}
 
 /* Selector de origen en Transferencias */
