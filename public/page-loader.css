@@ -28,7 +28,6 @@
   height: 84px;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 0 40px rgba(220, 30, 30, .35);
   animation: ccLoaderPulse 1.6s ease-in-out infinite;
 }
 
@@ -40,6 +39,6 @@
 }
 
 @keyframes ccLoaderPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(220, 30, 30, .35); }
-  50%      { transform: scale(1.06); box-shadow: 0 0 60px rgba(220, 30, 30, .55); }
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
 }
