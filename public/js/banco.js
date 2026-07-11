@@ -42,6 +42,7 @@
 
         mostrarTarjeta(data.cuenta, dniData.dni);
         ccAnimateNumber(document.getElementById('bank-saldo'), data.cuenta.saldo, formatCLP);
+        renderAhorroCard(data.cuenta);
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
 
         // Próximo sueldo
@@ -172,6 +173,7 @@
         document.getElementById('banco-loading').style.display = 'none';
         document.getElementById('bank-saldo').textContent = formatCLP(data.cuenta.saldo);
         if (currentDNI) mostrarTarjeta(data.cuenta, currentDNI);
+        renderAhorroCard(data.cuenta);
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
         document.getElementById('proximo-sueldo-box').style.display = 'none';
       } catch (err) {
@@ -179,13 +181,64 @@
       }
     }
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // NAVEGACIÓN DE SUB-VISTAS (Fase 4)
+    // ══════════════════════════════════════════════════════════════════════════
+    // Mapea el id lógico de cada botón de "Mis productos"/acciones a su
+    // elemento .subvista real dentro de #banco-cuenta-wrap.
+    const BANCO_SUBVISTAS = {
+      transfer: 'transfer-form',
+      historial: 'historial-wrap',
+      contactos: 'contactos-wrap',
+      prestamo: 'prestamo-wrap',
+      ahorro: 'ahorro-wrap',
+    };
+
+    function navegarBanco(id) {
+      const home = document.getElementById('bdc-home-view');
+      const card = document.getElementById('bdc-card-view');
+      if (home) home.style.display = 'none';
+      if (card) { card.style.display = 'none'; card.classList.remove('activa'); }
+      Object.values(BANCO_SUBVISTAS).forEach(elId => {
+        const el = document.getElementById(elId);
+        if (el) el.classList.remove('activa');
+      });
+
+      if (id === 'home') {
+        if (home) home.style.display = 'flex';
+        return;
+      }
+      const targetId = BANCO_SUBVISTAS[id];
+      const target = targetId && document.getElementById(targetId);
+      if (target) target.classList.add('activa');
+    }
+
+    function volverBancoHome() {
+      navegarBanco('home');
+    }
+
     // Transferencia
     function mostrarTransferir() {
-      ocultarSecciones();
-      document.getElementById('transfer-form').style.display = 'flex';
+      navegarBanco('transfer');
+      const ahorroOpt = document.getElementById('transfer-origen-ahorro-opt');
+      if (ahorroOpt) ahorroOpt.style.display = (currentCuenta && currentCuenta.ahorro_activa) ? '' : 'none';
+      const origenSel = document.getElementById('transfer-origen');
+      if (origenSel) origenSel.value = 'corriente';
+      actualizarOrigenTransferencia();
     }
     function ocultarTransferir() {
-      document.getElementById('transfer-form').style.display = 'none';
+      navegarBanco('home');
+    }
+
+    // Alterna entre "transferir a un tercero desde Corriente" y "mover desde
+    // Ahorro de vuelta a tu propia Corriente" (nunca a terceros).
+    function actualizarOrigenTransferencia() {
+      const origen = document.getElementById('transfer-origen')?.value || 'corriente';
+      const rutGroup = document.getElementById('transfer-rut-group');
+      const fijoGroup = document.getElementById('transfer-destino-fijo-group');
+      const esAhorro = origen === 'ahorro';
+      if (rutGroup) rutGroup.style.display = esAhorro ? 'none' : 'flex';
+      if (fijoGroup) fijoGroup.style.display = esAhorro ? 'flex' : 'none';
     }
 
     // Caché liviana de contactos guardados, para mostrar el nombre del
@@ -372,6 +425,9 @@
     }
 
     async function hacerTransferencia() {
+      const origen = document.getElementById('transfer-origen')?.value || 'corriente';
+      if (origen === 'ahorro') return hacerRetiroAhorro();
+
       const rut   = document.getElementById('transfer-rut').value.trim();
       const monto = document.getElementById('transfer-monto').value.trim();
       const errEl = document.getElementById('transfer-error');
@@ -411,6 +467,148 @@
       }
       btn.disabled = false;
       btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Transferir`;
+    }
+
+    // ── Retiro Ahorro → Corriente (vía formulario de Transferencias) ────────
+    // Reutiliza el mismo formulario/UI que hacerTransferencia(), pero pega
+    // contra ahorro_mover porque nunca puede ir a un tercero.
+    async function hacerRetiroAhorro() {
+      const monto = document.getElementById('transfer-monto').value.trim();
+      const errEl = document.getElementById('transfer-error');
+      const okEl  = document.getElementById('transfer-success');
+      errEl.classList.remove('visible'); okEl.classList.remove('visible');
+
+      if (!monto) {
+        errEl.textContent = 'Ingresa el monto.';
+        errEl.classList.add('visible'); return;
+      }
+
+      const btn = document.getElementById('btn-transferir');
+      btn.disabled = true; btn.textContent = 'Transfiriendo...';
+
+      try {
+        const res = await fetch('/api/banco?action=ahorro_mover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ direccion: 'retiro', monto }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.';
+          errEl.classList.add('visible');
+        } else {
+          currentCuenta.saldo = data.nuevoSaldo;
+          currentCuenta.ahorro_saldo = data.nuevoAhorroSaldo;
+          document.getElementById('bank-saldo').textContent = formatCLP(data.nuevoSaldo);
+          renderAhorroCard(currentCuenta);
+          okEl.textContent = `Retiro exitoso. Nuevo saldo en Corriente: ${formatCLP(data.nuevoSaldo)}`;
+          okEl.classList.add('visible');
+          if (typeof sonidoConfirmacion === 'function') sonidoConfirmacion();
+          document.getElementById('transfer-monto').value = '';
+        }
+      } catch (e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Transferir`;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // CUENTA DE AHORRO (Fase 4)
+    // ══════════════════════════════════════════════════════════════════════════
+    // Sincroniza la tarjeta de saldo de Ahorro en la vista principal y el
+    // detalle dentro de la propia sub-vista Ahorro con currentCuenta.
+    function renderAhorroCard(cuenta) {
+      cuenta = cuenta || {};
+      const activa = !!cuenta.ahorro_activa;
+
+      const saldoEl = document.getElementById('bdc-ahorro-saldo');
+      const inactivaEl = document.getElementById('bdc-ahorro-inactiva');
+      const labelEl = document.getElementById('bdc-ahorro-label');
+      if (saldoEl) saldoEl.style.display = activa ? '' : 'none';
+      if (inactivaEl) inactivaEl.style.display = activa ? 'none' : 'flex';
+      if (labelEl) labelEl.textContent = activa ? 'Saldo en Ahorro' : 'Cuenta de Ahorro';
+      if (activa && saldoEl) ccAnimateNumber(saldoEl, cuenta.ahorro_saldo || 0, formatCLP);
+
+      const crearForm = document.getElementById('ahorro-crear-form');
+      const activaWrap = document.getElementById('ahorro-activa-wrap');
+      if (crearForm) crearForm.style.display = activa ? 'none' : 'flex';
+      if (activaWrap) activaWrap.style.display = activa ? 'block' : 'none';
+      const detalle = document.getElementById('ahorro-saldo-detalle');
+      if (activa && detalle) detalle.textContent = formatCLP(cuenta.ahorro_saldo || 0);
+    }
+
+    async function abrirAhorro() {
+      try {
+        const res = await fetch('/api/banco?action=ahorro_abrir', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) {
+          if (typeof mostrarToast === 'function') mostrarToast(data.error || 'No se pudo abrir la Cuenta de Ahorro.', true);
+          return;
+        }
+        currentCuenta = { ...currentCuenta, ...data.cuenta };
+        renderAhorroCard(currentCuenta);
+        if (typeof mostrarToast === 'function') mostrarToast('Cuenta de Ahorro activada.', false);
+      } catch (e) {
+        if (typeof mostrarToast === 'function') mostrarToast('Error de conexión.', true);
+      }
+    }
+
+    function mostrarAhorro() {
+      navegarBanco('ahorro');
+      document.getElementById('ahorro-error')?.classList.remove('visible');
+      document.getElementById('ahorro-success')?.classList.remove('visible');
+      renderAhorroCard(currentCuenta);
+    }
+
+    async function depositarAhorro() {
+      const monto = document.getElementById('ahorro-deposito-monto').value.trim();
+      const errEl = document.getElementById('ahorro-error');
+      const okEl  = document.getElementById('ahorro-success');
+      errEl.classList.remove('visible'); okEl.classList.remove('visible');
+
+      if (!monto) {
+        errEl.textContent = 'Ingresa el monto a depositar.';
+        errEl.classList.add('visible'); return;
+      }
+
+      const btn = document.getElementById('btn-ahorro-depositar');
+      btn.disabled = true; btn.textContent = 'Depositando...';
+
+      try {
+        const res = await fetch('/api/banco?action=ahorro_mover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ direccion: 'deposito', monto }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.';
+          errEl.classList.add('visible');
+        } else {
+          currentCuenta.saldo = data.nuevoSaldo;
+          currentCuenta.ahorro_saldo = data.nuevoAhorroSaldo;
+          document.getElementById('bank-saldo').textContent = formatCLP(data.nuevoSaldo);
+          renderAhorroCard(currentCuenta);
+          okEl.textContent = `Depósito exitoso. Saldo en Ahorro: ${formatCLP(data.nuevoAhorroSaldo)}`;
+          okEl.classList.add('visible');
+          if (typeof sonidoConfirmacion === 'function') sonidoConfirmacion();
+          document.getElementById('ahorro-deposito-monto').value = '';
+        }
+      } catch (e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Depositar';
+    }
+
+    // Atajo desde la sub-vista Ahorro: abre Transferencias con el origen ya
+    // fijado en "ahorro" (mismo formulario, misma validación).
+    function irARetirarAhorro() {
+      mostrarTransferir();
+      const origenSel = document.getElementById('transfer-origen');
+      if (origenSel) origenSel.value = 'ahorro';
+      actualizarOrigenTransferencia();
     }
 
     // Historial
@@ -454,11 +652,9 @@
     }
 
     async function mostrarHistorial() {
-      const wrap = document.getElementById('historial-wrap');
       const lista = document.getElementById('historial-lista');
       const donutCard = document.getElementById('hist-donut-card');
-      ocultarSecciones();
-      wrap.style.display = 'block';
+      navegarBanco('historial');
       if (donutCard) donutCard.style.display = 'none';
       lista.innerHTML = '<div class="historial-vacio">Cargando...</div>';
 
@@ -524,8 +720,7 @@
     }
 
     async function mostrarPrestamo() {
-      ocultarSecciones();
-      document.getElementById('prestamo-wrap').style.display = 'block';
+      navegarBanco('prestamo');
       renderEstadoPrestamo();
       await cargarHistorialPrestamos();
     }
@@ -1024,16 +1219,8 @@
     // ══════════════════════════════════════════════════════════════════════════
 
     // ── Contactos ─────────────────────────────────────────────────────────────
-    function ocultarSecciones() {
-      document.getElementById('transfer-form').style.display = 'none';
-      document.getElementById('historial-wrap').style.display = 'none';
-      document.getElementById('contactos-wrap').style.display = 'none';
-      document.getElementById('prestamo-wrap').style.display = 'none';
-    }
-
     async function mostrarContactos() {
-      ocultarSecciones();
-      document.getElementById('contactos-wrap').style.display = 'block';
+      navegarBanco('contactos');
       await cargarContactos();
     }
 
@@ -1124,8 +1311,7 @@
     }
 
     function transferirAContacto(rut) {
-      ocultarSecciones();
-      document.getElementById('transfer-form').style.display = 'flex';
+      mostrarTransferir();
       document.getElementById('transfer-rut').value = rut;
       document.getElementById('transfer-monto').focus();
     }
