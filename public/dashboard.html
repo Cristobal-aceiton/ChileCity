@@ -126,7 +126,7 @@
           </div>
           <div class="balance-hero-value" id="profile-balance">—</div>
           <div class="balance-hero-sub" id="profile-balance-sub">Cargando saldo…</div>
-          <button class="balance-hero-btn" onclick="abrirSeccion('banco-screen'); cargarBanco()">
+          <button class="balance-hero-btn" onclick="abrirSeccion('banco-screen')">
             Ir al Banco <span>›</span>
           </button>
         </div>
@@ -155,21 +155,21 @@
         <div class="nav-section">
           <div class="nav-section-label">Identidad y comunidad</div>
           <div class="nav-grid">
-            <div class="nav-card" onclick="abrirSeccion('registro-civil'); cargarDNI()">
+            <div class="nav-card" onclick="abrirSeccion('registro-civil')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.2" cy="12" r="2.4"/><path d="M13.2 9.7h6M13.2 12.3h6M13.2 14.9h3.5"/></svg>
               </div>
               <div><div class="card-title">Registro Civil</div><div class="card-sub">Tu cédula de identidad</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen'); cargarPerfilPublico()">
+            <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 11h4M20 9v4" stroke-width="1.8"/></svg>
               </div>
               <div><div class="card-title">Perfil Público</div><div class="card-sub">Ciudadanos, inventarios y registros</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('logros-screen'); cargarLogros()" style="--card-color:#fbbf24; --card-glow:rgba(251,191,36,0.15)">
+            <div class="nav-card" onclick="abrirSeccion('logros-screen')" style="--card-color:#fbbf24; --card-glow:rgba(251,191,36,0.15)">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>
               </div>
@@ -182,28 +182,28 @@
         <div class="nav-section">
           <div class="nav-section-label">Finanzas y comercio</div>
           <div class="nav-grid">
-            <div class="nav-card" onclick="abrirSeccion('banco-screen'); cargarBanco()">
+            <div class="nav-card" onclick="abrirSeccion('banco-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/><path d="M5 15h2M9 15h6"/></svg>
               </div>
               <div><div class="card-title">Banco</div><div class="card-sub">Tu cuenta bancaria</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('tienda-screen'); cargarTienda()">
+            <div class="nav-card" onclick="abrirSeccion('tienda-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
               </div>
               <div><div class="card-title">Tienda</div><div class="card-sub">Armas, licencias y más</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('mercado-screen'); cargarMercado()" style="--card-color:#fb923c; --card-glow:rgba(251,146,60,0.15)">
+            <div class="nav-card" onclick="abrirSeccion('mercado-screen')" style="--card-color:#fb923c; --card-glow:rgba(251,146,60,0.15)">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="M9 13a3 3 0 0 0 6 0"/></svg>
               </div>
               <div><div class="card-title">Mercado</div><div class="card-sub">Compra y vende con otros ciudadanos</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('empresas-screen'); cargarEmpresas()" style="--card-color:#38bdf8; --card-glow:rgba(56,189,248,0.15)">
+            <div class="nav-card" onclick="abrirSeccion('empresas-screen')" style="--card-color:#38bdf8; --card-glow:rgba(56,189,248,0.15)">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg>
               </div>
@@ -216,21 +216,21 @@
         <div class="nav-section">
           <div class="nav-section-label">Vehículos</div>
           <div class="nav-grid">
-            <div class="nav-card" onclick="abrirSeccion('concesionario-screen'); cargarConcesionario()" style="--card-color:#10B981; --card-glow:rgba(16,185,129,0.15)">
+            <div class="nav-card" onclick="abrirSeccion('concesionario-screen')" style="--card-color:#10B981; --card-glow:rgba(16,185,129,0.15)">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17h1.5a2.5 2.5 0 0 0 5 0h5a2.5 2.5 0 0 0 5 0H21v-5l-2.5-4.5A2 2 0 0 0 16.75 6.5H14"/><path d="M14 6.5V17"/><path d="M3 12h11"/><path d="M6.5 6.5H10a1 1 0 0 1 1 1V12"/></svg>
               </div>
               <div><div class="card-title">Concesionario</div><div class="card-sub">Compra tu próximo vehículo</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('mis-autos-screen'); cargarMisAutos()" style="--card-color:#3fb673; --card-glow:rgba(63,182,115,0.14)">
+            <div class="nav-card" onclick="abrirSeccion('mis-autos-screen')" style="--card-color:#3fb673; --card-glow:rgba(63,182,115,0.14)">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="2.5" y="11" width="19" height="6.5" rx="2"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>
               </div>
               <div><div class="card-title">Tus Autos</div><div class="card-sub">Tu garage, registros y transferencias</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('inventario-screen'); cargarInventario()">
+            <div class="nav-card" onclick="abrirSeccion('inventario-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
               </div>
@@ -250,7 +250,7 @@
               <div><div class="card-title">Comisaría Virtual</div><div class="card-sub">Carabineros de Chile — Multas, antecedentes y denuncias</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('casino-screen'); cargarCasino()" style="--card-color:#F59E0B; --card-glow:rgba(245,158,11,0.15)">
+            <div class="nav-card" onclick="abrirSeccion('casino-screen')" style="--card-color:#F59E0B; --card-glow:rgba(245,158,11,0.15)">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/></svg>
               </div>
@@ -284,7 +284,7 @@
 
       <!-- Versión plana original (todas las cards del mismo tamaño, en líneas): solo desktop -->
       <div class="nav-grid nav-desktop-only">
-        <div class="nav-card" onclick="abrirSeccion('registro-civil'); cargarDNI()">
+        <div class="nav-card" onclick="abrirSeccion('registro-civil')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.2" cy="12" r="2.4"/><path d="M13.2 9.7h6M13.2 12.3h6M13.2 14.9h3.5"/></svg>
           </div>
@@ -292,7 +292,7 @@
           <span class="card-arrow">›</span>
         </div>
 
-        <div class="nav-card" onclick="abrirSeccion('banco-screen'); cargarBanco()">
+        <div class="nav-card" onclick="abrirSeccion('banco-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/><path d="M5 15h2M9 15h6"/></svg>
           </div>
@@ -300,49 +300,49 @@
           <span class="card-arrow">›</span>
         </div>
 
-        <div class="nav-card" onclick="abrirSeccion('tienda-screen'); cargarTienda()">
+        <div class="nav-card" onclick="abrirSeccion('tienda-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
           <div><div class="card-title">Tienda</div><div class="card-sub">Armas, licencias y más</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('concesionario-screen'); cargarConcesionario()" style="--card-color:#10B981; --card-glow:rgba(16,185,129,0.15)">
+        <div class="nav-card" onclick="abrirSeccion('concesionario-screen')" style="--card-color:#10B981; --card-glow:rgba(16,185,129,0.15)">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17h1.5a2.5 2.5 0 0 0 5 0h5a2.5 2.5 0 0 0 5 0H21v-5l-2.5-4.5A2 2 0 0 0 16.75 6.5H14"/><path d="M14 6.5V17"/><path d="M3 12h11"/><path d="M6.5 6.5H10a1 1 0 0 1 1 1V12"/></svg>
           </div>
           <div><div class="card-title">Concesionario</div><div class="card-sub">Compra tu próximo vehículo</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('mis-autos-screen'); cargarMisAutos()" style="--card-color:#3fb673; --card-glow:rgba(63,182,115,0.14)">
+        <div class="nav-card" onclick="abrirSeccion('mis-autos-screen')" style="--card-color:#3fb673; --card-glow:rgba(63,182,115,0.14)">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="2.5" y="11" width="19" height="6.5" rx="2"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>
           </div>
           <div><div class="card-title">Tus Autos</div><div class="card-sub">Tu garage, registros y transferencias</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('inventario-screen'); cargarInventario()">
+        <div class="nav-card" onclick="abrirSeccion('inventario-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
           </div>
           <div><div class="card-title">Inventario</div><div class="card-sub">Armas, licencias y otros objetos</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('mercado-screen'); cargarMercado()" style="--card-color:#fb923c; --card-glow:rgba(251,146,60,0.15)">
+        <div class="nav-card" onclick="abrirSeccion('mercado-screen')" style="--card-color:#fb923c; --card-glow:rgba(251,146,60,0.15)">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="M9 13a3 3 0 0 0 6 0"/></svg>
           </div>
           <div><div class="card-title">Mercado</div><div class="card-sub">Compra y vende con otros ciudadanos</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen'); cargarPerfilPublico()">
+        <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 11h4M20 9v4" stroke-width="1.8"/></svg>
           </div>
           <div><div class="card-title">Perfil Público</div><div class="card-sub">Ciudadanos, inventarios y registros</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('empresas-screen'); cargarEmpresas()" style="--card-color:#38bdf8; --card-glow:rgba(56,189,248,0.15)">
+        <div class="nav-card" onclick="abrirSeccion('empresas-screen')" style="--card-color:#38bdf8; --card-glow:rgba(56,189,248,0.15)">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg>
           </div>
@@ -363,7 +363,7 @@
           <div><div class="card-title">Admin</div><div class="card-sub">Panel de administración general</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('logros-screen'); cargarLogros()" style="--card-color:#fbbf24; --card-glow:rgba(251,191,36,0.15)">
+        <div class="nav-card" onclick="abrirSeccion('logros-screen')" style="--card-color:#fbbf24; --card-glow:rgba(251,191,36,0.15)">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>
           </div>
@@ -379,7 +379,7 @@
           <span class="card-arrow">›</span>
         </div>
 
-        <div class="nav-card" onclick="abrirSeccion('casino-screen'); cargarCasino()" style="--card-color:#F59E0B; --card-glow:rgba(245,158,11,0.15)">
+        <div class="nav-card" onclick="abrirSeccion('casino-screen')" style="--card-color:#F59E0B; --card-glow:rgba(245,158,11,0.15)">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/></svg>
           </div>
