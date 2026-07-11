@@ -43,6 +43,7 @@
         mostrarTarjeta(data.cuenta, dniData.dni);
         ccAnimateNumber(document.getElementById('bank-saldo'), data.cuenta.saldo, formatCLP);
         renderAhorroCard(data.cuenta);
+        cargarUltimaTransaccion();
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
 
         // Próximo sueldo
@@ -55,6 +56,40 @@
       } catch (err) {
         document.getElementById('banco-loading').style.display = 'none';
         document.getElementById('banco-crear-form').style.display = 'flex';
+      }
+    }
+
+    // Trae solo el movimiento más reciente para la mini-preview de la
+    // tarjeta de saldo (misma API que usa el historial completo).
+    async function cargarUltimaTransaccion() {
+      const el = document.getElementById('bdc-ultima-tx');
+      if (!el || !currentUser?.id) return;
+      try {
+        const res = await fetch(`/api/banco?action=historial&discord_id=${currentUser.id}`);
+        const data = await res.json();
+        const t = data.transacciones && data.transacciones[0];
+        if (!t) {
+          el.innerHTML = '<div class="nbk-ultima-tx-vacio">Sin movimientos aún</div>';
+          return;
+        }
+        const signo = t.tipo === 'egreso' ? '-' : '+';
+        const fechaObj = new Date(t.created_at);
+        const fecha = fechaObj.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const icono = t.tipo === 'sueldo'
+          ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
+          : t.tipo === 'ingreso'
+          ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`
+          : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+        el.innerHTML = `
+          <div class="nbk-ultima-tx-icono ${t.tipo}">${icono}</div>
+          <div class="nbk-ultima-tx-desc">
+            <div class="nbk-ultima-tx-titulo">${escHtml(t.descripcion || t.tipo)}</div>
+            <div class="nbk-ultima-tx-fecha">${fecha}</div>
+          </div>
+          <div class="nbk-ultima-tx-monto ${t.tipo}">${signo}${formatCLP(t.monto)}</div>
+        `;
+      } catch (e) {
+        el.innerHTML = '<div class="nbk-ultima-tx-vacio">Error al cargar</div>';
       }
     }
 
