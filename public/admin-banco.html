@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Banco — ChileCity RP</title>
+  <meta name="description" content="Sumérgete en el servidor de roleplay más inmersivo de habla hispana. Economía real, facciones, trabajos y una comunidad activa. Tu personaje. Tu historia." />
+  <meta name="theme-color" content="#e02020" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://chilecity.cl/" />
+  <meta property="og:title"       content="ChileCity RP — Servidor de Roleplay" />
+  <meta property="og:description" content="El servidor de roleplay más inmersivo de habla hispana. Vive tu historia en una ciudad viva. Tu personaje. Tu reglas." />
+  <meta property="og:image"       content="https://i.imgur.com/yH4wCVJ.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="ChileCity RP" />
+  <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
+  <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
+  <link rel="stylesheet" href="/styles.css?v=51">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ChileCity RP">
+  <link rel="apple-touch-icon" href="/logo.webp">
+</head>
+<body data-screen="admin-screen">
+
+  <!-- CC_PAGE_MAP: mapa id-de-pantalla -> archivo, usado por mostrarPantalla()
+       en app.js para navegar entre páginas cuando el id pedido no vive en esta. -->
+  <script>
+    window.CC_CURRENT_SCREEN = 'admin-screen';
+    window.CC_PAGE_MAP = {
+      'landing': '/',
+      'dashboard': '/dashboard.html',
+      'registro-civil': '/registro-civil.html',
+      'banco-screen': '/banco.html',
+      'admin-screen': '/admin-banco.html',
+      'tienda-screen': '/tienda.html',
+      'inventario-screen': '/inventario.html',
+      'mercado-screen': '/mercado.html',
+      'concesionario-screen': '/concesionario.html',
+      'mis-autos-screen': '/mis-autos.html',
+      'admin-tienda-screen': '/admin-tienda.html',
+      'casino-screen': '/casino.html',
+      'apuestas-screen': '/apuestas.html',
+      'admin-casino-screen': '/admin-casino.html',
+      'error-403': '/error-403.html',
+      'error-404': '/error-404.html',
+      'perfil-publico-screen': '/perfil-publico.html',
+      'empresas-screen': '/empresas.html',
+      'logros-screen': '/logros.html',
+      'admin-empresas-screen': '/admin-empresas.html',
+      'panel-admin-screen': '/panel-admin.html',
+      'staff-panel-screen': '/staff-panel.html',
+      'comisaria-screen': '/comisaria.html'
+    };
+  </script>
+
+<body>
+
+  <div id="bg-fx" aria-hidden="true">
+    <div id="bg-particles"></div>
+  </div>
+  <div class="overlay"></div>
+  <div id="grain-overlay"></div>
+
+  <div class="logo-corner">
+    <img src="/logo.webp" alt="Logo ChileCity RP">
+  </div>
+
+  <!-- LANDING -->
+
+  <!-- ═══ admin-screen ═══ -->
+  <section class="screen seccion-screen active" id="admin-screen">
+    <div class="seccion-container" style="max-width:740px;">
+      <div class="seccion-header">
+        <button class="sec-back" onclick="volverDesdeHerramienta()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+        <div class="seccion-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Administrar Banco
+        </div>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="adminTab('usuarios')">Usuarios</button>
+        <button class="admin-tab" onclick="adminTab('sueldos')">Sueldos</button>
+        <button class="admin-tab" onclick="adminTab('prestamos')">Préstamos<span id="admin-prestamos-badge" style="display:none;"></span></button>
+      </div>
+
+      <div class="admin-panel" style="width:100%;">
+
+        <!-- Tab Usuarios -->
+        <div class="admin-seccion visible" id="admin-tab-usuarios">
+          <div class="rc-loading" id="admin-loading-users">
+            <div class="spinner"></div>
+            <span>Cargando usuarios...</span>
+          </div>
+          <div id="admin-usuarios-lista"></div>
+        </div>
+
+        <!-- Tab Sueldos -->
+        <div class="admin-seccion" id="admin-tab-sueldos">
+          <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+            <p style="color:rgba(255,255,255,0.4); font-size:13px;">Selecciona un usuario en la pestaña Usuarios para gestionar sus sueldos.</p>
+          </div>
+          <div class="rc-error" id="admin-sueldo-info" style="background:rgba(168,85,247,0.1); border-color:rgba(168,85,247,0.25); color:#d8b4fe; display:none;">Selecciona un usuario primero desde la pestaña Usuarios.</div>
+          <div id="admin-sueldo-form-wrap" style="display:none; flex-direction:column; gap:14px;">
+            <p id="admin-sueldo-target-label" style="color: var(--gold); font-weight:700; font-size:14px;"></p>
+            <div class="rc-form" style="gap:14px;">
+              <h2 style="font-size:18px; display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Agregar sueldo
+              </h2>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nombre del sueldo</label>
+                  <input type="text" id="admin-sueldo-nombre" placeholder="Ej: Policia, Mecánico...">
+                </div>
+                <div class="form-group">
+                  <label>Monto ($)</label>
+                  <input type="number" id="admin-sueldo-monto" placeholder="Ej: 150000" min="1">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cada cuántos días se cobra</label>
+                <input type="number" id="admin-sueldo-dias" placeholder="Ej: 7" min="1">
+              </div>
+              <div class="rc-error" id="admin-sueldo-error"></div>
+              <button class="btn-green" onclick="adminCrearSueldo()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Asignar Sueldo
+              </button>
+            </div>
+            <div id="admin-sueldos-lista-target"></div>
+          </div>
+        </div>
+
+        <!-- Tab Préstamos -->
+        <div class="admin-seccion" id="admin-tab-prestamos">
+          <div class="tienda-admin-tabs" style="margin-bottom:0;">
+            <button class="ta-tab active" onclick="adminPrestamoFiltro('pendiente', this)">Pendientes</button>
+            <button class="ta-tab" onclick="adminPrestamoFiltro('aprobado', this)">Aprobados</button>
+            <button class="ta-tab" onclick="adminPrestamoFiltro('pagado', this)">Pagados</button>
+            <button class="ta-tab" onclick="adminPrestamoFiltro('rechazado', this)">Rechazados</button>
+          </div>
+          <div class="rc-loading" id="admin-loading-prestamos">
+            <div class="spinner"></div>
+            <span>Cargando préstamos...</span>
+          </div>
+          <div id="admin-prestamos-lista"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Elementos globales compartidos (modales, notificaciones, etc.) ── -->
+
+  <!-- DASHBOARD -->
+
+
+  <!-- REGISTRO CIVIL -->
+
+
+  <!-- BANCO -->
+
+
+  <!-- MODAL: recibo de transferencia exitosa — reemplaza el toast de 3s para
+       que el usuario confirme conscientemente montos grandes antes de seguir -->
+  <div class="admin-modal-overlay" id="modal-recibo-transferencia">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-recibo-transferencia')">✕</button>
+      <div class="tx-receipt" id="tx-receipt-voucher">
+        <div class="tx-receipt-folio">Comprobante N° <span id="recibo-tx-folio">000000</span></div>
+        <div class="tx-receipt-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="tx-receipt-titulo">Transferencia exitosa</div>
+        <div class="tx-receipt-monto" id="recibo-tx-monto">$0</div>
+        <div class="tx-receipt-palabras" id="recibo-tx-palabras">—</div>
+        <div class="tx-receipt-detalle">
+          <div class="tx-receipt-row">
+            <span class="tx-receipt-row-label">Destinatario</span>
+            <span class="tx-receipt-row-val" id="recibo-tx-destino">—</span>
+          </div>
+          <div class="tx-receipt-row">
+            <span class="tx-receipt-row-label">Fecha</span>
+            <span class="tx-receipt-row-val" id="recibo-tx-fecha">—</span>
+          </div>
+          <div class="tx-receipt-row">
+            <span class="tx-receipt-row-label">Tu nuevo saldo</span>
+            <span class="tx-receipt-row-val" id="recibo-tx-saldo">—</span>
+          </div>
+        </div>
+        <div class="tx-receipt-barcode"></div>
+        <div class="tx-receipt-barcode-txt" id="recibo-tx-barcode-txt">CC-000000-000000</div>
+      </div>
+      <div class="tx-receipt-actions">
+        <button class="btn-descargar-voucher" onclick="descargarVoucher()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar comprobante
+        </button>
+        <button class="btn-green" onclick="cerrarModal('modal-recibo-transferencia')" style="flex:1; justify-content:center;">
+          Listo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Top 10 Más Ricos -->
+  <div class="admin-modal-overlay" id="modal-top-ricos">
+    <div class="admin-modal tr-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-top-ricos')">✕</button>
+      <h3 class="tr-titulo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/></svg>
+        Top 10 Más Ricos
+      </h3>
+      <div class="tr-lista" id="tr-lista">
+        <div class="skeleton-wrap">
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
+        </div>
+      </div>
+      <div class="tr-mi-posicion" id="tr-mi-posicion" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN BANCO -->
+
+
+  <!-- MODAL: rechazar préstamo -->
+  <div class="admin-modal-overlay" id="modal-prestamo-rechazar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-prestamo-rechazar')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Rechazar Préstamo
+      </h3>
+      <p id="modal-prestamo-rechazar-label" style="color:rgba(255,255,255,.5); font-size:13px;"></p>
+      <div class="form-group">
+        <label>Motivo (opcional)</label>
+        <input type="text" id="modal-prestamo-rechazar-motivo" placeholder="Ej: Ya tiene deudas pendientes" maxlength="200">
+      </div>
+      <div class="rc-error" id="modal-prestamo-rechazar-error"></div>
+      <div class="modal-actions">
+        <button class="btn-crear" onclick="adminConfirmarRechazoPrestamo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Rechazar
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-prestamo-rechazar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ajustar saldo -->
+  <div class="admin-modal-overlay" id="modal-saldo">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-saldo')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Ajustar Saldo
+      </h3>
+      <p id="modal-saldo-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
+      <div class="form-group">
+        <label>Monto (puede ser negativo para restar)</label>
+        <input type="number" id="modal-saldo-monto" placeholder="Ej: 50000 o -10000">
+      </div>
+      <div class="form-group">
+        <label>Descripción (opcional)</label>
+        <input type="text" id="modal-saldo-desc" placeholder="Ej: Premio evento, Multa...">
+      </div>
+      <div class="rc-error" id="modal-saldo-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" onclick="adminConfirmarSaldo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-saldo')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: resetear cuenta -->
+  <div class="admin-modal-overlay" id="modal-reset">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-reset')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Resetear Cuenta
+      </h3>
+      <p id="modal-reset-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
+      <p style="color:#fdba74; font-size:13px; background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.25); border-radius:10px; padding:12px 14px;">
+        Esto va a dejar el saldo de esta cuenta en $1.000.000 (el monto inicial). No se puede deshacer. Úsalo solo si el saldo quedó corrupto o roto.
+      </p>
+      <div class="rc-error" id="modal-reset-error"></div>
+      <div class="modal-actions">
+        <button class="btn-crear" onclick="adminConfirmarReset()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Sí, resetear
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-reset')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIENDA -->
+
+
+  <!-- INVENTARIO -->
+
+
+  <!-- MERCADO -->
+
+
+  <!-- MODAL: Vender ítem en el Mercado -->
+  <div class="admin-modal-overlay" id="modal-mercado-publicar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-mercado-publicar')">✕</button>
+      <h3 style="color:#fdba74;">Vender un Ítem</h3>
+
+      <div class="form-group">
+        <label>Elige un ítem de tu inventario</label>
+        <div id="mercado-pub-items-loading" style="color:rgba(255,255,255,0.4);font-size:13px;">Cargando tu inventario...</div>
+        <div id="mercado-pub-items-lista" class="mercado-pub-items-lista" style="display:none;"></div>
+        <div id="mercado-pub-items-empty" class="tienda-empty" style="display:none;padding:20px 0;">No tienes ítems disponibles para vender.</div>
+      </div>
+
+      <div id="mercado-pub-form" style="display:none;flex-direction:column;gap:18px;">
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;">Vendiendo: <b id="mercado-pub-nombre" style="color:#fff;"></b></p>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="mercado-pub-descripcion" maxlength="300" rows="3" placeholder="Describe el estado, detalles o condiciones de la venta..." style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:Inter,sans-serif;resize:vertical;width:100%;outline:0;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Precio ($)</label>
+          <input type="number" id="mercado-pub-precio" placeholder="Ej: 250000" min="1">
+        </div>
+      </div>
+
+      <div class="rc-error" id="mercado-pub-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="mercado-pub-btn" onclick="mercadoConfirmarPublicar()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Publicar
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-mercado-publicar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCESIONARIO -->
+
+
+  <!-- TUS AUTOS -->
+
+
+  <!-- ADMIN TIENDA -->
+
+
+  <!-- MODAL: Editar Producto -->
+  <div class="admin-modal-overlay" id="modal-editar-prod">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-editar-prod')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar Producto
+      </h3>
+      <input type="hidden" id="ep-id">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="ep-nombre">
+      </div>
+      <div class="form-group">
+        <label>Precio ($)</label>
+        <input type="number" id="ep-precio" min="1">
+      </div>
+      <div class="form-group">
+        <label>Categoría</label>
+        <select class="cat-select" id="ep-categoria">
+          <option value="vehiculos">Vehículos</option>
+          <option value="armas">Armas</option>
+          <option value="licencias">Licencias</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>URL de imagen</label>
+        <input type="text" id="ep-imagen">
+      </div>
+      <div class="rc-error" id="ep-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" onclick="adminGuardarEdicion()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardar cambios
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-editar-prod')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Registrar Vehículo -->
+  <div class="admin-modal-overlay" id="modal-veh-registrar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-veh-registrar')">✕</button>
+      <h3>🚗 Registrar Vehículo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:13px;">Modelo: <b id="veh-reg-modelo" style="color:#fff;"></b></p>
+      <div class="form-group">
+        <label>Patente (formato ABC-123)</label>
+        <input type="text" id="veh-reg-patente" placeholder="ABC-123" maxlength="7" oninput="vehFormatearPatenteInput(this)">
+      </div>
+      <div class="form-group">
+        <label>Color del vehículo</label>
+        <input type="text" id="veh-reg-color" placeholder="Ej: Rojo">
+      </div>
+      <div class="rc-error" id="veh-reg-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="veh-reg-btn" onclick="vehConfirmarRegistro()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar Registro
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-veh-registrar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Transferir Vehículo -->
+  <div class="admin-modal-overlay" id="modal-veh-transferir">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-veh-transferir')">✕</button>
+      <h3>🔄 Transferir Vehículo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:13px;">Vehículo: <b id="veh-tr-vehiculo" style="color:#fff;"></b></p>
+      <div class="form-group">
+        <label>Buscar nuevo propietario</label>
+        <input type="text" id="veh-tr-buscar" placeholder="ID Discord, RUT, DNI, nombre de Discord o de personaje" oninput="vehTrBuscarInput()">
+        <div id="veh-tr-resultados" style="margin-top:8px;display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;max-height:220px;overflow-y:auto;"></div>
+      </div>
+      <p id="veh-tr-seleccionado" style="display:none;color:#4ade80;font-size:13px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:10px 14px;"></p>
+      <div class="rc-error" id="veh-tr-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="veh-tr-btn" onclick="vehConfirmarTransferencia()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar Transferencia
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-veh-transferir')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ══════════════════ CASINO ══════════════════ -->
+
+
+  <!-- ══════════════════ APUESTAS DEPORTIVAS ══════════════════ -->
+
+
+  <!-- Modal apuesta -->
+  <div class="ap-modal-overlay" id="ap-modal-overlay" onclick="cerrarModalApuesta(event)">
+    <div class="ap-modal" id="ap-modal">
+      <div class="ap-modal-title" id="ap-modal-title">Apuesta Simple</div>
+      <div class="ap-modal-sub" id="ap-modal-sub">Equipo A vs Equipo B</div>
+
+      <label>¿Quién gana?</label>
+      <div class="ap-eleccion-grid" id="ap-eleccion-grid">
+        <button class="ap-eleccion-btn" id="ap-btn-A" onclick="apElegir('A')">
+          <div id="ap-label-A" style="font-weight:800;">Equipo A</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-A">x2.0</div>
+        </button>
+        <button class="ap-eleccion-btn" id="ap-btn-empate" onclick="apElegir('empate')">
+          <div style="font-weight:800;">Empate</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-empate">x3.0</div>
+        </button>
+        <button class="ap-eleccion-btn" id="ap-btn-B" onclick="apElegir('B')">
+          <div id="ap-label-B" style="font-weight:800;">Equipo B</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-B">x2.0</div>
+        </button>
+      </div>
+
+      <!-- Marcador predicho (solo combinada) -->
+      <div id="ap-marcador-section" style="display:none;">
+        <label>Predice el marcador exacto (opcional — doble premio)</label>
+        <div class="ap-marcador-row">
+          <input type="number" id="ap-marc-a" min="0" max="99" placeholder="0" oninput="apActualizarPremio()">
+          <div class="ap-marcador-sep">–</div>
+          <input type="number" id="ap-marc-b" min="0" max="99" placeholder="0" oninput="apActualizarPremio()">
+        </div>
+      </div>
+
+      <label style="margin-top:4px;">Monto a apostar (CLP)</label>
+      <input type="number" id="ap-monto-input" min="1" placeholder="Ej: 10000" oninput="apActualizarPremio()" style="margin-bottom:14px;">
+
+      <div class="ap-premio-preview" id="ap-premio-preview">
+        Elige un resultado e ingresa el monto para ver el premio estimado.
+      </div>
+
+      <div class="ap-modal-btns">
+        <button class="btn-ap-cancel" onclick="cerrarModalApuesta()">Cancelar</button>
+        <button class="btn-ap-confirm" id="ap-btn-confirm" onclick="confirmarApuesta()" disabled>
+          Confirmar apuesta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ ADMIN CASINO ══════════════════ -->
+
+
+  <!-- Modal editar partido (admin) -->
+  <div class="adm-edit-modal-overlay" id="adm-edit-overlay" onclick="admCerrarEditModal(event)">
+    <div class="adm-edit-modal">
+      <div class="ap-modal-title">✏️ Editar Partido</div>
+      <div class="ap-modal-sub" style="margin-bottom:20px;" id="adm-edit-sub"></div>
+      <input type="hidden" id="adm-edit-id">
+      <div class="adm-form">
+        <div class="adm-form-row">
+          <input class="adm-input" id="adm-edit-eq-a" placeholder="Equipo A">
+          <input class="adm-input" id="adm-edit-eq-b" placeholder="Equipo B">
+        </div>
+        <div class="adm-form-row">
+          <input class="adm-input" id="adm-edit-logo-a" placeholder="URL Logo A">
+          <input class="adm-input" id="adm-edit-logo-b" placeholder="URL Logo B">
+        </div>
+        <div class="adm-form-row">
+          <div>
+            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. A</label>
+            <input class="adm-input" id="adm-edit-mult-a" type="number" step="0.1" min="1">
+          </div>
+          <div>
+            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. Empate</label>
+            <input class="adm-input" id="adm-edit-mult-e" type="number" step="0.1" min="1">
+          </div>
+          <div>
+            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. B</label>
+            <input class="adm-input" id="adm-edit-mult-b" type="number" step="0.1" min="1">
+          </div>
+        </div>
+        <div class="ap-modal-btns">
+          <button class="btn-ap-cancel" onclick="admCerrarEditModal()">Cancelar</button>
+          <button class="btn-ap-confirm" onclick="admGuardarEdicion()">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR 403 -->
+
+
+  <!-- ERROR 404 -->
+
+
+  <!-- PERFIL PÚBLICO -->
+
+
+  <!-- EMPRESAS (público) -->
+
+
+  <!-- LOGROS -->
+
+
+
+
+
+  <!-- MODAL: Editar Empresa -->
+  <div class="admin-modal-overlay" id="modal-editar-empresa">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-editar-empresa')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar Empresa
+      </h3>
+      <input type="hidden" id="ee-id">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="ee-nombre">
+      </div>
+      <div class="form-group">
+        <label>URL del logo</label>
+        <input type="text" id="ee-logo">
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea id="ee-descripcion" rows="3" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:'Inter',sans-serif;resize:vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Link de Discord</label>
+        <input type="text" id="ee-discord">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre de Discord del dueño</label>
+          <input type="text" id="ee-dueno-nombre">
+        </div>
+        <div class="form-group">
+          <label>URL foto de perfil del dueño</label>
+          <input type="text" id="ee-dueno-avatar">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Discord ID del dueño</label>
+        <input type="text" id="ee-dueno-id" placeholder="Ej: 123456789012345678">
+      </div>
+      <div class="rc-error" id="ee-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" onclick="adminGuardarEdicionEmpresa()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardar cambios
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-editar-empresa')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL ADMIN — hub central del staff. Verifica acceso al entrar
+       (GET /api/admin?action=verificar) y a partir de ahí da acceso a
+       Admin Banco/Tienda/Empresas/Casino. La gestión de administradores
+       (agregar/quitar por Discord ID) sigue siendo exclusiva del super
+       admin; el resto de las herramientas están disponibles para
+       cualquier admin autorizado. -->
+
+
+
+  <!-- PANEL STAFF — apartado "Staff" del dashboard. Rol independiente de
+       "admins": solo da acceso a este panel, nunca al Panel Admin. Se
+       autoriza por Discord ID desde la sección "Gestión de Staff" dentro
+       del Panel Admin. Verifica acceso al entrar
+       (GET /api/admin?action=verificarStaff). -->
+
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       COMISARÍA VIRTUAL
+       ═══════════════════════════════════════════════════════ -->
+
+
+  <!-- ══ GESTIÓN DE POLICÍAS (dentro del Panel Admin) ═════════════
+       Se añade como tab adicional al panel-admin-screen
+       ═══════════════════════════════════════════════════════════ -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       NOTIFICACIONES (campanita) — vive fuera de los .screen para
+       quedar visible sobre cualquier sección mientras hay sesión.
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="notif-bell-wrap">
+    <button class="notif-bell-btn" id="notif-bell-btn" aria-label="Notificaciones">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+    </button>
+    <div class="notif-panel">
+      <div class="notif-panel-header">
+        <span class="notif-panel-title">Notificaciones</span>
+        <div class="notif-panel-acciones">
+          <button class="notif-panel-marcar" id="notif-marcar-leidas">Marcar leídas</button>
+          <button class="notif-panel-limpiar" id="notif-limpiar-bandeja" title="Vaciar bandeja">Limpiar</button>
+        </div>
+      </div>
+      <div class="notif-list" id="notif-list">
+        <div class="notif-empty">Cargando…</div>
+      </div>
+    </div>
+  </div>
+
+
+  <script defer src="/js/app.js?v=51"></script>
+  <script defer src="/js/dashboard-fx.js?v=51"></script>
+  <script defer src="/js/notificaciones.js?v=51"></script>
+  <script defer src="/js/pull-to-refresh.js?v=51"></script>
+  <script defer src="/js/registro-civil.js?v=51"></script>
+  <script defer src="/js/banco.js?v=51"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="/js/tienda.js?v=51"></script>
+  <script defer src="/js/mercado.js?v=51"></script>
+  <script defer src="/js/vehiculos.js?v=51"></script>
+  <script defer src="/js/concesionario.js?v=51"></script>
+  <script defer src="/js/mis-autos.js?v=51"></script>
+  <script defer src="/js/admin-tienda.js?v=51"></script>
+  <script defer src="/js/empresas.js?v=51"></script>
+  <script defer src="/js/logros.js?v=51"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=51"></script>
+  <script defer src="/js/panel-admin.js?v=51"></script>
+  <script defer src="/js/comisaria.js?v=51"></script>
+  <script defer src="/js/casino.js?v=51"></script>
+  <script defer src="/js/apuestas.js?v=51"></script>
+  <script defer src="/js/parallax-landing.js?v=51"></script>
+  <script defer src="/js/bg-particles.js?v=51"></script>
+</body>
+</html>
