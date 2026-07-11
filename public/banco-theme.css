@@ -1,0 +1,45 @@
+/* ── banco-theme.css ──────────────────────────────────────────────────────
+   Ajuste SOLO para la pantalla del Banco (#banco-screen / body[data-screen=
+   "banco-screen"]). No toca ninguna otra página del sitio.
+
+   Por qué existe: el módulo de Banco ya tenía una tarjeta estilo "Tenpo"
+   (verde/negro) armada en styles.css, pero quedaba tapada por dos cosas
+   que no pegan con la referencia:
+     1) El fondo rojo animado de todo el sitio (#bg-fx), pensado para el
+        resto de las pantallas, se filtraba también acá y chocaba contra
+        el verde de la tarjeta.
+     2) Una pasada anterior "HUD futurista" (acentos cian + anillo dorado
+        girando) quedó mezclada encima del estilo Tenpo en el título de
+        la sección.
+   Esta hoja apaga esas dos cosas solo en /banco.html y deja la tarjeta,
+   el saldo, "Ahorro", la franja de tarjeta física y los botones de
+   acción tal como están (ya calzan con la imagen de referencia). */
+
+/* 1) Fondo: nada de rojo acá — negro con un verde muy sutil, en movimiento */
+body[data-screen="banco-screen"] #bg-fx {
+  background: #050705 !important;
+}
+body[data-screen="banco-screen"] #bg-fx::before {
+  background: radial-gradient(circle at 30% 30%, rgba(20, 90, 60, .38), rgba(20, 90, 60, 0) 62%) !important;
+}
+body[data-screen="banco-screen"] #bg-fx::after {
+  background: radial-gradient(circle at 70% 70%, rgba(12, 60, 42, .3), rgba(0, 0, 0, 0) 62%) !important;
+}
+body[data-screen="banco-screen"] #bg-particles {
+  display: none !important;
+}
+
+/* 2) Fuera el acento cian del HUD — título limpio en blanco, como la ref. */
+#banco-screen .seccion-title {
+  background: none !important;
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+}
+#banco-screen .seccion-title svg {
+  color: var(--nbk-green, #22e88a) !important;
+}
+#banco-screen .nbk-account-pill {
+  color: var(--nbk-green, #22e88a) !important;
+  background: rgba(34, 232, 138, .1) !important;
+  border-color: rgba(34, 232, 138, .28) !important;
+}
