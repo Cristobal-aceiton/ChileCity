@@ -1,7 +1,7 @@
     // Parallax sutil del fondo en el landing (mejora visual v9, no afecta lógica de la app)
     (function () {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const bg = document.getElementById('video-bg');
+      const bg = document.getElementById('bg-fx');
       const overlay = document.querySelector('.overlay');
       if (!bg || !overlay) return;
       let raf = null;

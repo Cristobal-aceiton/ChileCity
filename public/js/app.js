@@ -220,17 +220,43 @@
       document.getElementById('pa-contenido').style.display = 'flex';
 
       // Gestionar admins (agregar/quitar por Discord ID) es exclusivo del
-      // super admin; el resto del panel es para cualquier admin autorizado.
-      const gestionAdmins = document.getElementById('pa-gestion-admins-wrap');
-      if (gestionAdmins) gestionAdmins.style.display = paEsSuperAdmin ? '' : 'none';
-      if (paEsSuperAdmin && typeof paCargarAdmins === 'function') paCargarAdmins();
-      if (typeof gpCargarPolicias === 'function') gpCargarPolicias();
-      if (typeof psCargarStaff === 'function') psCargarStaff();
-      if (typeof slCargarLogs === 'function') slCargarLogs();
+      // super admin; el resto del hub es para cualquier admin autorizado.
+      const btnAdmins = document.getElementById('pa-hub-btn-admins');
+      if (btnAdmins) btnAdmins.style.display = paEsSuperAdmin ? '' : 'none';
+
+      // El panel ahora es un hub de botones: cada sección solo carga sus
+      // datos cuando el usuario realmente entra a ella (paAbrirSub), en vez
+      // de disparar las 4 llamadas de golpe como antes.
+      paVolverHub();
     }
 
     function volverPanelAdmin() {
       abrirPanelAdmin();
+    }
+
+    // ── Panel Admin: navegación hub ↔ subsección ─────────────────────────────
+    // Sustituye el scroll largo de siempre: el hub muestra una grilla de
+    // botones y cada uno abre su propio panel, cargando sus datos recién en
+    // ese momento (antes se pedían las 4 secciones de gestión de una sola vez
+    // al entrar al Panel Admin, aunque el admin solo quisiera ver una).
+    function paAbrirSub(id) {
+      const hub = document.getElementById('pa-hub-view');
+      if (hub) hub.style.display = 'none';
+      document.querySelectorAll('#pa-contenido .pa-sub').forEach(el => el.classList.remove('visible'));
+      const sub = document.getElementById('pa-sub-' + id);
+      if (!sub) return;
+      sub.classList.add('visible');
+
+      if (id === 'admins' && paEsSuperAdmin && typeof paCargarAdmins === 'function') paCargarAdmins();
+      if (id === 'policia' && typeof gpCargarPolicias === 'function') gpCargarPolicias();
+      if (id === 'staff' && typeof psCargarStaff === 'function') psCargarStaff();
+      if (id === 'stafflogs' && typeof slCargarLogs === 'function') slCargarLogs();
+    }
+
+    function paVolverHub() {
+      document.querySelectorAll('#pa-contenido .pa-sub').forEach(el => el.classList.remove('visible'));
+      const hub = document.getElementById('pa-hub-view');
+      if (hub) hub.style.display = 'flex';
     }
 
     // ── PANEL STAFF: punto de entrada único ──────────────────────────────────
