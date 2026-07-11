@@ -68,13 +68,17 @@
     // silencio navegamos de verdad a la página que sí lo contiene. Si el id
     // corresponde a esta misma página (o no hay mapa), se comporta como
     // siempre (toggle de clases .active).
-    function mostrarPantalla(id) {
+    function mostrarPantalla(id, opts = {}) {
       if (!document.getElementById(id) && window.CC_PAGE_MAP && window.CC_PAGE_MAP[id]) {
         // Caso especial: la restauración automática de sesión (initSesion)
-        // llama a goToDashboard() -> mostrarPantalla('dashboard') en TODAS
-        // las páginas para reponer el usuario logueado. Si ya estamos en un
-        // apartado propio (no landing), eso no debe rebotarnos al dashboard.
-        if (id === 'dashboard' && window.CC_CURRENT_SCREEN && window.CC_CURRENT_SCREEN !== 'landing') {
+        // llama a goToDashboard(user, true) -> mostrarPantalla('dashboard', { autoRestore: true })
+        // en TODAS las páginas para reponer el usuario logueado. Si ya estamos
+        // en un apartado propio (no landing), eso no debe rebotarnos al
+        // dashboard. OJO: este chequeo solo debe aplicar a esa restauración
+        // automática (opts.autoRestore) — NO a los botones "Volver" de cada
+        // sección (que también llaman a mostrarPantalla('dashboard') pero sin
+        // ese flag), porque si no, "Volver" queda muerto en todas las páginas.
+        if (opts.autoRestore && id === 'dashboard' && window.CC_CURRENT_SCREEN && window.CC_CURRENT_SCREEN !== 'landing') {
           return;
         }
         window.location.href = window.CC_PAGE_MAP[id];
@@ -113,8 +117,46 @@
 
     function volverDashboard() { mostrarPantalla('dashboard'); _navegandoProgramaticamente = true; window.history.pushState({ screen: 'dashboard' }, '', '/'); setTimeout(() => { _navegandoProgramaticamente = false; }, 50); }
 
-    
-    async function goToDashboard(user) {
+    // ── Compatibilidad multi-página: auto-carga de cada sección ─────────────
+    // Antes (SPA de una sola página) los nav-cards del dashboard hacían
+    // onclick="abrirSeccion('banco-screen')" — al cambiar de
+    // "pantalla" sin recargar, ese cargarBanco() sí corría en la sección ya
+    // visible. Ahora cada apartado es su propio archivo .html: abrirSeccion
+    // navega de verdad a banco.html, así que ese cargarBanco() encadenado se
+    // ejecuta (y falla, porque #banco-loading no existe) en la página VIEJA
+    // que se está por abandonar — nunca llega a pintar nada en banco.html.
+    // Resultado: la sección de destino se queda mostrando el esqueleto de
+    // carga para siempre (todo "no carga").
+    // Este mapa reemplaza esa dependencia: cuando la sesión se confirma en
+    // CADA página (ver goToDashboard más abajo), se llama a la función que
+    // corresponde a la sección actual (window.CC_CURRENT_SCREEN), sin
+    // importar desde dónde se navegó hasta aquí.
+    const CC_SECTION_ENTRY = {
+      'registro-civil':        () => { if (typeof cargarDNI === 'function') cargarDNI(); },
+      'banco-screen':          () => { if (typeof cargarBanco === 'function') cargarBanco(); },
+      'mercado-screen':        () => { if (typeof cargarMercado === 'function') cargarMercado(); },
+      'tienda-screen':         () => { if (typeof cargarTienda === 'function') cargarTienda(); },
+      'concesionario-screen':  () => { if (typeof cargarConcesionario === 'function') cargarConcesionario(); },
+      'mis-autos-screen':      () => { if (typeof cargarMisAutos === 'function') cargarMisAutos(); },
+      'inventario-screen':     () => { if (typeof cargarInventario === 'function') cargarInventario(); },
+      'perfil-publico-screen': () => { if (typeof cargarPerfilPublico === 'function') cargarPerfilPublico(); },
+      'empresas-screen':       () => { if (typeof cargarEmpresas === 'function') cargarEmpresas(); },
+      'logros-screen':         () => { if (typeof cargarLogros === 'function') cargarLogros(); },
+      'casino-screen':         () => { if (typeof cargarCasino === 'function') cargarCasino(); },
+      'apuestas-screen':       () => { if (typeof cargarApuestas === 'function') cargarApuestas(); },
+      // Estas ya hacen su propia verificación de acceso al servidor; al estar
+      // ya en su página (abrirSeccion no navega si el elemento ya existe),
+      // llamarlas de nuevo aquí solo dispara esa verificación + su carga.
+      'comisaria-screen':      () => { if (typeof abrirComisaria === 'function') abrirComisaria(); },
+      'panel-admin-screen':    () => { if (typeof abrirPanelAdmin === 'function') abrirPanelAdmin(); },
+      'staff-panel-screen':    () => { if (typeof abrirPanelStaff === 'function') abrirPanelStaff(); },
+      'admin-screen':          () => { if (typeof abrirAdminBanco === 'function') abrirAdminBanco(); },
+      'admin-tienda-screen':   () => { if (typeof abrirAdminTiendaPanel === 'function') abrirAdminTiendaPanel(); },
+      'admin-empresas-screen': () => { if (typeof abrirAdminEmpresasPanel === 'function') abrirAdminEmpresasPanel(); },
+      'admin-casino-screen':   () => { if (typeof abrirAdminCasino === 'function') abrirAdminCasino(); },
+    };
+
+    async function goToDashboard(user, opts = {}) {
       currentUser = user;
       actualizarBotonLogin();
       // NOTA multi-página: estos elementos solo existen en dashboard.html /
@@ -144,7 +186,20 @@
       // (analiza acceso vía /api/comisaria?action=verificar, para el nav-card
       // "Comisaría Virtual", separado del apartado "Staff").
 
-      mostrarPantalla('dashboard');
+      // Si el usuario llegó a "/" a propósito (botón de casa / irAlPortal),
+      // no lo rebotamos de vuelta a dashboard.html: se queda en la landing,
+      // pero con la sesión ya restaurada (nombre, avatar, botón de login).
+      if (!opts.quedarseEnLanding) {
+        mostrarPantalla('dashboard', { autoRestore: !!opts.autoRestore });
+      }
+
+      // Auto-carga de la sección actual (banco, registro civil, mercado,
+      // etc.) — ver comentario de CC_SECTION_ENTRY más arriba.
+      const entradaSeccion = CC_SECTION_ENTRY[window.CC_CURRENT_SCREEN];
+      if (entradaSeccion) {
+        try { entradaSeccion(); } catch (e) { console.error('Error al cargar la sección', window.CC_CURRENT_SCREEN, e); }
+      }
+
       if (typeof notifIniciar === 'function') notifIniciar();
     }
 
@@ -166,6 +221,7 @@
       const pill = document.getElementById('user-pill');
       if (pill) pill.classList.remove('open');
       actualizarBotonLogin();
+      try { sessionStorage.setItem('cc_ir_portal', '1'); } catch {}
       mostrarPantalla('landing');
       _navegandoProgramaticamente = true;
       window.history.pushState({ screen: 'landing' }, '', '/');
@@ -395,10 +451,23 @@
             // Solo reescribe la URL a "/" si venimos de la landing (root);
             // en cualquier otra página (banco.html, tienda.html, etc.) no
             // corresponde tocar la URL actual al restaurar sesión.
-            if (window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname)) {
+            const enLanding = window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname);
+            if (enLanding) {
               window.history.replaceState({ screen: 'dashboard' }, '', '/');
             }
-            goToDashboard(user);
+            // Si el usuario llegó a la landing a propósito (botón de casa,
+            // ver irAlPortal), no lo mandamos de vuelta a dashboard.html:
+            // debe poder ver el portal con la sesión abierta.
+            let quedarseEnLanding = false;
+            if (enLanding) {
+              try {
+                if (sessionStorage.getItem('cc_ir_portal') === '1') {
+                  sessionStorage.removeItem('cc_ir_portal');
+                  quedarseEnLanding = true;
+                }
+              } catch {}
+            }
+            goToDashboard(user, { autoRestore: true, quedarseEnLanding });
           }
         }
       } catch {}
@@ -692,7 +761,7 @@
             `<span class="profile-badge pb-rut"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg> ${escHtml(data.dni.rut || '')}</span>`);
         } else {
           badgesWrap.insertAdjacentHTML('beforeend',
-            `<span class="profile-badge pb-sin-rut" onclick="abrirSeccion('registro-civil'); cargarDNI()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg> Sin cédula — crear</span>`);
+            `<span class="profile-badge pb-sin-rut" onclick="abrirSeccion('registro-civil')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 10h8M8 14h5"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg> Sin cédula — crear</span>`);
         }
       } catch (e) {
         // Sin RUT visible si falla la carga; no bloquea el resto del perfil.
