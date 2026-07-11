@@ -76,6 +76,12 @@ async function initTables(sql) {
   await sql`
     CREATE INDEX IF NOT EXISTS idx_transacciones_discord_id ON transacciones(discord_id)
   `;
+  // Cuenta de Ahorro (Fase 4): vive dentro de la misma fila de "banco" — no
+  // es una tabla aparte porque cada usuario tiene a lo más una. Se activa
+  // una sola vez (irreversible) y solo admite mover plata hacia/desde la
+  // Cuenta Corriente del mismo usuario, nunca a terceros.
+  await sql`ALTER TABLE banco ADD COLUMN IF NOT EXISTS ahorro_activa BOOLEAN NOT NULL DEFAULT FALSE`;
+  await sql`ALTER TABLE banco ADD COLUMN IF NOT EXISTS ahorro_saldo BIGINT NOT NULL DEFAULT 0`;
   await sql`
     CREATE TABLE IF NOT EXISTS sueldos (
       id            SERIAL PRIMARY KEY,
@@ -347,7 +353,12 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         existe: true,
-        cuenta: { ...updated[0], saldo: toNumber(updated[0].saldo) },
+        cuenta: {
+          ...updated[0],
+          saldo: toNumber(updated[0].saldo),
+          ahorro_activa: !!updated[0].ahorro_activa,
+          ahorro_saldo: toNumber(updated[0].ahorro_saldo),
+        },
         sueldos: sueldosActivos.map(s => ({ ...s, monto: toNumber(s.monto) })),
         proximoSueldo,
         prestamoActivo: prestamoActivoOut,
@@ -385,7 +396,89 @@ export default async function handler(req, res) {
       // Logro: El Comienzo (abrir la cuenta bancaria)
       await otorgarLogro(sql, discord_id, "comienzo");
 
-      return res.status(201).json({ existe: true, cuenta: { ...rows[0], saldo: toNumber(rows[0].saldo) } });
+      return res.status(201).json({
+        existe: true,
+        cuenta: { ...rows[0], saldo: toNumber(rows[0].saldo), ahorro_activa: false, ahorro_saldo: 0 },
+      });
+    }
+
+    // ── POST: abrir Cuenta de Ahorro ─────────────────────────────────────────
+    // Irreversible: una vez activada no se puede volver a "cerrar" desde acá.
+    if (req.method === "POST" && action === "ahorro_abrir") {
+      const cuenta = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      if (cuenta.length === 0)
+        return res.status(404).json({ error: "No tienes cuenta bancaria" });
+      if (cuenta[0].ahorro_activa)
+        return res.status(409).json({ error: "Ya tienes una Cuenta de Ahorro activa" });
+
+      const rows = await sql`
+        UPDATE banco SET ahorro_activa = TRUE, ahorro_saldo = 0
+        WHERE discord_id = ${discord_id}
+        RETURNING *
+      `;
+      return res.status(200).json({
+        ok: true,
+        cuenta: {
+          ...rows[0],
+          saldo: toNumber(rows[0].saldo),
+          ahorro_activa: true,
+          ahorro_saldo: toNumber(rows[0].ahorro_saldo),
+        },
+      });
+    }
+
+    // ── POST: mover plata entre Corriente y Ahorro (mismo usuario) ──────────
+    // Nunca a terceros: es un traspaso interno entre las dos cuentas de la
+    // misma persona, por eso no pide RUT destinatario.
+    if (req.method === "POST" && action === "ahorro_mover") {
+      const { direccion, monto } = req.body || {};
+      if (direccion !== "deposito" && direccion !== "retiro")
+        return res.status(400).json({ error: "Dirección inválida" });
+
+      const montoNum = parseMonto(monto);
+      if (montoNum === null || montoNum <= 0)
+        return res.status(400).json({ error: "Monto inválido" });
+
+      const cuenta = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      if (cuenta.length === 0)
+        return res.status(404).json({ error: "No tienes cuenta bancaria" });
+      if (!cuenta[0].ahorro_activa)
+        return res.status(400).json({ error: "Debes activar tu Cuenta de Ahorro primero" });
+
+      const saldoCorriente = toNumber(cuenta[0].saldo);
+      const saldoAhorro = toNumber(cuenta[0].ahorro_saldo);
+
+      let nuevoSaldoCorriente, nuevoSaldoAhorro, descOrigen, descDestino;
+      if (direccion === "deposito") {
+        if (saldoCorriente < montoNum)
+          return res.status(400).json({ error: "Saldo insuficiente en tu Cuenta Corriente" });
+        nuevoSaldoCorriente = saldoCorriente - montoNum;
+        nuevoSaldoAhorro = saldoAhorro + montoNum;
+        descOrigen = "Depósito a Cuenta de Ahorro";
+      } else {
+        if (saldoAhorro < montoNum)
+          return res.status(400).json({ error: "Saldo insuficiente en tu Cuenta de Ahorro" });
+        nuevoSaldoCorriente = saldoCorriente + montoNum;
+        nuevoSaldoAhorro = saldoAhorro - montoNum;
+        descOrigen = "Retiro desde Cuenta de Ahorro";
+      }
+
+      await sql`
+        UPDATE banco SET saldo = ${nuevoSaldoCorriente}, ahorro_saldo = ${nuevoSaldoAhorro}
+        WHERE discord_id = ${discord_id}
+      `;
+      await sql`
+        INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+        VALUES (${discord_id}, 'ajuste', ${montoNum}, ${descOrigen}, ${nuevoSaldoCorriente})
+      `;
+
+      await checkLogrosSaldo(sql, discord_id, nuevoSaldoCorriente);
+
+      return res.status(200).json({
+        ok: true,
+        nuevoSaldo: nuevoSaldoCorriente,
+        nuevoAhorroSaldo: nuevoSaldoAhorro,
+      });
     }
 
     // ── POST: transferir ─────────────────────────────────────────────────────
