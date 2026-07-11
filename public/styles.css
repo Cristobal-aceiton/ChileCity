@@ -1068,3 +1068,40 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .pa-sub-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
 .pa-sub-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin:0}
 @media (max-width:600px){.pa-hub-grid{grid-template-columns:1fr}.pa-hub-btn{padding:18px 16px}}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE 4 — Cuenta de Ahorro + sub-vistas del Banco + paleta propia del Banco
+   Paleta: navy #0A2E5C, azul #1A5FAF, dorado #D4AF37, blanco, oscuro #061A33.
+   Todo escopado a #banco-screen — no toca el resto de la app. Sin glass.
+   ══════════════════════════════════════════════════════════════════════════ */
+#banco-screen{--bank-navy:#0A2E5C;--bank-blue:#1A5FAF;--bank-gold:#D4AF37;--bank-dark:#061A33}
+
+/* Patrón de sub-vistas: solo la que tiene .activa se muestra */
+#banco-screen .subvista{display:none}
+#banco-screen .subvista.activa{display:block}
+#banco-screen .subvista.rc-form.activa{display:flex}
+#banco-screen .bdc-card-back{margin-bottom:6px}
+
+/* Hero de saldo: Corriente + Ahorro lado a lado */
+.bdc-balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%;max-width:460px}
+.bdc-balance-card-ahorro{display:flex;flex-direction:column;background:linear-gradient(135deg,var(--bank-dark) 0%,var(--bank-navy) 100%);border:1px solid rgba(212,175,55,.35)}
+.bdc-ahorro-inactiva-txt{font-size:12.5px;color:rgba(255,255,255,.55);margin-top:2px}
+.bdc-ahorro-abrir-btn{margin-top:10px;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;align-self:flex-start;background:var(--bank-gold);color:var(--bank-dark);transition:transform .2s var(--ease)}
+.bdc-ahorro-abrir-btn:hover{transform:translateY(-2px)}
+.bdc-brand-logo{height:20px;display:block}
+.bank-logo-img{height:22px;display:block;filter:drop-shadow(0 0 6px rgba(212,175,55,.35))}
+
+/* Selector de origen en Transferencias */
+.transfer-destino-fijo{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:rgba(255,255,255,.75);font-size:14px}
+
+/* Paleta propia del banco sobre los elementos existentes (sin glass) */
+#banco-screen .bdc-balance-card{background:linear-gradient(135deg,var(--bank-navy) 0%,var(--bank-blue) 100%);box-shadow:0 24px 54px -20px rgba(10,46,92,.55)}
+#banco-screen .bank-action-btn.transfer{background:rgba(26,95,175,.16);border:1px solid rgba(26,95,175,.32);color:#e2ecf9}
+#banco-screen .bank-action-btn.transfer:hover{background:rgba(26,95,175,.28)}
+#banco-screen .bank-action-btn.ahorro{background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.32);color:#f3e3ab}
+#banco-screen .bank-action-btn.ahorro:hover{background:rgba(212,175,55,.28)}
+#banco-screen .btn-green{background:var(--bank-blue);box-shadow:0 0 24px rgba(26,95,175,.35)}
+#banco-screen .btn-green:hover{background:#164e8f}
+#banco-screen .bdc-prod-tag{color:var(--bank-blue)}
+
+@media (max-width:540px){.bdc-balances-grid{grid-template-columns:1fr}}
