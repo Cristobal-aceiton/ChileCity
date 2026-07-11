@@ -1,54 +1,566 @@
-# Cambios aplicados — ChileCity RP v14 (Casino: reskin "Stake" + Limbo/Plinko + Provably Fair)
+# Cambios aplicados — ChileCity RP v36 (Fase 3: Panel Admin modernizado)
 
-## 🎰 Casino — reskin visual estilo Stake + juegos nuevos
+## 🧭 Panel Admin — de scroll largo a hub de botones
 
-- **Paleta**: todo `#casino-screen` pasa a navy oscuro (#0f1923/#1a2c38) +
-  verde neón (#00e701) en vez del rojo/dorado genérico — lobby, tabs, botón
-  de apostar, ruleta. El podio de Top Ganadores se mantiene dorado a
-  propósito (jerarquía de logro, no acento de juego).
-- **Juegos nuevos**: **Limbo** (elige multiplicador objetivo, misma familia
-  matemática que Dice) y **Plinko** (8/12/16 filas, riesgo bajo/medio/alto,
-  tablero canvas con animación de caída).
-- **Provably Fair real**: cada apuesta de ruleta/moneda/avión/dice/limbo/
-  plinko ahora se resuelve con `HMAC-SHA256(server_seed, client_seed:nonce)`
-  en vez de `Math.random()`. El server seed queda comprometido (solo se
-  muestra su hash) hasta que el jugador lo rota, momento en que se revela en
-  texto plano para verificar cualquier apuesta pasada. Nuevo módulo
-  `lib/casinoSeed.js`, tablas `casino_seeds` / `casino_seeds_revelados`.
-- **Feed de apuestas en vivo**: nuevo endpoint público `feed_global` +
-  ticker en el lobby con las últimas apuestas de todos los jugadores.
-- Mines queda con su `Math.random()` original por ahora (su generación de
-  posiciones es más compleja de portar a seed determinístico) — pendiente
-  para una próxima pasada si se quiere unificar el 100% de los juegos.
+Antes, entrar al Panel Admin significaba un solo scroll gigante con seis
+bloques uno debajo del otro (Administradores, Enviar Notificación, Policías
+Virtuales, Gestión de Staff, Logros, Logs de Staff), además de la grilla de
+Herramientas (Admin Banco/Tienda/Empresas/Casino) arriba de todo. Ahora:
 
-## 🛠️ Service Worker — fix real del problema de caché
+- **`#pa-hub-view`**: una pantalla de inicio con dos grillas de botones
+  (`.pa-hub-grid` / `.pa-hub-btn`) — "Herramientas" arriba (sin cambios de
+  comportamiento, siguen navegando a su propia pantalla) y "Gestión" abajo
+  con seis botones: Administradores, Notificaciones, Policías Virtuales,
+  Gestión de Staff, Logros, Logs de Staff.
+- Cada botón de "Gestión" abre su **propio subpanel** (`.pa-sub`, oculto por
+  defecto) con un botón "Volver" que regresa al hub — mismo patrón visual
+  que ya usa el resto de la app (`sec-back` + `seccion-title`), no un
+  acordeón ni un modal.
+- El botón "Administradores" se oculta con `display:none` para cualquier
+  admin que no sea el super admin (antes ocultaba directamente el bloque
+  `pa-gestion-admins-wrap` en medio del scroll).
+- **Carga perezosa real**: antes `abrirPanelAdmin()` disparaba de una sola
+  vez `paCargarAdmins()` + `gpCargarPolicias()` + `psCargarStaff()` +
+  `slCargarLogs()` — cuatro llamadas a la API cada vez que un admin entraba
+  al panel, aunque solo quisiera revisar una cosa. Ahora cada función se
+  llama recién cuando el admin abre esa sección específica desde el hub
+  (`paAbrirSub(id)`), y el hub en sí no pega ningún request.
+- Ningún endpoint ni función de `/api` nueva: se reutiliza íntegro
+  `panel-admin.js` / `admin.js`, solo cambió cuándo se llaman sus funciones
+  y cómo se muestra el HTML.
 
-Causa raíz: `styles.css` sí se pedía con `?v=N`, pero **ningún** `/js/*.js`
-tenía versión en la URL — el Service Worker nunca tenía forma de saber que
-un JS había cambiado si no se subía manualmente `CACHE_VERSION` en `sw.js`.
-Ahora **todos** los `<script src="/js/...">` en `index.html` llevan `?v=25`,
-y el propio `sw.js` cambió de estrategia:
-- HTML (navegación) → network-first (con timeout y fallback a cache).
-- Estáticos con `?v=` → cache-first (la URL cambia por versión, es
-  inmutable e instantáneo).
-- Estáticos sin versión (íconos, manifest) → stale-while-revalidate, como
-  antes.
-
-Checklist agregado como comentario en la cabecera de `sw.js`: de ahora en
-más, cada deploy que toque CSS/JS debe subir el número en dos lugares (el
-`CACHE_VERSION` de `sw.js` y los `?v=` de `index.html`) — ambos con el mismo
-número para que sea fácil de auditar.
+### Archivos tocados
+- `public/index.html` — `panel-admin-screen` reestructurado: nuevo
+  `#pa-hub-view` con `.pa-hub-grid`/`.pa-hub-btn`, y los seis bloques de
+  gestión envueltos en `.pa-sub` con su propio header + botón Volver.
+- `public/js/app.js` — `abrirPanelAdmin()` ya no precarga las cuatro
+  secciones de golpe; nuevas `paAbrirSub(id)` / `paVolverHub()`.
+- `public/styles.css` — nuevas clases `.pa-hub-heading`, `.pa-hub-grid`,
+  `.pa-hub-btn`, `.pa-hub-icon`, `.pa-hub-title`, `.pa-hub-sub`, `.pa-sub`,
+  `.pa-sub-header`, `.pa-sub-title` (mismo lenguaje visual que las
+  `.nav-card` del dashboard: sin glass, degradado rojo/negro, acento de
+  color lateral al hover).
+- `public/sw.js` — `CACHE_VERSION` v35 → v36.
+- Todos los `<link>`/`<script>` de `index.html` — `?v=35` → `?v=36`.
 
 ---
 
-# Cambios aplicados — ChileCity RP v13
+# Cambios aplicados — ChileCity RP v26 (Rediseño completo del Perfil Público)
+
+## 🪪 Perfil Público — reconstrucción completa (layout maestro-detalle)
+
+Se rediseñó la sección **Perfil Público** de punta a punta, tanto en
+estructura como en estilo visual. El motivo: el diseño anterior era un
+acordeón de cards que se estiraban verticalmente al abrirse (una card más,
+igual a las demás secciones de la app), y esa combinación de scroller +
+contenido que crece de golpe era la causa raíz del bug de scroll trabado en
+iOS que ya se venía parchando (`ppDespertarScroll`).
+
+**Nueva estructura — maestro/detalle:**
+- **Lista compacta** a la izquierda: filas delgadas con nombre, RUT, franja
+  de color de estado y badges de multas/antecedentes — ya no es un feed de
+  cards altas, sino algo más parecido a un listado de expediente.
+- **Panel de detalle** aparte, no un acordeón que empuja el layout:
+  - **Desktop** (>900px): columna fija (`sticky`) al lado de la lista.
+    Se hace clic en una fila y el detalle se actualiza al lado, sin mover
+    nada del scroll.
+  - **Mobile** (≤900px): el detalle se abre como una pantalla completa que
+    se desliza encima (con botón "Volver a la lista"), en vez de crecer
+    dentro del mismo scroller. Esto resuelve el bug de iOS de raíz, no con
+    un parche: ya no existe el escenario que lo gatillaba.
+
+**Estilo visual — línea "expediente/dossier":**
+- Franja de color lateral en cada fila y barra superior en el detalle según
+  el estado del ciudadano (sin registros / con multas / con antecedentes).
+- Encabezado del expediente con jerarquía tipográfica más marcada (RUT
+  destacado tipo "número de expediente").
+- Pestañas de Inventario / Multas / Antecedentes / Logros rediseñadas con
+  estilo de pestañas de carpeta (folder tabs), no botones genéricos.
+- Búsqueda y stat de "Ciudadanos registrados" rediseñados con la misma
+  línea visual.
+
+**Sin emojis, solo íconos:** todo el módulo (badges, pestañas, categorías
+de inventario, logros, estados de multas/antecedentes) usa íconos SVG
+propios en vez de emojis — incluyendo los logros, que en el resto de la
+app siguen mostrando el emoji original de `lib/logros.js` (ese archivo es
+compartido con la sección "Logros" personal y no se tocó), pero acá se
+mapean a un set de íconos SVG nuevo por código de logro.
+
+Nota técnica: existía un archivo suelto `public/js/perfil-publico.js` que
+no estaba enlazado desde `index.html` (el código real vivía duplicado en un
+`<script>` inline). Se actualizó también ese archivo para que quede
+sincronizado con el nuevo diseño, por si en el futuro se decide separarlo.
+
+---
+
+
 
 ## ⚠️ Variables de entorno requeridas
 
-Las mismas que v12: `SESSION_SECRET`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DATABASE_URL`.
-No se requieren variables nuevas.
+Las mismas que v24 — sin cambios.
 
 ---
+
+## 📋 Nueva tabla `staff_logs` + sección "Logs de Staff" en el Panel Admin
+
+Nuevo módulo compartido `lib/staffLogs.js` (no es un archivo de `/api` para
+no sumar otra Serverless Function) con la tabla `staff_logs` y la función
+`registrarStaffLog()`, usada desde `api/admin.js`, `api/banco.js` y
+`api/comisaria.js` para dejar constancia de cada acción administrativa:
+
+- **Admin Banco**: agregar/quitar dinero a un usuario (`SALDO_AGREGAR` /
+  `SALDO_QUITAR`), resetear cuenta (`CUENTA_RESETEAR`), agregar/quitar un
+  sueldo (`SUELDO_AGREGAR` / `SUELDO_QUITAR`).
+- **Administrar Empresas**: crear/eliminar empresa (`EMPRESA_CREAR` /
+  `EMPRESA_ELIMINAR`).
+- **Gestión de Logros**: otorgar/quitar un logro (`LOGRO_OTORGAR` /
+  `LOGRO_QUITAR`).
+- **Gestión de Policías Virtuales**: autorizar/revocar
+  (`POLICIA_AUTORIZAR` / `POLICIA_REVOCAR`) — además del log propio que ya
+  tenía Comisaría, este también queda en `staff_logs`.
+- **Gestión de Staff**: autorizar/revocar (`STAFF_AUTORIZAR` /
+  `STAFF_REVOCAR`).
+
+Cada log guarda quién hizo la acción (`actor_id`/`actor_nombre`, tomado
+siempre de la cookie de sesión, nunca del cliente), qué hizo y sobre quién
+(con nombre real vía DNI cuando existe, si no el Discord ID), y cuándo.
+
+Nueva sección **"Logs de Staff"** al fondo del `panel-admin-screen`, visible
+para cualquier admin (no solo el super admin), con buscador por staff,
+acción o detalle. Se lee de `GET /api/admin?action=staff_logs_listar`.
+
+---
+
+# Cambios aplicados — ChileCity RP v24 (Panel Staff separado de Comisaría)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v23 — sin cambios.
+
+---
+
+## 🧭 "Staff" ya no es Comisaría — ahora es su propio rol
+
+Antes la card **"Staff"** del dashboard abría directamente la Comisaría
+Virtual (`abrirComisaria()`), duplicando la card "Comisaría Virtual" que ya
+existía por separado. Ahora son dos cosas totalmente independientes:
+
+- La card **"Staff"** abre un nuevo `staff-panel-screen`, que analiza acceso
+  contra el servidor (`GET /api/admin?action=verificarStaff`, nunca confía
+  en el cliente) con la misma animación de "Analizando tu acceso..." que ya
+  usan Comisaría y Panel Admin.
+  - Si la cuenta no está en la nueva tabla `staff` → pantalla de "Sin
+    acceso".
+  - Si es staff → se muestra el panel (por ahora un placeholder de
+    bienvenida; listo para agregarle herramientas cuando se definan).
+- La card **"Comisaría Virtual"** sigue exactamente igual que antes, con su
+  propia autorización (`policia_virtual`) independiente de todo lo demás.
+
+## 🔑 Nuevo rol "staff", gestionado por los admins desde el Panel Admin
+
+- Nueva tabla `staff` (discord_id, nombre, quién lo agregó) creada en
+  `api/admin.js`, junto a la tabla `admins` ya existente.
+- Nueva sección **"Gestión de Staff"** dentro de `panel-admin-screen`
+  (debajo de "Gestión de Policías Virtuales"), disponible para **cualquier
+  admin** — no solo el super admin, igual que esa sección de Policías.
+  Permite autorizar/revocar/buscar staff por Discord ID
+  (`/api/admin?action=staff_admin_listar|agregar|eliminar`).
+- El rol "staff" **no da acceso al Panel Admin ni a ninguna de sus
+  herramientas** (Admin Banco, Admin Tienda, Admin Empresas, Admin Casino,
+  Gestión de Admins/Staff/Policías/Logros) — solo entra al Panel Staff.
+- Los **admins** (tabla `admins`, gestionada por cualquier admin salvo la
+  gestión de la propia lista de admins que sigue siendo exclusiva del
+  super admin) ya tenían acceso completo al Panel Admin con todas sus
+  funciones — eso no cambió, se mantiene igual que en v23.
+
+---
+
+# Cambios aplicados — ChileCity RP v23 (botón único "Admin" + fix de seguridad en Policía Virtual)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v22 — sin cambios. El acceso admin sigue funcionando igual
+que siempre: `SUPER_ADMIN_ID` (o la variable de entorno) más la tabla
+`admins`, que el super admin gestiona **desde dentro del propio Panel
+Admin**, agregando IDs de Discord.
+
+---
+
+## 🧭 Un solo botón "Admin" para todo el staff
+
+Antes existían pantallas administrativas (Admin Banco, Admin Tienda, Admin
+Empresas, Admin Casino, Panel Admin) sin ningún botón real que llevara a
+ellas — habían quedado huérfanas tras un cambio anterior. Ahora:
+
+- La card **"Admin"** del dashboard (visible para cualquier usuario logueado)
+  abre `panel-admin-screen`, que primero **analiza el acceso** contra el
+  servidor (`GET /api/admin?action=verificar`, nunca confía en el cliente)
+  con la misma animación de "Analizando tu acceso..." que ya usaba Comisaría.
+  - Si la cuenta no está en la tabla `admins` → pantalla de "Sin acceso" con
+    botón para volver al dashboard.
+  - Si es admin → se muestra el hub con una grilla de **Herramientas**
+    (Admin Banco / Admin Tienda / Admin Empresas / Admin Casino) que antes
+    no tenían ningún punto de entrada, más las secciones que ya existían:
+    Enviar Notificación, Gestión de Policías Virtuales y Gestión de Logros.
+  - La sección "Gestión de Admins" (agregar/quitar por Discord ID) sigue
+    siendo **exclusiva del super admin** — se oculta para el resto.
+- Los 4 sub-paneles (Admin Banco/Tienda/Empresas/Casino) ahora regresan con
+  su botón "Volver" al hub del Panel Admin (`volverPanelAdmin()`) en vez de
+  saltar directo al dashboard, para reforzar que son herramientas agrupadas.
+- La card **"Staff"** ahora abre Comisaría Virtual (`abrirComisaria()`),
+  donde ya vivían las herramientas de Policía Virtual (se muestran solas si
+  la cuenta está autorizada como policía).
+
+## 🔒 Seguridad — Gestión de Policía Virtual sin protección
+
+Se detectó que `api/comisaria.js` tenía comentarios de "solo admins" en
+`autorizarPolicia`, `revocarPolicia`, `listarPolicias` y `buscarPolicia`,
+pero **nunca validaba esa condición en el código** — cualquier sesión válida
+(cualquier usuario logueado) podía llamar esas rutas directamente y
+otorgarse a sí mismo (o a cualquiera) el rol de Policía Virtual, sin pasar
+por el Panel Admin ni por ningún admin real. Corregido: las cuatro rutas
+ahora validan explícitamente contra la tabla `admins` antes de ejecutar
+cualquier cambio. El endpoint de `logs` ahora acepta tanto a policías como
+a admins (antes solo a policías).
+
+### Archivos tocados
+- `api/comisaria.js` — nuevo helper `esAdminComisaria()`, gate en
+  `listarPolicias`, `buscarPolicia`, `autorizarPolicia`, `revocarPolicia`,
+  `logs`.
+- `public/index.html` — cards "Admin"/"Staff" con `onclick`, grilla de
+  Herramientas dentro de `panel-admin-screen`, bloques de "Analizando
+  acceso" / "Sin acceso", botones "Volver" de los 4 sub-paneles apuntando
+  al hub.
+- `public/js/app.js` — `abrirPanelAdmin()`, `volverPanelAdmin()`,
+  `abrirAdminBanco()`, `abrirAdminTiendaPanel()`, `abrirAdminEmpresasPanel()`.
+- `public/js/comisaria.js` — eliminado código muerto de inyección dinámica
+  de la tab de policías (apuntaba a un `id` de card que ya no existía).
+
+---
+
+
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v20 — sin cambios.
+
+---
+
+## 📱 Pull-to-refresh en pantallas con datos en vivo
+
+Nuevo `public/js/pull-to-refresh.js`: gesto táctil genérico (sin librerías)
+que detecta el arrastre hacia abajo cuando el `scrollTop` de la pantalla ya
+está en 0, con resistencia progresiva y un indicador giratorio. Activado en:
+
+- **Banco** (`#banco-screen`) → refresca saldo y cuenta (`cargarBanco()`).
+- **Apuestas** (`#apuestas-screen`) → refresca saldo y, según la pestaña
+  activa, partidos o historial personal (nueva función `apRefrescarActivo()`
+  en `apuestas.js`).
+- **Campanita de notificaciones** (`#notif-list`) → refresca la bandeja
+  (`notifCargar()`). El indicador se cuelga como hermano de la lista, no
+  como hijo, porque `notifRenderLista()` reemplaza el `innerHTML` de la
+  lista en cada sondeo y lo hubiera borrado.
+
+Da un pulso corto de vibración (`navigator.vibrate(12)`) justo al cruzar el
+umbral de soltar, como confirmación táctil de que el refresco se va a
+disparar.
+
+## 📡 Indicador de sin conexión
+
+Nuevo banner discreto (`#offline-banner` en `app.js`) que escucha los
+eventos `online`/`offline` del navegador y se muestra en la parte superior
+de la pantalla con el texto "Sin conexión — mostrando datos guardados".
+El `sw.js` ya servía contenido cacheado sin red, pero eso era invisible
+para el usuario — esto evita que alguien haga una apuesta o transferencia
+creyendo que se procesó cuando en realidad nunca llegó al servidor.
+
+## 📳 Haptic feedback (navigator.vibrate)
+
+- `feedbackResultado()` en `app.js` — el punto único ya compartido entre
+  Casino y Apuestas Deportivas para victorias/derrotas — ahora vibra
+  además de sonar: patrón doble corto en victoria, pulso seco en derrota.
+  Cubre automáticamente todos los juegos de casino y las apuestas
+  deportivas sin tocar cada archivo de juego por separado.
+- `notifCargar()` en `notificaciones.js` — vibración corta al llegar una
+  notificación nueva (multa, transferencia recibida, resultado de apuesta),
+  junto con el sonido y la animación de campanita que ya existían.
+- Todas las llamadas están envueltas en `if (navigator.vibrate)` + try/catch:
+  en navegadores que no lo soportan (Safari/iOS) quedan como no-op, no
+  rompen nada.
+
+## 🧾 Recibo de transferencia (reemplaza el toast de 3s)
+
+Nuevo modal `#modal-recibo-transferencia` (mismo patrón visual que los
+modales admin existentes: `admin-modal-overlay` + `.visible`), con ícono
+de check, monto grande, destinatario (nombre si está en los Contactos
+guardados del usuario, si no el RUT), fecha/hora y el nuevo saldo. Se
+dispara desde `hacerTransferencia()` en `banco.js` vía la nueva función
+`mostrarReciboTransferencia()`, y el usuario lo cierra a propósito con el
+botón "Listo" (o Escape) — no se autodescarta solo. El mensaje inline
+(`#transfer-success`) se mantiene como apoyo, no se quitó.
+
+### Archivos tocados
+- `public/js/pull-to-refresh.js` — nuevo.
+- `public/js/app.js` — banner offline, vibración en `feedbackResultado()`.
+- `public/js/notificaciones.js` — vibración en notificación nueva.
+- `public/js/apuestas.js` — `apRefrescarActivo()`.
+- `public/js/banco.js` — `mostrarReciboTransferencia()`, caché de contactos.
+- `public/index.html` — modal de recibo, script tag de pull-to-refresh.js.
+- `public/styles.css` — estilos de `.ptr-indicator`, `#offline-banner`,
+  `.tx-receipt-*`.
+- `public/sw.js` — agrega `pull-to-refresh.js` al precache, sube a `v2`.
+
+
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v15 — sin cambios.
+
+---
+
+## 🐛 Bugfix — Cobro automático de multas nunca funcionaba
+
+- `api/comisaria.js`, acción `agregarMulta`: el código intentaba descontar el
+  monto de la multa desde una tabla llamada `cuentas`, que **no existe en
+  ningún lado del proyecto** (la tabla real es `banco`, usada en
+  `banco.js`/`casino.js`/`tienda.js`/`apuestas.js`). El error quedaba
+  silenciado por un `catch` que asumía "la cuenta puede no existir", pero en
+  realidad la query fallaba siempre por nombre de tabla incorrecto.
+- Resultado antes del fix: **ninguna multa se cobraba automáticamente**,
+  todas quedaban en estado `pendiente` aunque el ciudadano tuviera saldo
+  suficiente.
+- Corregido: ahora consulta y actualiza `banco`, como el resto del sistema.
+  **Esto cambia comportamiento visible**: de aquí en adelante, si el
+  ciudadano multado tiene saldo suficiente en su cuenta, la multa se
+  cobra sola al crearla y queda `pagada` automáticamente (como decía el
+  comentario original del código, que nunca se había cumplido).
+
+## 🚀 Rendimiento — Índices en la base de datos
+
+Se agregaron índices `CREATE INDEX IF NOT EXISTS` (no bloquean, idempotentes
+como las tablas) en las columnas que se filtran en cada `WHERE` de forma
+constante y que antes dependían de un table scan completo:
+
+| Tabla              | Columna       | Dónde se usa                          |
+|---------------------|---------------|----------------------------------------|
+| `transacciones`     | `discord_id`  | Historial bancario de cada usuario     |
+| `sueldos`           | `discord_id`  | Cobro de sueldo recurrente             |
+| `multas`            | `ciudadano_id`| Multas por ciudadano (Comisaría/Perfil)|
+| `antecedentes`      | `ciudadano_id`| Antecedentes por ciudadano             |
+| `inventario`        | `discord_id`  | Inventario de tienda por usuario       |
+| `casino_apuestas`   | `discord_id`  | Historial de casino                    |
+| `sport_apuestas`    | `discord_id`  | Apuestas deportivas por usuario        |
+| `sport_apuestas`    | `partido_id`  | Apuestas por partido (resolución/pagos)|
+
+No se indexaron `denuncias.denunciante_id` ni `comisaria_logs.usuario_id`
+porque sus búsquedas usan `ILIKE '%...%'` (substring) — un índice B-tree
+normal no ayuda ahí, se necesitaría una extensión `pg_trgm` aparte. Se deja
+pendiente si en algún momento esas búsquedas se sienten lentas con datos
+reales.
+
+## 📱 PWA — Service Worker
+
+- Nuevo `public/sw.js`: cachea JS/CSS/íconos con estrategia
+  *stale-while-revalidate* (responde con lo cacheado al instante y actualiza
+  en segundo plano), y la navegación (`/`) con *network-first* + fallback a
+  cache si no hay señal.
+- **`/api/*` y `/auth/*` nunca se cachean** — son datos en vivo (saldo,
+  sesión, inventario); cachearlos mostraría info vieja o de otra sesión.
+- Registrado en `public/js/app.js` al final de `window.load`, con manejo de
+  error silencioso si el navegador no soporta Service Workers.
+- `vercel.json`: rewrite `/sw.js` → `/public/sw.js` + header
+  `Cache-Control: no-cache` (para que las actualizaciones del SW lleguen
+  rápido a los clientes) y `Service-Worker-Allowed: /`.
+
+## 🔍 SEO — robots.txt y sitemap.xml
+
+- Nuevos `public/robots.txt` (permite todo excepto `/api/` y `/auth/`) y
+  `public/sitemap.xml` (con la home; el resto de las secciones son parte de
+  la SPA detrás de login, no rutas indexables por separado).
+- `vercel.json`: rewrites `/robots.txt` y `/sitemap.xml` hacia sus archivos
+  en `/public`.
+
+## 🖼️ Rendimiento — Íconos PNG comprimidos
+
+- `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` pasados por
+  `optipng -o4` (compresión **sin pérdida**, mismos píxeles exactos).
+  Reducción modesta (~3-6%) porque ya estaban relativamente optimizados.
+- Se evaluó `pngquant` (compresión con pérdida, reduce a 256 colores) pero
+  se descartó: el logo tiene degradados metálicos finos que se notarían con
+  banding visible a esa paleta reducida. Se priorizó mantener la calidad
+  visual intacta.
+
+## 🖼️ Rendimiento — `loading="lazy"` en imágenes de listas
+
+- Se agregó `loading="lazy"` a las imágenes generadas dinámicamente en:
+  `tienda.js` (catálogo + inventario), `perfil-publico.js` (inventario por
+  ciudadano), `admin-tienda.js` (catálogo + inventario admin),
+  `comisaria.js` (fotos de antecedentes), `empresas.js` (logos + avatares),
+  `apuestas.js` (logos de equipos).
+- No se tocó la imagen de fondo (`video-bg`) ni los íconos PWA — esas ya
+  usan `fetchpriority="high"` porque son visibles de inmediato y no deben
+  ir con `lazy`.
+
+### Archivos tocados
+- `api/comisaria.js` — bugfix tabla `cuentas` → `banco`, índices.
+- `api/banco.js`, `api/tienda.js`, `api/casino.js`, `api/apuestas.js` — índices.
+- `public/sw.js` — nuevo, Service Worker.
+- `public/js/app.js` — registro del Service Worker.
+- `public/robots.txt`, `public/sitemap.xml` — nuevos.
+- `public/icon-*.png` — comprimidos sin pérdida.
+- `public/js/tienda.js`, `perfil-publico.js`, `admin-tienda.js`, `comisaria.js`, `empresas.js`, `apuestas.js` — `loading="lazy"`.
+- `vercel.json` — rewrites de `/sw.js`, `/robots.txt`, `/sitemap.xml`.
+
+---
+
+# Cambios aplicados — ChileCity RP v15 (auditoría de mejoras)
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v14 — sin cambios.
+
+---
+
+## 🔒 Seguridad — Headers HTTP
+
+- `vercel.json`: se agregó un bloque `headers` aplicado a todo el sitio:
+  - `Content-Security-Policy` — restringe scripts/estilos/fuentes/imágenes a
+    `'self'` (más Google Fonts, que ya se usaba) y bloquea que el sitio sea
+    embebido en un `<iframe>` ajeno (`frame-ancestors 'none'`).
+  - `X-Content-Type-Options: nosniff` — evita que el navegador "adivine" el
+    tipo de un archivo servido (mitiga ataques de MIME-sniffing).
+  - `X-Frame-Options: DENY` — refuerzo del `frame-ancestors` para navegadores
+    viejos que no leen CSP.
+  - `Referrer-Policy: strict-origin-when-cross-origin` — no filtra la URL
+    completa al navegar a sitios externos.
+  - `Permissions-Policy` — deshabilita cámara/micrófono/geolocalización, que
+    el sitio no usa.
+- La CSP usa `'unsafe-inline'` en `script-src`/`style-src` porque el HTML
+  actual tiene `onclick=` inline y `style=""` en varios lugares — si en algún
+  momento se migran esos handlers a `addEventListener` y los estilos inline a
+  clases CSS, se puede sacar `'unsafe-inline'` y la política queda mucho más
+  estricta.
+
+## ⚡ Rendimiento — Caché de estáticos
+
+- `vercel.json`: se agregaron `Cache-Control` para los assets que no cambian
+  seguido:
+  - `/js/*` y `/styles.css` → `max-age=3600, must-revalidate` (una hora,
+    revalida después). Si más adelante versionas los nombres de archivo
+    (hash en el nombre), se puede subir a `immutable` con `max-age` largo.
+  - Íconos PWA, logo y favicon → `max-age=2592000, immutable` (30 días, no
+    cambian salvo que tú los reemplaces a mano).
+
+## 🧹 Limpieza — `vercel.json`
+
+- Se eliminaron 9 entradas de `rewrites` que eran no-operativas (`source`
+  igual a `destination`, ej. `/api/dni` → `/api/dni`): Vercel ya enruta
+  automáticamente cualquier archivo dentro de `/api` a su mismo path, así
+  que esas líneas no hacían nada. Se mantuvieron solo los rewrites que sí
+  cambian el path (`/auth/login`, `/api/logout`, assets en `/public`, etc).
+- **No se tocó la cantidad de funciones en `/api`** (siguen siendo 12:
+  admin, apuestas, banco, callback, casino, comisaria, dni, login,
+  notificaciones, perfil-publico, session, tienda) — el plan gratuito de
+  Vercel quedó respetado.
+
+## 🗜️ Rendimiento — CSS minificado
+
+- `public/styles.css`: pasado por `clean-css` (nivel `O2`, conserva
+  estructura pero quita comentarios, espacios y declaraciones redundantes).
+  129 KB → 92.6 KB (~28% más liviano). El contenido visual es idéntico, solo
+  cambió el formato del archivo.
+
+## ⏸️ Lo que NO se hizo en esta pasada (y por qué)
+
+- **Autoalojar la imagen de fondo (actualmente en Imgur)**: no se pudo
+  descargar desde este entorno porque no tengo acceso de red a `imgur.com`
+  (solo a un set acotado de dominios técnicos: npm, PyPI, GitHub, etc).
+  Si quieres, descarga tú la imagen y súbela a `public/`, o pásamela como
+  archivo adjunto y yo la optimizo (WebP + tamaños) y actualizo las
+  referencias en `index.html`.
+- **Dividir `index.html` (140 KB) en fragmentos cargados on-demand**: es un
+  cambio estructural grande (cómo se cargan las secciones del dashboard) con
+  riesgo real de romper algo que no puedo probar en un navegador real desde
+  acá. Si quieres avanzar en esto, mejor hacerlo de forma incremental,
+  sección por sección, probando en tu entorno de Vercel preview antes de
+  pasar a producción.
+
+### Archivos tocados
+- `vercel.json` — headers de seguridad, caché de estáticos, limpieza de rewrites redundantes.
+- `public/styles.css` — minificado.
+
+---
+
+# Cambios aplicados — ChileCity RP v14
+
+## ⚠️ Variables de entorno requeridas
+
+Las mismas que v13 — sin cambios.
+
+---
+
+## 🔒 Seguridad — XSS almacenado en Banco y Panel Admin
+
+- `public/js/banco.js`: la descripción de las transacciones, los nombres de
+  usuario/RUT del panel admin, los nombres de sueldo y los contactos
+  guardados se renderizaban con `innerHTML` **sin escapar**. Si alguien
+  escribía HTML/JS en el concepto de una transferencia (por ejemplo), se
+  ejecutaba en la pantalla de quien viera ese historial. Ahora todos esos
+  campos pasan por `escHtml()`, igual que en comisaría/perfil público.
+- `public/js/panel-admin.js`: el nombre de Discord y el ID de cada admin en
+  la lista del Panel Admin tampoco se escapaban. Corregido por consistencia
+  y defensa en profundidad.
+- Se auditó el resto de los módulos (`casino.js`, `tienda.js`,
+  `admin-tienda.js`, `empresas.js`, `apuestas.js`): ya escapaban
+  correctamente todo el texto proveniente de usuarios, no requerían cambios.
+
+## 📱 PWA — Set completo de íconos
+
+- El manifest solo traía un ícono de 128×128 sin propósito `maskable` bien
+  formado (recortaba mal en algunos launchers Android). Se generaron
+  `icon-192.png`, `icon-512.png` (purpose `any`) e `icon-maskable-512.png`
+  (con relleno de seguridad y fondo `#0a0a0f`) a partir del logo original,
+  y se agregaron sus rewrites correspondientes en `vercel.json`.
+
+## 🖼️ Rendimiento — imagen de fondo
+
+- `index.html`: se agregó `<link rel="preload" fetchpriority="high">` para
+  la imagen de fondo, además de `fetchpriority="high"` y `decoding="async"`
+  en el `<img>`, ya que es contenido visible de inmediato (no debe ir con
+  `loading="lazy"`).
+- Se agregó un fundido de entrada (`opacity` + `transition`) para que la
+  imagen no aparezca de golpe ("pop-in") mientras carga, con manejo de
+  `onerror` para que la pantalla no se quede oscura si la imagen falla.
+- Nota: la imagen sigue sirviéndose desde Imgur sin variantes responsivas;
+  para una mejora real de peso conviene autoalojar una versión comprimida
+  (WebP, varias resoluciones) — no se pudo hacer en este cambio por no
+  tener acceso de red para descargarla y recomprimirla.
+
+## 🔊 Sonidos y microinteracciones
+
+- Nuevas funciones globales en `app.js`: `sonidoNotificacion()` (ping suave,
+  dos tonos) y `sonidoConfirmacion()` (click corto tipo "listo"), con el
+  mismo motor de Web Audio que ya usaban los sonidos de victoria/derrota del
+  casino — sin archivos de audio externos.
+- La campanita de notificaciones ahora también suena (sutil) cuando llega
+  una notificación nueva, además de agitarse como antes.
+- Transferencias bancarias exitosas y toasts de tipo `success` (compras en
+  tienda, acciones varias) reproducen `sonidoConfirmacion()`.
+- Generar la Cédula de Identidad por primera vez ahora tiene una animación
+  de aparición (`rc-carnet-reveal`) + sonido de confirmación — pero solo la
+  primera vez que se crea, no cada vez que se abre Registro Civil con un
+  carnet ya existente.
+
+### Archivos tocados
+- `public/js/banco.js`, `public/js/panel-admin.js` — fix de XSS.
+- `public/manifest.json`, `vercel.json` — íconos PWA.
+- `public/index.html`, `public/styles.css` — preload/fade de fondo, animación de carnet.
+- `public/js/app.js` — nuevos sonidos `sonidoNotificacion()` / `sonidoConfirmacion()`.
+- `public/js/notificaciones.js`, `public/js/tienda.js`, `public/js/registro-civil.js` — enganche de los nuevos sonidos.
+
+---
+
+
 
 ## 🔔 Notificaciones — antecedentes + avisos de administración
 
@@ -157,3 +669,15 @@ Los últimos dos tienen color de alerta (amarillo y rojo).
 - SEO / Open Graph / favicon — sin cambios.
 - Rate limiting — sin cambios.
 - Autenticación por cookie httpOnly — sin cambios.
+
+---
+
+## 👤 v22 — Card de Perfil en el Dashboard
+
+- Nueva **card de perfil** arriba del dashboard: avatar de Discord con punto de estado, nombre, y badges (`@usuario` de Discord, RUT o aviso de "Sin cédula", cantidad de logros desbloqueados).
+- **Biografía editable**: cada ciudadano puede escribir una bio corta (máx. 160 caracteres) desde su propia card, con botón de editar/guardar/cancelar. Requiere tener cédula creada.
+  - Nueva columna `bio` en la tabla `dni` (se agrega sola con `ALTER TABLE ... IF NOT EXISTS`, no requiere migración manual).
+  - Nuevo método `PATCH` en `/api/dni` para guardar la bio (no se creó un endpoint nuevo: ya se estaba en el límite de 12 funciones serverless de Vercel).
+- Nueva **card de saldo bancario** al lado del perfil: muestra el saldo actual y el número de cuenta apenas se entra al dashboard (antes había que entrar a Banco para verlo), con botón directo "Ir al Banco".
+- Diseño inspirado en la estructura de otros portales de roleplay (avatar + badges + saldo destacado), reinterpretado con la paleta y tipografía propias de ChileCity RP (rojo neón, Bebas Neue, fondo oscuro).
+- Se eliminó el antiguo encabezado "Panel Principal / Hola, {nombre}" — reemplazado por la card de perfil.

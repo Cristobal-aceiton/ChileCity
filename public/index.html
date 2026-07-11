@@ -19,8 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=34">
-  <link rel="preload" as="image" href="https://i.imgur.com/yH4wCVJ.png" fetchpriority="high">
+  <link rel="stylesheet" href="/styles.css?v=36">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,8 +30,7 @@
 </head>
 <body>
 
-  <img id="video-bg" src="https://i.imgur.com/yH4wCVJ.png" alt="Fondo" fetchpriority="high" decoding="async"
-    onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')">
+  <div id="bg-fx" aria-hidden="true"></div>
   <div class="overlay"></div>
   <div id="grain-overlay"></div>
 
@@ -2442,77 +2440,129 @@
       <!-- Contenido (oculto hasta terminar la verificación) -->
       <div id="pa-contenido" style="display:none;flex-direction:column;">
 
-      <!-- Herramientas de administración -->
-      <div id="pa-herramientas" style="margin-bottom:28px;">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0 0 14px 0;">Herramientas</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
-          <div onclick="abrirAdminBanco()" style="cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/></svg>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:.5px;">Admin Banco</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);">Saldos y sueldos</div>
+      <!-- ═══════════ HUB — grilla de botones (reemplaza el scroll largo) ═══════════ -->
+      <div id="pa-hub-view" style="display:flex;flex-direction:column;">
+
+        <h3 class="pa-hub-heading">Herramientas</h3>
+        <div class="pa-hub-grid">
+          <button type="button" class="pa-hub-btn" style="--hub-color:#4ade80;--hub-glow:rgba(74,222,128,.22);" onclick="abrirAdminBanco()">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/></svg></div>
+            <div class="pa-hub-title">Admin Banco</div>
+            <div class="pa-hub-sub">Saldos y sueldos</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#60a5fa;--hub-glow:rgba(96,165,250,.22);" onclick="abrirAdminTiendaPanel()">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+            <div class="pa-hub-title">Admin Tienda</div>
+            <div class="pa-hub-sub">Productos e inventarios</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#fb923c;--hub-glow:rgba(251,146,60,.22);" onclick="abrirAdminEmpresasPanel()">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div>
+            <div class="pa-hub-title">Admin Empresas</div>
+            <div class="pa-hub-sub">Negocios del servidor</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#fbbf24;--hub-glow:rgba(251,191,36,.22);" onclick="abrirAdminCasino()">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+            <div class="pa-hub-title">Admin Casino</div>
+            <div class="pa-hub-sub">Partidos de apuestas</div>
+          </button>
+        </div>
+
+        <h3 class="pa-hub-heading" style="margin-top:30px;">Gestión</h3>
+        <div class="pa-hub-grid">
+          <button id="pa-hub-btn-admins" type="button" class="pa-hub-btn" style="--hub-color:#f87171;--hub-glow:rgba(248,113,113,.22);display:none;" onclick="paAbrirSub('admins')">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg></div>
+            <div class="pa-hub-title">Administradores</div>
+            <div class="pa-hub-sub">Agregar o quitar admins</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#818cf8;--hub-glow:rgba(129,140,248,.22);" onclick="paAbrirSub('notif')">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="pa-hub-title">Notificaciones</div>
+            <div class="pa-hub-sub">Enviar aviso a usuarios</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#1e8a4c;--hub-glow:rgba(30,138,76,.25);" onclick="paAbrirSub('policia')">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e8a4c" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="pa-hub-title">Policías Virtuales</div>
+            <div class="pa-hub-sub">Autorizar acceso a Comisaría</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#a78bfa;--hub-glow:rgba(167,139,250,.22);" onclick="paAbrirSub('staff')">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div class="pa-hub-title">Gestión de Staff</div>
+            <div class="pa-hub-sub">Autorizar acceso al Panel Staff</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#fbbf24;--hub-glow:rgba(251,191,36,.22);" onclick="paAbrirSub('logros')">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg></div>
+            <div class="pa-hub-title">Logros</div>
+            <div class="pa-hub-sub">Otorgar o quitar por usuario</div>
+          </button>
+          <button type="button" class="pa-hub-btn" style="--hub-color:#e5e7eb;--hub-glow:rgba(229,231,235,.18);" onclick="paAbrirSub('stafflogs')">
+            <div class="pa-hub-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div class="pa-hub-title">Logs de Staff</div>
+            <div class="pa-hub-sub">Historial de acciones</div>
+          </button>
+        </div>
+      </div>
+      <!-- ═══════════ /HUB ═══════════ -->
+
+      <!-- ─── Sub: Administradores (exclusivo super admin) ─── -->
+      <div class="pa-sub" id="pa-sub-admins">
+        <div class="pa-sub-header">
+          <button class="sec-back" onclick="paVolverHub()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <h3 class="pa-sub-title" style="color:#f87171;">Administradores</h3>
+        </div>
+
+        <div style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+          <p style="color:#fca5a5;font-size:13px;margin:0;line-height:1.6;">
+            Desde aquí puedes gestionar los administradores del sistema. Puedes agregar hasta <strong>4 admins adicionales</strong> aparte de ti. Tendrán acceso completo al Admin Banco, Admin Tienda y este Panel Admin.
+          </p>
+        </div>
+
+        <!-- Lista de admins actuales -->
+        <div style="margin-bottom:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0;">Administradores Actuales</h3>
+            <span id="pa-contador" style="font-size:12px;color:#9ca3af;background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:20px;">0/5</span>
           </div>
-          <div onclick="abrirAdminTiendaPanel()" style="cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:.5px;">Admin Tienda</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);">Productos e inventarios</div>
+          <div class="rc-loading" id="pa-loading">
+            <div class="spinner"></div>
+            <span>Cargando admins...</span>
           </div>
-          <div onclick="abrirAdminEmpresasPanel()" style="cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:.5px;">Admin Empresas</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);">Negocios del servidor</div>
-          </div>
-          <div onclick="abrirAdminCasino()" style="cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:.5px;">Admin Casino</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);">Partidos de apuestas</div>
+          <div id="pa-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+        <!-- Formulario agregar admin -->
+        <div id="pa-form-wrap" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;">
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0 0 16px 0;">Agregar Admin</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Discord ID</label>
+              <input id="pa-input-id" type="text" placeholder="Ej: 123456789012345678" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Nombre (opcional)</label>
+              <input id="pa-input-nombre" type="text" placeholder="Nombre del admin" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+            </div>
+            <button onclick="paAgregarAdmin()" style="background:rgba(220,38,38,0.8);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;margin-top:4px;">Agregar Admin</button>
+            <div id="pa-msg" style="font-size:13px;text-align:center;min-height:18px;"></div>
           </div>
         </div>
       </div>
+      <!-- /Sub Administradores -->
 
-      <div id="pa-gestion-admins-wrap">
-      <div style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-        <p style="color:#fca5a5;font-size:13px;margin:0;line-height:1.6;">
-          Desde aquí puedes gestionar los administradores del sistema. Puedes agregar hasta <strong>4 admins adicionales</strong> aparte de ti. Tendrán acceso completo al Admin Banco, Admin Tienda y este Panel Admin.
-        </p>
-      </div>
-
-      <!-- Lista de admins actuales -->
-      <div style="margin-bottom:24px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0;">Administradores Actuales</h3>
-          <span id="pa-contador" style="font-size:12px;color:#9ca3af;background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:20px;">0/5</span>
+      <!-- ─── Sub: Enviar notificación a usuarios ─── -->
+      <div class="pa-sub" id="pa-sub-notif">
+        <div class="pa-sub-header">
+          <button class="sec-back" onclick="paVolverHub()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <h3 class="pa-sub-title" style="color:#818cf8;display:flex;align-items:center;gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Enviar Notificación
+          </h3>
         </div>
-        <div class="rc-loading" id="pa-loading">
-          <div class="spinner"></div>
-          <span>Cargando admins...</span>
-        </div>
-        <div id="pa-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
-      </div>
-
-      <!-- Formulario agregar admin -->
-      <div id="pa-form-wrap" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0 0 16px 0;">Agregar Admin</h3>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div>
-            <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Discord ID</label>
-            <input id="pa-input-id" type="text" placeholder="Ej: 123456789012345678" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
-          </div>
-          <div>
-            <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Nombre (opcional)</label>
-            <input id="pa-input-nombre" type="text" placeholder="Nombre del admin" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
-          </div>
-          <button onclick="paAgregarAdmin()" style="background:rgba(220,38,38,0.8);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;margin-top:4px;">Agregar Admin</button>
-          <div id="pa-msg" style="font-size:13px;text-align:center;min-height:18px;"></div>
-        </div>
-      </div>
-      </div><!-- /pa-gestion-admins-wrap -->
-
-      <!-- Enviar notificación a usuarios -->
-      <div id="pn-wrap" style="margin-top:32px;border-top:1px solid rgba(99,102,241,0.18);padding-top:28px;">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#818cf8;letter-spacing:1px;margin:0 0 14px 0;display:flex;align-items:center;gap:10px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Enviar Notificación
-        </h3>
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;">
           <div>
             <label style="display:block;font-size:12px;color:#9ca3af;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Título</label>
@@ -2534,13 +2584,17 @@
           <div id="pn-msg" style="font-size:13px;text-align:center;min-height:18px;"></div>
         </div>
       </div>
+      <!-- /Sub Notificaciones -->
 
-
-      <!-- Gestión de Policías Virtuales -->
-      <div id="pa-policia-wrap" style="margin-top:32px;border-top:1px solid rgba(30,138,76,0.15);padding-top:28px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#1e8a4c;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8a4c" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <!-- ─── Sub: Gestión de Policías Virtuales ─── -->
+      <div class="pa-sub" id="pa-sub-policia">
+        <div class="pa-sub-header">
+          <button class="sec-back" onclick="paVolverHub()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <h3 class="pa-sub-title" style="color:#1e8a4c;display:flex;align-items:center;gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e8a4c" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Gestión de Policías Virtuales
           </h3>
         </div>
@@ -2568,12 +2622,17 @@
         <div class="rc-loading" id="gp-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
         <div id="gp-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
+      <!-- /Sub Policías -->
 
-      <!-- Gestión de Staff -->
-      <div id="pa-staff-wrap" style="margin-top:32px;border-top:1px solid rgba(167,139,250,0.15);padding-top:28px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#a78bfa;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <!-- ─── Sub: Gestión de Staff ─── -->
+      <div class="pa-sub" id="pa-sub-staff">
+        <div class="pa-sub-header">
+          <button class="sec-back" onclick="paVolverHub()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <h3 class="pa-sub-title" style="color:#a78bfa;display:flex;align-items:center;gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             Gestión de Staff
           </h3>
         </div>
@@ -2600,13 +2659,20 @@
         <div class="rc-loading" id="ps-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
         <div id="ps-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
+      <!-- /Sub Staff -->
 
-      <!-- Gestión de Logros -->
-      <div id="pa-logros-wrap" style="margin-top:32px;border-top:1px solid rgba(251,191,36,0.18);padding-top:28px;">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fbbf24;letter-spacing:1px;margin:0 0 14px 0;display:flex;align-items:center;gap:10px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>
-          Gestionar Logros de un Usuario
-        </h3>
+      <!-- ─── Sub: Gestión de Logros ─── -->
+      <div class="pa-sub" id="pa-sub-logros">
+        <div class="pa-sub-header">
+          <button class="sec-back" onclick="paVolverHub()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <h3 class="pa-sub-title" style="color:#fbbf24;display:flex;align-items:center;gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>
+            Gestionar Logros de un Usuario
+          </h3>
+        </div>
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <input id="al-buscar-id" type="text" placeholder="Discord ID del usuario" style="flex:1;min-width:200px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
@@ -2619,12 +2685,17 @@
         </div>
         <div id="al-lista" style="margin-top:14px;"></div>
       </div>
+      <!-- /Sub Logros -->
 
-      <!-- Logs de Staff -->
-      <div id="pa-stafflogs-wrap" style="margin-top:32px;border-top:1px solid rgba(255,255,255,0.1);padding-top:28px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin:0;display:flex;align-items:center;gap:10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <!-- ─── Sub: Logs de Staff ─── -->
+      <div class="pa-sub" id="pa-sub-stafflogs">
+        <div class="pa-sub-header">
+          <button class="sec-back" onclick="paVolverHub()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <h3 class="pa-sub-title" style="color:#fff;display:flex;align-items:center;gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Logs de Staff
           </h3>
         </div>
@@ -2638,6 +2709,8 @@
         <div class="rc-loading" id="sl-loading" style="display:none;"><div class="spinner"></div><span>Cargando...</span></div>
         <div id="sl-lista" style="display:flex;flex-direction:column;gap:2px;"></div>
       </div>
+      <!-- /Sub Logs de Staff -->
+
       </div><!-- /pa-contenido -->
     </div>
   </section>
@@ -3175,26 +3248,26 @@
     </div>
   </div>
 
-  <script defer src="/js/app.js?v=34"></script>
-  <script defer src="/js/dashboard-fx.js?v=34"></script>
-  <script defer src="/js/notificaciones.js?v=34"></script>
-  <script defer src="/js/pull-to-refresh.js?v=34"></script>
-  <script defer src="/js/registro-civil.js?v=34"></script>
-  <script defer src="/js/banco.js?v=34"></script>
+  <script defer src="/js/app.js?v=36"></script>
+  <script defer src="/js/dashboard-fx.js?v=36"></script>
+  <script defer src="/js/notificaciones.js?v=36"></script>
+  <script defer src="/js/pull-to-refresh.js?v=36"></script>
+  <script defer src="/js/registro-civil.js?v=36"></script>
+  <script defer src="/js/banco.js?v=36"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=34"></script>
-  <script defer src="/js/mercado.js?v=34"></script>
-  <script defer src="/js/vehiculos.js?v=34"></script>
-  <script defer src="/js/concesionario.js?v=34"></script>
-  <script defer src="/js/mis-autos.js?v=34"></script>
-  <script defer src="/js/admin-tienda.js?v=34"></script>
-  <script defer src="/js/empresas.js?v=34"></script>
-  <script defer src="/js/logros.js?v=34"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=34"></script>
-  <script defer src="/js/panel-admin.js?v=34"></script>
-  <script defer src="/js/comisaria.js?v=34"></script>
-  <script defer src="/js/casino.js?v=34"></script>
-  <script defer src="/js/apuestas.js?v=34"></script>
-  <script defer src="/js/parallax-landing.js?v=34"></script>
+  <script defer src="/js/tienda.js?v=36"></script>
+  <script defer src="/js/mercado.js?v=36"></script>
+  <script defer src="/js/vehiculos.js?v=36"></script>
+  <script defer src="/js/concesionario.js?v=36"></script>
+  <script defer src="/js/mis-autos.js?v=36"></script>
+  <script defer src="/js/admin-tienda.js?v=36"></script>
+  <script defer src="/js/empresas.js?v=36"></script>
+  <script defer src="/js/logros.js?v=36"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=36"></script>
+  <script defer src="/js/panel-admin.js?v=36"></script>
+  <script defer src="/js/comisaria.js?v=36"></script>
+  <script defer src="/js/casino.js?v=36"></script>
+  <script defer src="/js/apuestas.js?v=36"></script>
+  <script defer src="/js/parallax-landing.js?v=36"></script>
 </body>
 </html>
