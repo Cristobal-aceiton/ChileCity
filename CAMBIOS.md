@@ -1,3 +1,50 @@
+# Cambios aplicados — ChileCity RP v36 (Fase 3: Panel Admin modernizado)
+
+## 🧭 Panel Admin — de scroll largo a hub de botones
+
+Antes, entrar al Panel Admin significaba un solo scroll gigante con seis
+bloques uno debajo del otro (Administradores, Enviar Notificación, Policías
+Virtuales, Gestión de Staff, Logros, Logs de Staff), además de la grilla de
+Herramientas (Admin Banco/Tienda/Empresas/Casino) arriba de todo. Ahora:
+
+- **`#pa-hub-view`**: una pantalla de inicio con dos grillas de botones
+  (`.pa-hub-grid` / `.pa-hub-btn`) — "Herramientas" arriba (sin cambios de
+  comportamiento, siguen navegando a su propia pantalla) y "Gestión" abajo
+  con seis botones: Administradores, Notificaciones, Policías Virtuales,
+  Gestión de Staff, Logros, Logs de Staff.
+- Cada botón de "Gestión" abre su **propio subpanel** (`.pa-sub`, oculto por
+  defecto) con un botón "Volver" que regresa al hub — mismo patrón visual
+  que ya usa el resto de la app (`sec-back` + `seccion-title`), no un
+  acordeón ni un modal.
+- El botón "Administradores" se oculta con `display:none` para cualquier
+  admin que no sea el super admin (antes ocultaba directamente el bloque
+  `pa-gestion-admins-wrap` en medio del scroll).
+- **Carga perezosa real**: antes `abrirPanelAdmin()` disparaba de una sola
+  vez `paCargarAdmins()` + `gpCargarPolicias()` + `psCargarStaff()` +
+  `slCargarLogs()` — cuatro llamadas a la API cada vez que un admin entraba
+  al panel, aunque solo quisiera revisar una cosa. Ahora cada función se
+  llama recién cuando el admin abre esa sección específica desde el hub
+  (`paAbrirSub(id)`), y el hub en sí no pega ningún request.
+- Ningún endpoint ni función de `/api` nueva: se reutiliza íntegro
+  `panel-admin.js` / `admin.js`, solo cambió cuándo se llaman sus funciones
+  y cómo se muestra el HTML.
+
+### Archivos tocados
+- `public/index.html` — `panel-admin-screen` reestructurado: nuevo
+  `#pa-hub-view` con `.pa-hub-grid`/`.pa-hub-btn`, y los seis bloques de
+  gestión envueltos en `.pa-sub` con su propio header + botón Volver.
+- `public/js/app.js` — `abrirPanelAdmin()` ya no precarga las cuatro
+  secciones de golpe; nuevas `paAbrirSub(id)` / `paVolverHub()`.
+- `public/styles.css` — nuevas clases `.pa-hub-heading`, `.pa-hub-grid`,
+  `.pa-hub-btn`, `.pa-hub-icon`, `.pa-hub-title`, `.pa-hub-sub`, `.pa-sub`,
+  `.pa-sub-header`, `.pa-sub-title` (mismo lenguaje visual que las
+  `.nav-card` del dashboard: sin glass, degradado rojo/negro, acento de
+  color lateral al hover).
+- `public/sw.js` — `CACHE_VERSION` v35 → v36.
+- Todos los `<link>`/`<script>` de `index.html` — `?v=35` → `?v=36`.
+
+---
+
 # Cambios aplicados — ChileCity RP v26 (Rediseño completo del Perfil Público)
 
 ## 🪪 Perfil Público — reconstrucción completa (layout maestro-detalle)
