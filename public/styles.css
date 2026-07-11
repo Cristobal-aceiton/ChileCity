@@ -1062,6 +1062,7 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 /* ── Panel Admin — hub de botones (Fase 3) ──────────────────────────────── */
 .pa-hub-heading{font-family:'Bebas Neue',sans-serif;font-size:19px;color:rgba(255,255,255,.55);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 14px 0}
 .pa-hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;width:100%}
+@media (min-width:769px){.pa-hub-grid{grid-template-columns:repeat(3,1fr)}}
 .pa-hub-btn{--hub-color:#fff;--hub-glow:rgba(255,255,255,.15);cursor:pointer;text-align:left;color:#fff;font-family:Inter,sans-serif;display:flex;flex-direction:column;gap:10px;padding:20px 18px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(150deg,rgba(24,10,10,.6) 0%,rgba(10,9,12,.72) 100%);position:relative;overflow:hidden;transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
 .pa-hub-btn::before{content:'';position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:0 3px 3px 0;background:var(--hub-color);opacity:0;transition:opacity .3s var(--ease)}
 .pa-hub-btn:hover{transform:translateY(-4px);border-color:color-mix(in srgb, var(--hub-color) 45%, rgba(255,255,255,.15));box-shadow:0 14px 34px -12px var(--hub-glow)}
