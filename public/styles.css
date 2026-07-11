@@ -1090,6 +1090,8 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .bdc-ahorro-abrir-btn{margin-top:10px;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;align-self:flex-start;background:var(--bank-gold);color:var(--bank-dark);transition:transform .2s var(--ease)}
 .bdc-ahorro-abrir-btn:hover{transform:translateY(-2px)}
 .bdc-brand-logo{height:44px;width:auto;display:block;object-fit:contain}
+.bdc-brand-chip{background:#fff;padding:6px 12px;border-radius:12px;box-shadow:0 4px 14px rgba(0,10,40,.25)}
+.bdc-brand-chip .bdc-brand-logo{height:26px}
 .bank-logo-img{height:22px;display:block;filter:drop-shadow(0 0 6px rgba(212,175,55,.35))}
 
 /* Selector de origen en Transferencias */
