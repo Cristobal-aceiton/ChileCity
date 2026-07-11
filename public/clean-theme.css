@@ -6,23 +6,34 @@
    ni funcionalidad.
 
    Qué apaga:
-   1) El fondo ambiental con manchas rojas difuminadas (#bg-fx) y las
-      "brasas" flotantes (#bg-particles) — los puntitos tipo LED.
-   2) El brillo/halo detrás del logo de la esquina y del logo del splash
+   1) El brillo/halo detrás del logo de la esquina y del logo del splash
       de carga.
-   3) Los puntos de estado tipo LED (online, notificaciones) y su pulso.
-   4) Los glows de color (box-shadow / text-shadow / drop-shadow) en
+   2) Los puntos de estado tipo LED (online, notificaciones) y su pulso.
+   3) Los glows de color (box-shadow / text-shadow / drop-shadow) en
       botones, tarjetas del dashboard, avatares, casino, carnet, etc.
-   Todo lo demás (layout, colores base, tipografía, animaciones de
-   entrada) queda intacto. */
 
-/* 1) Fondo ambiental y partículas ------------------------------------- */
-#bg-fx::before,
-#bg-fx::after {
-  display: none !important;
+   Qué NO toca: el fondo animado (#bg-fx / #bg-particles) — se deja tal
+   cual estaba, solo se ajusta el balance de color para que predomine el
+   rojo sobre el negro (ver sección 1). Todo lo demás (layout, tipografía,
+   animaciones de entrada) queda intacto. */
+
+/* 1) Fondo ambiental: mismo movimiento de antes, más rojo que negro ---- */
+#bg-fx {
+  background: #1a0505 !important;
 }
-#bg-particles {
-  display: none !important;
+#bg-fx::before {
+  width: 130vmax !important;
+  height: 130vmax !important;
+  top: -50vmax !important;
+  left: -40vmax !important;
+  background: radial-gradient(circle at 30% 30%, rgba(230, 25, 25, .85), rgba(230, 25, 25, .25) 55%, rgba(230, 25, 25, 0) 78%) !important;
+}
+#bg-fx::after {
+  width: 120vmax !important;
+  height: 120vmax !important;
+  bottom: -45vmax !important;
+  right: -35vmax !important;
+  background: radial-gradient(circle at 70% 70%, rgba(190, 15, 15, .78), rgba(190, 15, 15, .2) 55%, rgba(0, 0, 0, 0) 78%) !important;
 }
 
 /* 2) Logo de la esquina y logo del splash de carga --------------------- */
