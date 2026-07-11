@@ -657,6 +657,18 @@
           fetch('/api/admin?action=verificarStaff')
         ]);
         const [dAdmin, dStaff] = await Promise.all([rAdmin.json(), rStaff.json()]);
+
+        // Tarjetas de Staff/Admin del dashboard: solo se muestran a quien
+        // realmente tiene el rol (misma verificación que abrirPanelAdmin/
+        // abrirPanelStaff, nunca se confía en el cliente para ocultarlas
+        // como única barrera, solo para no mostrar ruido a usuarios civiles).
+        const staffCard = document.getElementById('staff-card');
+        const adminCard = document.getElementById('admin-panel-card');
+        const staffSection = document.getElementById('nav-section-staff');
+        if (staffCard) staffCard.style.display = dStaff.esStaff ? '' : 'none';
+        if (adminCard) adminCard.style.display = dAdmin.esAdmin ? '' : 'none';
+        if (staffSection) staffSection.style.display = (dStaff.esStaff || dAdmin.esAdmin) ? '' : 'none';
+
         let cargoHtml;
         if (dAdmin.esAdmin) {
           cargoHtml = `<span class="profile-badge pb-admin"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg> Admin</span>`;
