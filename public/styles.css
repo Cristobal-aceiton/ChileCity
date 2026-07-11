@@ -1383,3 +1383,68 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
   background:linear-gradient(90deg,transparent,var(--bk-cyan),var(--bk-gold),transparent);
   opacity:.55;z-index:2;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   BANCO — rediseño (scoped a #banco-screen, no toca otros módulos)
+   ══════════════════════════════════════════════════════════════════════ */
+#banco-screen{--nbk-green:#22e88a;--nbk-green-deep:#0c9a5c;--nbk-bg-card:#12151a;--nbk-bg-card2:#171b21;--nbk-border:rgba(255,255,255,.08);--nbk-text-dim:rgba(255,255,255,.45)}
+#banco-screen .seccion-container{max-width:480px;gap:18px}
+#banco-screen .nbk-onboarding{align-items:center;text-align:center;gap:14px}
+#banco-screen .nbk-onboarding-logo{width:96px;height:auto;margin-bottom:4px}
+#banco-screen .nbk-onboarding-logo img{width:100%;height:auto;display:block;filter:drop-shadow(0 0 18px rgba(34,232,138,.25))}
+#banco-screen .nbk-home{width:100%;display:flex;flex-direction:column;gap:16px}
+
+/* Card de saldo principal */
+#banco-screen .nbk-balance-card{width:100%;background:linear-gradient(160deg,var(--nbk-bg-card) 0%,#0a0c0f 100%);border:1px solid var(--nbk-border);border-radius:22px;padding:22px 22px 20px;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+#banco-screen .nbk-balance-card::before{content:'';position:absolute;top:-70px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(34,232,138,.14),transparent 70%)}
+#banco-screen .nbk-balance-topbar{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;margin-bottom:18px}
+#banco-screen .nbk-brand-mark{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid var(--nbk-border);display:flex;align-items:center;justify-content:center;padding:5px}
+#banco-screen .nbk-brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
+#banco-screen .nbk-account-pill{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.55);background:rgba(255,255,255,.05);border:1px solid var(--nbk-border);border-radius:999px;padding:6px 12px;letter-spacing:.3px}
+#banco-screen .nbk-balance-label{font-size:12px;font-weight:600;color:var(--nbk-text-dim);text-transform:uppercase;letter-spacing:1px;position:relative;z-index:1}
+#banco-screen .nbk-balance-value{font-family:'Bebas Neue',sans-serif;font-size:44px;font-weight:400;letter-spacing:.5px;color:#fff;margin-top:4px;position:relative;z-index:1;text-shadow:0 0 30px rgba(34,232,138,.18)}
+#banco-screen .nbk-balance-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--nbk-border);position:relative;z-index:1}
+#banco-screen .nbk-balance-footer-num{display:flex;flex-direction:column;gap:2px;min-width:0}
+#banco-screen .nbk-balance-footer-label{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px}
+#banco-screen .nbk-balance-footer-val{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.75);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#banco-screen .nbk-copy-mini-btn{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:rgba(34,232,138,.1);border:1px solid rgba(34,232,138,.25);color:var(--nbk-green);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+#banco-screen .nbk-copy-mini-btn:hover{background:rgba(34,232,138,.18)}
+
+/* Ahorro + sueldo secundarios */
+#banco-screen .nbk-secondary-grid{display:grid;grid-template-columns:1fr;gap:12px}
+#banco-screen .nbk-ahorro-card{width:100%;max-width:100%;margin:0;cursor:pointer;background:var(--nbk-bg-card2);border:1px solid var(--nbk-border);border-radius:18px}
+#banco-screen .nbk-sueldo-card{width:100%;max-width:100%;margin:0}
+@media (min-width:420px){#banco-screen .nbk-secondary-grid{grid-template-columns:1fr 1fr}}
+
+/* Franja "tarjeta física" */
+#banco-screen .nbk-tarjeta-promo{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(120deg,var(--nbk-green) 0%,#17c471 55%,#0c9a5c 100%);border-radius:18px;padding:14px 16px;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 10px 26px rgba(34,232,138,.18)}
+#banco-screen .nbk-tarjeta-promo:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(34,232,138,.28)}
+#banco-screen .nbk-tarjeta-promo-left{display:flex;align-items:center;gap:12px;min-width:0}
+#banco-screen .nbk-tarjeta-promo-label{font-size:12px;font-weight:800;color:rgba(6,30,20,.8);text-transform:uppercase;letter-spacing:.5px;writing-mode:horizontal-tb;display:none}
+#banco-screen .nbk-mini-card{width:52px;height:34px;border-radius:8px;background:linear-gradient(135deg,#0b0f0d,#1a1f1c);border:1px solid rgba(255,255,255,.15);padding:6px 7px;display:flex;flex-direction:column;justify-content:space-between;flex-shrink:0}
+#banco-screen .nbk-mini-card .bdc-mini-top{display:flex;align-items:center;justify-content:space-between}
+#banco-screen .nbk-mini-logo{width:16px;height:auto;object-fit:contain;filter:brightness(0) invert(1);opacity:.9}
+#banco-screen .nbk-tarjeta-promo-num{font-size:12.5px;font-weight:700;color:rgba(5,25,17,.85);font-variant-numeric:tabular-nums;letter-spacing:.5px}
+#banco-screen .nbk-tarjeta-promo-arrow{color:rgba(5,25,17,.7);flex-shrink:0}
+
+/* Sección de acciones */
+#banco-screen .nbk-section-label{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);margin-top:2px}
+#banco-screen .nbk-actions{display:grid!important;grid-template-columns:repeat(5,1fr);flex-direction:row!important;gap:8px}
+#banco-screen .nbk-action-btn{background:var(--nbk-bg-card2)!important;border:1px solid var(--nbk-border)!important;border-radius:16px!important;padding:14px 6px!important;gap:8px!important}
+#banco-screen .nbk-action-btn:hover{background:rgba(34,232,138,.08)!important;border-color:rgba(34,232,138,.25)!important;transform:translateY(-2px)}
+#banco-screen .nbk-action-icon{width:36px;height:36px;border-radius:11px;background:rgba(34,232,138,.12);color:var(--nbk-green);display:flex;align-items:center;justify-content:center}
+#banco-screen .nbk-action-btn span:last-child{font-size:10.5px!important;letter-spacing:.2px!important}
+
+/* Reutiliza estilos globales (rc-form, historial-item, etc.) pero con acento
+   verde-menta consistente con la card principal, solo dentro de #banco-screen */
+#banco-screen .rc-form{border-radius:20px}
+#banco-screen .btn-green{background:linear-gradient(135deg,var(--nbk-green),var(--nbk-green-deep));box-shadow:0 0 24px rgba(34,232,138,.3)}
+#banco-screen .btn-green:hover{background:linear-gradient(135deg,#3cf49f,var(--nbk-green))}
+#banco-screen .hi-icono.ingreso,#banco-screen .hi-monto.ingreso{color:var(--nbk-green)}
+#banco-screen .bank-saldo-valor{color:var(--nbk-green)}
+
+@media (max-width:420px){
+  #banco-screen .nbk-balance-value{font-size:36px}
+  #banco-screen .nbk-actions{grid-template-columns:repeat(3,1fr)}
+  #banco-screen .nbk-action-btn span:last-child{font-size:9.5px!important}
+}

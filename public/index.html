@@ -19,7 +19,7 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=48">
+  <link rel="stylesheet" href="/styles.css?v=49">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -666,15 +666,6 @@
         </div>
       </div>
 
-      <div class="bdc-hero">
-        <div class="bdc-hero-glow"></div>
-        <div class="bdc-hero-logo"><img src="/bank-logo.png?v=48" alt="ChileCity Bank"></div>
-        <div class="bdc-hero-text">
-          <div class="bdc-hero-name">ChileCity <b>Bank</b></div>
-          <div class="bdc-hero-tag">Banca oficial de ChileCity</div>
-        </div>
-      </div>
-
       <div class="rc-loading" id="banco-loading">
         <div class="skeleton-wrap" style="max-width:480px;width:100%;">
           <div class="skeleton-card">
@@ -691,7 +682,8 @@
       </div>
 
       <!-- Vista sin cuenta -->
-      <div class="rc-form" id="banco-crear-form" style="display:none;">
+      <div class="rc-form nbk-onboarding" id="banco-crear-form" style="display:none;">
+        <div class="nbk-onboarding-logo"><img src="/logo-x.png?v=49" alt="Logo"></div>
         <h2>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/></svg>
           Abrir Cuenta Bancaria
@@ -708,26 +700,34 @@
       <div id="banco-cuenta-wrap" style="display:none; width:100%; display:none; flex-direction:column; align-items:center; gap:20px;">
 
         <!-- ═══════ VISTA PRINCIPAL (saldo + productos) ═══════ -->
-        <div class="bdc-home" id="bdc-home-view">
+        <div class="nbk-home" id="bdc-home-view">
 
-          <!-- Hero de saldo: Corriente + Ahorro -->
-          <div class="bdc-balances-grid">
-            <div class="bdc-balance-card">
-              <div class="bdc-balance-top">
-                <div class="bdc-brand">
-                  <span class="bdc-brand-mark"><img src="/bank-logo-icon.png?v=48" alt=""></span>
-                  <span class="bdc-brand-name">ChileCity <b>Bank</b></span>
-                </div>
-                <div class="bdc-account-pill">Cta. •• <span id="bdc-cuenta-corta">0000</span></div>
-              </div>
-              <div class="bdc-balance-label">Cuenta Corriente</div>
-              <div class="bank-saldo-valor" id="bank-saldo">$0</div>
+          <!-- Card de saldo principal -->
+          <div class="nbk-balance-card">
+            <div class="nbk-balance-topbar">
+              <span class="bdc-brand-mark nbk-brand-mark"><img src="/logo-x.png?v=49" alt="Logo"></span>
+              <div class="bdc-account-pill nbk-account-pill">Cta. •• <span id="bdc-cuenta-corta">0000</span></div>
             </div>
+            <div class="nbk-balance-label">Saldo disponible</div>
+            <div class="bank-saldo-valor nbk-balance-value" id="bank-saldo">$0</div>
 
-            <div class="bdc-balance-card bdc-balance-card-ahorro" id="bdc-ahorro-card">
+            <div class="nbk-balance-footer">
+              <div class="nbk-balance-footer-num">
+                <span class="nbk-balance-footer-label">N° de cuenta</span>
+                <span class="nbk-balance-footer-val" id="bdc-cuenta-num-mini">0000-0000-0000-0000</span>
+              </div>
+              <button class="nbk-copy-mini-btn" onclick="copiarNumeroTarjeta()" aria-label="Copiar número de cuenta" title="Copiar número de cuenta">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Ahorro + próximo sueldo -->
+          <div class="nbk-secondary-grid">
+            <div class="bdc-balance-card bdc-balance-card-ahorro nbk-ahorro-card" id="bdc-ahorro-card" onclick="mostrarAhorro()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')mostrarAhorro()">
               <div class="bdc-balance-top">
                 <div class="bdc-brand">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9V6a2 2 0 0 0-2-2H8a5 5 0 0 0-5 5v1"/><path d="M3 10h13a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-1v3h-3v-3H8v3H5v-3a4 4 0 0 1-2-3.46"/><circle cx="16" cy="12" r="1"/></svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9V6a2 2 0 0 0-2-2H8a5 5 0 0 0-5 5v1"/><path d="M3 10h13a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-1v3h-3v-3H8v3H5v-3a4 4 0 0 1-2-3.46"/><circle cx="16" cy="12" r="1"/></svg>
                   Ahorro
                 </div>
               </div>
@@ -735,63 +735,71 @@
               <div class="bank-saldo-valor" id="bdc-ahorro-saldo" style="display:none;">$0</div>
               <div id="bdc-ahorro-inactiva" style="display:flex; flex-direction:column;">
                 <div class="bdc-ahorro-inactiva-txt">No activada</div>
-                <button class="bdc-ahorro-abrir-btn" onclick="abrirAhorro()">+ Abrir Ahorro</button>
+                <button class="bdc-ahorro-abrir-btn" onclick="event.stopPropagation(); abrirAhorro()">+ Abrir Ahorro</button>
+              </div>
+            </div>
+
+            <div class="proximo-sueldo nbk-sueldo-card" id="proximo-sueldo-box" style="display:none;">
+              <div class="ps-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="ps-info">
+                <div class="ps-titulo">Próximo sueldo</div>
+                <div class="ps-tiempo" id="ps-tiempo">—</div>
+                <div class="ps-nombre" id="ps-nombre">—</div>
               </div>
             </div>
           </div>
 
-          <!-- Próximo sueldo -->
-          <div class="proximo-sueldo" id="proximo-sueldo-box" style="display:none;">
-            <div class="ps-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="ps-info">
-              <div class="ps-titulo">Próximo sueldo</div>
-              <div class="ps-tiempo" id="ps-tiempo">—</div>
-              <div class="ps-nombre" id="ps-nombre">—</div>
-            </div>
-          </div>
-
-          <!-- Mis productos -->
-          <div class="bdc-section-label">Mis productos</div>
-          <div class="bdc-productos-grid">
-            <div class="bdc-prod-card">
-              <div class="bdc-prod-tag">Cuenta Corriente</div>
-              <div class="bdc-prod-num" id="bdc-cuenta-num-mini">0000-0000-0000-0000</div>
-              <div class="bdc-prod-foot"><span>Disponible</span><b id="bdc-disponible-mini">$0</b></div>
-            </div>
-            <div class="bdc-prod-card bdc-prod-tarjeta" onclick="mostrarVistaTarjeta()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')mostrarVistaTarjeta()">
-              <div class="bdc-mini-card">
+          <!-- Tarjeta física — franja promo -->
+          <div class="nbk-tarjeta-promo" onclick="mostrarVistaTarjeta()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')mostrarVistaTarjeta()">
+            <div class="nbk-tarjeta-promo-left">
+              <div class="nbk-tarjeta-promo-label">Tarjeta física</div>
+              <div class="bdc-mini-card nbk-mini-card">
                 <div class="bdc-mini-top">
                   <div class="bdc-mini-chip"></div>
-                  <img src="/bank-logo-icon.png?v=48" alt="" class="bdc-mini-logo">
+                  <img src="/logo-x.png?v=49" alt="" class="bdc-mini-logo nbk-mini-logo">
                 </div>
                 <div class="bdc-mini-lines"><span></span><span></span></div>
               </div>
-              <div class="bdc-prod-foot"><span>Tarjeta</span><b>Ver tarjeta ›</b></div>
+              <div class="nbk-tarjeta-promo-num">•••• •••• •••• ••••</div>
             </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="nbk-tarjeta-promo-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+            <!-- id sincronizado por banco.js (bdcSetupMiniSync); se mantiene en el DOM aunque no se muestre en este layout -->
+            <span id="bdc-disponible-mini" style="display:none;"></span>
           </div>
 
           <!-- Acciones -->
-          <div class="bank-actions">
-            <button class="bank-action-btn transfer" onclick="mostrarTransferir()">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          <div class="nbk-section-label">¿Y qué hacemos ahora?</div>
+          <div class="bank-actions nbk-actions">
+            <button class="bank-action-btn transfer nbk-action-btn" onclick="mostrarTransferir()">
+              <span class="nbk-action-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </span>
               <span>Transferir</span>
             </button>
-            <button class="bank-action-btn history" onclick="mostrarHistorial()">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+            <button class="bank-action-btn history nbk-action-btn" onclick="mostrarHistorial()">
+              <span class="nbk-action-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+              </span>
               <span>Historial</span>
             </button>
-            <button class="bank-action-btn" onclick="mostrarContactos()">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <button class="bank-action-btn nbk-action-btn" onclick="mostrarContactos()">
+              <span class="nbk-action-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
               <span>Contactos</span>
             </button>
-            <button class="bank-action-btn" onclick="mostrarPrestamo()">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <button class="bank-action-btn nbk-action-btn" onclick="mostrarPrestamo()">
+              <span class="nbk-action-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
               <span>Préstamo</span>
             </button>
-            <button class="bank-action-btn ahorro" onclick="mostrarAhorro()">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9V6a2 2 0 0 0-2-2H8a5 5 0 0 0-5 5v1"/><path d="M3 10h13a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-1v3h-3v-3H8v3H5v-3a4 4 0 0 1-2-3.46"/><circle cx="16" cy="12" r="1"/></svg>
+            <button class="bank-action-btn ahorro nbk-action-btn" onclick="mostrarAhorro()">
+              <span class="nbk-action-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9V6a2 2 0 0 0-2-2H8a5 5 0 0 0-5 5v1"/><path d="M3 10h13a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-1v3h-3v-3H8v3H5v-3a4 4 0 0 1-2-3.46"/><circle cx="16" cy="12" r="1"/></svg>
+              </span>
               <span>Ahorro</span>
             </button>
           </div>
@@ -991,7 +999,7 @@
             <div class="bank-card-flip" id="bank-card-flip" onclick="bdcToggleFlip(event)" role="button" tabindex="0" aria-label="Girar tarjeta" onkeydown="if(event.key==='Enter')bdcToggleFlip(event)">
               <div class="bank-card bank-card-front" id="bank-card">
                 <div class="bank-card-top">
-                  <img src="/bank-logo-icon.png?v=48" alt="ChileCity Bank" class="bank-logo-img">
+                  <img src="/logo-x.png?v=49" alt="Logo" class="bank-logo-img">
                   <div class="bdc-card-top-right">
                     <svg class="bdc-nfc" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 12.3a3.5 3.5 0 0 1 7 0"/><path d="M6 12.3a6 6 0 0 1 12 0"/><path d="M3.5 12.3a8.5 8.5 0 0 1 17 0"/></svg>
                     <div class="bank-chip"></div>
@@ -1040,6 +1048,7 @@
           </button>
         </div>
 
+      </div>
       </div>
     </div>
   </section>
@@ -3489,27 +3498,27 @@
     </div>
   </div>
 
-  <script defer src="/js/app.js?v=48"></script>
-  <script defer src="/js/dashboard-fx.js?v=48"></script>
-  <script defer src="/js/notificaciones.js?v=48"></script>
-  <script defer src="/js/pull-to-refresh.js?v=48"></script>
-  <script defer src="/js/registro-civil.js?v=48"></script>
-  <script defer src="/js/banco.js?v=48"></script>
+  <script defer src="/js/app.js?v=49"></script>
+  <script defer src="/js/dashboard-fx.js?v=49"></script>
+  <script defer src="/js/notificaciones.js?v=49"></script>
+  <script defer src="/js/pull-to-refresh.js?v=49"></script>
+  <script defer src="/js/registro-civil.js?v=49"></script>
+  <script defer src="/js/banco.js?v=49"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=48"></script>
-  <script defer src="/js/mercado.js?v=48"></script>
-  <script defer src="/js/vehiculos.js?v=48"></script>
-  <script defer src="/js/concesionario.js?v=48"></script>
-  <script defer src="/js/mis-autos.js?v=48"></script>
-  <script defer src="/js/admin-tienda.js?v=48"></script>
-  <script defer src="/js/empresas.js?v=48"></script>
-  <script defer src="/js/logros.js?v=48"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=48"></script>
-  <script defer src="/js/panel-admin.js?v=48"></script>
-  <script defer src="/js/comisaria.js?v=48"></script>
-  <script defer src="/js/casino.js?v=48"></script>
-  <script defer src="/js/apuestas.js?v=48"></script>
-  <script defer src="/js/parallax-landing.js?v=48"></script>
-  <script defer src="/js/bg-particles.js?v=48"></script>
+  <script defer src="/js/tienda.js?v=49"></script>
+  <script defer src="/js/mercado.js?v=49"></script>
+  <script defer src="/js/vehiculos.js?v=49"></script>
+  <script defer src="/js/concesionario.js?v=49"></script>
+  <script defer src="/js/mis-autos.js?v=49"></script>
+  <script defer src="/js/admin-tienda.js?v=49"></script>
+  <script defer src="/js/empresas.js?v=49"></script>
+  <script defer src="/js/logros.js?v=49"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=49"></script>
+  <script defer src="/js/panel-admin.js?v=49"></script>
+  <script defer src="/js/comisaria.js?v=49"></script>
+  <script defer src="/js/casino.js?v=49"></script>
+  <script defer src="/js/apuestas.js?v=49"></script>
+  <script defer src="/js/parallax-landing.js?v=49"></script>
+  <script defer src="/js/bg-particles.js?v=49"></script>
 </body>
 </html>
