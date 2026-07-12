@@ -778,3 +778,109 @@ body[data-screen="banco-screen"] .tx-receipt-monto {
   border-color: var(--nbk-mint) !important;
   box-shadow: 0 0 0 3px rgba(87,224,172,.1), 0 4px 12px -4px rgba(87,224,172,.2) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PARCHE "TER SPO" v2 — Conversión total a Fondo Verde Esmeralda
+   --------------------------------------------------------------------- */
+
+/* ── 1) Cambio de paleta base: De Grafito a Verde Esmeralda Oscuro ──── */
+body[data-screen="banco-screen"] {
+  /* Fondo principal ahora es verde muy oscuro en vez de gris #0a0b0d */
+  --nbk-bg: #061a12;
+  /* Las tarjetas secundarias heredan ese tono pero un poco más claro */
+  --nbk-bg-card: #0c2519;
+  --nbk-bg-card2: #10301f;
+  /* Ajustamos los bordes para que se vean sutiles sobre el verde */
+  --nbk-border: rgba(255,255,255,.08);
+  --nbk-border-soft: rgba(255,255,255,.04);
+}
+
+/* ── 2) Aplicar el nuevo fondo al contenedor principal ──────────────── */
+body[data-screen="banco-screen"] #bg-fx {
+  background: var(--nbk-bg) !important; /* Ahora pinta el fondo de verde */
+}
+/* Añadimos un halo verde sutil en la parte superior (como la imagen 2) */
+body[data-screen="banco-screen"] #bg-fx::before {
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(87,224,172,.06), transparent 60%) !important;
+}
+
+/* ── 3) Tarjeta de Saldo Principal adaptada al verde ─────────────────── */
+#banco-screen .nbk-balance-card {
+  /* Mezclamos el verde base con un poco de transparencia para que se integre */
+  background: linear-gradient(175deg, rgba(16,40,30,.9) 0%, rgba(6,26,18,.98) 100%) !important;
+  border: 1px solid rgba(87,224,172,.1) !important; /* Borde con un toque de verde menta */
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,.5), 0 0 40px -15px rgba(87,224,172,.08);
+}
+
+/* ── 4) El Comprobante de Éxito (Modal) integrado al tema verde ─────── */
+body[data-screen="banco-screen"] .tx-receipt-modal.admin-modal {
+  /* Fondo del modal ahora es una gradación del mismo verde esmeralda */
+  background: linear-gradient(180deg, #0e3022 0%, #061a12 100%) !important;
+  border: 1px solid rgba(87,224,172,.15) !important;
+  box-shadow: 0 30px 60px -15px rgba(0,0,0,.7), 0 0 80px -20px rgba(87,224,172,.15) !important;
+}
+
+body[data-screen="banco-screen"] .tx-receipt {
+  background: rgba(255,255,255,.03) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+}
+
+/* Check de éxito brillando sobre el fondo verde */
+body[data-screen="banco-screen"] .tx-receipt-icon {
+  background: rgba(87,224,172,.2) !important;
+  border-color: rgba(87,224,172,.5) !important;
+  box-shadow: 0 0 25px rgba(87,224,172,.3);
+}
+
+/* ── 5) Tarjeta Física (Ajuste de tono para combinar) ───────────────── */
+#banco-screen .bank-card-vert.bank-card {
+  /* Le damos un tono grafito-verdoso muy sutil para que no desentone */
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(216,178,106,.10), transparent 60%),
+    linear-gradient(165deg, #141e1a 0%, #0a100d 58%, #111c17 100%) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+}
+
+/* ── 6) Tarjetas secundarias (Ahorro/Sueldo) y Botones ─────────────── */
+#banco-screen .nbk-ahorro-card,
+#banco-screen .bdc-balance-card {
+  background: var(--nbk-bg-card) !important;
+  border: 1px solid var(--nbk-border) !important;
+}
+
+#banco-screen .nbk-action-btn {
+  background: rgba(255,255,255,.03) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+}
+#banco-screen .nbk-action-btn:hover {
+  background: rgba(255,255,255,.07) !important;
+  border-color: rgba(87,224,172,.2) !important; /* Al pasar el ratón, borde verde */
+}
+
+/* ── 7) Formularios de transferencia adaptados ──────────────────────── */
+#banco-screen .rc-form {
+  background: linear-gradient(175deg, #0e2a1e 0%, #081c14 100%) !important;
+  border: 1px solid rgba(87,224,172,.1) !important;
+}
+
+#banco-screen .form-group input,
+#banco-screen .form-group select {
+  background: rgba(0,0,0,.2) !important; /* Inputs más oscuros dentro del verde */
+  border: 1px solid rgba(255,255,255,.08) !important;
+}
+#banco-screen .form-group input:focus,
+#banco-screen .form-group select:focus {
+  border-color: var(--nbk-mint) !important;
+  box-shadow: 0 0 0 3px rgba(87,224,172,.15) !important;
+}
+
+/* ── 8) Historial de transacciones ──────────────────────────────────── */
+#banco-screen .historial-item {
+  background: rgba(255,255,255,.02) !important;
+  border: 1px solid rgba(255,255,255,.05) !important;
+}
+#banco-screen .historial-item:hover {
+  background: rgba(87,224,172,.05) !important; /* Al hacer hover, brilla verde suave */
+  border-color: rgba(87,224,172,.15) !important;
+  transform: translateX(4px);
+}
