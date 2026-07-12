@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="/styles.css?v=57">
   <link rel="stylesheet" href="/page-loader.css?v=57">
   <link rel="stylesheet" href="/clean-theme.css?v=57">
-  <link rel="stylesheet" href="/banco-theme.css?v=57">
+  <link rel="stylesheet" href="/banco-theme.css?v=58">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -444,40 +444,57 @@
             Volver a mi cuenta
           </button>
 
-          <div class="bdc-card-stage">
-            <div class="bank-card-flip" id="bank-card-flip" onclick="bdcToggleFlip(event)" role="button" tabindex="0" aria-label="Girar tarjeta">
+          <div class="bdc-card-stage bdc-card-stage-vert">
+            <div class="bank-card-flip bank-card-flip-vert" id="bank-card-flip" onclick="bdcToggleFlip(event)" role="button" tabindex="0" aria-label="Girar tarjeta">
 
               <!-- Frente -->
-              <div class="bank-card" id="bank-card">
+              <div class="bank-card bank-card-vert" id="bank-card">
+                <div class="bcv-sheen" aria-hidden="true"></div>
                 <div class="bank-card-top">
-                  <span class="bank-logo-text">ChileCity Bank</span>
+                  <div class="bcv-brand">
+                    <span class="bank-logo-text">ChileCity</span>
+                    <span class="bcv-brand-sub">BANK</span>
+                  </div>
                   <div class="bdc-card-top-right">
-                    <svg class="bdc-nfc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a10 10 0 0 1 20 0"/><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                    <svg class="bdc-nfc" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a10 10 0 0 1 20 0"/><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
                   </div>
                 </div>
-                <div class="bank-chip"></div>
-                <div class="bank-numero-row">
+
+                <div class="bcv-chip-row">
+                  <div class="bank-chip"></div>
+                </div>
+
+                <div class="bank-numero-row bcv-numero-row">
                   <span class="bank-numero bn-masked" id="bank-numero" data-full="0000-0000-0000-0000">•••• •••• •••• 0000</span>
                   <button class="bn-eye-btn" onclick="bdcToggleReveal(event)" aria-label="Mostrar número" title="Mostrar número">
                     <svg id="bn-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                 </div>
-                <div class="bank-bottom">
-                  <div>
-                    <div class="bank-titular-label">Titular</div>
-                    <div class="bank-titular-nombre" id="bank-titular">—</div>
-                    <div class="bank-rut-valor" id="bank-rut">—</div>
-                  </div>
-                  <div class="bdc-card-network">
+
+                <div class="bcv-bottom">
+                  <div class="bdc-card-network bcv-tag">
                     <span class="bdc-network-tag">Cuenta</span>
                     <span class="bdc-network-word">Corriente</span>
                   </div>
+                  <span class="bcv-mark">CC</span>
                 </div>
               </div>
 
               <!-- Reverso -->
-              <div class="bank-card bank-card-back">
+              <div class="bank-card bank-card-vert bank-card-back">
                 <div class="bank-card-back-banda"></div>
+
+                <div class="bcv-back-datos">
+                  <div class="bcv-back-campo">
+                    <span class="bcv-back-label">Titular</span>
+                    <span class="bcv-back-valor" id="bank-titular">—</span>
+                  </div>
+                  <div class="bcv-back-campo">
+                    <span class="bcv-back-label">RUT</span>
+                    <span class="bcv-back-valor bcv-back-rut" id="bank-rut">—</span>
+                  </div>
+                </div>
+
                 <div class="bank-card-back-firma">
                   <div class="bank-card-back-firma-strip"><span id="bank-firma-nombre">—</span></div>
                   <div class="bank-card-back-cvv">···</div>
@@ -491,7 +508,7 @@
             </div>
             <div class="bdc-flip-hint">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
-              Toca la tarjeta para ver el reverso
+              Toca la tarjeta para ver tus datos
             </div>
           </div>
 
@@ -520,14 +537,14 @@
   <!-- MODAL: recibo de transferencia exitosa — reemplaza el toast de 3s para
        que el usuario confirme conscientemente montos grandes antes de seguir -->
   <div class="admin-modal-overlay" id="modal-recibo-transferencia">
-    <div class="admin-modal" style="position:relative;">
+    <div class="admin-modal tx-receipt-modal" style="position:relative;">
       <button class="admin-modal-close" onclick="cerrarModal('modal-recibo-transferencia')">✕</button>
       <div class="tx-receipt" id="tx-receipt-voucher">
-        <div class="tx-receipt-folio">Comprobante N° <span id="recibo-tx-folio">000000</span></div>
         <div class="tx-receipt-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <div class="tx-receipt-titulo">Transferencia exitosa</div>
+        <div class="tx-receipt-folio">Comprobante N° <span id="recibo-tx-folio">000000</span></div>
         <div class="tx-receipt-monto" id="recibo-tx-monto">$0</div>
         <div class="tx-receipt-palabras" id="recibo-tx-palabras">—</div>
         <div class="tx-receipt-detalle">
