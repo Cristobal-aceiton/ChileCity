@@ -24,12 +24,14 @@
       <p id="n-cuenta">x</p>
     </div>
 
+    <button id="btn-abrir-cuenta" class="abrir-cuenta-btn" style="display:none;">Abrir tu cuenta bancaria</button>
+    <p id="abrir-cuenta-msg" class="transfer-msg" style="display:none;"></p>
+
 </div>
 
 <div class="card-2" onclick="mostrarSeccion('tarjeta')">
   <h1>Tarjeta fisica</h1>
   <p id="N-tarjeta-mini">**** **** ****</p>
-  <img src="tarjeta1.png" alt="">
 </div>
 
 <h1 class="que-sige">¿Y que hacemos ahora?</h1>
@@ -230,14 +232,6 @@ body,html {
   margin-left: 20px;
   margin-top: 0px;
   margin-bottom: 0px;
-}
-
-.card-2 img {
-  width: 50px;
-  position: absolute;
-  right: 30px; 
-  top: 30%;
-  transform: translateY(-50%);
 }
 
 .que-sige {
@@ -492,6 +486,27 @@ body,html {
   flex-shrink: 0;
 }
 
+.abrir-cuenta-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  background-color: #00ec8a;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: #0d0d0d;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.abrir-cuenta-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 </style>
 
 <script>
@@ -553,6 +568,10 @@ function volver(){
     const cuentaEl  = $('n-cuenta');
     const miniEl    = $('N-tarjeta-mini');
     const fullEl    = $('N-tarjeta-full');
+    const btnAbrir  = $('btn-abrir-cuenta');
+    const msgAbrir  = $('abrir-cuenta-msg');
+    const card2El   = document.querySelector('.card-2');
+    const boxesEl   = document.querySelector('.boxes');
 
     try {
       const res = await fetch('/api/banco?action=cuenta');
@@ -561,6 +580,7 @@ function volver(){
         if (saldoEl) saldoEl.textContent = 'Inicia sesión';
         if (cuentaEl) cuentaEl.textContent = '—';
         if (miniEl) miniEl.textContent = 'Inicia sesión';
+        if (btnAbrir) btnAbrir.style.display = 'none';
         return;
       }
 
@@ -569,6 +589,12 @@ function volver(){
         if (cuentaEl) cuentaEl.textContent = 'Sin cuenta';
         if (miniEl) miniEl.textContent = 'Debes abrir tu cuenta';
         if (fullEl) fullEl.textContent = 'Número de cuenta: aún no tienes cuenta bancaria';
+        // Sin cuenta todavía: ocultamos la tarjeta y los accesos rápidos
+        // (transferir, historial, etc. no tienen sentido sin cuenta) y
+        // mostramos el botón para abrirla por primera vez.
+        if (card2El) card2El.style.display = 'none';
+        if (boxesEl) boxesEl.style.display = 'none';
+        if (btnAbrir) btnAbrir.style.display = 'block';
         return;
       }
 
@@ -581,11 +607,53 @@ function volver(){
       if (cuentaEl) cuentaEl.textContent = cuentaActual.numero_cuenta;
       if (miniEl) miniEl.textContent = maskNumeroCuenta(cuentaActual.numero_cuenta);
       if (fullEl) fullEl.textContent = 'Número de cuenta: ' + cuentaActual.numero_cuenta;
+      if (btnAbrir) btnAbrir.style.display = 'none';
+      if (msgAbrir) msgAbrir.style.display = 'none';
+      if (card2El) card2El.style.display = 'block';
+      if (boxesEl) boxesEl.style.display = 'grid';
 
     } catch (err) {
       console.error('Error cargando la cuenta:', err);
       if (saldoEl) saldoEl.textContent = 'Error';
       if (cuentaEl) cuentaEl.textContent = 'Error';
+    }
+  }
+
+  // ── Abrir cuenta / tarjeta por primera vez ───────────────────────────────
+  async function abrirCuenta() {
+    const btnAbrir = $('btn-abrir-cuenta');
+    const msgAbrir = $('abrir-cuenta-msg');
+    if (!btnAbrir) return;
+
+    msgAbrir.style.display = 'block';
+    msgAbrir.textContent = '';
+    msgAbrir.className = 'transfer-msg';
+
+    btnAbrir.disabled = true;
+    const textoOriginal = btnAbrir.textContent;
+    btnAbrir.textContent = 'Abriendo cuenta...';
+
+    try {
+      const res = await fetch('/api/banco?action=crear', { method: 'POST' });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // El backend exige tener el DNI creado antes de abrir la cuenta.
+        msgAbrir.textContent = data.error || 'No se pudo abrir la cuenta.';
+        msgAbrir.classList.add('error');
+        return;
+      }
+
+      msgAbrir.textContent = '¡Cuenta creada! Cargando...';
+      msgAbrir.classList.add('exito');
+      await cargarCuenta();
+    } catch (err) {
+      console.error('Error abriendo la cuenta:', err);
+      msgAbrir.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgAbrir.classList.add('error');
+    } finally {
+      btnAbrir.disabled = false;
+      btnAbrir.textContent = textoOriginal;
     }
   }
 
@@ -842,6 +910,8 @@ function volver(){
     if (form) form.addEventListener('submit', enviarTransferencia);
     const formContacto = $('contacto-form');
     if (formContacto) formContacto.addEventListener('submit', agregarContacto);
+    const btnAbrir = $('btn-abrir-cuenta');
+    if (btnAbrir) btnAbrir.addEventListener('click', abrirCuenta);
   });
 })();
 
