@@ -28,7 +28,7 @@
 
 <div class="card-2" onclick="mostrarSeccion('tarjeta')">
   <h1>Tarjeta fisica</h1>
-  <p id="N-tarjeta">**** **** ****</p>
+  <p id="N-tarjeta-mini">**** **** ****</p>
   <img src="tarjeta1.png" alt="">
 </div>
 
@@ -36,7 +36,7 @@
 
 <div class="boxes">
 
-  <div class="box1">
+  <div class="box1" onclick="abrirTransferencia()">
     <img src="billete.svg" alt="">
     <p>Transferir</p>
   </div>
@@ -64,7 +64,29 @@
 
     <img src="tarjeta2.webp">
 
-    <p id="N-tarjeta">Número de cuenta: **** **** ****</p>
+    <p id="N-tarjeta-full">Número de cuenta: **** **** ****</p>
+
+    <button onclick="volver()">Volver</button>
+
+</section>
+
+<section id="transferir" class="seccion">
+
+    <h1>Transferir</h1>
+
+    <form id="transfer-form" class="transfer-form">
+
+      <label for="transfer-rut">RUT del destinatario</label>
+      <input type="text" id="transfer-rut" placeholder="Ej: 12345678-9" autocomplete="off">
+
+      <label for="transfer-monto">Monto</label>
+      <input type="number" id="transfer-monto" placeholder="Ej: 10000" min="1" step="1">
+
+      <p id="transfer-msg" class="transfer-msg"></p>
+
+      <button type="submit" id="transfer-btn">Transferir</button>
+
+    </form>
 
     <button onclick="volver()">Volver</button>
 
@@ -264,6 +286,59 @@ body,html {
   border-radius: 15px;
   margin-left: 155px;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.transfer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.transfer-form label {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.transfer-form input {
+  background-color: rgb(37, 37, 37);
+  border: 1px solid rgb(60, 60, 60);
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.transfer-form input:focus {
+  outline: none;
+  border-color: #00ec8a;
+}
+
+.transfer-form button[type="submit"] {
+  margin: 10px 0 20px;
+  align-self: center;
+}
+
+.transfer-msg {
+  min-height: 18px;
+  font-size: 13px;
+  text-align: center;
+  margin: 4px 0 0;
+}
+
+.transfer-msg.error {
+  color: #ff5c5c;
+}
+
+.transfer-msg.exito {
+  color: #00ec8a;
 }
 
 </style>
@@ -289,9 +364,13 @@ function volver(){
     document.querySelector(".que-sige").style.display = "block";
     document.querySelector(".boxes").style.display = "grid";
 
-
-    document.getElementById("tarjeta").style.display = "none";
+    // Oculta cualquier sección que haya quedado abierta (tarjeta, transferir, etc.)
+    document.querySelectorAll(".seccion").forEach(function (sec) {
+      sec.style.display = "none";
+    });
 
 }
 
 </script>
+
+<script src="/js/banco-cuenta.js?v=62"></script>
