@@ -7,13 +7,21 @@
 </head>
 <body>
 
+  <a href="/dashboard.html" class="btn-volver-dash">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5"/>
+      <path d="M12 19l-7-7 7-7"/>
+    </svg>
+    Volver
+  </a>
+
   <h1 class="hi-temp">Hola, <span class="ten-green">Tenpista</span></h1>
   
 <div class="card-1">
     <div class="saldo-container">
         <h1 id="saldo-1">$0</h1>
 
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <svg id="btn-ojo-saldo" onclick="toggleSaldo()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
             <path d="M12 5C7 5 2.7 8.1 1 12c1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 12c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z"/>
         </svg>
 
@@ -141,6 +149,25 @@ body,html {
   background-color: rgb(19, 19, 19);
   margin: 0px;
 }
+
+.btn-volver-dash {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgb(37, 37, 37);
+  border-radius: 30px;
+  box-sizing: border-box;
+}
+
 .card-1 {
   background-color: rgb(37, 37, 37);
   width: 100%;
@@ -572,6 +599,7 @@ function volver(){
     const msgAbrir  = $('abrir-cuenta-msg');
     const card2El   = document.querySelector('.card-2');
     const boxesEl   = document.querySelector('.boxes');
+    const queSigeEl = document.querySelector('.que-sige');
 
     try {
       const res = await fetch('/api/banco?action=cuenta');
@@ -589,10 +617,11 @@ function volver(){
         if (cuentaEl) cuentaEl.textContent = 'Sin cuenta';
         if (miniEl) miniEl.textContent = 'Debes abrir tu cuenta';
         if (fullEl) fullEl.textContent = 'Número de cuenta: aún no tienes cuenta bancaria';
-        // Sin cuenta todavía: ocultamos la tarjeta y los accesos rápidos
-        // (transferir, historial, etc. no tienen sentido sin cuenta) y
-        // mostramos el botón para abrirla por primera vez.
+        // Sin cuenta todavía: ocultamos la tarjeta, el título "¿Y que
+        // hacemos ahora?" y los accesos rápidos (no tienen sentido sin
+        // cuenta) y mostramos el botón para abrirla por primera vez.
         if (card2El) card2El.style.display = 'none';
+        if (queSigeEl) queSigeEl.style.display = 'none';
         if (boxesEl) boxesEl.style.display = 'none';
         if (btnAbrir) btnAbrir.style.display = 'block';
         return;
@@ -603,13 +632,18 @@ function volver(){
       const data = await res.json();
       cuentaActual = data.cuenta;
 
-      if (saldoEl) saldoEl.textContent = formatCLP(cuentaActual.saldo);
+      if (saldoEl) {
+        saldoEl.textContent = formatCLP(cuentaActual.saldo);
+        saldoEl.dataset.saldoReal = cuentaActual.saldo;
+        saldoEl.dataset.oculto = '0';
+      }
       if (cuentaEl) cuentaEl.textContent = cuentaActual.numero_cuenta;
       if (miniEl) miniEl.textContent = maskNumeroCuenta(cuentaActual.numero_cuenta);
       if (fullEl) fullEl.textContent = 'Número de cuenta: ' + cuentaActual.numero_cuenta;
       if (btnAbrir) btnAbrir.style.display = 'none';
       if (msgAbrir) msgAbrir.style.display = 'none';
       if (card2El) card2El.style.display = 'block';
+      if (queSigeEl) queSigeEl.style.display = 'block';
       if (boxesEl) boxesEl.style.display = 'grid';
 
     } catch (err) {
@@ -618,6 +652,21 @@ function volver(){
       if (cuentaEl) cuentaEl.textContent = 'Error';
     }
   }
+
+  // ── Ocultar/mostrar el saldo con el ícono de ojo ─────────────────────────
+  window.toggleSaldo = function () {
+    const saldoEl = $('saldo-1');
+    if (!saldoEl || saldoEl.dataset.saldoReal === undefined) return;
+
+    const oculto = saldoEl.dataset.oculto === '1';
+    if (oculto) {
+      saldoEl.textContent = formatCLP(saldoEl.dataset.saldoReal);
+      saldoEl.dataset.oculto = '0';
+    } else {
+      saldoEl.textContent = '••••••';
+      saldoEl.dataset.oculto = '1';
+    }
+  };
 
   // ── Abrir cuenta / tarjeta por primera vez ───────────────────────────────
   async function abrirCuenta() {

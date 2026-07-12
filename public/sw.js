@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v65"; // <--- ⚠️ ACTUALIZADO A v65 (banco.html: quitada tarjeta1.png + botón abrir cuenta/tarjeta por primera vez)
+const CACHE_VERSION = "v66"; // <--- ⚠️ ACTUALIZADO A v66 (banco.html: ocultar "que sige" sin cuenta + ojo oculta saldo + botón volver al dashboard)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
