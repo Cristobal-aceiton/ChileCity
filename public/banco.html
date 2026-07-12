@@ -41,12 +41,12 @@
     <p>Transferir</p>
   </div>
 
-  <div class="box1">
+  <div class="box1" onclick="abrirHistorial()">
     <img src="historial.svg" alt="">
     <p>Historial</p>
   </div>
 
-  <div class="box1">
+  <div class="box1" onclick="abrirContactos()">
     <img src="contactos.svg" alt="">
     <p>Contactos</p>
   </div>
@@ -85,6 +85,44 @@
       <p id="transfer-msg" class="transfer-msg"></p>
 
       <button type="submit" id="transfer-btn">Transferir</button>
+
+    </form>
+
+    <button onclick="volver()">Volver</button>
+
+</section>
+
+<section id="historial" class="seccion">
+
+    <h1>Historial</h1>
+
+    <div id="historial-lista" class="historial-lista">
+      <p class="hist-vacio">Cargando movimientos...</p>
+    </div>
+
+    <button onclick="volver()">Volver</button>
+
+</section>
+
+<section id="contactos" class="seccion">
+
+    <h1>Contactos</h1>
+
+    <div id="contactos-lista" class="contactos-lista">
+      <p class="hist-vacio">Cargando contactos...</p>
+    </div>
+
+    <form id="contacto-form" class="transfer-form">
+
+      <label for="contacto-nombre">Nombre del contacto</label>
+      <input type="text" id="contacto-nombre" placeholder="Ej: Juan Pérez" autocomplete="off">
+
+      <label for="contacto-rut">RUT del contacto</label>
+      <input type="text" id="contacto-rut" placeholder="Ej: 12345678-9" autocomplete="off">
+
+      <p id="contacto-msg" class="transfer-msg"></p>
+
+      <button type="submit" id="contacto-btn">Agregar contacto</button>
 
     </form>
 
@@ -341,6 +379,119 @@ body,html {
   color: #00ec8a;
 }
 
+.historial-lista,
+.contactos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.hist-vacio {
+  color: #9a9a9a !important;
+  font-size: 13px;
+  text-align: center;
+}
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgb(37, 37, 37);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
+
+.hist-item-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hist-item-desc {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+}
+
+.hist-item-fecha {
+  color: #9a9a9a !important;
+  font-size: 11px !important;
+  text-align: left !important;
+}
+
+.hist-item-monto {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.hist-item-monto.ingreso,
+.hist-item-monto.sueldo {
+  color: #00ec8a;
+}
+
+.hist-item-monto.egreso {
+  color: #ff5c5c;
+}
+
+.contacto-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgb(37, 37, 37);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
+
+.contacto-item-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 2px;
+  min-width: 0;
+}
+
+.contacto-item-nombre {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  font-weight: 500 !important;
+}
+
+.contacto-item-rut {
+  color: #9a9a9a !important;
+  font-size: 11px !important;
+  text-align: left !important;
+}
+
+.contacto-item-borrar {
+  background: none;
+  border: none;
+  color: #ff5c5c;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
 </style>
 
 <script>
@@ -373,4 +524,4 @@ function volver(){
 
 </script>
 
-<script src="/js/banco-cuenta.js?v=62"></script>
+<script src="/js/banco-cuenta.js?v=63"></script>
