@@ -138,5 +138,185 @@
     cargarCuenta();
     const form = $('transfer-form');
     if (form) form.addEventListener('submit', enviarTransferencia);
+    const formContacto = $('contacto-form');
+    if (formContacto) formContacto.addEventListener('submit', agregarContacto);
   });
+
+  // Escapa texto antes de meterlo en innerHTML (nombres, descripciones, etc.
+  // pueden venir de otros usuarios, así que nunca se insertan crudos).
+  function escHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  // ── Historial ─────────────────────────────────────────────────────────────
+  window.abrirHistorial = function () {
+    mostrarSeccion('historial');
+    cargarHistorial();
+  };
+
+  async function cargarHistorial() {
+    const lista = $('historial-lista');
+    if (!lista) return;
+    lista.innerHTML = '<p class="hist-vacio">Cargando movimientos...</p>';
+
+    try {
+      const res = await fetch('/api/banco?action=historial');
+
+      if (res.status === 401) {
+        lista.innerHTML = '<p class="hist-vacio">Inicia sesión para ver tu historial.</p>';
+        return;
+      }
+      if (!res.ok) throw new Error('No se pudo cargar el historial');
+
+      const data = await res.json();
+      const transacciones = data.transacciones || [];
+
+      if (transacciones.length === 0) {
+        lista.innerHTML = '<p class="hist-vacio">Sin movimientos aún.</p>';
+        return;
+      }
+
+      lista.innerHTML = transacciones.map(function (t) {
+        const signo = t.tipo === 'egreso' ? '-' : '+';
+        const fecha = new Date(t.created_at).toLocaleDateString('es-CL', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+        });
+        return (
+          '<div class="hist-item">' +
+            '<div class="hist-item-info">' +
+              '<span class="hist-item-desc">' + escHtml(t.descripcion || t.tipo) + '</span>' +
+              '<span class="hist-item-fecha">' + fecha + '</span>' +
+            '</div>' +
+            '<div class="hist-item-monto ' + escHtml(t.tipo) + '">' + signo + formatCLP(t.monto) + '</div>' +
+          '</div>'
+        );
+      }).join('');
+    } catch (err) {
+      console.error('Error cargando el historial:', err);
+      lista.innerHTML = '<p class="hist-vacio">Error al cargar el historial.</p>';
+    }
+  }
+
+  // ── Contactos ─────────────────────────────────────────────────────────────
+  window.abrirContactos = function () {
+    const msgEl = $('contacto-msg');
+    if (msgEl) {
+      msgEl.textContent = '';
+      msgEl.className = 'transfer-msg';
+    }
+    mostrarSeccion('contactos');
+    cargarContactos();
+  };
+
+  async function cargarContactos() {
+    const lista = $('contactos-lista');
+    if (!lista) return;
+    lista.innerHTML = '<p class="hist-vacio">Cargando contactos...</p>';
+
+    try {
+      const res = await fetch('/api/banco?action=contactos');
+
+      if (res.status === 401) {
+        lista.innerHTML = '<p class="hist-vacio">Inicia sesión para ver tus contactos.</p>';
+        return;
+      }
+      if (!res.ok) throw new Error('No se pudo cargar los contactos');
+
+      const data = await res.json();
+      const contactos = data.contactos || [];
+
+      if (contactos.length === 0) {
+        lista.innerHTML = '<p class="hist-vacio">Aún no tienes contactos guardados.</p>';
+        return;
+      }
+
+      lista.innerHTML = contactos.map(function (c) {
+        return (
+          '<div class="contacto-item">' +
+            '<div class="contacto-item-info">' +
+              '<span class="contacto-item-nombre">' + escHtml(c.nombre) + '</span>' +
+              '<span class="contacto-item-rut">' + escHtml(c.rut) + '</span>' +
+            '</div>' +
+            '<button type="button" class="contacto-item-borrar" onclick="borrarContacto(' + c.id + ')" title="Eliminar">&times;</button>' +
+          '</div>'
+        );
+      }).join('');
+    } catch (err) {
+      console.error('Error cargando los contactos:', err);
+      lista.innerHTML = '<p class="hist-vacio">Error al cargar los contactos.</p>';
+    }
+  }
+
+  async function agregarContacto(ev) {
+    ev.preventDefault();
+
+    const nombreInput = $('contacto-nombre');
+    const rutInput    = $('contacto-rut');
+    const msgEl       = $('contacto-msg');
+    const btn         = $('contacto-btn');
+
+    const nombre = nombreInput.value.trim();
+    const rut    = rutInput.value.trim();
+
+    msgEl.textContent = '';
+    msgEl.className = 'transfer-msg';
+
+    if (!nombre) {
+      msgEl.textContent = 'Ingresa el nombre del contacto.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!rut) {
+      msgEl.textContent = 'Ingresa el RUT del contacto.';
+      msgEl.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    const textoOriginal = btn.textContent;
+    btn.textContent = 'Agregando...';
+
+    try {
+      const res = await fetch('/api/banco?action=contacto_agregar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: nombre, rut: rut }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.error || 'No se pudo agregar el contacto.';
+        msgEl.classList.add('error');
+        return;
+      }
+
+      msgEl.textContent = 'Contacto agregado.';
+      msgEl.classList.add('exito');
+      nombreInput.value = '';
+      rutInput.value = '';
+
+      await cargarContactos();
+    } catch (err) {
+      console.error('Error agregando contacto:', err);
+      msgEl.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgEl.classList.add('error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+    }
+  }
+
+  window.borrarContacto = async function (id) {
+    try {
+      const res = await fetch('/api/banco?action=contacto_borrar&id=' + encodeURIComponent(id), {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('No se pudo eliminar el contacto');
+      await cargarContactos();
+    } catch (err) {
+      console.error('Error eliminando contacto:', err);
+    }
+  };
 })();
