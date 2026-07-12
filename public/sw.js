@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v59";
+const CACHE_VERSION = "v60"; // <--- ⚠️ ACTUALIZADO DE v59 A v60
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
@@ -55,6 +55,7 @@ const PRECACHE_URLS = [
   `/styles.css?v=${CACHE_VERSION.replace("v", "")}`,
   `/page-loader.css?v=${CACHE_VERSION.replace("v", "")}`,
   `/clean-theme.css?v=${CACHE_VERSION.replace("v", "")}`,
+  `/banco-theme.css?v=${CACHE_VERSION.replace("v", "")}`, // <--- ⚠️ NUEVO CSS DEL BANCO AÑADIDO
   "/favicon.svg",
 ];
 
