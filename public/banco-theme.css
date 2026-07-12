@@ -664,3 +664,117 @@ body[data-screen="banco-screen"] .admin-modal {
 body[data-screen="banco-screen"] .admin-modal h3 {
   font-family: Inter, sans-serif; font-weight: 700; color: var(--nbk-ink); letter-spacing: -.2px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PARCHE VISUAL "TER SPO" — Se pega al final de banco-theme.css
+   --------------------------------------------------------------------- */
+body[data-screen="banco-screen"] {
+  /* Ajuste fino de bordes para que se vean más definidos (estilo app real) */
+  --nbk-border: rgba(244,245,243,.12);
+  --nbk-border-soft: rgba(244,245,243,.07);
+}
+
+/* ── 1) Mejora de la Tarjeta de Saldo Principal (Look más "App") ────── */
+#banco-screen .nbk-balance-card {
+  /* Añadimos un sutil efecto de vidrio/esmerilado al fondo principal */
+  background: linear-gradient(175deg, rgba(22,24,28,.95) 0%, rgba(13,14,17,.98) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,.6);
+}
+
+/* ── 2) El Comprobante (Modal de Éxito) al estilo Imagen 2 ──────────── */
+/* Fondo verde esmeralda oscuro en lugar del gris puro */
+body[data-screen="banco-screen"] .tx-receipt-modal.admin-modal {
+  background: linear-gradient(180deg, #0e3a27 0%, #091f16 100%) !important;
+  border: 1px solid rgba(87,224,172,.15) !important;
+  box-shadow: 0 30px 60px -15px rgba(0,0,0,.7), 0 0 80px -20px rgba(87,224,172,.15) !important;
+}
+
+body[data-screen="banco-screen"] .tx-receipt {
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* El icono de check en el comprobante más brillante */
+body[data-screen="banco-screen"] .tx-receipt-icon {
+  background: rgba(87,224,172,.2) !important;
+  border-color: rgba(87,224,172,.5) !important;
+  box-shadow: 0 0 20px rgba(87,224,172,.25);
+}
+
+/* Texto del monto en el comprobante más impactante */
+body[data-screen="banco-screen"] .tx-receipt-monto {
+  font-size: 38px;
+  text-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+
+/* ── 3) Tarjeta Física (Efecto Premium tipo Imagen 1) ──────────────── */
+#banco-screen .bank-card-vert.bank-card {
+  /* Un gradiente un poco más complejo para dar sensación de profundidad */
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(216,178,106,.12), transparent 60%),
+    radial-gradient(circle at 0% 100%, rgba(87,224,172,.05), transparent 50%),
+    linear-gradient(165deg, #1e2025 0%, #0d0e10 58%, #15171b 100%);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 
+    0 35px 60px -20px rgba(0,0,0,.7), 
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.3);
+}
+
+/* ── 4) Botones de Acción Rápida (Más limpios y espaciados) ─────────── */
+#banco-screen .nbk-action-btn {
+  background: rgba(255,255,255,.03) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+}
+
+#banco-screen .nbk-action-btn:hover {
+  background: rgba(255,255,255,.07) !important;
+  border-color: rgba(255,255,255,.15) !important;
+  box-shadow: 0 8px 20px -8px rgba(0,0,0,.5);
+}
+
+/* Iconos internos un poco más suaves */
+#banco-screen .nbk-action-icon {
+  background: rgba(255,255,255,.04);
+  color: var(--nbk-ink-dim);
+}
+
+/* ── 5) Ajustes de Historial y Secundarios ──────────────────────────── */
+#banco-screen .historial-item {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.06);
+  transition: all .2s var(--nbk-ease);
+}
+
+#banco-screen .historial-item:hover {
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.12);
+  transform: translateX(4px); /* Desplazamiento sutil al pasar el ratón */
+}
+
+#banco-screen .nbk-ahorro-card,
+#banco-screen .bdc-balance-card {
+  background: rgba(22,24,28,.8) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── 6) Inputs del Formulario de Transferencia ──────────────────────── */
+#banco-screen .form-group input,
+#banco-screen .form-group select {
+  background: rgba(255,255,255,.03) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  transition: all .3s var(--nbk-ease);
+}
+
+#banco-screen .form-group input:focus,
+#banco-screen .form-group select:focus {
+  background: rgba(255,255,255,.06) !important;
+  border-color: var(--nbk-mint) !important;
+  box-shadow: 0 0 0 3px rgba(87,224,172,.1), 0 4px 12px -4px rgba(87,224,172,.2) !important;
+}
