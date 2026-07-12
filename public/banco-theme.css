@@ -884,3 +884,42 @@ body[data-screen="banco-screen"] .tx-receipt-icon {
   border-color: rgba(87,224,172,.15) !important;
   transform: translateX(4px);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FIX TARJETA FÍSICA — Efecto "Flotante / Plástico Metalizado"
+   --------------------------------------------------------------------- */
+
+#banco-screen .bank-card-vert.bank-card {
+  /* 1. Fondo gris metálico oscuro (rompe el camuflaje con el fondo verde) */
+  background:
+    /* Brillo de plástico reflejando la luz en la esquina superior derecha */
+    linear-gradient(115deg, rgba(255,255,255,0.12) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.04) 100%),
+    /* Gradiente base gris titanio */
+    linear-gradient(165deg, #2e3136 0%, #1e2025 50%, #26292e 100%) !important;
+
+  /* 2. Borde brillante para delimitar los bordes de la tarjeta */
+  border: 1px solid rgba(255,255,255,0.18) !important;
+
+  /* 3. Sombra muy marcada para que "flote" sobre la interfaz verde */
+  box-shadow:
+    0 30px 50px -15px rgba(0,0,0,0.9), /* Sombra oscura principal */
+    0 0 40px -10px rgba(0,0,0,0.5),    /* Sombra difusa de entorno */
+    inset 0 1px 0 rgba(255,255,255,0.25) !important; /* Línea de luz en el borde superior */
+}
+
+/* Mejora del Chip para que resalte más contra el gris */
+#banco-screen .bank-card-vert .bank-chip {
+  background: linear-gradient(135deg, #f5e6b8, #d4b86a 45%, #a88840) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.3) !important;
+}
+
+/* Asegurar que el número de tarjeta tenga suficiente contraste */
+#banco-screen .bank-card-vert .bank-numero {
+  color: rgba(255,255,255,0.95) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Que el logo del banco también destaque bien */
+#banco-screen .bank-card-vert .bank-logo-text {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
