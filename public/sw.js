@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v63"; // <--- ⚠️ ACTUALIZADO A v63 (banco.html: max-width 350px + Historial/Contactos conectados)
+const CACHE_VERSION = "v64"; // <--- ⚠️ ACTUALIZADO A v64 (banco.html: JS metido inline, se borró js/banco-cuenta.js)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
