@@ -61,7 +61,7 @@
     <p>Contactos</p>
   </div>
 
-  <div class="box1">
+  <div class="box1" onclick="abrirPrestamos()">
     <img src="prestamos.svg" alt="">
     <p>Prestamos</p>
   </div>
@@ -172,6 +172,27 @@
       </button>
 
     </form>
+  </div>
+
+</section>
+
+<section id="prestamos" class="seccion seccion-panel">
+
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Préstamos</h1>
+    <span class="panel-header-spacer"></span>
+  </div>
+
+  <div id="prestamo-contenido">
+    <p class="hist-vacio">Cargando...</p>
+  </div>
+
+  <div id="prestamo-historial-wrap" style="display:none;">
+    <h2 class="prestamo-subtitulo">Historial de préstamos</h2>
+    <div id="prestamo-historial-lista" class="historial-lista"></div>
   </div>
 
 </section>
@@ -858,18 +879,227 @@ body,html {
 }
 
 .contacto-form-wrap {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows .28s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height .32s cubic-bezier(0.16, 1, 0.3, 1), opacity .22s ease;
 }
 
 .contacto-form-wrap.abierto {
-  grid-template-rows: 1fr;
+  max-height: 480px;
+  opacity: 1;
 }
 
-.contacto-form-wrap > form {
+/* ── Préstamos ────────────────────────────────────────────────────────── */
+
+.prestamo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.prestamo-badge.pendiente { background: rgba(255, 209, 102, 0.14); color: #ffd166; }
+.prestamo-badge.aprobado  { background: rgba(95, 208, 255, 0.14); color: #5fd0ff; }
+.prestamo-badge.pagado    { background: rgba(0, 236, 138, 0.14); color: #00ec8a; }
+.prestamo-badge.rechazado { background: rgba(255, 92, 92, 0.14); color: #ff5c5c; }
+
+.prestamo-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.prestamo-monto-grande {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 2px 0 0;
+}
+
+.prestamo-razon {
+  color: #9a9a9a !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  margin: 4px 0 0 !important;
+}
+
+.prestamo-divisor {
+  height: 1px;
+  background-color: rgb(52, 52, 52);
+  margin: 16px 0;
+  border: none;
+}
+
+.prestamo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.prestamo-row-label {
+  color: #9a9a9a !important;
+  font-size: 12px !important;
+  text-align: left !important;
+}
+
+.prestamo-row-valor {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  text-align: right !important;
+}
+
+.prestamo-row-valor.egreso { color: #ff5c5c !important; }
+.prestamo-row-valor.ingreso { color: #00ec8a !important; }
+
+.prestamo-progreso-track {
+  width: 100%;
+  height: 7px;
+  background-color: rgb(24, 24, 24);
+  border-radius: 10px;
   overflow: hidden;
-  min-height: 0;
+  margin-top: 4px;
+}
+
+.prestamo-progreso-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ec8a, #5fd0ff);
+  border-radius: 10px;
+  transition: width .4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prestamo-cuenta-regresiva {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(48, 48, 48);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 14px;
+}
+
+.prestamo-cuenta-regresiva svg {
+  color: #5fd0ff;
+  flex-shrink: 0;
+}
+
+.prestamo-cuenta-regresiva span {
+  color: #ffffff !important;
+  font-size: 12px !important;
+  text-align: left !important;
+}
+
+.btn-secundario {
+  display: block;
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 11px;
+  background: none;
+  border: 1px solid rgb(70, 70, 70);
+  border-radius: 12px;
+  color: #ff5c5c;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.btn-secundario:hover {
+  border-color: #ff5c5c;
+  background-color: rgba(255, 92, 92, 0.08);
+}
+
+.campo-textarea {
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(55, 55, 55);
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  resize: none;
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color .2s ease;
+}
+
+.campo-textarea:focus {
+  outline: none;
+  border-color: #00ec8a;
+}
+
+.campo-select {
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(55, 55, 55);
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color .2s ease;
+}
+
+.campo-select:focus {
+  outline: none;
+  border-color: #00ec8a;
+}
+
+.prestamo-cuota-preview {
+  color: #6c6c6c !important;
+  font-size: 12px !important;
+  text-align: left !important;
+  margin: 6px 0 0 !important;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: #00ec8a;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.checkbox-row span {
+  color: #c9c9c9;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.prestamo-subtitulo {
+  color: #9a9a9a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  text-align: left !important;
+  margin: 22px 0 10px !important;
 }
 
 .abrir-cuenta-btn {
@@ -1300,6 +1530,266 @@ function volver(){
       lista.innerHTML = '<p class="hist-vacio">Error al cargar el historial.</p>';
     }
   }
+
+  // ── Préstamos ─────────────────────────────────────────────────────────────
+  const PRESTAMO_CUOTAS_MAX = 12;
+  const PRESTAMO_ETIQUETAS_ESTADO = {
+    pendiente: 'Pendiente de revisión',
+    aprobado:  'Aprobado',
+    pagado:    'Pagado',
+    rechazado: 'Rechazado',
+  };
+
+  window.abrirPrestamos = function () {
+    mostrarSeccion('prestamos');
+    cargarPrestamos();
+  };
+
+  function formatDuracion(ms) {
+    if (ms == null || ms <= 0) return 'muy pronto';
+    const totalMin = Math.floor(ms / 60000);
+    const dias = Math.floor(totalMin / (60 * 24));
+    const horas = Math.floor((totalMin % (60 * 24)) / 60);
+    const min = totalMin % 60;
+    if (dias > 0) return dias + 'd ' + horas + 'h';
+    if (horas > 0) return horas + 'h ' + min + 'min';
+    return min + ' min';
+  }
+
+  async function cargarPrestamos() {
+    const contenido = $('prestamo-contenido');
+    const histWrap   = $('prestamo-historial-wrap');
+    const histLista   = $('prestamo-historial-lista');
+    if (!contenido) return;
+    contenido.innerHTML = '<p class="hist-vacio">Cargando...</p>';
+    if (histWrap) histWrap.style.display = 'none';
+
+    try {
+      const [resCuenta, resMios] = await Promise.all([
+        fetch('/api/banco?action=cuenta'),
+        fetch('/api/banco?action=prestamos_mios'),
+      ]);
+
+      if (resCuenta.status === 401) {
+        contenido.innerHTML = '<p class="hist-vacio">Inicia sesión para pedir un préstamo.</p>';
+        return;
+      }
+      if (resCuenta.status === 404) {
+        contenido.innerHTML = '<p class="hist-vacio">Debes abrir tu cuenta bancaria antes de solicitar un préstamo.</p>';
+        return;
+      }
+      if (!resCuenta.ok) throw new Error('No se pudo cargar la cuenta');
+
+      const dataCuenta = await resCuenta.json();
+      const activo = dataCuenta.prestamoActivo;
+
+      if (activo) {
+        renderPrestamoActivo(contenido, activo);
+      } else {
+        renderFormularioSolicitud(contenido);
+      }
+
+      if (resMios.ok) {
+        const dataMios = await resMios.json();
+        const historial = (dataMios.prestamos || []).filter(function (p) {
+          return p.estado === 'pagado' || p.estado === 'rechazado';
+        });
+        if (historial.length > 0 && histWrap && histLista) {
+          histWrap.style.display = 'block';
+          histLista.innerHTML = historial.map(function (p, idx) {
+            const fecha = new Date(p.created_at).toLocaleDateString('es-CL', {
+              day: '2-digit', month: '2-digit', year: 'numeric',
+            });
+            const demora = Math.min(idx, 8) * 0.035;
+            return (
+              '<div class="hist-item" style="animation-delay:' + demora + 's">' +
+                '<div class="hist-item-icono ' + (p.estado === 'pagado' ? 'ingreso' : 'egreso') + '">' + iconoMovimiento(p.estado === 'pagado' ? 'ingreso' : 'egreso') + '</div>' +
+                '<div class="hist-item-info">' +
+                  '<span class="hist-item-desc">' + escHtml(p.razon) + '</span>' +
+                  '<span class="hist-item-fecha">' + fecha + '</span>' +
+                '</div>' +
+                '<div class="hist-item-monto">' + formatCLP(p.monto) + '</div>' +
+              '</div>'
+            );
+          }).join('');
+        }
+      }
+    } catch (err) {
+      console.error('Error cargando préstamos:', err);
+      contenido.innerHTML = '<p class="hist-vacio">Error al cargar la información de préstamos.</p>';
+    }
+  }
+
+  function renderPrestamoActivo(contenido, p) {
+    const badgeClase = escHtml(p.estado);
+    const badgeTexto = PRESTAMO_ETIQUETAS_ESTADO[p.estado] || p.estado;
+    const progreso = p.cuotas_totales > 0 ? Math.round((p.cuotas_pagadas / p.cuotas_totales) * 100) : 0;
+
+    let html = '' +
+      '<div class="panel-card">' +
+        '<div class="prestamo-card-top">' +
+          '<div>' +
+            '<p class="prestamo-razon">' + escHtml(p.razon) + '</p>' +
+            '<p class="prestamo-monto-grande">' + formatCLP(p.monto) + '</p>' +
+          '</div>' +
+          '<span class="prestamo-badge ' + badgeClase + '">' + escHtml(badgeTexto) + '</span>' +
+        '</div>' +
+        '<hr class="prestamo-divisor">' +
+        '<div class="prestamo-row">' +
+          '<span class="prestamo-row-label">Cuotas pagadas</span>' +
+          '<span class="prestamo-row-valor">' + p.cuotas_pagadas + ' / ' + p.cuotas_totales + '</span>' +
+        '</div>' +
+        '<div class="prestamo-progreso-track"><div class="prestamo-progreso-fill" style="width:' + progreso + '%"></div></div>' +
+        '<div class="prestamo-row">' +
+          '<span class="prestamo-row-label">Valor de la cuota</span>' +
+          '<span class="prestamo-row-valor">' + formatCLP(p.cuota_monto) + '</span>' +
+        '</div>' +
+        '<div class="prestamo-row">' +
+          '<span class="prestamo-row-label">Saldo pendiente</span>' +
+          '<span class="prestamo-row-valor egreso">' + formatCLP(p.saldo_pendiente) + '</span>' +
+        '</div>' +
+        (p.deuda_ciclo > 0 ? (
+          '<div class="prestamo-row">' +
+            '<span class="prestamo-row-label">Deuda arrastrada este ciclo</span>' +
+            '<span class="prestamo-row-valor egreso">' + formatCLP(p.deuda_ciclo) + '</span>' +
+          '</div>'
+        ) : '') +
+        (p.estado === 'aprobado' && p.proximoCobroMs != null ? (
+          '<div class="prestamo-cuenta-regresiva">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>' +
+            '<span>Próximo cobro automático en ' + formatDuracion(p.proximoCobroMs) + '</span>' +
+          '</div>'
+        ) : '') +
+        (p.estado === 'pendiente' ? (
+          '<button type="button" class="btn-secundario" onclick="cancelarPrestamo(' + p.id + ')">Cancelar solicitud</button>'
+        ) : '') +
+      '</div>';
+
+    contenido.innerHTML = html;
+  }
+
+  function renderFormularioSolicitud(contenido) {
+    let opcionesCuotas = '';
+    for (let i = 1; i <= PRESTAMO_CUOTAS_MAX; i++) {
+      opcionesCuotas += '<option value="' + i + '"' + (i === 1 ? ' selected' : '') + '>' + i + (i === 1 ? ' cuota' : ' cuotas') + '</option>';
+    }
+
+    contenido.innerHTML = '' +
+      '<form id="prestamo-form" class="panel-card" onsubmit="solicitarPrestamo(event)">' +
+        '<label class="monto-label" for="prestamo-monto">Monto a solicitar</label>' +
+        '<div class="monto-input-wrap">' +
+          '<span class="monto-prefijo">$</span>' +
+          '<input type="number" id="prestamo-monto" placeholder="0" min="1" step="1" inputmode="numeric" oninput="actualizarPreviewCuota()">' +
+        '</div>' +
+        '<p id="prestamo-cuota-preview" class="prestamo-cuota-preview">&nbsp;</p>' +
+
+        '<label for="prestamo-razon" class="campo-label">Razón del préstamo</label>' +
+        '<textarea id="prestamo-razon" class="campo-textarea" rows="2" maxlength="200" placeholder="Ej: Necesito capital para mi negocio"></textarea>' +
+
+        '<label for="prestamo-cuotas" class="campo-label">Cuotas</label>' +
+        '<select id="prestamo-cuotas" class="campo-select" onchange="actualizarPreviewCuota()">' + opcionesCuotas + '</select>' +
+
+        '<label class="checkbox-row" for="prestamo-acepta">' +
+          '<input type="checkbox" id="prestamo-acepta">' +
+          '<span>Acepto que las cuotas se cobren automáticamente desde mi cuenta cada ' + '2 días hasta pagar el préstamo completo.</span>' +
+        '</label>' +
+
+        '<p id="prestamo-msg" class="transfer-msg"></p>' +
+
+        '<button type="submit" id="prestamo-btn" class="btn-primario"><span>Solicitar préstamo</span></button>' +
+      '</form>';
+  }
+
+  window.actualizarPreviewCuota = function () {
+    const monto  = parseInt(($('prestamo-monto') || {}).value, 10);
+    const cuotas = parseInt(($('prestamo-cuotas') || {}).value, 10);
+    const preview = $('prestamo-cuota-preview');
+    if (!preview) return;
+    if (!monto || monto <= 0 || !cuotas) {
+      preview.textContent = '\u00a0';
+      return;
+    }
+    const cuotaMonto = Math.ceil(monto / cuotas);
+    preview.textContent = cuotas + ' cuota' + (cuotas > 1 ? 's' : '') + ' de ' + formatCLP(cuotaMonto);
+  };
+
+  window.solicitarPrestamo = async function (ev) {
+    ev.preventDefault();
+
+    const montoInput  = $('prestamo-monto');
+    const razonInput  = $('prestamo-razon');
+    const cuotasInput = $('prestamo-cuotas');
+    const aceptaInput = $('prestamo-acepta');
+    const msgEl       = $('prestamo-msg');
+    const btn         = $('prestamo-btn');
+    const btnLabel    = btn.querySelector('span');
+
+    const monto  = parseInt(montoInput.value, 10);
+    const razon  = razonInput.value.trim();
+    const cuotas = parseInt(cuotasInput.value, 10);
+
+    msgEl.textContent = '';
+    msgEl.className = 'transfer-msg';
+
+    if (!monto || monto <= 0) {
+      msgEl.textContent = 'Ingresa un monto válido.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!razon) {
+      msgEl.textContent = 'Indica la razón del préstamo.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!aceptaInput.checked) {
+      msgEl.textContent = 'Debes aceptar el cobro automático de las cuotas.';
+      msgEl.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    const textoOriginal = btnLabel.textContent;
+    btnLabel.textContent = 'Enviando...';
+
+    try {
+      const res = await fetch('/api/banco?action=prestamo_solicitar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ monto: monto, razon: razon, cuotas: cuotas, acepta_cobro_auto: true }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.error || 'No se pudo enviar la solicitud.';
+        msgEl.classList.add('error');
+        btn.disabled = false;
+        btnLabel.textContent = textoOriginal;
+        return;
+      }
+
+      await cargarPrestamos();
+    } catch (err) {
+      console.error('Error solicitando préstamo:', err);
+      msgEl.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgEl.classList.add('error');
+      btn.disabled = false;
+      btnLabel.textContent = textoOriginal;
+    }
+  };
+
+  window.cancelarPrestamo = async function (id) {
+    try {
+      const res = await fetch('/api/banco?action=prestamo_cancelar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prestamo_id: id }),
+      });
+      if (!res.ok) throw new Error('No se pudo cancelar la solicitud');
+      await cargarPrestamos();
+    } catch (err) {
+      console.error('Error cancelando préstamo:', err);
+    }
+  };
 
   // ── Contactos ─────────────────────────────────────────────────────────────
   window.abrirContactos = function () {
