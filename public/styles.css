@@ -701,6 +701,37 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 #casino-screen .clc-badge{ background:var(--sk-green-dim)!important; color:var(--sk-green)!important; border:1px solid rgba(0,231,1,.35)!important; }
 #casino-screen .clc-badge.nuevo{ background:rgba(99,102,241,.15)!important; color:#a5b4fc!important; border-color:rgba(99,102,241,.3)!important; }
 
+/* Lobby: tarjetas con portada (imagen de juego a pantalla completa dentro del tile) */
+#casino-screen .casino-lobby-card.clc-cover{
+  padding:0!important;
+  aspect-ratio:1410/2250;
+  background:#0a0a0a!important;
+}
+#casino-screen .clc-cover-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform .35s var(--ease,ease);
+}
+#casino-screen .casino-lobby-card.clc-cover:hover .clc-cover-img{
+  transform:scale(1.05);
+}
+#casino-screen .clc-cover-scrim{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%);
+  pointer-events:none;
+}
+#casino-screen .casino-lobby-card.clc-cover .clc-badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:2;
+}
+
 /* Tabs y boton principal de apuesta: acento verde consistente */
 #casino-screen .casino-tab.active{
   background:linear-gradient(135deg,rgba(0,231,1,.22),rgba(0,180,1,.14))!important;
