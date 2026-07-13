@@ -68,15 +68,28 @@
 
 </div>
 
-<section id="tarjeta" class="seccion">
+<section id="tarjeta" class="seccion seccion-panel seccion-tarjeta">
 
-    <h1>Tarjeta debito</h1>
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Tarjeta débito</h1>
+  </div>
 
-    <img src="tarjeta2.webp">
+  <div class="tarjeta-flip-wrap">
+    <div class="tarjeta-flip" id="tarjeta-flip" onclick="toggleFlipTarjeta()">
+      <div class="tarjeta-cara tarjeta-front">
+        <img src="tarjeta2.webp" alt="Tarjeta débito">
+      </div>
+      <div class="tarjeta-cara tarjeta-back">
+        <img src="tarjeta3.png" alt="Reverso tarjeta débito">
+        <span id="N-tarjeta-full" class="tarjeta-numero">**** **** ****</span>
+      </div>
+    </div>
+  </div>
 
-    <p id="N-tarjeta-full">Número de cuenta: **** **** ****</p>
-
-    <button onclick="volver()">Volver</button>
+  <p class="tarjeta-hint">Toca la tarjeta para ver tu número de cuenta</p>
 
 </section>
 
@@ -369,12 +382,6 @@ body,html {
   margin: 0 auto;
 }
 
-.seccion img {
-  position: relative;
-  width: 220px;
-  margin-left: 94px; 
-}
-
 .seccion h1 {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
@@ -388,22 +395,6 @@ body,html {
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   font-weight: 400;
-}
-
-#tarjeta button {
-  background-color: #00ec8a;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  color: #ffffff;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 8px;
-  padding-top: 8px;
-  border-radius: 15px;
-  margin-left: 155px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
 }
 
 /* ── Paneles nuevos: Transferir / Historial / Contactos ─────────────────── */
@@ -1102,6 +1093,86 @@ body,html {
   margin: 22px 0 10px !important;
 }
 
+/* ── Tarjeta débito (flip 3D) ─────────────────────────────────────────── */
+
+#tarjeta .panel-header {
+  position: relative;
+  justify-content: center;
+}
+
+#tarjeta .panel-header .btn-back {
+  position: absolute;
+  left: 0;
+}
+
+#tarjeta .panel-header h1 {
+  flex: none;
+  text-align: center !important;
+}
+
+.tarjeta-flip-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 26px 0 6px;
+}
+
+.tarjeta-flip {
+  position: relative;
+  width: 230px;
+  height: 340px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform .65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tarjeta-flip.volteada {
+  transform: rotateY(180deg);
+}
+
+.tarjeta-cara {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+}
+
+.tarjeta-cara img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.tarjeta-back {
+  transform: rotateY(180deg);
+}
+
+.tarjeta-numero {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  transform: translate(-50%, -50%);
+  color: #1a1a1a !important;
+  font-family: 'Courier New', monospace;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+.tarjeta-hint {
+  color: #6c6c6c !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  margin-top: 18px !important;
+}
+
 .abrir-cuenta-btn {
   display: block;
   width: 100%;
@@ -1151,6 +1222,15 @@ function volver(){
       sec.style.display = "none";
     });
 
+    // La tarjeta siempre debe volver a mostrar el frente al reabrirla.
+    const flip = document.getElementById('tarjeta-flip');
+    if (flip) flip.classList.remove('volteada');
+
+}
+
+function toggleFlipTarjeta() {
+  const flip = document.getElementById('tarjeta-flip');
+  if (flip) flip.classList.toggle('volteada');
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1254,7 +1334,7 @@ function volver(){
         if (saldoEl) saldoEl.textContent = '$0';
         if (cuentaEl) cuentaEl.textContent = 'Sin cuenta';
         if (miniEl) miniEl.textContent = 'Debes abrir tu cuenta';
-        if (fullEl) fullEl.textContent = 'Número de cuenta: aún no tienes cuenta bancaria';
+        if (fullEl) fullEl.textContent = 'Sin cuenta';
         // Sin cuenta todavía: ocultamos la tarjeta, el título "¿Y que
         // hacemos ahora?" y los accesos rápidos (no tienen sentido sin
         // cuenta) y mostramos el botón para abrirla por primera vez.
@@ -1277,7 +1357,7 @@ function volver(){
       }
       if (cuentaEl) cuentaEl.textContent = cuentaActual.numero_cuenta;
       if (miniEl) miniEl.textContent = maskNumeroCuenta(cuentaActual.numero_cuenta);
-      if (fullEl) fullEl.textContent = 'Número de cuenta: ' + cuentaActual.numero_cuenta;
+      if (fullEl) fullEl.textContent = cuentaActual.numero_cuenta;
       if (btnAbrir) btnAbrir.style.display = 'none';
       if (msgAbrir) msgAbrir.style.display = 'none';
       if (card2El) card2El.style.display = 'block';
