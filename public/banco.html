@@ -84,7 +84,20 @@
       </div>
       <div class="tarjeta-cara tarjeta-back">
         <img src="tarjeta3.png" alt="Reverso tarjeta débito">
-        <span id="N-tarjeta-full" class="tarjeta-numero">**** **** ****</span>
+        <div class="tarjeta-info">
+          <div class="tarjeta-info-block">
+            <span class="tarjeta-label">N° de cuenta</span>
+            <span id="N-tarjeta-full" class="tarjeta-numero">**** **** ****</span>
+            <button type="button" class="tarjeta-copy-btn" id="tarjeta-copy-btn" onclick="copiarNumeroCuenta(event)" aria-label="Copiar número de cuenta">
+              <svg class="tarjeta-copy-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+              <span class="tarjeta-copy-txt">Copiar número</span>
+            </button>
+          </div>
+          <div class="tarjeta-info-block">
+            <span class="tarjeta-label">RUT titular</span>
+            <span id="tarjeta-rut" class="tarjeta-rut">--</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1152,18 +1165,94 @@ body,html {
   transform: rotateY(180deg);
 }
 
-.tarjeta-numero {
+.tarjeta-info {
   position: absolute;
   left: 50%;
-  top: 66%;
+  top: 60%;
   transform: translate(-50%, -50%);
+  width: 184px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.tarjeta-info-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.tarjeta-label {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #8a8a8a !important;
+}
+
+.tarjeta-numero {
+  display: block;
+  max-width: 100%;
   color: #1a1a1a !important;
   font-family: 'Courier New', monospace;
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 1.5px;
-  white-space: nowrap;
+  letter-spacing: 0.5px;
+  white-space: normal;
+  word-break: break-all;
   text-align: center !important;
+  line-height: 1.3;
+}
+
+.tarjeta-rut {
+  display: block;
+  color: #1a1a1a !important;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-align: center !important;
+}
+
+.tarjeta-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #f2f2f2;
+  color: #1a1a1a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease, border-color .2s ease;
+}
+
+.tarjeta-copy-btn:hover {
+  background: #e6e6e6;
+}
+
+.tarjeta-copy-btn:active {
+  transform: scale(0.94);
+}
+
+.tarjeta-copy-btn.copiado {
+  background: #00ec8a;
+  border-color: #00ec8a;
+  color: #0d0d0d;
+}
+
+.tarjeta-copy-icon {
+  flex-shrink: 0;
 }
 
 .tarjeta-hint {
@@ -1231,6 +1320,53 @@ function volver(){
 function toggleFlipTarjeta() {
   const flip = document.getElementById('tarjeta-flip');
   if (flip) flip.classList.toggle('volteada');
+}
+
+// Copia el número de cuenta al portapapeles sin voltear la tarjeta.
+function copiarNumeroCuenta(event) {
+  event.stopPropagation();
+
+  const numeroEl = document.getElementById('N-tarjeta-full');
+  const btn = document.getElementById('tarjeta-copy-btn');
+  if (!numeroEl || !btn) return;
+
+  const numero = (numeroEl.textContent || '').replace(/\s+/g, '').trim();
+  if (!numero || numero === '****' || numero === 'Sincuenta') return;
+
+  const marcarCopiado = () => {
+    const txt = btn.querySelector('.tarjeta-copy-txt');
+    const original = txt ? txt.textContent : null;
+    btn.classList.add('copiado');
+    if (txt) txt.textContent = '¡Copiado!';
+    setTimeout(() => {
+      btn.classList.remove('copiado');
+      if (txt && original) txt.textContent = original;
+    }, 1500);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(numero).then(marcarCopiado).catch(() => {
+      copiarNumeroCuentaFallback(numero, marcarCopiado);
+    });
+  } else {
+    copiarNumeroCuentaFallback(numero, marcarCopiado);
+  }
+}
+
+function copiarNumeroCuentaFallback(texto, onOk) {
+  try {
+    const tmp = document.createElement('textarea');
+    tmp.value = texto;
+    tmp.style.position = 'fixed';
+    tmp.style.opacity = '0';
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    onOk();
+  } catch (e) {
+    console.error('No se pudo copiar el número de cuenta:', e);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1364,10 +1500,27 @@ function toggleFlipTarjeta() {
       if (queSigeEl) queSigeEl.style.display = 'block';
       if (boxesEl) boxesEl.style.display = 'grid';
 
+      cargarRutTarjeta();
+
     } catch (err) {
       console.error('Error cargando la cuenta:', err);
       if (saldoEl) saldoEl.textContent = 'Error';
       if (cuentaEl) cuentaEl.textContent = 'Error';
+    }
+  }
+
+  // ── Carga el RUT del titular para mostrarlo en el reverso de la tarjeta ──
+  async function cargarRutTarjeta() {
+    const rutEl = $('tarjeta-rut');
+    if (!rutEl) return;
+    try {
+      const res = await fetch('/api/dni');
+      if (!res.ok) { rutEl.textContent = '—'; return; }
+      const data = await res.json();
+      rutEl.textContent = (data.existe && data.dni && data.dni.rut) ? data.dni.rut : '—';
+    } catch (err) {
+      console.error('Error cargando el RUT:', err);
+      rutEl.textContent = '—';
     }
   }
 
