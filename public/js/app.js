@@ -20,7 +20,7 @@
     }
 
     // ── Pantallas ─────────────────────────────────────────────────────────────
-    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','mercado-screen','concesionario-screen','mis-autos-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','casino-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
+    const screens = ['landing','dashboard','registro-civil','banco-screen','admin-screen','tienda-screen','mercado-screen','concesionario-screen','mis-autos-screen','inventario-screen','admin-tienda-screen','perfil-publico-screen','panel-admin-screen','staff-panel-screen','comisaria-screen','apuestas-screen','admin-casino-screen','empresas-screen','admin-empresas-screen','logros-screen','error-403','error-404'];
 
     // ── Indicador de sección activa ──────────────────────────────────────────
     let _sectionIndicatorTimer = null;
@@ -40,7 +40,6 @@
         'panel-admin-screen': 'Panel Admin',
         'staff-panel-screen': 'Panel Staff',
         'comisaria-screen': 'Comisaría Virtual',
-        'casino-screen': 'Casino',
         'apuestas-screen': 'Apuestas',
         'admin-casino-screen': 'Admin Casino',
         'empresas-screen': 'Empresas',
@@ -142,7 +141,6 @@
       'perfil-publico-screen': () => { if (typeof cargarPerfilPublico === 'function') cargarPerfilPublico(); },
       'empresas-screen':       () => { if (typeof cargarEmpresas === 'function') cargarEmpresas(); },
       'logros-screen':         () => { if (typeof cargarLogros === 'function') cargarLogros(); },
-      'casino-screen':         () => { if (typeof cargarCasino === 'function') cargarCasino(); },
       'apuestas-screen':       () => { if (typeof cargarApuestas === 'function') cargarApuestas(); },
       // Estas ya hacen su propia verificación de acceso al servidor; al estar
       // ya en su página (abrirSeccion no navega si el elemento ya existe),
