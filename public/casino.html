@@ -1,991 +1,138 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Casino — ChileCity RP</title>
-  <meta name="description" content="Sumérgete en el servidor de roleplay más inmersivo de habla hispana. Economía real, facciones, trabajos y una comunidad activa. Tu personaje. Tu historia." />
-  <meta name="theme-color" content="#e02020" />
-
-  <!-- Open Graph -->
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://chilecity.cl/" />
-  <meta property="og:title"       content="ChileCity RP — Servidor de Roleplay" />
-  <meta property="og:description" content="El servidor de roleplay más inmersivo de habla hispana. Vive tu historia en una ciudad viva. Tu personaje. Tu reglas." />
-  <meta property="og:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card"        content="summary_large_image" />
-  <meta name="twitter:title"       content="ChileCity RP" />
-  <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
-  <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=55">
-  <link rel="stylesheet" href="/page-loader.css?v=55">
-  <link rel="stylesheet" href="/clean-theme.css?v=55">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ChileCity RP">
-  <link rel="apple-touch-icon" href="/logo.webp">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino chilecity RP</title>
 </head>
-<body data-screen="casino-screen">
-
-  <!-- CC_PAGE_MAP: mapa id-de-pantalla -> archivo, usado por mostrarPantalla()
-       en app.js para navegar entre páginas cuando el id pedido no vive en esta. -->
-  <script>
-    window.CC_CURRENT_SCREEN = 'casino-screen';
-    window.CC_PAGE_MAP = {
-      'landing': '/',
-      'dashboard': '/dashboard.html',
-      'registro-civil': '/registro-civil.html',
-      'banco-screen': '/banco.html',
-      'admin-screen': '/admin-banco.html',
-      'tienda-screen': '/tienda.html',
-      'inventario-screen': '/inventario.html',
-      'mercado-screen': '/mercado.html',
-      'concesionario-screen': '/concesionario.html',
-      'mis-autos-screen': '/mis-autos.html',
-      'admin-tienda-screen': '/admin-tienda.html',
-      'casino-screen': '/casino.html',
-      'apuestas-screen': '/apuestas.html',
-      'admin-casino-screen': '/admin-casino.html',
-      'error-403': '/error-403.html',
-      'error-404': '/error-404.html',
-      'perfil-publico-screen': '/perfil-publico.html',
-      'empresas-screen': '/empresas.html',
-      'logros-screen': '/logros.html',
-      'admin-empresas-screen': '/admin-empresas.html',
-      'panel-admin-screen': '/panel-admin.html',
-      'staff-panel-screen': '/staff-panel.html',
-      'comisaria-screen': '/comisaria.html'
-    };
-  </script>
-
 <body>
 
-  <div id="cc-page-loader" aria-hidden="true">
-    <div class="cc-loader-logo"><img src="/logo.webp" alt="ChileCity RP"></div>
-  </div>
-  <script>
-    (function(){
-      function ccOcultarLoader(){
-        var l = document.getElementById('cc-page-loader');
-        if (l) l.classList.add('cc-loader-hidden');
-      }
-      window.addEventListener('load', function(){ setTimeout(ccOcultarLoader, 250); });
-      // Salvavidas: si 'load' tarda demasiado (conexión lenta, recurso
-      // colgado) no dejamos al usuario mirando el loader para siempre.
-      setTimeout(ccOcultarLoader, 6000);
-    })();
-  </script>
+    <a href="/dashboard.html" class="btn-volver-dash">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5"/>
+      <path d="M12 19l-7-7 7-7"/>
+    </svg>
+    Volver
+  </a>
+    
+    <img class="logo-c" src="logo-casino.webp" alt="">
 
-  <div id="bg-fx" aria-hidden="true">
-    <div id="bg-particles"></div>
-  </div>
-  <div class="overlay"></div>
-  <div id="grain-overlay"></div>
-
-  <div class="logo-corner">
-    <img src="/logo.webp" alt="Logo ChileCity RP">
-  </div>
-
-  <!-- LANDING -->
-
-  <!-- ═══ casino-screen ═══ -->
-  <section class="screen seccion-screen active" id="casino-screen">
-    <div class="casino-container">
-      <div class="seccion-header">
-        <button class="sec-back" onclick="volverDashboard()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          Volver
-        </button>
-        <div class="seccion-title" style="color:#F59E0B;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/><path d="M15.5 8.5h.01M15.5 11.5h.01"/></svg> Casino
-        </div>
-      </div>
-
-      <!-- Saldo -->
-      <div class="casino-saldo-banner">
-        <div>
-          <div class="csb-label">Tu saldo disponible</div>
-          <div class="csb-valor" id="casino-saldo-val">$0</div>
-        </div>
-        <div class="csb-mono">CLP</div>
-      </div>
-
-      <!-- Lobby de juegos -->
-      <div id="casino-lobby-section">
-        <!-- Feed de apuestas en vivo -->
-        <div class="casino-live-feed">
-          <div class="clf-header"><span class="clf-dot"></span> Apuestas en vivo</div>
-          <div class="clf-list" id="casino-live-feed-list">
-            <div class="ranking-empty" style="padding:12px 0;">Cargando...</div>
-          </div>
-        </div>
-
-        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:14px;">Elige un juego</div>
-        <div class="casino-lobby">
-          <div class="casino-lobby-card clc-cover" onclick="casinoAbrirJuego('limbo')"
-               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);">
-            <img class="clc-cover-img" src="casino-cover-limbo.webp" alt="Limbo" loading="lazy">
-            <div class="clc-cover-scrim"></div>
-            <div class="clc-badge nuevo">Nuevo</div>
-          </div>
-          <div class="casino-lobby-card clc-cover" onclick="casinoAbrirJuego('plinko')"
-               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);">
-            <img class="clc-cover-img" src="casino-cover-plinko.webp" alt="Plinko" loading="lazy">
-            <div class="clc-cover-scrim"></div>
-            <div class="clc-badge nuevo">Nuevo</div>
-          </div>
-          <div class="casino-lobby-card clc-cover" onclick="casinoAbrirJuego('ruleta')"
-               style="--clc:rgba(220,30,30,0.12);--clc-border:rgba(220,30,30,0.4);--clc-shadow:rgba(220,30,30,0.15);--tile-a:#7c3aed;--tile-b:#a855f7;">
-            <img class="clc-cover-img" src="casino-cover-ruleta.webp" alt="Ruleta" loading="lazy">
-            <div class="clc-cover-scrim"></div>
-            <div class="clc-badge">Disponible</div>
-          </div>
-          <div class="casino-lobby-card clc-cover" onclick="casinoAbrirJuego('moneda')"
-               style="--clc:rgba(245,158,11,0.12);--clc-border:rgba(245,158,11,0.4);--clc-shadow:rgba(245,158,11,0.15);--tile-a:#db2777;--tile-b:#ec4899;">
-            <img class="clc-cover-img" src="casino-cover-moneda.webp" alt="Cara o Cruz" loading="lazy">
-            <div class="clc-cover-scrim"></div>
-            <div class="clc-badge">Disponible</div>
-          </div>
-          <div class="casino-lobby-card clc-cover" onclick="casinoAbrirJuego('avion')"
-               style="--clc:rgba(6,182,212,0.12);--clc-border:rgba(6,182,212,0.4);--clc-shadow:rgba(6,182,212,0.15);--tile-a:#0891b2;--tile-b:#22d3ee;">
-            <img class="clc-cover-img" src="casino-cover-avion.webp" alt="Avión" loading="lazy">
-            <div class="clc-cover-scrim"></div>
-            <div class="clc-badge nuevo">Nuevo</div>
-          </div>
-          <div class="casino-lobby-card clc-cover" onclick="casinoAbrirJuego('mines')"
-               style="--clc:rgba(0,231,1,0.12);--clc-border:rgba(0,231,1,0.4);--clc-shadow:rgba(0,231,1,0.15);--tile-a:#1a2c38;--tile-b:#213743;">
-            <img class="clc-cover-img" src="casino-cover-mines.webp" alt="Mines" loading="lazy">
-            <div class="clc-cover-scrim"></div>
-            <div class="clc-badge nuevo">Nuevo</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabs (ocultas hasta abrir juego) -->
-      <div class="casino-tabs" id="casino-tabs-bar" style="display:none;">
-        <button class="casino-tab" id="ctab-lobby" onclick="casinoVolverLobby()">← Lobby</button>
-        <button class="casino-tab active" id="ctab-ruleta" onclick="casinoTab('ruleta')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:5px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg> Ruleta</button>
-        <button class="casino-tab" id="ctab-moneda" onclick="casinoTab('moneda')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:5px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><path d="M9.3 14.2c.4 1 1.5 1.6 2.7 1.6 1.7 0 2.8-.8 2.8-1.9 0-1.2-1.2-1.6-2.8-1.9-1.6-.3-2.8-.7-2.8-1.9 0-1.1 1.1-1.9 2.8-1.9 1.2 0 2.3.6 2.7 1.6"/></svg> Cara o Cruz</button>
-        <button class="casino-tab" id="ctab-avion" onclick="casinoTab('avion')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> Avión</button>
-        <button class="casino-tab" id="ctab-mines" onclick="casinoTab('mines')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Mines</button>
-        <button class="casino-tab" id="ctab-limbo" onclick="casinoTab('limbo')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> Limbo</button>
-        <button class="casino-tab" id="ctab-plinko" onclick="casinoTab('plinko')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><circle cx="6" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.4" fill="currentColor" stroke="none"/><path d="M4 21l5-8M20 21l-5-8"/></svg> Plinko</button>
-      </div>
-
-      <!-- ── PROVABLY FAIR (compartido por todos los juegos) ─────────────── -->
-      <div class="pf-panel" id="pf-panel">
-        <div class="pf-panel-header" onclick="pfTogglePanel()">
-          <div class="pf-panel-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
-            Provably Fair
-          </div>
-          <svg class="pf-panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div class="pf-panel-body">
-          <div class="pf-row">
-            <label>Server Seed (hash) — comprometido, se revela al rotar</label>
-            <div class="pf-row-value"><input type="text" id="pf-server-hash" readonly value="cargando..."><button class="pf-copy-btn" onclick="pfCopiar('pf-server-hash')">Copiar</button></div>
-          </div>
-          <div class="pf-row">
-            <label>Client Seed (puedes cambiarlo)</label>
-            <div class="pf-row-value"><input type="text" id="pf-client-seed" value=""><button class="pf-copy-btn" onclick="pfCopiar('pf-client-seed')">Copiar</button></div>
-          </div>
-          <div class="pf-row">
-            <label>Nonce actual</label>
-            <div class="pf-row-value"><span id="pf-nonce">0</span></div>
-          </div>
-          <button class="pf-rotate-btn" style="align-self:flex-start;" onclick="pfRotarSeed()">Rotar seed y revelar el anterior</button>
-          <div class="pf-note">Cada apuesta se calcula con <b>HMAC-SHA256(server_seed, client_seed:nonce)</b>. El server seed queda comprometido (solo ves su hash) hasta que rotas — ahí se revela en texto plano y puedes verificar cualquier apuesta pasada hecha con ese seed.</div>
-          <div id="pf-revelados-wrap" style="display:none;">
-            <div class="pf-note" style="margin-top:4px;"><b>Seeds revelados (verificables):</b></div>
-            <div id="pf-revelados-lista" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>
-          </div>
-          <div id="pf-verify-result"></div>
-        </div>
-      </div>
-
-      <!-- ── RULETA ────────────────────────────────── -->
-      <div class="casino-juego" id="casino-panel-ruleta">
-        <div class="ruleta-outer">
-  <div class="ruleta-canvas-wrap" id="ruleta-canvas-wrap">
-    <canvas id="ruleta-canvas" class="ruleta-canvas" width="280" height="280"></canvas>
-    <div class="ruleta-aguja"></div>
-    <div class="ruleta-centro">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
-        <path d="M12 3l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/>
-      </svg>
+    <div class="sueldo">
+        <h1>Sueldo disponible</h1>
+        <p id="saldo">$0</p>
     </div>
-  </div>
-</div>
-        <div class="casino-mult-info">
-          <div class="cmi-item"><span class="cmi-badge rojo"><svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:3px;"><circle cx="5" cy="5" r="5" fill="#c41e3a"/></svg>x2</span> Rojo</div>
-          <div class="cmi-item"><span class="cmi-badge negro"><svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:3px;"><circle cx="5" cy="5" r="5" fill="#333"/></svg>x2</span> Negro</div>
-          <div class="cmi-item"><span class="cmi-badge verde"><svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:3px;"><circle cx="5" cy="5" r="5" fill="#146b3a"/></svg>x14</span> Verde</div>
-        </div>
 
-        <div class="casino-bet-form">
-          <label>Monto a apostar (CLP)</label>
-          <input type="number" id="ruleta-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="casinoActualizarGanancia('ruleta')">
-          <div id="ruleta-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
-          <label>Elige tu apuesta</label>
-          <div class="casino-opciones">
-            <button class="casino-opcion" id="cop-rojo" onclick="casinoElegir('ruleta','rojo')">
-              <span class="co-emoji"><svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#c41e3a"/></svg></span>
-              <span>Rojo</span>
-            </button>
-            <button class="casino-opcion" id="cop-negro" onclick="casinoElegir('ruleta','negro')">
-              <span class="co-emoji"><svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#222"/><circle cx="11" cy="11" r="11" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/></svg></span>
-              <span>Negro</span>
-            </button>
-            <button class="casino-opcion" id="cop-verde" onclick="casinoElegir('ruleta','verde')">
-              <span class="co-emoji"><svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#146b3a"/></svg></span>
-              <span>Verde</span>
-            </button>
-          </div>
-        </div>
+    <div class="juegos-c">
 
-        <div class="casino-resultado" id="ruleta-resultado"></div>
+        <a href="">
+            <img src="1.png" alt="">
+        </a>
 
-        <button class="btn-casino" id="btn-ruleta" onclick="jugarRuleta()" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:8px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg> Girar Ruleta
-        </button>
-      </div>
+        <a href="">
+            <img src="2.png" alt="">
+        </a>
 
-      <!-- ── CARA O CRUZ ─────────────────────────── -->
-      <div class="casino-juego" id="casino-panel-moneda">
-        <div class="moneda-scene">
-          <div class="moneda-wrap" id="moneda-wrap">
-            <div class="moneda-cara"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(120,80,0,0.8)" stroke-width="1.2" stroke-linecap="round"><path d="M12 6v2M12 16v2M9 8.5c.5-1 1.5-1.5 3-1.5s3 .8 3 2.2c0 1.5-1.5 2-3 2.3C10.5 11.8 9 12.3 9 13.8c0 1.4 1.5 2.2 3 2.2 1.5 0 2.5-.8 3-1.5"/></svg></div>
-            <div class="moneda-cruz"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-          </div>
-        </div>
+        <a href="">
+            <img src="3.png" alt="">
+        </a>
 
-        <div class="casino-mult-info">
-          <div class="cmi-item"><span class="cmi-badge moneda"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg>x2</span> Cara o Cruz — ganas el doble</div>
-        </div>
+        <a href="">
+            <img src="4.png" alt="">
+        </a>     
 
-        <div class="casino-bet-form">
-          <label>Monto a apostar (CLP)</label>
-          <input type="number" id="moneda-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="casinoActualizarGanancia('moneda')">
-          <div id="moneda-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
-          <label>Elige tu lado</label>
-          <div class="casino-opciones">
-            <button class="casino-opcion" id="cop-cara" onclick="casinoElegir('moneda','cara')">
-              <span class="co-emoji"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v2M12 16v2M9 8.5c.5-1 1.5-1.5 3-1.5s3 .8 3 2.2c0 1.5-1.5 2-3 2.3C10.5 11.8 9 12.3 9 13.8c0 1.4 1.5 2.2 3 2.2 1.5 0 2.5-.8 3-1.5"/></svg></span>
-              <span>Cara</span>
-            </button>
-            <button class="casino-opcion" id="cop-cruz" onclick="casinoElegir('moneda','cruz')">
-              <span class="co-emoji"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v2M12 16v2M9 8.5c.5-1 1.5-1.5 3-1.5s3 .8 3 2.2c0 1.5-1.5 2-3 2.3C10.5 11.8 9 12.3 9 13.8c0 1.4 1.5 2.2 3 2.2 1.5 0 2.5-.8 3-1.5"/></svg></span>
-              <span>Cruz</span>
-            </button>
-          </div>
-        </div>
+        <a href="">
+            <img src="5.png" alt="">
+        </a>
 
-        <div class="casino-resultado" id="moneda-resultado"></div>
-
-        <button class="btn-casino" id="btn-moneda" onclick="jugarMoneda()" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:middle;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" stroke-opacity="0.5"/><path d="M9.3 14.2c.4 1 1.5 1.6 2.7 1.6 1.7 0 2.8-.8 2.8-1.9 0-1.2-1.2-1.6-2.8-1.9-1.6-.3-2.8-.7-2.8-1.9 0-1.1 1.1-1.9 2.8-1.9 1.2 0 2.3.6 2.7 1.6"/></svg> Lanzar Moneda
-        </button>
-      </div>
-
-
-      <!-- ── AVIÓN ──────────────────────────────────────────────────────────── -->
-      <div class="casino-juego" id="casino-panel-avion">
-        <div style="text-align:center; padding: 10px 0 18px;">
-          <div id="avion-display" style="position:relative; background:linear-gradient(180deg,rgba(6,182,212,0.08) 0%,rgba(0,0,0,0) 100%); border:1px solid rgba(6,182,212,0.2); border-radius:16px; padding:28px 20px 20px; margin-bottom:18px; overflow:hidden;">
-            <div id="avion-pista" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(6,182,212,0.25);border-radius:2px;"></div>
-            <div id="avion-emoji" style="font-size:40px; transition: transform 0.3s; display:inline-block;"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="rgba(6,182,212,0.15)"/></svg></div>
-            <div id="avion-mult-display" style="font-size:42px; font-weight:800; color:#06B6D4; letter-spacing:-1px; margin-top:8px; font-variant-numeric: tabular-nums;">x1.00</div>
-            <div id="avion-estado" style="font-size:12px; color:rgba(255,255,255,0.4); margin-top:4px;">Esperando apuesta...</div>
-          </div>
-          <div class="casino-info-mults" style="margin-bottom:14px;">
-            <div class="cmi-item"><span class="cmi-badge" style="background:rgba(6,182,212,0.15);color:#06B6D4;border-color:rgba(6,182,212,0.3);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> Variable</span> Más alto = más riesgo</div>
-          </div>
-          <div class="form-group" style="margin-bottom:10px;">
-            <label>Monto a apostar (CLP)</label>
-            <input type="number" id="avion-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="avionActualizarInfo()">
-          </div>
-          <div class="form-group" style="margin-bottom:10px;">
-            <label>Retirarme cuando llegue a... <span style="color:#06B6D4;font-weight:700;" id="avion-mult-label">x2.00</span></label>
-            <input type="range" id="avion-mult-slider" min="110" max="1000" value="200" step="5" oninput="avionSliderChange()" style="width:100%;accent-color:#06B6D4;">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;">
-              <span>x1.10</span><span>x5</span><span>x10x</span>
-            </div>
-          </div>
-          <div id="avion-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;margin-bottom:10px;"></div>
-          <div class="casino-resultado" id="avion-resultado"></div>
-          <button class="btn-casino" id="btn-avion" onclick="jugarAvion()" disabled style="background:linear-gradient(135deg,#0891b2,#06B6D4);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> Despegar
-          </button>
-        </div>
-      </div>
-
-      <!-- ── LIMBO ──────────────────────────────────────────────────────────── -->
-      <div class="casino-juego" id="casino-panel-limbo">
-        <div class="limbo-display">
-          <div class="limbo-mult-display" id="limbo-mult-display">x1.00</div>
-          <div class="limbo-sub" id="limbo-estado">Elige tu objetivo y apuesta</div>
-        </div>
-
-        <div class="casino-bet-form">
-          <label>Multiplicador objetivo</label>
-          <div class="limbo-target-row">
-            <input type="number" id="limbo-target" value="2.00" min="1.01" step="0.01" oninput="limboActualizarInfo()">
-            <div class="limbo-chance-pill" id="limbo-chance-pill">49.50%</div>
-          </div>
-          <label>Monto a apostar (CLP)</label>
-          <input type="number" id="limbo-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="limboActualizarInfo()">
-          <div id="limbo-ganancia-info" style="font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
-        </div>
-
-        <div class="casino-resultado" id="limbo-resultado"></div>
-
-        <button class="btn-casino" id="btn-limbo" onclick="jugarLimbo()" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> Jugar Limbo
-        </button>
-      </div>
-
-      <!-- ── PLINKO ─────────────────────────────────────────────────────────── -->
-      <div class="casino-juego" id="casino-panel-plinko">
-        <div class="plinko-wrap">
-          <canvas id="plinko-canvas" class="plinko-canvas" width="340" height="340"></canvas>
-          <div class="plinko-mults-row" id="plinko-mults-row"></div>
-        </div>
-
-        <div class="plinko-config-row">
-          <div>
-            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);font-weight:700;display:block;margin-bottom:6px;">Filas</label>
-            <select class="plinko-select" id="plinko-filas" onchange="plinkoActualizarTabla()">
-              <option value="8">8 filas</option>
-              <option value="12" selected>12 filas</option>
-              <option value="16">16 filas</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);font-weight:700;display:block;margin-bottom:6px;">Riesgo</label>
-            <select class="plinko-select" id="plinko-riesgo" onchange="plinkoActualizarTabla()">
-              <option value="bajo">Bajo</option>
-              <option value="medio" selected>Medio</option>
-              <option value="alto">Alto</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="casino-bet-form">
-          <label>Monto a apostar (CLP)</label>
-          <input type="number" id="plinko-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="plinkoActualizarBoton()">
-        </div>
-
-        <div class="casino-resultado" id="plinko-resultado"></div>
-
-        <button class="btn-casino" id="btn-plinko" onclick="jugarPlinko()" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><path d="M4 21l5-8M20 21l-5-8"/></svg> Soltar bolita
-        </button>
-      </div>
-
-      <!-- ── MINES ──────────────────────────────────────────────────────────── -->
-      <div class="casino-juego" id="casino-panel-mines">
-
-        <div class="mines-topbar" id="mines-topbar" style="display:none;">
-          <div class="mines-topbar-item">
-            <label>Multiplicador actual</label>
-            <div class="mines-mult-val" id="mines-mult-actual">x1.00</div>
-          </div>
-          <div class="mines-topbar-item">
-            <label>Retiro estimado</label>
-            <div class="mines-mult-val mines-cash" id="mines-cashout-val">$0</div>
-          </div>
-        </div>
-
-        <div class="mines-grid" id="mines-grid"></div>
-
-        <div class="casino-bet-form" id="mines-config-form">
-          <label>Monto a apostar (CLP)</label>
-          <input type="number" id="mines-monto" placeholder="Ej: 5000" min="1" max="850000000" oninput="minesActualizarBoton()">
-          <label>Cantidad de minas</label>
-          <div class="mines-select-wrap">
-            <select id="mines-cantidad" onchange="minesActualizarBoton()">
-              <option value="1">1 mina</option>
-              <option value="3" selected>3 minas</option>
-              <option value="5">5 minas</option>
-              <option value="8">8 minas</option>
-              <option value="12">12 minas</option>
-              <option value="16">16 minas</option>
-              <option value="20">20 minas</option>
-              <option value="24">24 minas</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="casino-resultado" id="mines-resultado"></div>
-
-        <button class="btn-casino" id="btn-mines-start" onclick="minesIniciar()" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Iniciar Partida
-        </button>
-        <button class="btn-casino mines-btn-cashout" id="btn-mines-cashout" onclick="minesRetirar()" style="display:none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Retirar <span id="mines-cashout-btn-val"></span>
-        </button>
-      </div>
-
-      <!-- ── RANKING ─────────────────────────────── -->
-      <div class="casino-ranking">
-        <div class="casino-ranking-titulo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 0 0 5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-          Top Ganadores
-        </div>
-        <div id="casino-ranking-lista">
-          <div class="ranking-empty">Cargando ranking...</div>
-        </div>
-      </div>
-
-      <!-- ── HISTORIAL ───────────────────────────── -->
-      <div class="casino-historial">
-        <div class="casino-historial-titulo">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Historial de Apuestas
-        </div>
-        <div id="casino-historial-lista">
-          <div class="ranking-empty">Sin apuestas aún</div>
-        </div>
-      </div>
+        <a href="">
+            <img src="6.png" alt="">
+        </a>
 
     </div>
-  </section>
 
-  <!-- ── Elementos globales compartidos (modales, notificaciones, etc.) ── -->
+    <script src="/js/casino.js?v=1" defer></script>
 
-  <!-- DASHBOARD -->
-
-
-  <!-- REGISTRO CIVIL -->
-
-
-  <!-- BANCO -->
-
-
-  <!-- MODAL: recibo de transferencia exitosa — reemplaza el toast de 3s para
-       que el usuario confirme conscientemente montos grandes antes de seguir -->
-  <div class="admin-modal-overlay" id="modal-recibo-transferencia">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-recibo-transferencia')">✕</button>
-      <div class="tx-receipt" id="tx-receipt-voucher">
-        <div class="tx-receipt-folio">Comprobante N° <span id="recibo-tx-folio">000000</span></div>
-        <div class="tx-receipt-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="tx-receipt-titulo">Transferencia exitosa</div>
-        <div class="tx-receipt-monto" id="recibo-tx-monto">$0</div>
-        <div class="tx-receipt-palabras" id="recibo-tx-palabras">—</div>
-        <div class="tx-receipt-detalle">
-          <div class="tx-receipt-row">
-            <span class="tx-receipt-row-label">Destinatario</span>
-            <span class="tx-receipt-row-val" id="recibo-tx-destino">—</span>
-          </div>
-          <div class="tx-receipt-row">
-            <span class="tx-receipt-row-label">Fecha</span>
-            <span class="tx-receipt-row-val" id="recibo-tx-fecha">—</span>
-          </div>
-          <div class="tx-receipt-row">
-            <span class="tx-receipt-row-label">Tu nuevo saldo</span>
-            <span class="tx-receipt-row-val" id="recibo-tx-saldo">—</span>
-          </div>
-        </div>
-        <div class="tx-receipt-barcode"></div>
-        <div class="tx-receipt-barcode-txt" id="recibo-tx-barcode-txt">CC-000000-000000</div>
-      </div>
-      <div class="tx-receipt-actions">
-        <button class="btn-descargar-voucher" onclick="descargarVoucher()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar comprobante
-        </button>
-        <button class="btn-green" onclick="cerrarModal('modal-recibo-transferencia')" style="flex:1; justify-content:center;">
-          Listo
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Top 10 Más Ricos -->
-  <div class="admin-modal-overlay" id="modal-top-ricos">
-    <div class="admin-modal tr-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-top-ricos')">✕</button>
-      <h3 class="tr-titulo">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/></svg>
-        Top 10 Más Ricos
-      </h3>
-      <div class="tr-lista" id="tr-lista">
-        <div class="skeleton-wrap">
-          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
-          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
-          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
-          <div class="skeleton-line" style="height:44px;border-radius:12px;"></div>
-        </div>
-      </div>
-      <div class="tr-mi-posicion" id="tr-mi-posicion" style="display:none;"></div>
-    </div>
-  </div>
-
-  <!-- ADMIN BANCO -->
-
-
-  <!-- MODAL: rechazar préstamo -->
-  <div class="admin-modal-overlay" id="modal-prestamo-rechazar">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-prestamo-rechazar')">✕</button>
-      <h3>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        Rechazar Préstamo
-      </h3>
-      <p id="modal-prestamo-rechazar-label" style="color:rgba(255,255,255,.5); font-size:13px;"></p>
-      <div class="form-group">
-        <label>Motivo (opcional)</label>
-        <input type="text" id="modal-prestamo-rechazar-motivo" placeholder="Ej: Ya tiene deudas pendientes" maxlength="200">
-      </div>
-      <div class="rc-error" id="modal-prestamo-rechazar-error"></div>
-      <div class="modal-actions">
-        <button class="btn-crear" onclick="adminConfirmarRechazoPrestamo()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-          Rechazar
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-prestamo-rechazar')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: ajustar saldo -->
-  <div class="admin-modal-overlay" id="modal-saldo">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-saldo')">✕</button>
-      <h3>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Ajustar Saldo
-      </h3>
-      <p id="modal-saldo-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
-      <div class="form-group">
-        <label>Monto (puede ser negativo para restar)</label>
-        <input type="number" id="modal-saldo-monto" placeholder="Ej: 50000 o -10000">
-      </div>
-      <div class="form-group">
-        <label>Descripción (opcional)</label>
-        <input type="text" id="modal-saldo-desc" placeholder="Ej: Premio evento, Multa...">
-      </div>
-      <div class="rc-error" id="modal-saldo-error"></div>
-      <div class="modal-actions">
-        <button class="btn-green" onclick="adminConfirmarSaldo()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Confirmar
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-saldo')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: resetear cuenta -->
-  <div class="admin-modal-overlay" id="modal-reset">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-reset')">✕</button>
-      <h3>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-        Resetear Cuenta
-      </h3>
-      <p id="modal-reset-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
-      <p style="color:#fdba74; font-size:13px; background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.25); border-radius:10px; padding:12px 14px;">
-        Esto va a dejar el saldo de esta cuenta en $1.000.000 (el monto inicial). No se puede deshacer. Úsalo solo si el saldo quedó corrupto o roto.
-      </p>
-      <div class="rc-error" id="modal-reset-error"></div>
-      <div class="modal-actions">
-        <button class="btn-crear" onclick="adminConfirmarReset()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          Sí, resetear
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-reset')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TIENDA -->
-
-
-  <!-- INVENTARIO -->
-
-
-  <!-- MERCADO -->
-
-
-  <!-- MODAL: Vender ítem en el Mercado -->
-  <div class="admin-modal-overlay" id="modal-mercado-publicar">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-mercado-publicar')">✕</button>
-      <h3 style="color:#fdba74;">Vender un Ítem</h3>
-
-      <div class="form-group">
-        <label>Elige un ítem de tu inventario</label>
-        <div id="mercado-pub-items-loading" style="color:rgba(255,255,255,0.4);font-size:13px;">Cargando tu inventario...</div>
-        <div id="mercado-pub-items-lista" class="mercado-pub-items-lista" style="display:none;"></div>
-        <div id="mercado-pub-items-empty" class="tienda-empty" style="display:none;padding:20px 0;">No tienes ítems disponibles para vender.</div>
-      </div>
-
-      <div id="mercado-pub-form" style="display:none;flex-direction:column;gap:18px;">
-        <p style="color:rgba(255,255,255,0.5);font-size:13px;">Vendiendo: <b id="mercado-pub-nombre" style="color:#fff;"></b></p>
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea id="mercado-pub-descripcion" maxlength="300" rows="3" placeholder="Describe el estado, detalles o condiciones de la venta..." style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:Inter,sans-serif;resize:vertical;width:100%;outline:0;"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Precio ($)</label>
-          <input type="number" id="mercado-pub-precio" placeholder="Ej: 250000" min="1">
-        </div>
-      </div>
-
-      <div class="rc-error" id="mercado-pub-error"></div>
-      <div class="modal-actions">
-        <button class="btn-green" id="mercado-pub-btn" onclick="mercadoConfirmarPublicar()" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Publicar
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-mercado-publicar')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONCESIONARIO -->
-
-
-  <!-- TUS AUTOS -->
-
-
-  <!-- ADMIN TIENDA -->
-
-
-  <!-- MODAL: Editar Producto -->
-  <div class="admin-modal-overlay" id="modal-editar-prod">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-editar-prod')">✕</button>
-      <h3>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Editar Producto
-      </h3>
-      <input type="hidden" id="ep-id">
-      <div class="form-group">
-        <label>Nombre</label>
-        <input type="text" id="ep-nombre">
-      </div>
-      <div class="form-group">
-        <label>Precio ($)</label>
-        <input type="number" id="ep-precio" min="1">
-      </div>
-      <div class="form-group">
-        <label>Categoría</label>
-        <select class="cat-select" id="ep-categoria">
-          <option value="vehiculos">Vehículos</option>
-          <option value="armas">Armas</option>
-          <option value="licencias">Licencias</option>
-          <option value="otros">Otros</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>URL de imagen</label>
-        <input type="text" id="ep-imagen">
-      </div>
-      <div class="rc-error" id="ep-error"></div>
-      <div class="modal-actions">
-        <button class="btn-green" onclick="adminGuardarEdicion()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Guardar cambios
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-editar-prod')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Registrar Vehículo -->
-  <div class="admin-modal-overlay" id="modal-veh-registrar">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-veh-registrar')">✕</button>
-      <h3>🚗 Registrar Vehículo</h3>
-      <p style="color:rgba(255,255,255,0.5); font-size:13px;">Modelo: <b id="veh-reg-modelo" style="color:#fff;"></b></p>
-      <div class="form-group">
-        <label>Patente (formato ABC-123)</label>
-        <input type="text" id="veh-reg-patente" placeholder="ABC-123" maxlength="7" oninput="vehFormatearPatenteInput(this)">
-      </div>
-      <div class="form-group">
-        <label>Color del vehículo</label>
-        <input type="text" id="veh-reg-color" placeholder="Ej: Rojo">
-      </div>
-      <div class="rc-error" id="veh-reg-error"></div>
-      <div class="modal-actions">
-        <button class="btn-green" id="veh-reg-btn" onclick="vehConfirmarRegistro()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Confirmar Registro
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-veh-registrar')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Transferir Vehículo -->
-  <div class="admin-modal-overlay" id="modal-veh-transferir">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-veh-transferir')">✕</button>
-      <h3>🔄 Transferir Vehículo</h3>
-      <p style="color:rgba(255,255,255,0.5); font-size:13px;">Vehículo: <b id="veh-tr-vehiculo" style="color:#fff;"></b></p>
-      <div class="form-group">
-        <label>Buscar nuevo propietario</label>
-        <input type="text" id="veh-tr-buscar" placeholder="ID Discord, RUT, DNI, nombre de Discord o de personaje" oninput="vehTrBuscarInput()">
-        <div id="veh-tr-resultados" style="margin-top:8px;display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;max-height:220px;overflow-y:auto;"></div>
-      </div>
-      <p id="veh-tr-seleccionado" style="display:none;color:#4ade80;font-size:13px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:10px 14px;"></p>
-      <div class="rc-error" id="veh-tr-error"></div>
-      <div class="modal-actions">
-        <button class="btn-green" id="veh-tr-btn" onclick="vehConfirmarTransferencia()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Confirmar Transferencia
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-veh-transferir')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast container -->
-  <div class="toast-container" id="toast-container"></div>
-
-  <!-- ══════════════════ CASINO ══════════════════ -->
-
-
-  <!-- ══════════════════ APUESTAS DEPORTIVAS ══════════════════ -->
-
-
-  <!-- Modal apuesta -->
-  <div class="ap-modal-overlay" id="ap-modal-overlay" onclick="cerrarModalApuesta(event)">
-    <div class="ap-modal" id="ap-modal">
-      <div class="ap-modal-title" id="ap-modal-title">Apuesta Simple</div>
-      <div class="ap-modal-sub" id="ap-modal-sub">Equipo A vs Equipo B</div>
-
-      <label>¿Quién gana?</label>
-      <div class="ap-eleccion-grid" id="ap-eleccion-grid">
-        <button class="ap-eleccion-btn" id="ap-btn-A" onclick="apElegir('A')">
-          <div id="ap-label-A" style="font-weight:800;">Equipo A</div>
-          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-A">x2.0</div>
-        </button>
-        <button class="ap-eleccion-btn" id="ap-btn-empate" onclick="apElegir('empate')">
-          <div style="font-weight:800;">Empate</div>
-          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-empate">x3.0</div>
-        </button>
-        <button class="ap-eleccion-btn" id="ap-btn-B" onclick="apElegir('B')">
-          <div id="ap-label-B" style="font-weight:800;">Equipo B</div>
-          <div style="font-size:10px;opacity:0.6;margin-top:2px;" id="ap-mult-B">x2.0</div>
-        </button>
-      </div>
-
-      <!-- Marcador predicho (solo combinada) -->
-      <div id="ap-marcador-section" style="display:none;">
-        <label>Predice el marcador exacto (opcional — doble premio)</label>
-        <div class="ap-marcador-row">
-          <input type="number" id="ap-marc-a" min="0" max="99" placeholder="0" oninput="apActualizarPremio()">
-          <div class="ap-marcador-sep">–</div>
-          <input type="number" id="ap-marc-b" min="0" max="99" placeholder="0" oninput="apActualizarPremio()">
-        </div>
-      </div>
-
-      <label style="margin-top:4px;">Monto a apostar (CLP)</label>
-      <input type="number" id="ap-monto-input" min="1" placeholder="Ej: 10000" oninput="apActualizarPremio()" style="margin-bottom:14px;">
-
-      <div class="ap-premio-preview" id="ap-premio-preview">
-        Elige un resultado e ingresa el monto para ver el premio estimado.
-      </div>
-
-      <div class="ap-modal-btns">
-        <button class="btn-ap-cancel" onclick="cerrarModalApuesta()">Cancelar</button>
-        <button class="btn-ap-confirm" id="ap-btn-confirm" onclick="confirmarApuesta()" disabled>
-          Confirmar apuesta
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════ ADMIN CASINO ══════════════════ -->
-
-
-  <!-- Modal editar partido (admin) -->
-  <div class="adm-edit-modal-overlay" id="adm-edit-overlay" onclick="admCerrarEditModal(event)">
-    <div class="adm-edit-modal">
-      <div class="ap-modal-title">✏️ Editar Partido</div>
-      <div class="ap-modal-sub" style="margin-bottom:20px;" id="adm-edit-sub"></div>
-      <input type="hidden" id="adm-edit-id">
-      <div class="adm-form">
-        <div class="adm-form-row">
-          <input class="adm-input" id="adm-edit-eq-a" placeholder="Equipo A">
-          <input class="adm-input" id="adm-edit-eq-b" placeholder="Equipo B">
-        </div>
-        <div class="adm-form-row">
-          <input class="adm-input" id="adm-edit-logo-a" placeholder="URL Logo A">
-          <input class="adm-input" id="adm-edit-logo-b" placeholder="URL Logo B">
-        </div>
-        <div class="adm-form-row">
-          <div>
-            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. A</label>
-            <input class="adm-input" id="adm-edit-mult-a" type="number" step="0.1" min="1">
-          </div>
-          <div>
-            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. Empate</label>
-            <input class="adm-input" id="adm-edit-mult-e" type="number" step="0.1" min="1">
-          </div>
-          <div>
-            <label style="font-size:10px;color:rgba(255,255,255,0.35);display:block;margin-bottom:4px;">Mult. B</label>
-            <input class="adm-input" id="adm-edit-mult-b" type="number" step="0.1" min="1">
-          </div>
-        </div>
-        <div class="ap-modal-btns">
-          <button class="btn-ap-cancel" onclick="admCerrarEditModal()">Cancelar</button>
-          <button class="btn-ap-confirm" onclick="admGuardarEdicion()">Guardar cambios</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ERROR 403 -->
-
-
-  <!-- ERROR 404 -->
-
-
-  <!-- PERFIL PÚBLICO -->
-
-
-  <!-- EMPRESAS (público) -->
-
-
-  <!-- LOGROS -->
-
-
-
-
-
-  <!-- MODAL: Editar Empresa -->
-  <div class="admin-modal-overlay" id="modal-editar-empresa">
-    <div class="admin-modal" style="position:relative;">
-      <button class="admin-modal-close" onclick="cerrarModal('modal-editar-empresa')">✕</button>
-      <h3>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Editar Empresa
-      </h3>
-      <input type="hidden" id="ee-id">
-      <div class="form-group">
-        <label>Nombre</label>
-        <input type="text" id="ee-nombre">
-      </div>
-      <div class="form-group">
-        <label>URL del logo</label>
-        <input type="text" id="ee-logo">
-      </div>
-      <div class="form-group">
-        <label>Descripción</label>
-        <textarea id="ee-descripcion" rows="3" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:'Inter',sans-serif;resize:vertical;"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Link de Discord</label>
-        <input type="text" id="ee-discord">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Nombre de Discord del dueño</label>
-          <input type="text" id="ee-dueno-nombre">
-        </div>
-        <div class="form-group">
-          <label>URL foto de perfil del dueño</label>
-          <input type="text" id="ee-dueno-avatar">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Discord ID del dueño</label>
-        <input type="text" id="ee-dueno-id" placeholder="Ej: 123456789012345678">
-      </div>
-      <div class="rc-error" id="ee-error"></div>
-      <div class="modal-actions">
-        <button class="btn-green" onclick="adminGuardarEdicionEmpresa()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Guardar cambios
-        </button>
-        <button class="sec-back" onclick="cerrarModal('modal-editar-empresa')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PANEL ADMIN — hub central del staff. Verifica acceso al entrar
-       (GET /api/admin?action=verificar) y a partir de ahí da acceso a
-       Admin Banco/Tienda/Empresas/Casino. La gestión de administradores
-       (agregar/quitar por Discord ID) sigue siendo exclusiva del super
-       admin; el resto de las herramientas están disponibles para
-       cualquier admin autorizado. -->
-
-
-
-  <!-- PANEL STAFF — apartado "Staff" del dashboard. Rol independiente de
-       "admins": solo da acceso a este panel, nunca al Panel Admin. Se
-       autoriza por Discord ID desde la sección "Gestión de Staff" dentro
-       del Panel Admin. Verifica acceso al entrar
-       (GET /api/admin?action=verificarStaff). -->
-
-
-
-  <!-- ══════════════════════════════════════════════════════════
-       COMISARÍA VIRTUAL
-       ═══════════════════════════════════════════════════════ -->
-
-
-  <!-- ══ GESTIÓN DE POLICÍAS (dentro del Panel Admin) ═════════════
-       Se añade como tab adicional al panel-admin-screen
-       ═══════════════════════════════════════════════════════════ -->
-
-  <!-- ══════════════════════════════════════════════════════════
-       NOTIFICACIONES (campanita) — vive fuera de los .screen para
-       quedar visible sobre cualquier sección mientras hay sesión.
-       ═══════════════════════════════════════════════════════════ -->
-  <div id="notif-bell-wrap">
-    <button class="notif-bell-btn" id="notif-bell-btn" aria-label="Notificaciones">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
-    </button>
-    <div class="notif-panel">
-      <div class="notif-panel-header">
-        <span class="notif-panel-title">Notificaciones</span>
-        <div class="notif-panel-acciones">
-          <button class="notif-panel-marcar" id="notif-marcar-leidas">Marcar leídas</button>
-          <button class="notif-panel-limpiar" id="notif-limpiar-bandeja" title="Vaciar bandeja">Limpiar</button>
-        </div>
-      </div>
-      <div class="notif-list" id="notif-list">
-        <div class="notif-empty">Cargando…</div>
-      </div>
-    </div>
-  </div>
-
-
-  <script defer src="/js/app.js?v=55"></script>
-  <script defer src="/js/dashboard-fx.js?v=55"></script>
-  <script defer src="/js/notificaciones.js?v=55"></script>
-  <script defer src="/js/pull-to-refresh.js?v=55"></script>
-  <script defer src="/js/registro-civil.js?v=55"></script>
-  <script defer src="/js/banco.js?v=55"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=55"></script>
-  <script defer src="/js/mercado.js?v=55"></script>
-  <script defer src="/js/vehiculos.js?v=55"></script>
-  <script defer src="/js/concesionario.js?v=55"></script>
-  <script defer src="/js/mis-autos.js?v=55"></script>
-  <script defer src="/js/admin-tienda.js?v=55"></script>
-  <script defer src="/js/empresas.js?v=55"></script>
-  <script defer src="/js/logros.js?v=55"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=55"></script>
-  <script defer src="/js/panel-admin.js?v=55"></script>
-  <script defer src="/js/comisaria.js?v=55"></script>
-  <script defer src="/js/casino.js?v=55"></script>
-  <script defer src="/js/parallax-landing.js?v=55"></script>
-  <script defer src="/js/bg-particles.js?v=55"></script>
 </body>
 </html>
+
+<style>
+
+body,html {
+    background-color: #495d70;
+    margin: 0;
+}
+    
+    .logo-c {
+        max-width: 200px;
+        display: block;
+        margin: 0 auto;
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+
+    .sueldo {
+        background-color: #00ff00ad;
+        max-width: 320px;
+        margin: 0 auto;
+        padding: 1px;
+        border-radius: 10px;
+    }
+
+    .sueldo h1 {
+        text-align: center;
+        color: white;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-weight:600;
+        font-size: 20px;
+    }
+
+    .sueldo p {
+        text-align: center;
+        color: rgb(255, 255, 255);
+        font-family: arial, Helvetica, sans-serif;
+        font-weight:100;
+        font-size: 20px;
+    }
+
+    .juegos-c {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 300px;
+    margin: 50px auto;
+}
+
+.juegos-c a {
+    display: flex;
+    justify-content: center;
+}
+
+.juegos-c img {
+    width: 120px;
+    border-radius: 12px;
+    transition: transform .2s;
+}
+
+.juegos-c img:hover {
+    transform: scale(1.05);
+}
+
+.btn-volver-dash {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgb(37, 37, 37);
+  border-radius: 30px;
+  box-sizing: border-box;
+}
+
+</style>
