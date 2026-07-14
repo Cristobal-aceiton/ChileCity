@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
+import crypto from "crypto";
 import { requireSession } from "../lib/auth.js";
-import { SUPER_ADMIN_ID, BASE_URL, RATE_TRANSFER_SEG } from "../lib/constants.js";
+import { SUPER_ADMIN_ID, BASE_URL, RATE_TRANSFER_SEG, RATE_CASINO_SEG, CASINO_MIN_APUESTA, CASINO_MAX_APUESTA } from "../lib/constants.js";
 import { checkRateLimit } from "../lib/rateLimit.js";
 import { ensureLogrosSchema, otorgarLogro, checkLogrosSaldo, listarLogrosUsuario } from "../lib/logros.js";
 import { ensureStaffLogsSchema, registrarStaffLog } from "../lib/staffLogs.js";
@@ -16,6 +17,65 @@ const PRESTAMO_INTERVALO_DIAS = 2; // cada cuántos días se cobra automáticame
 function generarNumeroCuenta() {
   const seg = () => Math.floor(Math.random() * 9000 + 1000).toString();
   return `${seg()}-${seg()}-${seg()}-${seg()}`;
+}
+
+// ── Ruleta (americana, 38 casilleros: 0, 00, 1-36) ───────────────────────────
+const RULETA_ROJOS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+
+function ruletaColor(numero) {
+  if (numero === "0" || numero === "00") return "verde";
+  return RULETA_ROJOS.has(Number(numero)) ? "rojo" : "negro";
+}
+
+// Gira la ruleta de forma criptográficamente aleatoria e imparcial (0-37,
+// donde el índice 37 representa el "00"). Se hace en el servidor para que
+// nadie pueda predecir o manipular el resultado desde el navegador.
+function ruletaGirar() {
+  const idx = crypto.randomInt(38); // 0..37
+  return idx === 37 ? "00" : String(idx);
+}
+
+// Calcula si una apuesta gana y su multiplicador (cuánto se devuelve por
+// cada peso apostado, incluyendo la apuesta original). Devuelve 0 si pierde.
+function ruletaMultiplicador(tipo, valor, numeroGanador) {
+  const n = numeroGanador;
+  const esVerde = n === "0" || n === "00";
+  switch (tipo) {
+    case "numero":
+      return String(valor) === n ? 36 : 0;
+    case "color":
+      if (esVerde) return 0;
+      return ruletaColor(n) === valor ? 2 : 0;
+    case "paridad":
+      if (esVerde) return 0;
+      const num = Number(n);
+      const esPar = num !== 0 && num % 2 === 0;
+      return (valor === "par") === esPar ? 2 : 0;
+    case "mitad":
+      if (esVerde) return 0;
+      const nn = Number(n);
+      if (valor === "1-18") return nn >= 1 && nn <= 18 ? 2 : 0;
+      if (valor === "19-36") return nn >= 19 && nn <= 36 ? 2 : 0;
+      return 0;
+    case "docena":
+      if (esVerde) return 0;
+      const d = Number(n);
+      if (valor === "1") return d >= 1 && d <= 12 ? 3 : 0;
+      if (valor === "2") return d >= 13 && d <= 24 ? 3 : 0;
+      if (valor === "3") return d >= 25 && d <= 36 ? 3 : 0;
+      return 0;
+    default:
+      return 0;
+  }
+}
+
+function ruletaValorValido(tipo, valor) {
+  if (tipo === "numero") return valor === "00" || (/^\d+$/.test(String(valor)) && Number(valor) >= 0 && Number(valor) <= 36);
+  if (tipo === "color") return valor === "rojo" || valor === "negro";
+  if (tipo === "paridad") return valor === "par" || valor === "impar";
+  if (tipo === "mitad") return valor === "1-18" || valor === "19-36";
+  if (tipo === "docena") return valor === "1" || valor === "2" || valor === "3";
+  return false;
 }
 
 function toNumber(value) {
@@ -946,6 +1006,73 @@ export default async function handler(req, res) {
         DELETE FROM contactos_banco WHERE id = ${id} AND discord_id = ${discord_id}
       `;
       return res.status(200).json({ ok: true });
+    }
+
+    // ── POST: jugar una tirada de Ruleta ──────────────────────────────────────
+    if (req.method === "POST" && action === "ruleta_jugar") {
+      const { tipo, valor, monto } = req.body;
+      if (!tipo || valor === undefined || valor === null)
+        return res.status(400).json({ error: "Falta el tipo o valor de la apuesta" });
+      if (!ruletaValorValido(tipo, valor))
+        return res.status(400).json({ error: "Apuesta inválida" });
+
+      const rl = await checkRateLimit(sql, discord_id, "casino", RATE_CASINO_SEG);
+      if (rl) return res.status(429).json({ error: rl });
+
+      const montoNum = parseMonto(monto);
+      if (montoNum === null || montoNum <= 0)
+        return res.status(400).json({ error: "Monto inválido" });
+      if (montoNum < CASINO_MIN_APUESTA)
+        return res.status(400).json({ error: `La apuesta mínima es $${CASINO_MIN_APUESTA.toLocaleString("es-CL")}.` });
+      if (montoNum > CASINO_MAX_APUESTA)
+        return res.status(400).json({ error: `La apuesta máxima es $${CASINO_MAX_APUESTA.toLocaleString("es-CL")}.` });
+
+      const cuenta = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
+      if (cuenta.length === 0)
+        return res.status(404).json({ error: "No tienes cuenta bancaria" });
+
+      const saldoActual = toNumber(cuenta[0].saldo);
+      if (saldoActual < montoNum)
+        return res.status(400).json({ error: "Saldo insuficiente" });
+
+      // Resultado del giro: se calcula en el servidor, el cliente solo lo anima.
+      const numeroGanador = ruletaGirar();
+      const color = ruletaColor(numeroGanador);
+      const mult = ruletaMultiplicador(tipo, valor, numeroGanador);
+      const gano = mult > 0;
+      const pago = gano ? montoNum * mult : 0;
+      const nuevoSaldo = saldoActual - montoNum + pago;
+
+      await sql`UPDATE banco SET saldo = ${nuevoSaldo} WHERE discord_id = ${discord_id}`;
+
+      const desc = `Ruleta: apuesta ${tipo}=${valor} por $${montoNum.toLocaleString("es-CL")} → salió ${numeroGanador} (${color})`;
+      await sql`
+        INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+        VALUES (${discord_id}, 'casino', ${gano ? pago - montoNum : -montoNum}, ${desc}, ${nuevoSaldo})
+      `;
+
+      if (gano) await otorgarLogro(sql, discord_id, "suertudo");
+      await checkLogrosSaldo(sql, discord_id, nuevoSaldo);
+
+      return res.status(200).json({
+        ok: true,
+        numeroGanador,
+        color,
+        gano,
+        pago,
+        nuevoSaldo,
+      });
+    }
+
+    // ── GET: historial reciente de tiradas de Ruleta ──────────────────────────
+    if (req.method === "GET" && action === "ruleta_historial") {
+      const rows = await sql`
+        SELECT monto, descripcion, saldo_after, created_at FROM transacciones
+        WHERE discord_id = ${discord_id} AND tipo = 'casino'
+        ORDER BY created_at DESC
+        LIMIT 15
+      `;
+      return res.status(200).json({ historial: rows });
     }
 
     return res.status(405).json({ error: "Método no permitido" });
