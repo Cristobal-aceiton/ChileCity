@@ -50,6 +50,32 @@ async function ensureSchema(sql) {
 
 function toNumber(v) { return v == null ? 0 : Number(v); }
 
+// ── Control de acceso: esta base de datos es exclusiva para personal ────────
+// policial (Policía Virtual) y staff/admin. Un civil solo debe ver un
+// mensaje indicando que el acceso está restringido, nunca los datos.
+async function esPoliciaVirtual(sql, discord_id) {
+  const rows = await sql`SELECT id FROM policia_virtual WHERE discord_id = ${discord_id}`;
+  return rows.length > 0;
+}
+async function esAdmin(sql, discord_id) {
+  const rows = await sql`SELECT id FROM admins WHERE discord_id = ${discord_id}`;
+  return rows.length > 0;
+}
+async function esStaff(sql, discord_id) {
+  try {
+    const rows = await sql`SELECT id FROM staff WHERE discord_id = ${discord_id}`;
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+async function tieneAccesoPolicial(sql, discord_id) {
+  if (await esPoliciaVirtual(sql, discord_id)) return true;
+  if (await esAdmin(sql, discord_id)) return true;
+  if (await esStaff(sql, discord_id)) return true;
+  return false;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", BASE_URL);
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -62,6 +88,27 @@ export default async function handler(req, res) {
 
   try {
     const sql = neon(process.env.DATABASE_URL);
+
+    // Tabla policia_virtual puede no existir aún si comisaria.js nunca corrió
+    // antes que este endpoint; se declara acá también por seguridad.
+    await sql`
+      CREATE TABLE IF NOT EXISTS policia_virtual (
+        id          SERIAL PRIMARY KEY,
+        discord_id  TEXT UNIQUE NOT NULL,
+        nombre      TEXT,
+        autorizado_por_id   TEXT NOT NULL,
+        autorizado_por_nombre TEXT,
+        created_at  TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+
+    if (!(await tieneAccesoPolicial(sql, session.id))) {
+      return res.status(403).json({
+        denied: true,
+        error: "Esta base de datos es de uso exclusivo para personal policial.",
+      });
+    }
+
     await ensureSchema(sql);
 
     const { q } = req.query;
