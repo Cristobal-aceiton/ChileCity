@@ -803,16 +803,19 @@ export default async function handler(req, res) {
         SELECT discord_id, saldo FROM banco ORDER BY saldo DESC LIMIT 10
       `;
 
-      // Nombres de Discord vía la tabla dni (si no existe o falla, se sigue
-      // sin nombres: el front cae a "Ciudadano" + discord_id truncado).
+      // Nombres y avatares de Discord vía la tabla dni (si no existe o falla,
+      // se sigue sin ellos: el front cae a "Ciudadano" + discord_id truncado
+      // y a un ícono placeholder).
       let nombresPorId = {};
+      let avataresPorId = {};
       try {
         const ids = top.map(r => r.discord_id);
         if (ids.length > 0) {
           const dnis = await sql`
-            SELECT discord_id, discord_username FROM dni WHERE discord_id = ANY(${ids})
+            SELECT discord_id, discord_username, discord_avatar FROM dni WHERE discord_id = ANY(${ids})
           `;
-          nombresPorId = Object.fromEntries(dnis.map(d => [d.discord_id, d.discord_username]));
+          nombresPorId  = Object.fromEntries(dnis.map(d => [d.discord_id, d.discord_username]));
+          avataresPorId = Object.fromEntries(dnis.map(d => [d.discord_id, d.discord_avatar]));
         }
       } catch {}
 
@@ -820,6 +823,7 @@ export default async function handler(req, res) {
         posicion: i + 1,
         discord_id: r.discord_id,
         discord_username: nombresPorId[r.discord_id] || null,
+        discord_avatar: avataresPorId[r.discord_id] || null,
         saldo: toNumber(r.saldo),
       }));
 

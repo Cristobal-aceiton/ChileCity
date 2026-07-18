@@ -54,6 +54,10 @@ async function initTable(sql) {
   // Biografía corta del ciudadano, editable desde la card de perfil del
   // dashboard. Nullable: no todos la habrán llenado.
   await sql`ALTER TABLE dni ADD COLUMN IF NOT EXISTS bio TEXT`;
+  // URL del avatar de Discord (la arma callback.js al hacer login). Se guarda
+  // igual que discord_username para poder mostrarla en rankings públicos
+  // (ej. Top Ricos) sin depender de que el otro usuario esté conectado.
+  await sql`ALTER TABLE dni ADD COLUMN IF NOT EXISTS discord_avatar TEXT`;
   schemaReady = true;
 }
 
@@ -91,6 +95,14 @@ export default async function handler(req, res) {
         rows[0].discord_username = session.username;
       }
 
+      // Igual, pero para el avatar de Discord (cambia si el usuario se
+      // cambia la foto de perfil). Así el Top Ricos siempre puede mostrar
+      // la foto más reciente sin que el otro usuario tenga que estar online.
+      if (session.avatar && rows[0].discord_avatar !== session.avatar) {
+        await sql`UPDATE dni SET discord_avatar = ${session.avatar} WHERE discord_id = ${discord_id}`;
+        rows[0].discord_avatar = session.avatar;
+      }
+
       return res.status(200).json({ existe: true, dni: rows[0] });
     }
 
@@ -124,8 +136,8 @@ export default async function handler(req, res) {
       const a2 = apellido2.trim().toUpperCase();
 
       const rows = await sql`
-        INSERT INTO dni (discord_id, rut, nombre1, nombre2, apellido1, apellido2, fecha_nac, discord_username)
-        VALUES (${discord_id}, ${rut}, ${n1}, ${n2}, ${a1}, ${a2}, ${fecha_nac}, ${session.username || null})
+        INSERT INTO dni (discord_id, rut, nombre1, nombre2, apellido1, apellido2, fecha_nac, discord_username, discord_avatar)
+        VALUES (${discord_id}, ${rut}, ${n1}, ${n2}, ${a1}, ${a2}, ${fecha_nac}, ${session.username || null}, ${session.avatar || null})
         RETURNING *
       `;
 
