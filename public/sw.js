@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v76"; // <--- ⚠️ ACTUALIZADO A v76 (avatares Discord en Top Ricos, corona #1, saludo dinámico, overlay mantenimiento casino)
+const CACHE_VERSION = "v77"; // <--- ⚠️ ACTUALIZADO A v77 (sección features landing, stat jugadores en vivo, parallax mobile, bio cristouballlll)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

@@ -19,9 +19,9 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=76">
-  <link rel="stylesheet" href="/page-loader.css?v=76">
-  <link rel="stylesheet" href="/clean-theme.css?v=76">
+  <link rel="stylesheet" href="/styles.css?v=77">
+  <link rel="stylesheet" href="/page-loader.css?v=77">
+  <link rel="stylesheet" href="/clean-theme.css?v=77">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -104,6 +104,10 @@
         Vive tu historia en una ciudad viva, con economía real, facciones,
         trabajos y una comunidad activa que nunca duerme. Tu personaje. Tu reglas.
       </p>
+      <div class="landing-live-stat" id="landing-live-stat">
+        <span class="landing-live-dot"></span>
+        <span id="landing-live-stat-text">Conectando con el servidor…</span>
+      </div>
       <div class="btn-group">
         <a href="/auth/login" class="btn-discord" id="login-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
@@ -121,6 +125,65 @@
       </div>
     </div>
 
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features-section">
+      <div class="features-header">
+        <span class="features-eyebrow">Qué encontrarás</span>
+        <div class="features-titulo">Todo lo que necesitas para vivir tu historia</div>
+        <div class="directiva-divider"></div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" style="--f-color:#34d399; --f-glow:rgba(52,211,153,.15)">
+          <div class="feature-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/><path d="M5 15h2M9 15h6"/></svg>
+          </div>
+          <div class="feature-title">Economía Real</div>
+          <p class="feature-desc">Banco, sueldos, préstamos y transferencias entre ciudadanos, todo desde tu panel.</p>
+        </div>
+
+        <div class="feature-card" style="--f-color:#22d3ee; --f-glow:rgba(34,211,238,.15)">
+          <div class="feature-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 3 7v6c0 5 4 9 9 9s9-4 9-9V7l-9-5Z"/></svg>
+          </div>
+          <div class="feature-title">Facciones y Ley</div>
+          <p class="feature-desc">Carabineros, base de datos policial y un sistema de roleplay serio y organizado.</p>
+        </div>
+
+        <div class="feature-card" style="--f-color:#F59E0B; --f-glow:rgba(245,158,11,.15)">
+          <div class="feature-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          </div>
+          <div class="feature-title">Casino y Apuestas</div>
+          <p class="feature-desc">Ruleta, moneda, avión y apuestas deportivas con tu plata del servidor.</p>
+        </div>
+
+        <div class="feature-card" style="--f-color:#a855f7; --f-glow:rgba(168,85,247,.15)">
+          <div class="feature-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg>
+          </div>
+          <div class="feature-title">Empresas Propias</div>
+          <p class="feature-desc">Crea tu negocio, gestiona tu equipo y hazlo crecer dentro de la ciudad.</p>
+        </div>
+
+        <div class="feature-card" style="--f-color:#6366f1; --f-glow:rgba(99,102,241,.15)">
+          <div class="feature-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M6 17v-5l2-5h8l2 5v5"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg>
+          </div>
+          <div class="feature-title">Concesionario</div>
+          <p class="feature-desc">Compra, personaliza y administra tus vehículos desde tu garage.</p>
+        </div>
+
+        <div class="feature-card" style="--f-color:#fbbf24; --f-glow:rgba(251,191,36,.15)">
+          <div class="feature-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>
+          </div>
+          <div class="feature-title">Logros y Progreso</div>
+          <p class="feature-desc">Desbloquea medallas e hitos a medida que construyes tu historia en la ciudad.</p>
+        </div>
+      </div>
     </div>
 
     <!-- DIRECTIVA -->
@@ -186,7 +249,7 @@
           </div>
           <span class="dc-badge cofundador">Co-Fundador</span>
           <div class="dc-name">cristouballlll</div>
-          <p class="dc-desc">Responsable del portal web y los bots de Discord. Lleva la tecnología del servidor para que todo funcione sin interrupciones.</p>
+          <p class="dc-desc">Cristóbal está detrás de la web y los bots de Discord. Se encarga de que el servidor esté siempre organizado y funcionando.</p>
         </div>
 
       </div>
@@ -719,25 +782,25 @@
   </div>
 
 
-  <script defer src="/js/app.js?v=76"></script>
-  <script defer src="/js/dashboard-fx.js?v=76"></script>
-  <script defer src="/js/notificaciones.js?v=76"></script>
-  <script defer src="/js/pull-to-refresh.js?v=76"></script>
-  <script defer src="/js/registro-civil.js?v=76"></script>
-  <script defer src="/js/banco.js?v=76"></script>
+  <script defer src="/js/app.js?v=77"></script>
+  <script defer src="/js/dashboard-fx.js?v=77"></script>
+  <script defer src="/js/notificaciones.js?v=77"></script>
+  <script defer src="/js/pull-to-refresh.js?v=77"></script>
+  <script defer src="/js/registro-civil.js?v=77"></script>
+  <script defer src="/js/banco.js?v=77"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=76"></script>
-  <script defer src="/js/mercado.js?v=76"></script>
-  <script defer src="/js/vehiculos.js?v=76"></script>
-  <script defer src="/js/concesionario.js?v=76"></script>
-  <script defer src="/js/mis-autos.js?v=76"></script>
-  <script defer src="/js/admin-tienda.js?v=76"></script>
-  <script defer src="/js/empresas.js?v=76"></script>
-  <script defer src="/js/logros.js?v=76"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=76"></script>
-  <script defer src="/js/panel-admin.js?v=76"></script>
-  <script defer src="/js/comisaria.js?v=76"></script>
-  <script defer src="/js/apuestas.js?v=76"></script>
-  <script defer src="/js/parallax-landing.js?v=76"></script>
+  <script defer src="/js/tienda.js?v=77"></script>
+  <script defer src="/js/mercado.js?v=77"></script>
+  <script defer src="/js/vehiculos.js?v=77"></script>
+  <script defer src="/js/concesionario.js?v=77"></script>
+  <script defer src="/js/mis-autos.js?v=77"></script>
+  <script defer src="/js/admin-tienda.js?v=77"></script>
+  <script defer src="/js/empresas.js?v=77"></script>
+  <script defer src="/js/logros.js?v=77"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=77"></script>
+  <script defer src="/js/panel-admin.js?v=77"></script>
+  <script defer src="/js/comisaria.js?v=77"></script>
+  <script defer src="/js/apuestas.js?v=77"></script>
+  <script defer src="/js/parallax-landing.js?v=77"></script>
 </body>
 </html>
