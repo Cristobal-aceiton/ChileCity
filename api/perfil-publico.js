@@ -51,29 +51,14 @@ async function ensureSchema(sql) {
 function toNumber(v) { return v == null ? 0 : Number(v); }
 
 // ── Control de acceso: esta base de datos es exclusiva para personal ────────
-// policial (Policía Virtual) y staff/admin. Un civil solo debe ver un
-// mensaje indicando que el acceso está restringido, nunca los datos.
+// policial (Policía Virtual). Un civil (o cualquier otro rol) solo debe ver
+// un mensaje indicando que el acceso está restringido, nunca los datos.
 async function esPoliciaVirtual(sql, discord_id) {
   const rows = await sql`SELECT id FROM policia_virtual WHERE discord_id = ${discord_id}`;
   return rows.length > 0;
 }
-async function esAdmin(sql, discord_id) {
-  const rows = await sql`SELECT id FROM admins WHERE discord_id = ${discord_id}`;
-  return rows.length > 0;
-}
-async function esStaff(sql, discord_id) {
-  try {
-    const rows = await sql`SELECT id FROM staff WHERE discord_id = ${discord_id}`;
-    return rows.length > 0;
-  } catch {
-    return false;
-  }
-}
 async function tieneAccesoPolicial(sql, discord_id) {
-  if (await esPoliciaVirtual(sql, discord_id)) return true;
-  if (await esAdmin(sql, discord_id)) return true;
-  if (await esStaff(sql, discord_id)) return true;
-  return false;
+  return esPoliciaVirtual(sql, discord_id);
 }
 
 export default async function handler(req, res) {
@@ -111,7 +96,7 @@ export default async function handler(req, res) {
 
     await ensureSchema(sql);
 
-    const { q } = req.query;
+    const { q, vista } = req.query;
 
     // ── Paginación ───────────────────────────────────────────────────────
     // Antes se traían hasta 200 ciudadanos (o 100 en una búsqueda) en una
@@ -125,6 +110,81 @@ export default async function handler(req, res) {
     const page  = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(PAGE_SIZE_MAX, Math.max(1, parseInt(req.query.limit, 10) || PAGE_SIZE_DEFAULT));
     const offset = (page - 1) * limit;
+
+    // ── Vista "Vehículos": listado maestro de TODOS los vehículos ──────────
+    // registrados en la ciudad (no solo los del ciudadano seleccionado),
+    // con el nombre/RUT/usuario Discord del dueño actual para que el
+    // policía pueda buscar directo por patente, modelo, dueño o RUT.
+    if (vista === "vehiculos") {
+      const busqV = q && q.trim() ? `%${q.trim().replace(/^@/, "").toLowerCase()}%` : null;
+      let vehRows, totalVRow;
+      if (busqV) {
+        [vehRows, totalVRow] = await Promise.all([
+          sql`
+            SELECT v.*, d.nombre1, d.nombre2, d.apellido1, d.apellido2, d.rut, d.discord_username
+            FROM vehiculos_registrados v
+            LEFT JOIN dni d ON d.discord_id = v.propietario_actual_id
+            WHERE LOWER(v.patente) LIKE ${busqV}
+               OR LOWER(v.modelo)  LIKE ${busqV}
+               OR LOWER(v.color)   LIKE ${busqV}
+               OR LOWER(d.nombre1)   LIKE ${busqV}
+               OR LOWER(d.nombre2)   LIKE ${busqV}
+               OR LOWER(d.apellido1) LIKE ${busqV}
+               OR LOWER(d.apellido2) LIKE ${busqV}
+               OR LOWER(d.rut)       LIKE ${busqV}
+               OR LOWER(d.discord_username) LIKE ${busqV}
+            ORDER BY v.created_at DESC
+            LIMIT ${limit} OFFSET ${offset}
+          `,
+          sql`
+            SELECT COUNT(*)::int AS total
+            FROM vehiculos_registrados v
+            LEFT JOIN dni d ON d.discord_id = v.propietario_actual_id
+            WHERE LOWER(v.patente) LIKE ${busqV}
+               OR LOWER(v.modelo)  LIKE ${busqV}
+               OR LOWER(v.color)   LIKE ${busqV}
+               OR LOWER(d.nombre1)   LIKE ${busqV}
+               OR LOWER(d.nombre2)   LIKE ${busqV}
+               OR LOWER(d.apellido1) LIKE ${busqV}
+               OR LOWER(d.apellido2) LIKE ${busqV}
+               OR LOWER(d.rut)       LIKE ${busqV}
+               OR LOWER(d.discord_username) LIKE ${busqV}
+          `,
+        ]);
+      } else {
+        [vehRows, totalVRow] = await Promise.all([
+          sql`
+            SELECT v.*, d.nombre1, d.nombre2, d.apellido1, d.apellido2, d.rut, d.discord_username
+            FROM vehiculos_registrados v
+            LEFT JOIN dni d ON d.discord_id = v.propietario_actual_id
+            ORDER BY v.created_at DESC
+            LIMIT ${limit} OFFSET ${offset}
+          `,
+          sql`SELECT COUNT(*)::int AS total FROM vehiculos_registrados`,
+        ]);
+      }
+      const totalV = totalVRow[0]?.total || 0;
+      return res.status(200).json({
+        vista: "vehiculos",
+        page,
+        limit,
+        total: totalV,
+        hasMore: offset + vehRows.length < totalV,
+        vehiculos: vehRows.map(v => ({
+          id: v.id,
+          patente: v.patente,
+          modelo: v.modelo,
+          color: v.color,
+          anio: v.anio,
+          estado: v.estado,
+          propietario_actual_id: v.propietario_actual_id,
+          propietario_nombre: [v.nombre1, v.apellido1].filter(Boolean).join(" ") || v.propietario_actual_nombre || "Sin dueño registrado",
+          propietario_rut: v.rut || null,
+          propietario_username: v.discord_username || null,
+          duenos_anteriores: v.duenos_anteriores || [],
+        })),
+      });
+    }
 
     // Búsqueda de DNIs (paginada)
     let dnis, totalRow;
