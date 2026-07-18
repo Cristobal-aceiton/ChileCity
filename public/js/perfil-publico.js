@@ -8,12 +8,35 @@
     // eso ya no hay contenido que "crece" dentro del scroller de la lista, y el
     // bug de iOS queda resuelto de raíz en vez de parchado).
     let ppRegistros     = [];
+    let ppVehiculos     = [];
+    let ppVistaActual   = 'ciudadanos'; // 'ciudadanos' | 'vehiculos'
     let ppSearchTimer   = null;
     let ppPaginaActual  = 1;
     let ppQueryActual   = '';
     let ppCargandoMas   = false;
     let ppHasMore       = false;
     let ppSeleccionadoId = null;
+
+    // Cambia entre la vista de Ciudadanos y la vista maestra de Vehículos
+    // (todos los autos registrados en la ciudad, con su dueño actual).
+    function ppCambiarVista(vista) {
+      if (ppVistaActual === vista) return;
+      ppVistaActual = vista;
+      document.querySelectorAll('#pp-view-tabs .pp2-view-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.vista === vista);
+      });
+      const inp = document.getElementById('pp-search');
+      if (inp) {
+        inp.value = '';
+        inp.placeholder = vista === 'vehiculos'
+          ? 'Buscar por patente, modelo, dueño o RUT…'
+          : 'Buscar por nombre, apellidos, RUT, usuario de Discord o patente…';
+      }
+      const clearBtn = document.getElementById('pp-clear');
+      if (clearBtn) clearBtn.style.opacity = '0';
+      document.getElementById('pp-total-label').textContent = vista === 'vehiculos' ? 'Vehículos' : 'Ciudadanos';
+      cargarPerfilPublico('');
+    }
 
     // ── Íconos (solo SVG, sin emojis) ──────────────────────────────────────
     const PP_ICON_PERSONA = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
@@ -125,6 +148,15 @@
 
         if (toolbar) toolbar.style.display = '';
         document.getElementById('pp-wrap').classList.remove('pp2-hidden');
+
+        if (ppVistaActual === 'vehiculos') {
+          ppVehiculos = data.vehiculos || [];
+          ppHasMore   = !!data.hasMore;
+          renderVehiculosPP(ppVehiculos, data.total ?? ppVehiculos.length);
+          actualizarBotonCargarMasPP();
+          return;
+        }
+
         ppRegistros = data.registros || [];
         ppHasMore   = !!data.hasMore;
         renderPerfilPublico(ppRegistros, data.total ?? ppRegistros.length);
@@ -165,10 +197,15 @@
         const data = await ppFetchPagina(ppQueryActual, ppPaginaActual + 1);
         ppPaginaActual += 1;
         ppHasMore = !!data.hasMore;
-        ppRegistros = ppRegistros.concat(data.registros || []);
-        renderPerfilPublico(ppRegistros, data.total ?? ppRegistros.length);
+        if (ppVistaActual === 'vehiculos') {
+          ppVehiculos = ppVehiculos.concat(data.vehiculos || []);
+          renderVehiculosPP(ppVehiculos, data.total ?? ppVehiculos.length);
+        } else {
+          ppRegistros = ppRegistros.concat(data.registros || []);
+          renderPerfilPublico(ppRegistros, data.total ?? ppRegistros.length);
+        }
       } catch {
-        mostrarToast && mostrarToast('Error al cargar más ciudadanos.', true);
+        mostrarToast && mostrarToast('Error al cargar más registros.', true);
       } finally {
         ppCargandoMas = false;
         actualizarBotonCargarMasPP();
@@ -178,6 +215,7 @@
     async function ppFetchPagina(q, page) {
       const params = new URLSearchParams({ page: String(page) });
       if (q) params.set('q', q);
+      if (ppVistaActual === 'vehiculos') params.set('vista', 'vehiculos');
       const res = await fetch(`/api/perfil-publico?${params.toString()}`, { credentials: 'same-origin' });
       if (res.status === 401) { const err = new Error('401'); err.sesionInvalida = true; throw err; }
       // 403 no es un error de red: es la respuesta esperada para un civil sin
@@ -252,6 +290,124 @@
         const row = document.getElementById(`ppr-${ppSeleccionadoId}`);
         if (row) row.classList.add('selected');
       }
+    }
+
+    // ── Vista Vehículos: lista maestra de TODOS los vehículos registrados ──
+    let ppVehSeleccionadoId = null;
+
+    function renderVehiculosPP(lista, totalServer) {
+      const el      = document.getElementById('pp-lista');
+      const statsEl = document.getElementById('pp-stats');
+
+      if (!lista.length) {
+        el.innerHTML = '<div class="pp2-lista-vacia">No se encontraron vehículos.</div>';
+        statsEl.style.display = 'none';
+        ppCerrarDetalleVacio();
+        return;
+      }
+
+      document.getElementById('pp-total-registros').textContent = totalServer ?? lista.length;
+      statsEl.style.display = 'flex';
+
+      el.innerHTML = lista.map(v => {
+        const estadoColor = v.estado === 'Activo' ? '#10b981' : '#ef4444';
+        return `
+          <div class="pp2-row" id="ppv-${v.id}" style="--pp-status:${estadoColor}" onclick="ppSeleccionarVehiculo(${v.id})">
+            <div class="pp2-row-avatar">${PP_ICON_AUTO}</div>
+            <div class="pp2-row-info">
+              <div class="pp2-row-nombre">${escHtml(v.modelo)} · ${escHtml(v.patente)}</div>
+              <div class="pp2-row-rut">${escHtml(v.propietario_nombre)}${v.propietario_rut ? ' · ' + escHtml(v.propietario_rut) : ''}</div>
+            </div>
+            <div class="pp2-row-badges"><span class="pp2-badge" style="background:color-mix(in srgb,${estadoColor} 18%,transparent);color:${estadoColor};border:1px solid color-mix(in srgb,${estadoColor} 35%,transparent)">${escHtml(v.estado)}</span></div>
+            <svg class="pp2-row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 6 15 12 9 18"/></svg>
+          </div>`;
+      }).join('');
+
+      if (ppVehSeleccionadoId) {
+        const row = document.getElementById(`ppv-${ppVehSeleccionadoId}`);
+        if (row) row.classList.add('selected');
+      }
+    }
+
+    function ppSeleccionarVehiculo(id) {
+      const v = ppVehiculos.find(x => x.id === id);
+      if (!v) return;
+      ppVehSeleccionadoId = id;
+
+      document.querySelectorAll('.pp2-row.selected').forEach(el => el.classList.remove('selected'));
+      const row = document.getElementById(`ppv-${id}`);
+      if (row) row.classList.add('selected');
+
+      const estadoColor = v.estado === 'Activo' ? '#10b981' : '#ef4444';
+      const anteriores = (v.duenos_anteriores || []);
+      const anterioresHtml = anteriores.length === 0
+        ? ppEmptySlot('Sin dueños anteriores', PP_ICON_CARPETA.replace('width="40" height="40"', 'width="22" height="22"'))
+        : anteriores.map(a => `
+            <div class="pp2-record-row">
+              <div class="pp2-record-main">
+                <div class="pp2-record-titulo">${escHtml(a.nombre || a.propietario_nombre || 'Dueño anterior')}</div>
+                ${a.fecha ? `<div class="pp2-record-meta">${new Date(a.fecha).toLocaleDateString('es-CL')}</div>` : ''}
+              </div>
+            </div>`).join('');
+
+      document.getElementById('pp-detail-content').innerHTML = `
+        <div class="pp2-detail-back" onclick="ppCerrarDetalleMobile()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver a la lista
+        </div>
+
+        <div class="pp2-dossier-header" style="--pp-status:${estadoColor}">
+          <div class="pp2-dossier-avatar">${PP_ICON_AUTO.replace('width="13" height="13"', 'width="26" height="26"')}</div>
+          <div class="pp2-dossier-titulos">
+            <div class="pp2-dossier-nombre">${escHtml(v.modelo)}</div>
+            <div class="pp2-dossier-rut">${escHtml(v.patente)}</div>
+          </div>
+          <div class="pp2-dossier-estado">${v.estado === 'Activo' ? PP_ICON_CHECK : PP_ICON_ALERTA}${escHtml(v.estado)}</div>
+        </div>
+
+        <div class="pp2-detail-body">
+          <div class="pp2-mini-carnet">
+            <div class="pp2-mini-foto">${PP_ICON_AUTO.replace('width="13" height="13"', 'width="24" height="24"')}</div>
+            <div class="pp2-mini-datos">
+              <div class="pp2-mini-campo"><div class="pp2-mini-label">Patente</div><div class="pp2-mini-valor pp2-mini-rut">${escHtml(v.patente)}</div></div>
+              <div class="pp2-mini-campo"><div class="pp2-mini-label">Modelo</div><div class="pp2-mini-valor">${escHtml(v.modelo)}</div></div>
+              <div class="pp2-mini-campo"><div class="pp2-mini-label">Color</div><div class="pp2-mini-valor">${escHtml(v.color)}</div></div>
+              <div class="pp2-mini-campo"><div class="pp2-mini-label">Año</div><div class="pp2-mini-valor">${escHtml(v.anio)}</div></div>
+              <div class="pp2-mini-campo"><div class="pp2-mini-label">Dueño actual</div><div class="pp2-mini-valor">${escHtml(v.propietario_nombre)}</div></div>
+              <div class="pp2-mini-campo"><div class="pp2-mini-label">RUT del dueño</div><div class="pp2-mini-valor pp2-mini-rut">${escHtml(v.propietario_rut || '—')}</div></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-small green" onclick="verRegistroVehiculo(${v.id})">📄 Ver Registro</button>
+            ${v.propietario_actual_id ? `<button class="btn-small" onclick="ppVerDuenoDesdeVehiculo('${v.propietario_actual_id}','${(v.propietario_rut || '').replace(/'/g, '')}')">Ver expediente del dueño</button>` : ''}
+          </div>
+
+          <div>
+            <div class="pp2-mini-label" style="margin-bottom:8px;">Dueños anteriores</div>
+            <div class="pp2-records-list">${anterioresHtml}</div>
+          </div>
+        </div>`;
+
+      document.getElementById('pp-detail-empty').style.display = 'none';
+      document.getElementById('pp-detail-content').style.display = 'block';
+      document.getElementById('pp-detail').classList.add('pp2-detail-open');
+    }
+
+    // Desde el detalle de un vehículo, salta directo al expediente del
+    // ciudadano dueño (cambia a la vista Ciudadanos y busca por su RUT,
+    // que es un identificador único y evita depender del orden de página).
+    async function ppVerDuenoDesdeVehiculo(discordId, rut) {
+      ppVistaActual = 'ciudadanos';
+      document.querySelectorAll('#pp-view-tabs .pp2-view-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.vista === 'ciudadanos');
+      });
+      document.getElementById('pp-total-label').textContent = 'Ciudadanos';
+      const inp = document.getElementById('pp-search');
+      if (inp) inp.value = rut || '';
+      await cargarPerfilPublico(rut || '');
+      const target = ppRegistros.find(r => r.discord_id === discordId) || ppRegistros[0];
+      if (target) ppSeleccionar(target.discord_id);
     }
 
     // ── Detalle (expediente) ─────────────────────────────────────────────────
