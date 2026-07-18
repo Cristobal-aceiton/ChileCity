@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v71"; // <--- ⚠️ ACTUALIZADO A v71 (vuelve el Casino: casino.html + ruleta.html nuevos)
+const CACHE_VERSION = "v72"; // <--- ⚠️ ACTUALIZADO A v72 (Base de Datos Policial: vista Vehículos + control de acceso + fix mobile)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

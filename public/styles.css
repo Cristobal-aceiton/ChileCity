@@ -338,6 +338,36 @@
   .pp2-toolbar{flex-direction:column;align-items:stretch}
   .pp2-stat-bar{justify-content:center}
 }
+
+/* ── Tabs de vista: Ciudadanos / Vehículos ── */
+.pp2-view-tabs{display:flex;gap:6px;width:100%}
+.pp2-view-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:12.5px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s var(--ease);white-space:nowrap}
+.pp2-view-tab:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.85)}
+.pp2-view-tab.active{background:rgba(220,30,30,.16);border-color:rgba(220,30,30,.4);color:#ff8a8a}
+
+/* ── Optimización móvil general de la base de datos policial ── */
+@media (max-width:860px){
+  .pp2-container{padding-left:14px!important;padding-right:14px!important}
+  .pp2-toolbar{gap:10px}
+  .pp2-search-input{padding-top:13px;padding-bottom:13px;font-size:15px}
+  .pp2-row{padding:14px}
+  .pp2-row-nombre{font-size:14px}
+  .pp2-detail-body{padding:16px 16px 40px}
+  .pp2-dossier-header{padding:16px}
+  .pp2-folder-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:8px}
+  .pp2-folder-tabs::-webkit-scrollbar{display:none}
+  .pp2-folder-tab{flex-shrink:0}
+}
+@media (max-width:480px){
+  .pp2-view-tab{font-size:11.5px;padding:11px 8px}
+  .pp2-view-tab svg{flex-shrink:0}
+  .pp2-record-row{flex-direction:column;align-items:stretch;gap:8px}
+  .pp2-record-right{align-items:flex-start;flex-direction:row;justify-content:space-between}
+  .pp2-mini-carnet{padding:14px}
+  .pp2-inv-grid{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))}
+  .pp2-logros-grid{grid-template-columns:1fr}
+  .pp2-dossier-nombre{font-size:15px}
+}
 .veh-acciones{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .veh-acciones button{margin-top:0!important}
 
