@@ -932,6 +932,8 @@
       if (tab === 'prestamos') cargarAdminPrestamos();
     }
 
+    let _adminUsuariosData = [];
+
     async function cargarAdminUsuarios() {
       const loading = document.getElementById('admin-loading-users');
       const lista   = document.getElementById('admin-usuarios-lista');
@@ -942,36 +944,69 @@
         const data = await res.json();
         loading.style.display = 'none';
 
-        if (!data.usuarios?.length) {
-          lista.innerHTML = '<div class="historial-vacio">No hay usuarios con cuenta bancaria.</div>';
-          return;
-        }
-
-        lista.innerHTML = data.usuarios.map(u => `
-          <div class="usuario-row">
-            <div class="ur-info">
-              <div class="ur-nombre">${escHtml(u.nombre1 || '?')} ${escHtml(u.apellido1 || '')}</div>
-              <div class="ur-rut">${escHtml(u.rut || u.discord_id)}</div>
-            </div>
-            <div class="ur-saldo">${formatCLP(u.saldo)}</div>
-            <div class="ur-acciones">
-              <button class="btn-small purple" onclick="abrirModalSaldo('${escHtml(u.discord_id)}','${escHtml(u.nombre1 + ' ' + u.apellido1)}')">
-                Ajustar
-              </button>
-              <button class="btn-small" style="background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.25);"
-                onclick="seleccionarParaSueldo('${escHtml(u.discord_id)}','${escHtml(u.nombre1 + ' ' + u.apellido1)}')">
-                Sueldos
-              </button>
-              <button class="btn-small orange" onclick="abrirModalReset('${escHtml(u.discord_id)}','${escHtml(u.nombre1 + ' ' + u.apellido1)}')">
-                Resetear
-              </button>
-            </div>
-          </div>
-        `).join('');
+        _adminUsuariosData = data.usuarios || [];
+        const buscador = document.getElementById('admin-banco-buscar');
+        if (buscador) buscador.value = '';
+        renderAdminUsuarios(_adminUsuariosData);
       } catch(e) {
         loading.style.display = 'none';
         lista.innerHTML = '<div class="historial-vacio">Error al cargar.</div>';
       }
+    }
+
+    function renderAdminUsuarios(usuarios) {
+      const lista = document.getElementById('admin-usuarios-lista');
+      const vacio = document.getElementById('admin-usuarios-sin-resultados');
+
+      if (!_adminUsuariosData.length) {
+        lista.innerHTML = '<div class="historial-vacio">No hay usuarios con cuenta bancaria.</div>';
+        if (vacio) vacio.style.display = 'none';
+        return;
+      }
+      if (!usuarios.length) {
+        lista.innerHTML = '';
+        if (vacio) vacio.style.display = 'block';
+        return;
+      }
+      if (vacio) vacio.style.display = 'none';
+
+      lista.innerHTML = usuarios.map(u => `
+        <div class="usuario-row">
+          <div class="ur-info">
+            <div class="ur-nombre">${escHtml(u.nombre1 || '?')} ${escHtml(u.apellido1 || '')}</div>
+            <div class="ur-rut">${escHtml(u.rut || u.discord_id)}</div>
+          </div>
+          <div class="ur-saldo">${formatCLP(u.saldo)}</div>
+          <div class="ur-acciones">
+            <button class="btn-small purple" onclick="abrirModalSaldo('${escHtml(u.discord_id)}','${escHtml(u.nombre1 + ' ' + u.apellido1)}')">
+              Ajustar
+            </button>
+            <button class="btn-small" style="background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.25);"
+              onclick="seleccionarParaSueldo('${escHtml(u.discord_id)}','${escHtml(u.nombre1 + ' ' + u.apellido1)}')">
+              Sueldos
+            </button>
+            <button class="btn-small orange" onclick="abrirModalReset('${escHtml(u.discord_id)}','${escHtml(u.nombre1 + ' ' + u.apellido1)}')">
+              Resetear
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Filtra la lista ya cargada en memoria por Discord ID, RUT o nombre IC
+    // (nombre1 + apellido1) — sin volver a golpear al backend en cada letra.
+    function filtrarAdminUsuarios() {
+      const q = (document.getElementById('admin-banco-buscar').value || '').trim().toLowerCase();
+      if (!q) { renderAdminUsuarios(_adminUsuariosData); return; }
+
+      const normaliza = (s) => (s || '').toString().toLowerCase();
+      const filtrados = _adminUsuariosData.filter(u => {
+        const nombreCompleto = normaliza(`${u.nombre1 || ''} ${u.apellido1 || ''}`);
+        const rut = normaliza(u.rut);
+        const discordId = normaliza(u.discord_id);
+        return nombreCompleto.includes(q) || rut.includes(q) || discordId.includes(q);
+      });
+      renderAdminUsuarios(filtrados);
     }
 
     function abrirModalSaldo(discordId, nombre) {
@@ -1009,6 +1044,58 @@
         cargarAdminUsuarios();
       } catch(e) {
         errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    function abrirModalSaldoMasivo() {
+      const total = _adminUsuariosData.length;
+      document.getElementById('modal-saldo-masivo-label').textContent =
+        `Esto va a afectar a las ${total} cuenta${total === 1 ? '' : 's'} bancaria${total === 1 ? '' : 's'} registrada${total === 1 ? '' : 's'} en el servidor.`;
+      document.getElementById('modal-saldo-masivo-monto').value = '';
+      document.getElementById('modal-saldo-masivo-desc').value  = '';
+      document.getElementById('modal-saldo-masivo-error').classList.remove('visible');
+      document.getElementById('modal-saldo-masivo').classList.add('visible');
+    }
+
+    async function adminConfirmarSaldoMasivo() {
+      const monto = document.getElementById('modal-saldo-masivo-monto').value.trim();
+      const desc  = document.getElementById('modal-saldo-masivo-desc').value.trim();
+      const errEl = document.getElementById('modal-saldo-masivo-error');
+      errEl.classList.remove('visible');
+
+      if (!monto || isNaN(parseInt(monto)) || parseInt(monto) === 0) {
+        errEl.textContent = 'Ingresa un monto válido (distinto de 0).';
+        errEl.classList.add('visible'); return;
+      }
+
+      const total = _adminUsuariosData.length;
+      const verbo = parseInt(monto) >= 0 ? 'sumar' : 'restar';
+      const ok = window.confirm(
+        `¿Seguro que quieres ${verbo} ${formatCLP(Math.abs(parseInt(monto)))} a las ${total} cuentas del servidor? Esta acción no se puede deshacer.`
+      );
+      if (!ok) return;
+
+      const btn = document.getElementById('btn-confirmar-saldo-masivo');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/banco?action=admin_saldo_masivo', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ admin_id: currentUser.id, monto, descripcion: desc }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error.';
+          errEl.classList.add('visible'); return;
+        }
+        cerrarModal('modal-saldo-masivo');
+        toast.ok(`Listo: ${data.afectadas} de ${data.total} cuentas actualizadas${data.clampeadas ? ` (${data.clampeadas} llegaron a $0)` : ''}.`);
+        cargarAdminUsuarios();
+      } catch(e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      } finally {
+        btn.disabled = false;
       }
     }
 
