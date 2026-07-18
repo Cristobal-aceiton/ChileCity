@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v82"; // <--- ⚠️ ACTUALIZADO A v82 (fix: emoji saludo dashboard, logo/favicon nuevo, fuente e historial banco)
+const CACHE_VERSION = "v83"; // <--- ⚠️ ACTUALIZADO A v83 (fix: primer sueldo se cobra el mismo día + lista de varios sueldos pendientes en Banco)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

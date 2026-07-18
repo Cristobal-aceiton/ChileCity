@@ -1595,3 +1595,8 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
 .feature-desc{font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.5);position:relative;z-index:1}
 @media (max-width:820px){.features-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:540px){.features-grid{grid-template-columns:1fr}.feature-card{padding:20px 18px}}
+
+/* Lista de varios sueldos dentro de #proximo-sueldo-box (misma estética dorada) */
+.ps-lista-multi{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:6px}
+#proximo-sueldo-box:has(.ps-lista-multi) .sueldo-item{background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.2)}
+#proximo-sueldo-box:has(.ps-lista-multi) .si-nombre{color:var(--bk-gold,#D4AF37)}
