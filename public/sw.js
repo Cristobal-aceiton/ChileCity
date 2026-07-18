@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v81"; // <--- ⚠️ ACTUALIZADO A v81 (admin banco: búsqueda por Discord/RUT/nombre IC + ajuste de saldo masivo a todas las cuentas)
+const CACHE_VERSION = "v82"; // <--- ⚠️ ACTUALIZADO A v82 (fix: emoji saludo dashboard, logo/favicon nuevo, fuente e historial banco)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
