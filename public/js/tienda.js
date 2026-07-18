@@ -181,8 +181,10 @@
           const txt = online.toLocaleString() + ' online · ' + total.toLocaleString() + ' miembros';
           const el1 = document.getElementById('footer-players');
           const el2 = document.getElementById('dash-footer-players');
+          const el3 = document.getElementById('landing-live-stat-text');
           if (el1) el1.textContent = txt;
           if (el2) el2.textContent = txt;
+          if (el3) el3.textContent = online.toLocaleString() + ' personas conectadas ahora · ' + total.toLocaleString() + ' miembros en la comunidad';
         }
       } catch(e) { /* silencioso */ }
     }
