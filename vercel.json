@@ -4,6 +4,7 @@
     { "source": "/auth/callback", "destination": "/api/callback" },
     { "source": "/api/logout",         "destination": "/api/session?ruta=logout" },
     { "source": "/api/me",             "destination": "/api/session?ruta=me" },
+    { "source": "/api/discord-stats",  "destination": "/api/session?ruta=discord-stats" },
     { "source": "/manifest.json",  "destination": "/public/manifest.json" },
     { "source": "/favicon.svg",    "destination": "/public/favicon.svg" },
     { "source": "/styles.css",     "destination": "/public/styles.css" },
