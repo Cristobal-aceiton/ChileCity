@@ -19,9 +19,9 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=79">
-  <link rel="stylesheet" href="/page-loader.css?v=79">
-  <link rel="stylesheet" href="/clean-theme.css?v=79">
+  <link rel="stylesheet" href="/styles.css?v=81">
+  <link rel="stylesheet" href="/page-loader.css?v=81">
+  <link rel="stylesheet" href="/clean-theme.css?v=81">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -115,11 +115,21 @@
 
         <!-- Tab Usuarios -->
         <div class="admin-seccion visible" id="admin-tab-usuarios">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+            <div class="search-bar-wrap" style="flex:1; min-width:220px; margin-bottom:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" class="search-input" id="admin-banco-buscar" placeholder="Buscar por Discord ID, RUT o nombre IC..." oninput="filtrarAdminUsuarios()">
+            </div>
+            <button class="btn-small" style="background:rgba(239,68,68,0.15);color:#ff8080;border:1px solid rgba(239,68,68,0.3); white-space:nowrap;" onclick="abrirModalSaldoMasivo()">
+              Ajustar a todos
+            </button>
+          </div>
           <div class="rc-loading" id="admin-loading-users">
             <div class="spinner"></div>
             <span>Cargando usuarios...</span>
           </div>
           <div id="admin-usuarios-lista"></div>
+          <div class="historial-vacio" id="admin-usuarios-sin-resultados" style="display:none;">Ningún usuario coincide con la búsqueda.</div>
         </div>
 
         <!-- Tab Sueldos -->
@@ -302,6 +312,37 @@
           Confirmar
         </button>
         <button class="sec-back" onclick="cerrarModal('modal-saldo')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ajustar saldo A TODAS LAS CUENTAS -->
+  <div class="admin-modal-overlay" id="modal-saldo-masivo">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-saldo-masivo')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Ajustar saldo a TODOS los usuarios
+      </h3>
+      <p id="modal-saldo-masivo-label" style="color:rgba(255,255,255,0.5); font-size:13px;"></p>
+      <p style="color:#fdba74; font-size:13px; background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.25); border-radius:10px; padding:12px 14px;">
+        Esto suma o resta el mismo monto a <b>todas</b> las cuentas bancarias registradas. Si a alguna cuenta le queda un saldo negativo, esa cuenta puntual se deja en $0 en vez de fallar. No se puede deshacer.
+      </p>
+      <div class="form-group">
+        <label>Monto (puede ser negativo para restar a todos)</label>
+        <input type="number" id="modal-saldo-masivo-monto" placeholder="Ej: 50000 o -10000">
+      </div>
+      <div class="form-group">
+        <label>Descripción (opcional, queda en el historial de cada usuario)</label>
+        <input type="text" id="modal-saldo-masivo-desc" placeholder="Ej: Evento de temporada, Impuesto general...">
+      </div>
+      <div class="rc-error" id="modal-saldo-masivo-error"></div>
+      <div class="modal-actions">
+        <button class="btn-adm danger" onclick="adminConfirmarSaldoMasivo()" id="btn-confirmar-saldo-masivo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Sí, aplicar a todos
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-saldo-masivo')">Cancelar</button>
       </div>
     </div>
   </div>
@@ -686,25 +727,25 @@
   </div>
 
 
-  <script defer src="/js/app.js?v=79"></script>
-  <script defer src="/js/dashboard-fx.js?v=79"></script>
-  <script defer src="/js/notificaciones.js?v=79"></script>
-  <script defer src="/js/pull-to-refresh.js?v=79"></script>
-  <script defer src="/js/registro-civil.js?v=79"></script>
-  <script defer src="/js/banco.js?v=79"></script>
+  <script defer src="/js/app.js?v=81"></script>
+  <script defer src="/js/dashboard-fx.js?v=81"></script>
+  <script defer src="/js/notificaciones.js?v=81"></script>
+  <script defer src="/js/pull-to-refresh.js?v=81"></script>
+  <script defer src="/js/registro-civil.js?v=81"></script>
+  <script defer src="/js/banco.js?v=81"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=79"></script>
-  <script defer src="/js/mercado.js?v=79"></script>
-  <script defer src="/js/vehiculos.js?v=79"></script>
-  <script defer src="/js/concesionario.js?v=79"></script>
-  <script defer src="/js/mis-autos.js?v=79"></script>
-  <script defer src="/js/admin-tienda.js?v=79"></script>
-  <script defer src="/js/empresas.js?v=79"></script>
-  <script defer src="/js/logros.js?v=79"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=79"></script>
-  <script defer src="/js/panel-admin.js?v=79"></script>
-  <script defer src="/js/comisaria.js?v=79"></script>
-  <script defer src="/js/apuestas.js?v=79"></script>
-  <script defer src="/js/parallax-landing.js?v=79"></script>
+  <script defer src="/js/tienda.js?v=81"></script>
+  <script defer src="/js/mercado.js?v=81"></script>
+  <script defer src="/js/vehiculos.js?v=81"></script>
+  <script defer src="/js/concesionario.js?v=81"></script>
+  <script defer src="/js/mis-autos.js?v=81"></script>
+  <script defer src="/js/admin-tienda.js?v=81"></script>
+  <script defer src="/js/empresas.js?v=81"></script>
+  <script defer src="/js/logros.js?v=81"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=81"></script>
+  <script defer src="/js/panel-admin.js?v=81"></script>
+  <script defer src="/js/comisaria.js?v=81"></script>
+  <script defer src="/js/apuestas.js?v=81"></script>
+  <script defer src="/js/parallax-landing.js?v=81"></script>
 </body>
 </html>
