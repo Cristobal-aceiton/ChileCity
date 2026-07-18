@@ -1388,11 +1388,19 @@
 
         lista.innerHTML = ranking.map((r, i) => {
           const esYo = r.discord_id === currentUser.id;
+          const esPrimero = r.posicion === 1;
           const nombre = r.discord_username ? `@${escHtml(r.discord_username)}` : `Ciudadano ${r.discord_id.slice(-4)}`;
+          const inicial = escHtml(iniciales(r.discord_username || 'C'));
+          const avatarHtml = r.discord_avatar
+            ? `<img class="tr-avatar tr-avatar-img" src="${escHtml(r.discord_avatar)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'tr-avatar',textContent:'${inicial}'}))">`
+            : `<div class="tr-avatar">${inicial}</div>`;
+          const corona = esPrimero
+            ? `<svg class="tr-corona" width="16" height="16" viewBox="0 0 24 24" fill="#F5D06B" stroke="#F5D06B"><path d="M3 18h18l-1.5-9-4.5 4-3-6-3 6-4.5-4L3 18Z"/></svg>`
+            : '';
           return `
             <div class="tr-row ${esYo ? 'tr-yo' : ''} tr-top${r.posicion <= 3 ? r.posicion : ''}" style="animation-delay:${i * 40}ms;">
               <div class="tr-pos ${claseRango(r.posicion)}">${r.posicion}</div>
-              <div class="tr-avatar">${iniciales(r.discord_username || 'C')}</div>
+              <div class="tr-avatar-wrap">${avatarHtml}${corona}</div>
               <div class="tr-info">
                 <div class="tr-nombre">${nombre}</div>
               </div>

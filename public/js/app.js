@@ -848,10 +848,20 @@
 
         const claseRango = (pos) => pos === 1 ? 'gold' : pos === 2 ? 'silver' : 'bronze';
         lista.innerHTML = top3.map(r => {
+          const esPrimero = r.posicion === 1;
           const nombre = r.discord_username ? `@${escHtml(r.discord_username)}` : `Ciudadano ${r.discord_id.slice(-4)}`;
+          const inicial = escHtml((r.discord_username || 'C').charAt(0).toUpperCase());
+          const avatarClase = `top-hero-avatar${esPrimero ? ' top-hero-avatar-first' : ''}`;
+          const avatarHtml = r.discord_avatar
+            ? `<img class="${avatarClase}" src="${escHtml(r.discord_avatar)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'${avatarClase} top-hero-avatar-fallback',textContent:'${inicial}'}))">`
+            : `<div class="${avatarClase} top-hero-avatar-fallback">${inicial}</div>`;
+          const corona = esPrimero
+            ? `<svg class="top-hero-corona" width="14" height="14" viewBox="0 0 24 24" fill="#F5D06B" stroke="#F5D06B"><path d="M3 18h18l-1.5-9-4.5 4-3-6-3 6-4.5-4L3 18Z"/></svg>`
+            : '';
           return `
-            <div class="top-hero-row">
+            <div class="top-hero-row ${esPrimero ? 'top-hero-row-first' : ''}">
               <div class="top-hero-pos ${claseRango(r.posicion)}">${r.posicion}</div>
+              <div class="top-hero-avatar-wrap">${avatarHtml}${corona}</div>
               <div class="top-hero-nombre">${nombre}</div>
               <div class="top-hero-monto">${formatCLP(r.saldo)}</div>
             </div>`;
