@@ -919,6 +919,54 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, nuevoSaldo: SALDO_INICIAL });
     }
 
+    // ── ADMIN: ajustar saldo a TODAS las cuentas de una sola vez ──────────────
+    // Suma o resta el mismo monto a cada cuenta del banco. Si restar dejaría
+    // a alguna cuenta en negativo, esa cuenta puntual se deja en $0 en vez de
+    // fallar toda la operación (así un "quitar 50k a todos" no se cae solo
+    // porque un usuario tenía 20k) — se informa cuántas cuentas quedaron
+    // "clampeadas" a $0 para que el admin lo sepa.
+    if (req.method === "POST" && action === "admin_saldo_masivo") {
+      if (!puedeAdminBanco)
+        return res.status(403).json({ error: "No autorizado" });
+
+      const { monto, descripcion } = req.body;
+      const montoNum = parseMonto(monto);
+      if (montoNum === null || montoNum === 0)
+        return res.status(400).json({ error: "Monto inválido" });
+
+      const cuentas = await sql`SELECT discord_id, saldo FROM banco`;
+      if (cuentas.length === 0)
+        return res.status(404).json({ error: "No hay cuentas registradas" });
+
+      const tipo = montoNum >= 0 ? "ingreso" : "egreso";
+      const descFinal = (descripcion && descripcion.trim()) ||
+        (montoNum >= 0 ? "Ajuste masivo administrativo" : "Descuento masivo administrativo");
+
+      let afectadas = 0;
+      let clampeadas = 0;
+      for (const cuenta of cuentas) {
+        const saldoActual = toNumber(cuenta.saldo);
+        let nuevoSaldo = saldoActual + montoNum;
+        if (nuevoSaldo < 0) { nuevoSaldo = 0; clampeadas++; }
+        if (!Number.isSafeInteger(nuevoSaldo)) continue;
+        if (nuevoSaldo === saldoActual) continue;
+
+        await sql`UPDATE banco SET saldo = ${nuevoSaldo} WHERE discord_id = ${cuenta.discord_id}`;
+        await sql`
+          INSERT INTO transacciones (discord_id, tipo, monto, descripcion, saldo_after)
+          VALUES (${cuenta.discord_id}, ${tipo}, ${Math.abs(nuevoSaldo - saldoActual)}, ${descFinal}, ${nuevoSaldo})
+        `;
+        await checkLogrosSaldo(sql, cuenta.discord_id, nuevoSaldo);
+        afectadas++;
+      }
+
+      await registrarStaffLog(sql, discord_id, discord_name,
+        montoNum >= 0 ? "SALDO_MASIVO_AGREGAR" : "SALDO_MASIVO_QUITAR",
+        `${montoNum >= 0 ? "Agregó" : "Quitó"} $${Math.abs(montoNum).toLocaleString('es-CL')} ${montoNum >= 0 ? "a" : "de"} TODAS las cuentas (${afectadas}/${cuentas.length} afectadas${clampeadas ? `, ${clampeadas} llegaron a $0` : ''})${descripcion ? ` — "${descripcion}"` : ""}`);
+
+      return res.status(200).json({ ok: true, afectadas, clampeadas, total: cuentas.length });
+    }
+
     // ── ADMIN: crear sueldo ───────────────────────────────────────────────────
     if (req.method === "POST" && action === "admin_sueldo_crear") {
       if (!puedeAdminBanco)
