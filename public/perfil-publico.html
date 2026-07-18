@@ -102,12 +102,24 @@
         </button>
         <div class="seccion-title">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M15 3v5h5" stroke-width="2"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
-          Perfil Público
+          Base de Datos Policial
+        </div>
+      </div>
+
+      <!-- Acceso denegado: se muestra solo si el usuario no es personal policial -->
+      <div class="rc-loading" id="pp-denied" style="display:none; flex-direction:column; align-items:center; text-align:center; gap:14px; padding:60px 20px;">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="opacity:.65">
+          <path d="M12 21s7.5-3.7 7.5-9.3V5.6L12 3 4.5 5.6v6.1C4.5 17.3 12 21 12 21z"/>
+          <line x1="9" y1="9.5" x2="15" y2="14.5"/><line x1="15" y1="9.5" x2="9" y2="14.5"/>
+        </svg>
+        <div style="font-size:17px; font-weight:700;">Acceso restringido</div>
+        <div style="opacity:.75; max-width:380px; line-height:1.5;">
+          Esta base de datos es de uso exclusivo para personal policial. Si crees que esto es un error, contacta a un administrador.
         </div>
       </div>
 
       <!-- Barra de búsqueda + stat -->
-      <div class="pp2-toolbar">
+      <div class="pp2-toolbar" id="pp-toolbar">
         <div class="pp2-search-wrap">
           <svg class="pp2-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input class="pp2-search-input" id="pp-search" type="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Buscar por nombre, apellidos, RUT, usuario de Discord o patente…">
