@@ -842,7 +842,7 @@
         const top3 = (data.ranking || []).slice(0, 3);
 
         if (top3.length === 0) {
-          lista.innerHTML = '<div class="top-hero-empty">Aún no hay cuentas bancarias</div>';
+          lista.innerHTML = '<div class="top-hero-empty"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/></svg><span>Aún no hay cuentas bancarias</span></div>';
           return;
         }
 
@@ -857,7 +857,7 @@
             </div>`;
         }).join('');
       } catch (e) {
-        lista.innerHTML = '<div class="top-hero-empty">Error al cargar</div>';
+        lista.innerHTML = '<div class="top-hero-empty"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><span>Error al cargar</span></div>';
       }
     }
 
