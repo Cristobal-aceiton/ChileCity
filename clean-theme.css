@@ -1,0 +1,166 @@
+/* ── clean-theme.css ──────────────────────────────────────────────────────
+   Capa de "limpieza" visual que se carga DESPUÉS de styles.css en todas
+   las páginas. No borra ninguna regla de styles.css (que sigue siendo la
+   base real del sitio) — solo anula los brillos/neones/LEDs decorativos
+   para dejar una estética plana y minimalista, sin tocar layout, tamaños
+   ni funcionalidad.
+
+   Qué apaga:
+   1) El brillo/halo detrás del logo de la esquina y del logo del splash
+      de carga.
+   2) Los puntos de estado tipo LED (online, notificaciones) y su pulso.
+   3) Los glows de color (box-shadow / text-shadow / drop-shadow) en
+      botones, tarjetas del dashboard, avatares, casino, carnet, etc.
+
+   Qué NO toca: el fondo animado (#bg-fx / #bg-particles) — se deja tal
+   cual estaba, solo se ajusta el balance de color para que predomine el
+   rojo sobre el negro (ver sección 1). Todo lo demás (layout, tipografía,
+   animaciones de entrada) queda intacto. */
+
+/* 1) Fondo ambiental: mismo movimiento de antes, más rojo que negro ---- */
+#bg-fx {
+  background: #1a0505 !important;
+}
+#bg-fx::before {
+  width: 130vmax !important;
+  height: 130vmax !important;
+  top: -50vmax !important;
+  left: -40vmax !important;
+  background: radial-gradient(circle at 30% 30%, rgba(230, 25, 25, .85), rgba(230, 25, 25, .25) 55%, rgba(230, 25, 25, 0) 78%) !important;
+}
+#bg-fx::after {
+  width: 120vmax !important;
+  height: 120vmax !important;
+  bottom: -45vmax !important;
+  right: -35vmax !important;
+  background: radial-gradient(circle at 70% 70%, rgba(190, 15, 15, .78), rgba(190, 15, 15, .2) 55%, rgba(0, 0, 0, 0) 78%) !important;
+}
+
+/* 2) Logo de la esquina y logo del splash de carga --------------------- */
+.logo-corner {
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, .14) !important;
+}
+.logo-corner:hover {
+  box-shadow: none !important;
+  transform: none !important;
+}
+#cc-page-loader .cc-loader-logo,
+#cc-page-loader .cc-loader-logo img {
+  box-shadow: none !important;
+  filter: none !important;
+  background: transparent !important;
+}
+#cc-page-loader {
+  background: #0a0a0a !important;
+}
+#cc-page-loader::before,
+#cc-page-loader::after {
+  display: none !important;
+}
+
+/* 3) LEDs / puntos de estado -------------------------------------------- */
+.status-dot {
+  animation: none !important;
+  box-shadow: none !important;
+}
+.profile-status-dot {
+  box-shadow: none !important;
+}
+.notif-badge {
+  box-shadow: none !important;
+}
+.notif-bell-btn:hover {
+  box-shadow: none !important;
+}
+
+/* 4) Tarjetas del dashboard (nav-card): fuera spotlight y tinte de color */
+.nav-card::before,
+.nav-card::after {
+  display: none !important;
+}
+.nav-card:hover {
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+}
+.card-icon,
+.card-icon img {
+  filter: none !important;
+}
+
+/* 5) Botones: sombras planas en vez de glow de color -------------------- */
+.btn-discord,
+.btn-discord:hover,
+.btn-discord-empresa,
+.btn-discord-empresa:hover,
+.btn-crear,
+.btn-crear:hover,
+.btn-green,
+.btn-green:hover,
+.btn-comprar:hover,
+.btn-comprar-showroom:hover,
+.btn-casino,
+.btn-casino:hover,
+.cv-hero-btn,
+.cv-hero-btn:hover,
+.cv-tramite-central,
+.cv-tramite-central:hover {
+  box-shadow: none !important;
+}
+
+/* 6) Textos e íconos con glow (drop-shadow / text-shadow) --------------- */
+.landing-title,
+.csb-valor,
+#avion-mult-display,
+.seccion-title svg,
+.ruleta-aguja,
+.ruleta-centro,
+.cid-estrella,
+.cv-hero-emblema,
+.moneda-cara,
+.moneda-cruz {
+  filter: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* 7) Avatares, carnet, empresa, directiva -------------------------------- */
+.user-avatar,
+.user-pill:hover .user-avatar,
+.profile-avatar-wrap img,
+.dc-avatar,
+.directiva-card:hover .dc-avatar,
+.empresa-logo,
+.bd-avatar {
+  box-shadow: none !important;
+}
+.profile-card::before,
+.directiva-card::before,
+.dc-ring {
+  display: none !important;
+}
+
+/* 8) Casino: banners, fichas, popups de premio -------------------------- */
+.casino-saldo-banner,
+.casino-lobby-card:hover,
+.cc-win-popup,
+.cc-win-popup.grande,
+#avion-display,
+.btn-adm.primary:hover,
+.btn-adm.success:hover {
+  box-shadow: none !important;
+}
+
+/* 9) Inputs enfocados: anillo neutro en vez de glow de color ------------ */
+.pp-search-input:focus,
+.pp2-search-input:focus,
+.casino-bet-form input[type=number]:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .08) !important;
+  border-color: rgba(255, 255, 255, .3) !important;
+}
+
+/* 10) Estados de acierto/error de formularios: sin glow, solo color ----- */
+input.input-ok,
+input.input-error {
+  box-shadow: none !important;
+}

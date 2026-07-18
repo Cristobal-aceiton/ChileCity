@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Círculo y flecha blanca -->
+  <path fill="white" d="M13 3a9 9 0 0 0-9 9H1l3.5 3.5L8 12H5a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3z"></path>
+
+  <!-- Aguja del reloj verde -->
+  <path fill="#00ec8a" d="M12 8a1 1 0 0 1 1 1v3.45l2.3 1.38a1 1 0 1 1-1 1.72l-2.8-1.68A1 1 0 0 1 12 13V9a1 1 0 0 1 0-1z"></path>
+</svg>

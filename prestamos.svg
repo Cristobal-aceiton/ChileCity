@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Documento / contrato -->
+  <path fill="white" d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+
+  <!-- Esquina del documento -->
+  <path fill="#00ec8a" d="M14 2v5h5z"></path>
+
+  <!-- Líneas del contrato -->
+  <rect x="7" y="10" width="7" height="1.5" rx="0.75" fill="#00ec8a"></rect>
+  <rect x="7" y="13" width="5" height="1.5" rx="0.75" fill="#00ec8a"></rect>
+
+  <!-- Moneda -->
+  <circle cx="16.5" cy="16.5" r="4" fill="#00ec8a"></circle>
+  <text x="16.5" y="18.2" text-anchor="middle" font-size="4" font-family="Arial" fill="white">$</text>
+</svg>

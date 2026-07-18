@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banco — ChileCity RP</title>
+</head>
+<body>
+
+  <a href="/dashboard.html" class="btn-volver-dash">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5"/>
+      <path d="M12 19l-7-7 7-7"/>
+    </svg>
+    Volver
+  </a>
+
+  <h1 class="hi-temp">Hola, <span class="ten-green">Tenpista</span></h1>
+  
+<div class="card-1">
+    <div class="saldo-container">
+        <h1 id="saldo-1">$0</h1>
+
+        <svg id="btn-ojo-saldo" onclick="toggleSaldo()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+            <path d="M12 5C7 5 2.7 8.1 1 12c1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 12c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z"/>
+        </svg>
+
+    </div>
+
+    <div class="fila-1">
+      <h2>Nº de cuenta</h2>
+      <p id="n-cuenta">x</p>
+    </div>
+
+    <button id="btn-abrir-cuenta" class="abrir-cuenta-btn" style="display:none;">Abrir tu cuenta bancaria</button>
+    <p id="abrir-cuenta-msg" class="transfer-msg" style="display:none;"></p>
+
+</div>
+
+<div class="card-2" onclick="mostrarSeccion('tarjeta')">
+  <h1>Tarjeta fisica</h1>
+  <p id="N-tarjeta-mini">**** **** ****</p>
+</div>
+
+<h1 class="que-sige">¿Y que hacemos ahora?</h1>
+
+<div class="boxes">
+
+  <div class="box1" onclick="abrirTransferencia()">
+    <img src="billete.svg" alt="">
+    <p>Transferir</p>
+  </div>
+
+  <div class="box1" onclick="abrirHistorial()">
+    <img src="historial.svg" alt="">
+    <p>Historial</p>
+  </div>
+
+  <div class="box1" onclick="abrirContactos()">
+    <img src="contactos.svg" alt="">
+    <p>Contactos</p>
+  </div>
+
+  <div class="box1" onclick="abrirPrestamos()">
+    <img src="prestamos.svg" alt="">
+    <p>Prestamos</p>
+  </div>
+
+</div>
+
+<section id="tarjeta" class="seccion seccion-panel seccion-tarjeta">
+
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Tarjeta débito</h1>
+  </div>
+
+  <div class="tarjeta-flip-wrap">
+    <div class="tarjeta-flip" id="tarjeta-flip" onclick="toggleFlipTarjeta()">
+      <div class="tarjeta-cara tarjeta-front">
+        <img src="tarjeta2.webp" alt="Tarjeta débito">
+      </div>
+      <div class="tarjeta-cara tarjeta-back">
+        <img src="tarjeta3.png" alt="Reverso tarjeta débito">
+        <div class="tarjeta-info">
+          <div class="tarjeta-info-block">
+            <span class="tarjeta-label">N° de cuenta</span>
+            <span id="N-tarjeta-full" class="tarjeta-numero">**** **** ****</span>
+            <button type="button" class="tarjeta-copy-btn" id="tarjeta-copy-btn" onclick="copiarNumeroCuenta(event)" aria-label="Copiar número de cuenta">
+              <svg class="tarjeta-copy-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+              <span class="tarjeta-copy-txt">Copiar número</span>
+            </button>
+          </div>
+          <div class="tarjeta-info-block">
+            <span class="tarjeta-label">RUT titular</span>
+            <span id="tarjeta-rut" class="tarjeta-rut">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="tarjeta-hint">Toca la tarjeta para ver tu número de cuenta</p>
+
+</section>
+
+<section id="transferir" class="seccion seccion-panel">
+
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Transferir</h1>
+    <span class="panel-header-spacer"></span>
+  </div>
+
+  <form id="transfer-form" class="panel-card">
+
+    <label class="monto-label" for="transfer-monto">Monto a transferir</label>
+    <div class="monto-input-wrap">
+      <span class="monto-prefijo">$</span>
+      <input type="number" id="transfer-monto" placeholder="0" min="1" step="1" inputmode="numeric">
+    </div>
+    <p id="transfer-monto-preview" class="monto-preview">&nbsp;</p>
+
+    <label for="transfer-rut" class="campo-label">RUT del destinatario</label>
+    <div class="campo-input-wrap">
+      <svg class="campo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input type="text" id="transfer-rut" class="campo-input" placeholder="Ej: 12.345.678-9" autocomplete="off">
+    </div>
+
+    <div id="transfer-contactos-quick" class="contactos-quick"></div>
+
+    <p id="transfer-msg" class="transfer-msg"></p>
+
+    <button type="submit" id="transfer-btn" class="btn-primario">
+      <span>Transferir</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    </button>
+
+  </form>
+
+</section>
+
+<section id="historial" class="seccion seccion-panel">
+
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Historial</h1>
+    <span class="panel-header-spacer"></span>
+  </div>
+
+  <div id="historial-lista" class="historial-lista">
+    <p class="hist-vacio">Cargando movimientos...</p>
+  </div>
+
+</section>
+
+<section id="contactos" class="seccion seccion-panel">
+
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Contactos</h1>
+    <button type="button" class="btn-add-contacto" id="btn-add-contacto" onclick="toggleFormContacto()" aria-label="Agregar contacto">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <div id="contactos-lista" class="contactos-lista">
+    <p class="hist-vacio">Cargando contactos...</p>
+  </div>
+
+  <div id="contacto-form-wrap" class="contacto-form-wrap">
+    <form id="contacto-form" class="panel-card panel-card-inset">
+
+      <label for="contacto-nombre" class="campo-label">Nombre del contacto</label>
+      <div class="campo-input-wrap">
+        <svg class="campo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input type="text" id="contacto-nombre" class="campo-input" placeholder="Ej: Juan Pérez" autocomplete="off">
+      </div>
+
+      <label for="contacto-rut" class="campo-label">RUT del contacto</label>
+      <div class="campo-input-wrap">
+        <svg class="campo-icono" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+        <input type="text" id="contacto-rut" class="campo-input" placeholder="Ej: 12.345.678-9" autocomplete="off">
+      </div>
+
+      <p id="contacto-msg" class="transfer-msg"></p>
+
+      <button type="submit" id="contacto-btn" class="btn-primario">
+        <span>Guardar contacto</span>
+      </button>
+
+    </form>
+  </div>
+
+</section>
+
+<section id="prestamos" class="seccion seccion-panel">
+
+  <div class="panel-header">
+    <button type="button" class="btn-back" onclick="volver()" aria-label="Volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1>Préstamos</h1>
+    <span class="panel-header-spacer"></span>
+  </div>
+
+  <div id="prestamo-contenido">
+    <p class="hist-vacio">Cargando...</p>
+  </div>
+
+  <div id="prestamo-historial-wrap" style="display:none;">
+    <h2 class="prestamo-subtitulo">Historial de préstamos</h2>
+    <div id="prestamo-historial-lista" class="historial-lista"></div>
+  </div>
+
+</section>
+
+</body>
+</html>
+
+<style>
+
+body,html {
+  background-color: rgb(19, 19, 19);
+  margin: 0px;
+}
+
+.btn-volver-dash {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgb(37, 37, 37);
+  border-radius: 30px;
+  box-sizing: border-box;
+}
+
+.card-1 {
+  background-color: rgb(37, 37, 37);
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  margin-top: 30px;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 20px;
+}
+
+.card-1 h1 {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  color: white;
+  font-weight: 300;
+}
+
+.hi-temp {
+  color: #ffffff;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-weight: 600;
+  font-size: 25px;
+  max-width: 350px;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.card-1 svg {
+  cursor: pointer;
+  margin-left: 300px;
+}
+
+.saldo-container {
+    display: flex;
+    align-items: center;
+}
+
+.saldo-container h1 {
+    margin: 0;
+}
+
+.saldo-container svg {
+    margin-left: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.card-1 h2 {
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-weight: 100;
+}
+
+.card-1 p {
+  color:  rgb(0, 236, 138);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fila-1 {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.card-2 {
+  position: relative;
+  background-color: rgb(0, 236, 138);
+  max-width: 350px;
+  margin: 30px auto;
+  border-radius: 10px;
+  padding: 5px;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.card-2 h1 {
+  font-size: 20px;
+  margin-left: 20px;  
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.card-2 p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 38px;
+  margin-left: 20px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.que-sige {
+  max-width: 350px;
+  margin: 0 auto;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.boxes {
+  max-width: 350px;
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.box1 {
+  background-color: rgb(37, 37, 37);
+  height: 90px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.box1 img {
+  width: 35px;
+  height: 35px;
+}
+
+.box1 p {
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+
+.ten-green {
+  color: #00ec8a;
+}
+
+.seccion {
+  display: none;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.seccion h1 {
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.seccion p {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* ── Paneles nuevos: Transferir / Historial / Contactos ─────────────────── */
+
+.seccion-panel {
+  padding: 0 20px 30px;
+  box-sizing: border-box;
+  animation: panelIn .32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 18px;
+}
+
+.panel-header h1 {
+  flex: 1;
+  text-align: left !important;
+  font-size: 20px !important;
+  margin: 0 !important;
+  letter-spacing: -0.3px;
+}
+
+.panel-header-spacer {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.btn-back,
+.btn-add-contacto {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(37, 37, 37);
+  border: 1px solid rgb(55, 55, 55);
+  border-radius: 10px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform .15s cubic-bezier(0.16, 1, 0.3, 1), border-color .15s ease, color .15s ease;
+}
+
+.btn-back:hover,
+.btn-add-contacto:hover {
+  border-color: #00ec8a;
+  color: #00ec8a;
+}
+
+.btn-back:active,
+.btn-add-contacto:active {
+  transform: scale(0.92);
+}
+
+.btn-add-contacto {
+  color: #00ec8a;
+}
+
+.panel-card {
+  background: linear-gradient(160deg, rgb(40, 40, 40) 0%, rgb(30, 30, 30) 100%);
+  border: 1px solid rgb(52, 52, 52);
+  border-radius: 18px;
+  padding: 22px 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panel-card-inset {
+  background: rgb(30, 30, 30);
+  margin-top: 14px;
+}
+
+.monto-label,
+.campo-label {
+  color: #9a9a9a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin: 10px 0 6px;
+  text-align: left;
+}
+
+.monto-label {
+  margin-top: 0;
+}
+
+.monto-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 2px solid rgb(60, 60, 60);
+  padding-bottom: 10px;
+  transition: border-color .2s ease;
+}
+
+.monto-input-wrap:focus-within {
+  border-color: #00ec8a;
+}
+
+.monto-prefijo {
+  color: #00ec8a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.monto-input-wrap input {
+  background: none;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  width: 100%;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.monto-input-wrap input::-webkit-outer-spin-button,
+.monto-input-wrap input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.monto-preview {
+  color: #6c6c6c !important;
+  font-size: 12px !important;
+  text-align: left !important;
+  margin: 6px 0 0 !important;
+  min-height: 16px;
+}
+
+.campo-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(55, 55, 55);
+  border-radius: 12px;
+  padding: 0 12px;
+  transition: border-color .2s ease;
+}
+
+.campo-input-wrap:focus-within {
+  border-color: #00ec8a;
+}
+
+.campo-icono {
+  color: #6c6c6c;
+  flex-shrink: 0;
+}
+
+.campo-input-wrap:focus-within .campo-icono {
+  color: #00ec8a;
+}
+
+.campo-input {
+  background: none;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 11px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contactos-quick {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 14px 2px 4px;
+  margin: 0 -2px;
+}
+
+.contactos-quick::-webkit-scrollbar {
+  display: none;
+}
+
+.contacto-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  width: 58px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: .8;
+  transition: opacity .15s ease, transform .15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contacto-chip:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.contacto-chip.activo {
+  opacity: 1;
+}
+
+.contacto-chip-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d0d0d;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  border: 2px solid transparent;
+  transition: border-color .15s ease;
+}
+
+.contacto-chip.activo .contacto-chip-avatar {
+  border-color: #00ec8a;
+}
+
+.contacto-chip-nombre {
+  color: #9a9a9a !important;
+  font-size: 10px !important;
+  text-align: center !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 58px;
+}
+
+.btn-primario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 4px;
+  padding: 13px 20px;
+  background-color: #00ec8a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: #0d0d0d;
+  border-radius: 13px;
+  border: none;
+  cursor: pointer;
+  transition: transform .15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .2s ease, opacity .2s ease;
+  box-shadow: 0 6px 16px -6px rgba(0, 236, 138, 0.45);
+}
+
+.btn-primario:hover {
+  box-shadow: 0 8px 20px -6px rgba(0, 236, 138, 0.6);
+}
+
+.btn-primario:active {
+  transform: scale(0.97);
+}
+
+.btn-primario:disabled {
+  opacity: .55;
+  cursor: default;
+  box-shadow: none;
+}
+
+.transfer-msg {
+  min-height: 18px;
+  font-size: 13px;
+  text-align: center;
+  margin: 4px 0 0;
+}
+
+.transfer-msg.error {
+  color: #ff5c5c;
+}
+
+.transfer-msg.exito {
+  color: #00ec8a;
+}
+
+.historial-lista,
+.contactos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.hist-vacio {
+  color: #9a9a9a !important;
+  font-size: 13px;
+  text-align: center;
+  padding: 30px 0;
+}
+
+.hist-item,
+.contacto-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgb(32, 32, 32);
+  border: 1px solid rgb(48, 48, 48);
+  border-radius: 14px;
+  padding: 11px 14px;
+  box-sizing: border-box;
+  animation: itemIn .28s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.hist-item:hover,
+.contacto-item:hover {
+  border-color: rgb(70, 70, 70);
+  background-color: rgb(36, 36, 36);
+}
+
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hist-item-icono {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hist-item-icono.ingreso,
+.hist-item-icono.sueldo {
+  background-color: rgba(0, 236, 138, 0.14);
+  color: #00ec8a;
+}
+
+.hist-item-icono.egreso {
+  background-color: rgba(255, 92, 92, 0.14);
+  color: #ff5c5c;
+}
+
+.hist-item-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.hist-item-desc {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 165px;
+}
+
+.hist-item-fecha {
+  color: #9a9a9a !important;
+  font-size: 11px !important;
+  text-align: left !important;
+}
+
+.hist-item-monto {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.hist-item-monto.ingreso,
+.hist-item-monto.sueldo {
+  color: #00ec8a;
+}
+
+.hist-item-monto.egreso {
+  color: #ff5c5c;
+}
+
+.contacto-item-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d0d0d;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.contacto-item-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.contacto-item-nombre {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  font-weight: 500 !important;
+}
+
+.contacto-item-rut {
+  color: #9a9a9a !important;
+  font-size: 11px !important;
+  text-align: left !important;
+}
+
+.contacto-item-acciones {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.contacto-item-enviar,
+.contacto-item-borrar {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+
+.contacto-item-enviar {
+  color: #00ec8a;
+}
+
+.contacto-item-borrar {
+  color: #ff5c5c;
+}
+
+.contacto-item-enviar:hover,
+.contacto-item-borrar:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.contacto-form-wrap {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height .32s cubic-bezier(0.16, 1, 0.3, 1), opacity .22s ease;
+}
+
+.contacto-form-wrap.abierto {
+  max-height: 480px;
+  opacity: 1;
+}
+
+/* ── Préstamos ────────────────────────────────────────────────────────── */
+
+.prestamo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.prestamo-badge.pendiente { background: rgba(255, 209, 102, 0.14); color: #ffd166; }
+.prestamo-badge.aprobado  { background: rgba(95, 208, 255, 0.14); color: #5fd0ff; }
+.prestamo-badge.pagado    { background: rgba(0, 236, 138, 0.14); color: #00ec8a; }
+.prestamo-badge.rechazado { background: rgba(255, 92, 92, 0.14); color: #ff5c5c; }
+
+.prestamo-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.prestamo-monto-grande {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 2px 0 0;
+}
+
+.prestamo-razon {
+  color: #9a9a9a !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  margin: 4px 0 0 !important;
+}
+
+.prestamo-divisor {
+  height: 1px;
+  background-color: rgb(52, 52, 52);
+  margin: 16px 0;
+  border: none;
+}
+
+.prestamo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.prestamo-row-label {
+  color: #9a9a9a !important;
+  font-size: 12px !important;
+  text-align: left !important;
+}
+
+.prestamo-row-valor {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  text-align: right !important;
+}
+
+.prestamo-row-valor.egreso { color: #ff5c5c !important; }
+.prestamo-row-valor.ingreso { color: #00ec8a !important; }
+
+.prestamo-progreso-track {
+  width: 100%;
+  height: 7px;
+  background-color: rgb(24, 24, 24);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.prestamo-progreso-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ec8a, #5fd0ff);
+  border-radius: 10px;
+  transition: width .4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prestamo-cuenta-regresiva {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(48, 48, 48);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 14px;
+}
+
+.prestamo-cuenta-regresiva svg {
+  color: #5fd0ff;
+  flex-shrink: 0;
+}
+
+.prestamo-cuenta-regresiva span {
+  color: #ffffff !important;
+  font-size: 12px !important;
+  text-align: left !important;
+}
+
+.btn-secundario {
+  display: block;
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 11px;
+  background: none;
+  border: 1px solid rgb(70, 70, 70);
+  border-radius: 12px;
+  color: #ff5c5c;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.btn-secundario:hover {
+  border-color: #ff5c5c;
+  background-color: rgba(255, 92, 92, 0.08);
+}
+
+.campo-textarea {
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(55, 55, 55);
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  resize: none;
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color .2s ease;
+}
+
+.campo-textarea:focus {
+  outline: none;
+  border-color: #00ec8a;
+}
+
+.campo-select {
+  background-color: rgb(24, 24, 24);
+  border: 1px solid rgb(55, 55, 55);
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color .2s ease;
+}
+
+.campo-select:focus {
+  outline: none;
+  border-color: #00ec8a;
+}
+
+.prestamo-cuota-preview {
+  color: #6c6c6c !important;
+  font-size: 12px !important;
+  text-align: left !important;
+  margin: 6px 0 0 !important;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: #00ec8a;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.checkbox-row span {
+  color: #c9c9c9;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.prestamo-subtitulo {
+  color: #9a9a9a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  text-align: left !important;
+  margin: 22px 0 10px !important;
+}
+
+/* ── Tarjeta débito (flip 3D) ─────────────────────────────────────────── */
+
+#tarjeta .panel-header {
+  position: relative;
+  justify-content: center;
+}
+
+#tarjeta .panel-header .btn-back {
+  position: absolute;
+  left: 0;
+}
+
+#tarjeta .panel-header h1 {
+  flex: none;
+  text-align: center !important;
+}
+
+.tarjeta-flip-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 26px 0 6px;
+}
+
+.tarjeta-flip {
+  position: relative;
+  width: 230px;
+  height: 340px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform .65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tarjeta-flip.volteada {
+  transform: rotateY(180deg);
+}
+
+.tarjeta-cara {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+}
+
+.tarjeta-cara img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.tarjeta-back {
+  transform: rotateY(180deg);
+}
+
+.tarjeta-info {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  width: 184px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.tarjeta-info-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.tarjeta-label {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #8a8a8a !important;
+}
+
+.tarjeta-numero {
+  display: block;
+  max-width: 100%;
+  color: #1a1a1a !important;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: normal;
+  word-break: break-all;
+  text-align: center !important;
+  line-height: 1.3;
+}
+
+.tarjeta-rut {
+  display: block;
+  color: #1a1a1a !important;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-align: center !important;
+}
+
+.tarjeta-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #f2f2f2;
+  color: #1a1a1a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease, border-color .2s ease;
+}
+
+.tarjeta-copy-btn:hover {
+  background: #e6e6e6;
+}
+
+.tarjeta-copy-btn:active {
+  transform: scale(0.94);
+}
+
+.tarjeta-copy-btn.copiado {
+  background: #00ec8a;
+  border-color: #00ec8a;
+  color: #0d0d0d;
+}
+
+.tarjeta-copy-icon {
+  flex-shrink: 0;
+}
+
+.tarjeta-hint {
+  color: #6c6c6c !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  margin-top: 18px !important;
+}
+
+.abrir-cuenta-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  background-color: #00ec8a;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: #0d0d0d;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.abrir-cuenta-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+</style>
+
+<script>
+
+function mostrarSeccion(id) {
+
+    document.querySelector(".card-1").style.display = "none";
+    document.querySelector(".card-2").style.display = "none";
+    document.querySelector(".que-sige").style.display = "none";
+    document.querySelector(".boxes").style.display = "none";
+
+
+    document.getElementById(id).style.display = "block";
+}
+
+
+function volver(){
+
+    document.querySelector(".card-1").style.display = "block";
+    document.querySelector(".card-2").style.display = "block";
+    document.querySelector(".que-sige").style.display = "block";
+    document.querySelector(".boxes").style.display = "grid";
+
+    // Oculta cualquier sección que haya quedado abierta (tarjeta, transferir, etc.)
+    document.querySelectorAll(".seccion").forEach(function (sec) {
+      sec.style.display = "none";
+    });
+
+    // La tarjeta siempre debe volver a mostrar el frente al reabrirla.
+    const flip = document.getElementById('tarjeta-flip');
+    if (flip) flip.classList.remove('volteada');
+
+}
+
+function toggleFlipTarjeta() {
+  const flip = document.getElementById('tarjeta-flip');
+  if (flip) flip.classList.toggle('volteada');
+}
+
+// Copia el número de cuenta al portapapeles sin voltear la tarjeta.
+function copiarNumeroCuenta(event) {
+  event.stopPropagation();
+
+  const numeroEl = document.getElementById('N-tarjeta-full');
+  const btn = document.getElementById('tarjeta-copy-btn');
+  if (!numeroEl || !btn) return;
+
+  const numero = (numeroEl.textContent || '').replace(/\s+/g, '').trim();
+  if (!numero || numero === '****' || numero === 'Sincuenta') return;
+
+  const marcarCopiado = () => {
+    const txt = btn.querySelector('.tarjeta-copy-txt');
+    const original = txt ? txt.textContent : null;
+    btn.classList.add('copiado');
+    if (txt) txt.textContent = '¡Copiado!';
+    setTimeout(() => {
+      btn.classList.remove('copiado');
+      if (txt && original) txt.textContent = original;
+    }, 1500);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(numero).then(marcarCopiado).catch(() => {
+      copiarNumeroCuentaFallback(numero, marcarCopiado);
+    });
+  } else {
+    copiarNumeroCuentaFallback(numero, marcarCopiado);
+  }
+}
+
+function copiarNumeroCuentaFallback(texto, onOk) {
+  try {
+    const tmp = document.createElement('textarea');
+    tmp.value = texto;
+    tmp.style.position = 'fixed';
+    tmp.style.opacity = '0';
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    onOk();
+  } catch (e) {
+    console.error('No se pudo copiar el número de cuenta:', e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Conexión de banco.html con la API real (/api/banco).
+// La identidad del usuario viene de la cookie de sesión (cc_session), por
+// eso no hace falta mandar discord_id a mano: el navegador la envía sola en
+// cada fetch same-origin.
+// ══════════════════════════════════════════════════════════════════════════
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  let cuentaActual = null;
+
+  function formatCLP(monto) {
+    const n = Number(monto) || 0;
+    return '$' + n.toLocaleString('es-CL');
+  }
+
+  // Colores para los avatares de contactos/chips, elegidos por hash del
+  // nombre para que cada contacto tenga siempre el mismo color.
+  const AVATAR_COLORES = ['#00ec8a', '#5fd0ff', '#ffd166', '#ff8fab', '#a78bfa', '#7ee787'];
+  function colorAvatar(str) {
+    const s = String(str || '');
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+    return AVATAR_COLORES[hash % AVATAR_COLORES.length];
+  }
+  function iniciales(nombre) {
+    const partes = String(nombre || '').trim().split(/\s+/).filter(Boolean);
+    if (partes.length === 0) return '?';
+    if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+    return (partes[0][0] + partes[1][0]).toUpperCase();
+  }
+
+  // Formatea un RUT chileno mientras se escribe: 12.345.678-9
+  function formatearRut(valor) {
+    let limpio = String(valor || '').replace(/[^0-9kK]/g, '').toUpperCase();
+    if (limpio.length === 0) return '';
+    limpio = limpio.slice(0, 9);
+    const cuerpo = limpio.slice(0, -1);
+    const dv = limpio.slice(-1);
+    if (cuerpo.length === 0) return dv;
+    let cuerpoFmt = '';
+    for (let i = 0; i < cuerpo.length; i++) {
+      const posDesdeFin = cuerpo.length - i;
+      cuerpoFmt += cuerpo[i];
+      if (posDesdeFin > 1 && (posDesdeFin - 1) % 3 === 0) cuerpoFmt += '.';
+    }
+    return cuerpoFmt + '-' + dv;
+  }
+  function activarFormatoRut(input) {
+    if (!input) return;
+    input.addEventListener('input', function () {
+      const cursorAlFinal = input.selectionEnd === input.value.length;
+      input.value = formatearRut(input.value);
+      if (cursorAlFinal) input.setSelectionRange(input.value.length, input.value.length);
+    });
+  }
+
+  // Ícono según el tipo de movimiento del historial.
+  function iconoMovimiento(tipo) {
+    if (tipo === 'egreso') {
+      return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14"/><path d="M18 13l-6 6-6-6"/></svg>';
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>';
+  }
+
+  // Enmascara el número de cuenta dejando solo los últimos 4 dígitos visibles.
+  function maskNumeroCuenta(numero) {
+    const limpio = String(numero || '').replace(/[^0-9]/g, '');
+    if (limpio.length <= 4) return numero || '';
+    const ultimos4 = limpio.slice(-4);
+    const grupos = Math.max(0, Math.ceil(limpio.length / 4) - 1);
+    return `${'•••• '.repeat(grupos).trim()} ${ultimos4}`.trim();
+  }
+
+  // ── Carga saldo + número de cuenta ───────────────────────────────────────
+  async function cargarCuenta() {
+    const saldoEl   = $('saldo-1');
+    const cuentaEl  = $('n-cuenta');
+    const miniEl    = $('N-tarjeta-mini');
+    const fullEl    = $('N-tarjeta-full');
+    const btnAbrir  = $('btn-abrir-cuenta');
+    const msgAbrir  = $('abrir-cuenta-msg');
+    const card2El   = document.querySelector('.card-2');
+    const boxesEl   = document.querySelector('.boxes');
+    const queSigeEl = document.querySelector('.que-sige');
+
+    try {
+      const res = await fetch('/api/banco?action=cuenta');
+
+      if (res.status === 401) {
+        if (saldoEl) saldoEl.textContent = 'Inicia sesión';
+        if (cuentaEl) cuentaEl.textContent = '—';
+        if (miniEl) miniEl.textContent = 'Inicia sesión';
+        if (btnAbrir) btnAbrir.style.display = 'none';
+        return;
+      }
+
+      if (res.status === 404) {
+        if (saldoEl) saldoEl.textContent = '$0';
+        if (cuentaEl) cuentaEl.textContent = 'Sin cuenta';
+        if (miniEl) miniEl.textContent = 'Debes abrir tu cuenta';
+        if (fullEl) fullEl.textContent = 'Sin cuenta';
+        // Sin cuenta todavía: ocultamos la tarjeta, el título "¿Y que
+        // hacemos ahora?" y los accesos rápidos (no tienen sentido sin
+        // cuenta) y mostramos el botón para abrirla por primera vez.
+        if (card2El) card2El.style.display = 'none';
+        if (queSigeEl) queSigeEl.style.display = 'none';
+        if (boxesEl) boxesEl.style.display = 'none';
+        if (btnAbrir) btnAbrir.style.display = 'block';
+        return;
+      }
+
+      if (!res.ok) throw new Error('No se pudo cargar la cuenta');
+
+      const data = await res.json();
+      cuentaActual = data.cuenta;
+
+      if (saldoEl) {
+        saldoEl.textContent = formatCLP(cuentaActual.saldo);
+        saldoEl.dataset.saldoReal = cuentaActual.saldo;
+        saldoEl.dataset.oculto = '0';
+      }
+      if (cuentaEl) cuentaEl.textContent = cuentaActual.numero_cuenta;
+      if (miniEl) miniEl.textContent = maskNumeroCuenta(cuentaActual.numero_cuenta);
+      if (fullEl) fullEl.textContent = cuentaActual.numero_cuenta;
+      if (btnAbrir) btnAbrir.style.display = 'none';
+      if (msgAbrir) msgAbrir.style.display = 'none';
+      if (card2El) card2El.style.display = 'block';
+      if (queSigeEl) queSigeEl.style.display = 'block';
+      if (boxesEl) boxesEl.style.display = 'grid';
+
+      cargarRutTarjeta();
+
+    } catch (err) {
+      console.error('Error cargando la cuenta:', err);
+      if (saldoEl) saldoEl.textContent = 'Error';
+      if (cuentaEl) cuentaEl.textContent = 'Error';
+    }
+  }
+
+  // ── Carga el RUT del titular para mostrarlo en el reverso de la tarjeta ──
+  async function cargarRutTarjeta() {
+    const rutEl = $('tarjeta-rut');
+    if (!rutEl) return;
+    try {
+      const res = await fetch('/api/dni');
+      if (!res.ok) { rutEl.textContent = '—'; return; }
+      const data = await res.json();
+      rutEl.textContent = (data.existe && data.dni && data.dni.rut) ? data.dni.rut : '—';
+    } catch (err) {
+      console.error('Error cargando el RUT:', err);
+      rutEl.textContent = '—';
+    }
+  }
+
+  // ── Ocultar/mostrar el saldo con el ícono de ojo ─────────────────────────
+  window.toggleSaldo = function () {
+    const saldoEl = $('saldo-1');
+    if (!saldoEl || saldoEl.dataset.saldoReal === undefined) return;
+
+    const oculto = saldoEl.dataset.oculto === '1';
+    if (oculto) {
+      saldoEl.textContent = formatCLP(saldoEl.dataset.saldoReal);
+      saldoEl.dataset.oculto = '0';
+    } else {
+      saldoEl.textContent = '••••••';
+      saldoEl.dataset.oculto = '1';
+    }
+  };
+
+  // ── Abrir cuenta / tarjeta por primera vez ───────────────────────────────
+  async function abrirCuenta() {
+    const btnAbrir = $('btn-abrir-cuenta');
+    const msgAbrir = $('abrir-cuenta-msg');
+    if (!btnAbrir) return;
+
+    msgAbrir.style.display = 'block';
+    msgAbrir.textContent = '';
+    msgAbrir.className = 'transfer-msg';
+
+    btnAbrir.disabled = true;
+    const textoOriginal = btnAbrir.textContent;
+    btnAbrir.textContent = 'Abriendo cuenta...';
+
+    try {
+      const res = await fetch('/api/banco?action=crear', { method: 'POST' });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // El backend exige tener el DNI creado antes de abrir la cuenta.
+        msgAbrir.textContent = data.error || 'No se pudo abrir la cuenta.';
+        msgAbrir.classList.add('error');
+        return;
+      }
+
+      msgAbrir.textContent = '¡Cuenta creada! Cargando...';
+      msgAbrir.classList.add('exito');
+      await cargarCuenta();
+    } catch (err) {
+      console.error('Error abriendo la cuenta:', err);
+      msgAbrir.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgAbrir.classList.add('error');
+    } finally {
+      btnAbrir.disabled = false;
+      btnAbrir.textContent = textoOriginal;
+    }
+  }
+
+  // ── Transferencias ───────────────────────────────────────────────────────
+  let contactosCache = null; // se reutiliza entre Contactos y los chips rápidos de Transferir
+
+  window.abrirTransferencia = function () {
+    const msgEl = $('transfer-msg');
+    if (msgEl) {
+      msgEl.textContent = '';
+      msgEl.className = 'transfer-msg';
+    }
+    const montoPreview = $('transfer-monto-preview');
+    if (montoPreview) montoPreview.textContent = '\u00a0';
+    mostrarSeccion('transferir');
+    cargarContactosQuick();
+  };
+
+  async function cargarContactosQuick() {
+    const cont = $('transfer-contactos-quick');
+    if (!cont) return;
+
+    if (!contactosCache) {
+      try {
+        const res = await fetch('/api/banco?action=contactos');
+        if (res.ok) {
+          const data = await res.json();
+          contactosCache = data.contactos || [];
+        }
+      } catch (err) {
+        console.error('Error cargando contactos rápidos:', err);
+      }
+    }
+
+    const contactos = contactosCache || [];
+    if (contactos.length === 0) {
+      cont.innerHTML = '';
+      return;
+    }
+
+    cont.innerHTML = contactos.map(function (c) {
+      const color = colorAvatar(c.nombre);
+      return (
+        '<button type="button" class="contacto-chip" data-rut="' + escHtml(c.rut) + '" onclick="seleccionarContactoChip(this)">' +
+          '<span class="contacto-chip-avatar" style="background-color:' + color + '">' + escHtml(iniciales(c.nombre)) + '</span>' +
+          '<span class="contacto-chip-nombre">' + escHtml(c.nombre.split(' ')[0]) + '</span>' +
+        '</button>'
+      );
+    }).join('');
+  }
+
+  window.seleccionarContactoChip = function (el) {
+    const rutInput = $('transfer-rut');
+    if (rutInput) rutInput.value = formatearRut(el.dataset.rut);
+    document.querySelectorAll('.contacto-chip').forEach(function (chip) {
+      chip.classList.toggle('activo', chip === el);
+    });
+  };
+
+  // Preseleccionar RUT de un contacto y saltar directo a Transferir.
+  window.transferirAContacto = function (rut) {
+    window.abrirTransferencia();
+    const rutInput = $('transfer-rut');
+    if (rutInput) rutInput.value = formatearRut(rut);
+  };
+
+  async function enviarTransferencia(ev) {
+    ev.preventDefault();
+
+    const rutInput   = $('transfer-rut');
+    const montoInput = $('transfer-monto');
+    const msgEl      = $('transfer-msg');
+    const btn        = $('transfer-btn');
+    const btnLabel    = btn.querySelector('span');
+
+    const rut   = rutInput.value.trim();
+    const monto = parseInt(montoInput.value, 10);
+
+    msgEl.textContent = '';
+    msgEl.className = 'transfer-msg';
+
+    if (!rut) {
+      msgEl.textContent = 'Ingresa el RUT del destinatario.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!monto || monto <= 0) {
+      msgEl.textContent = 'Ingresa un monto válido.';
+      msgEl.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    const textoOriginal = btnLabel.textContent;
+    btnLabel.textContent = 'Enviando...';
+
+    try {
+      const res = await fetch('/api/banco?action=transferir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rut_destino: rut, monto: monto }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.error || 'No se pudo realizar la transferencia.';
+        msgEl.classList.add('error');
+        return;
+      }
+
+      msgEl.textContent = 'Transferencia exitosa. Nuevo saldo: ' + formatCLP(data.nuevoSaldo);
+      msgEl.classList.add('exito');
+      rutInput.value = '';
+      montoInput.value = '';
+      const montoPreview = $('transfer-monto-preview');
+      if (montoPreview) montoPreview.textContent = '\u00a0';
+      document.querySelectorAll('.contacto-chip').forEach(function (chip) {
+        chip.classList.remove('activo');
+      });
+
+      await cargarCuenta();
+    } catch (err) {
+      console.error('Error en la transferencia:', err);
+      msgEl.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgEl.classList.add('error');
+    } finally {
+      btn.disabled = false;
+      btnLabel.textContent = textoOriginal;
+    }
+  }
+
+  // Escapa texto antes de meterlo en innerHTML (nombres, descripciones, etc.
+  // pueden venir de otros usuarios, así que nunca se insertan crudos).
+  function escHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  // ── Historial ─────────────────────────────────────────────────────────────
+  window.abrirHistorial = function () {
+    mostrarSeccion('historial');
+    cargarHistorial();
+  };
+
+  async function cargarHistorial() {
+    const lista = $('historial-lista');
+    if (!lista) return;
+    lista.innerHTML = '<p class="hist-vacio">Cargando movimientos...</p>';
+
+    try {
+      const res = await fetch('/api/banco?action=historial');
+
+      if (res.status === 401) {
+        lista.innerHTML = '<p class="hist-vacio">Inicia sesión para ver tu historial.</p>';
+        return;
+      }
+      if (!res.ok) throw new Error('No se pudo cargar el historial');
+
+      const data = await res.json();
+      const transacciones = data.transacciones || [];
+
+      if (transacciones.length === 0) {
+        lista.innerHTML = '<p class="hist-vacio">Sin movimientos aún.</p>';
+        return;
+      }
+
+      lista.innerHTML = transacciones.map(function (t, idx) {
+        const signo = t.tipo === 'egreso' ? '-' : '+';
+        const fecha = new Date(t.created_at).toLocaleDateString('es-CL', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+        });
+        const demora = Math.min(idx, 8) * 0.035;
+        return (
+          '<div class="hist-item" style="animation-delay:' + demora + 's">' +
+            '<div class="hist-item-icono ' + escHtml(t.tipo) + '">' + iconoMovimiento(t.tipo) + '</div>' +
+            '<div class="hist-item-info">' +
+              '<span class="hist-item-desc">' + escHtml(t.descripcion || t.tipo) + '</span>' +
+              '<span class="hist-item-fecha">' + fecha + '</span>' +
+            '</div>' +
+            '<div class="hist-item-monto ' + escHtml(t.tipo) + '">' + signo + formatCLP(t.monto) + '</div>' +
+          '</div>'
+        );
+      }).join('');
+    } catch (err) {
+      console.error('Error cargando el historial:', err);
+      lista.innerHTML = '<p class="hist-vacio">Error al cargar el historial.</p>';
+    }
+  }
+
+  // ── Préstamos ─────────────────────────────────────────────────────────────
+  const PRESTAMO_CUOTAS_MAX = 12;
+  const PRESTAMO_ETIQUETAS_ESTADO = {
+    pendiente: 'Pendiente de revisión',
+    aprobado:  'Aprobado',
+    pagado:    'Pagado',
+    rechazado: 'Rechazado',
+  };
+
+  window.abrirPrestamos = function () {
+    mostrarSeccion('prestamos');
+    cargarPrestamos();
+  };
+
+  function formatDuracion(ms) {
+    if (ms == null || ms <= 0) return 'muy pronto';
+    const totalMin = Math.floor(ms / 60000);
+    const dias = Math.floor(totalMin / (60 * 24));
+    const horas = Math.floor((totalMin % (60 * 24)) / 60);
+    const min = totalMin % 60;
+    if (dias > 0) return dias + 'd ' + horas + 'h';
+    if (horas > 0) return horas + 'h ' + min + 'min';
+    return min + ' min';
+  }
+
+  async function cargarPrestamos() {
+    const contenido = $('prestamo-contenido');
+    const histWrap   = $('prestamo-historial-wrap');
+    const histLista   = $('prestamo-historial-lista');
+    if (!contenido) return;
+    contenido.innerHTML = '<p class="hist-vacio">Cargando...</p>';
+    if (histWrap) histWrap.style.display = 'none';
+
+    try {
+      const [resCuenta, resMios] = await Promise.all([
+        fetch('/api/banco?action=cuenta'),
+        fetch('/api/banco?action=prestamos_mios'),
+      ]);
+
+      if (resCuenta.status === 401) {
+        contenido.innerHTML = '<p class="hist-vacio">Inicia sesión para pedir un préstamo.</p>';
+        return;
+      }
+      if (resCuenta.status === 404) {
+        contenido.innerHTML = '<p class="hist-vacio">Debes abrir tu cuenta bancaria antes de solicitar un préstamo.</p>';
+        return;
+      }
+      if (!resCuenta.ok) throw new Error('No se pudo cargar la cuenta');
+
+      const dataCuenta = await resCuenta.json();
+      const activo = dataCuenta.prestamoActivo;
+
+      if (activo) {
+        renderPrestamoActivo(contenido, activo);
+      } else {
+        renderFormularioSolicitud(contenido);
+      }
+
+      if (resMios.ok) {
+        const dataMios = await resMios.json();
+        const historial = (dataMios.prestamos || []).filter(function (p) {
+          return p.estado === 'pagado' || p.estado === 'rechazado';
+        });
+        if (historial.length > 0 && histWrap && histLista) {
+          histWrap.style.display = 'block';
+          histLista.innerHTML = historial.map(function (p, idx) {
+            const fecha = new Date(p.created_at).toLocaleDateString('es-CL', {
+              day: '2-digit', month: '2-digit', year: 'numeric',
+            });
+            const demora = Math.min(idx, 8) * 0.035;
+            return (
+              '<div class="hist-item" style="animation-delay:' + demora + 's">' +
+                '<div class="hist-item-icono ' + (p.estado === 'pagado' ? 'ingreso' : 'egreso') + '">' + iconoMovimiento(p.estado === 'pagado' ? 'ingreso' : 'egreso') + '</div>' +
+                '<div class="hist-item-info">' +
+                  '<span class="hist-item-desc">' + escHtml(p.razon) + '</span>' +
+                  '<span class="hist-item-fecha">' + fecha + '</span>' +
+                '</div>' +
+                '<div class="hist-item-monto">' + formatCLP(p.monto) + '</div>' +
+              '</div>'
+            );
+          }).join('');
+        }
+      }
+    } catch (err) {
+      console.error('Error cargando préstamos:', err);
+      contenido.innerHTML = '<p class="hist-vacio">Error al cargar la información de préstamos.</p>';
+    }
+  }
+
+  function renderPrestamoActivo(contenido, p) {
+    const badgeClase = escHtml(p.estado);
+    const badgeTexto = PRESTAMO_ETIQUETAS_ESTADO[p.estado] || p.estado;
+    const progreso = p.cuotas_totales > 0 ? Math.round((p.cuotas_pagadas / p.cuotas_totales) * 100) : 0;
+
+    let html = '' +
+      '<div class="panel-card">' +
+        '<div class="prestamo-card-top">' +
+          '<div>' +
+            '<p class="prestamo-razon">' + escHtml(p.razon) + '</p>' +
+            '<p class="prestamo-monto-grande">' + formatCLP(p.monto) + '</p>' +
+          '</div>' +
+          '<span class="prestamo-badge ' + badgeClase + '">' + escHtml(badgeTexto) + '</span>' +
+        '</div>' +
+        '<hr class="prestamo-divisor">' +
+        '<div class="prestamo-row">' +
+          '<span class="prestamo-row-label">Cuotas pagadas</span>' +
+          '<span class="prestamo-row-valor">' + p.cuotas_pagadas + ' / ' + p.cuotas_totales + '</span>' +
+        '</div>' +
+        '<div class="prestamo-progreso-track"><div class="prestamo-progreso-fill" style="width:' + progreso + '%"></div></div>' +
+        '<div class="prestamo-row">' +
+          '<span class="prestamo-row-label">Valor de la cuota</span>' +
+          '<span class="prestamo-row-valor">' + formatCLP(p.cuota_monto) + '</span>' +
+        '</div>' +
+        '<div class="prestamo-row">' +
+          '<span class="prestamo-row-label">Saldo pendiente</span>' +
+          '<span class="prestamo-row-valor egreso">' + formatCLP(p.saldo_pendiente) + '</span>' +
+        '</div>' +
+        (p.deuda_ciclo > 0 ? (
+          '<div class="prestamo-row">' +
+            '<span class="prestamo-row-label">Deuda arrastrada este ciclo</span>' +
+            '<span class="prestamo-row-valor egreso">' + formatCLP(p.deuda_ciclo) + '</span>' +
+          '</div>'
+        ) : '') +
+        (p.estado === 'aprobado' && p.proximoCobroMs != null ? (
+          '<div class="prestamo-cuenta-regresiva">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>' +
+            '<span>Próximo cobro automático en ' + formatDuracion(p.proximoCobroMs) + '</span>' +
+          '</div>'
+        ) : '') +
+        (p.estado === 'pendiente' ? (
+          '<button type="button" class="btn-secundario" onclick="cancelarPrestamo(' + p.id + ')">Cancelar solicitud</button>'
+        ) : '') +
+      '</div>';
+
+    contenido.innerHTML = html;
+  }
+
+  function renderFormularioSolicitud(contenido) {
+    let opcionesCuotas = '';
+    for (let i = 1; i <= PRESTAMO_CUOTAS_MAX; i++) {
+      opcionesCuotas += '<option value="' + i + '"' + (i === 1 ? ' selected' : '') + '>' + i + (i === 1 ? ' cuota' : ' cuotas') + '</option>';
+    }
+
+    contenido.innerHTML = '' +
+      '<form id="prestamo-form" class="panel-card" onsubmit="solicitarPrestamo(event)">' +
+        '<label class="monto-label" for="prestamo-monto">Monto a solicitar</label>' +
+        '<div class="monto-input-wrap">' +
+          '<span class="monto-prefijo">$</span>' +
+          '<input type="number" id="prestamo-monto" placeholder="0" min="1" step="1" inputmode="numeric" oninput="actualizarPreviewCuota()">' +
+        '</div>' +
+        '<p id="prestamo-cuota-preview" class="prestamo-cuota-preview">&nbsp;</p>' +
+
+        '<label for="prestamo-razon" class="campo-label">Razón del préstamo</label>' +
+        '<textarea id="prestamo-razon" class="campo-textarea" rows="2" maxlength="200" placeholder="Ej: Necesito capital para mi negocio"></textarea>' +
+
+        '<label for="prestamo-cuotas" class="campo-label">Cuotas</label>' +
+        '<select id="prestamo-cuotas" class="campo-select" onchange="actualizarPreviewCuota()">' + opcionesCuotas + '</select>' +
+
+        '<label class="checkbox-row" for="prestamo-acepta">' +
+          '<input type="checkbox" id="prestamo-acepta">' +
+          '<span>Acepto que las cuotas se cobren automáticamente desde mi cuenta cada ' + '2 días hasta pagar el préstamo completo.</span>' +
+        '</label>' +
+
+        '<p id="prestamo-msg" class="transfer-msg"></p>' +
+
+        '<button type="submit" id="prestamo-btn" class="btn-primario"><span>Solicitar préstamo</span></button>' +
+      '</form>';
+  }
+
+  window.actualizarPreviewCuota = function () {
+    const monto  = parseInt(($('prestamo-monto') || {}).value, 10);
+    const cuotas = parseInt(($('prestamo-cuotas') || {}).value, 10);
+    const preview = $('prestamo-cuota-preview');
+    if (!preview) return;
+    if (!monto || monto <= 0 || !cuotas) {
+      preview.textContent = '\u00a0';
+      return;
+    }
+    const cuotaMonto = Math.ceil(monto / cuotas);
+    preview.textContent = cuotas + ' cuota' + (cuotas > 1 ? 's' : '') + ' de ' + formatCLP(cuotaMonto);
+  };
+
+  window.solicitarPrestamo = async function (ev) {
+    ev.preventDefault();
+
+    const montoInput  = $('prestamo-monto');
+    const razonInput  = $('prestamo-razon');
+    const cuotasInput = $('prestamo-cuotas');
+    const aceptaInput = $('prestamo-acepta');
+    const msgEl       = $('prestamo-msg');
+    const btn         = $('prestamo-btn');
+    const btnLabel    = btn.querySelector('span');
+
+    const monto  = parseInt(montoInput.value, 10);
+    const razon  = razonInput.value.trim();
+    const cuotas = parseInt(cuotasInput.value, 10);
+
+    msgEl.textContent = '';
+    msgEl.className = 'transfer-msg';
+
+    if (!monto || monto <= 0) {
+      msgEl.textContent = 'Ingresa un monto válido.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!razon) {
+      msgEl.textContent = 'Indica la razón del préstamo.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!aceptaInput.checked) {
+      msgEl.textContent = 'Debes aceptar el cobro automático de las cuotas.';
+      msgEl.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    const textoOriginal = btnLabel.textContent;
+    btnLabel.textContent = 'Enviando...';
+
+    try {
+      const res = await fetch('/api/banco?action=prestamo_solicitar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ monto: monto, razon: razon, cuotas: cuotas, acepta_cobro_auto: true }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.error || 'No se pudo enviar la solicitud.';
+        msgEl.classList.add('error');
+        btn.disabled = false;
+        btnLabel.textContent = textoOriginal;
+        return;
+      }
+
+      await cargarPrestamos();
+    } catch (err) {
+      console.error('Error solicitando préstamo:', err);
+      msgEl.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgEl.classList.add('error');
+      btn.disabled = false;
+      btnLabel.textContent = textoOriginal;
+    }
+  };
+
+  window.cancelarPrestamo = async function (id) {
+    try {
+      const res = await fetch('/api/banco?action=prestamo_cancelar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prestamo_id: id }),
+      });
+      if (!res.ok) throw new Error('No se pudo cancelar la solicitud');
+      await cargarPrestamos();
+    } catch (err) {
+      console.error('Error cancelando préstamo:', err);
+    }
+  };
+
+  // ── Contactos ─────────────────────────────────────────────────────────────
+  window.abrirContactos = function () {
+    const msgEl = $('contacto-msg');
+    if (msgEl) {
+      msgEl.textContent = '';
+      msgEl.className = 'transfer-msg';
+    }
+    cerrarFormContacto();
+    mostrarSeccion('contactos');
+    cargarContactos();
+  };
+
+  window.toggleFormContacto = function () {
+    const wrap = $('contacto-form-wrap');
+    const btn  = $('btn-add-contacto');
+    if (!wrap) return;
+    const abierto = wrap.classList.toggle('abierto');
+    if (btn) btn.style.transform = abierto ? 'rotate(45deg)' : 'rotate(0deg)';
+    if (abierto) {
+      const nombreInput = $('contacto-nombre');
+      if (nombreInput) setTimeout(function () { nombreInput.focus(); }, 200);
+    }
+  };
+
+  function cerrarFormContacto() {
+    const wrap = $('contacto-form-wrap');
+    const btn  = $('btn-add-contacto');
+    if (wrap) wrap.classList.remove('abierto');
+    if (btn) btn.style.transform = 'rotate(0deg)';
+  }
+
+  async function cargarContactos() {
+    const lista = $('contactos-lista');
+    if (!lista) return;
+    lista.innerHTML = '<p class="hist-vacio">Cargando contactos...</p>';
+
+    try {
+      const res = await fetch('/api/banco?action=contactos');
+
+      if (res.status === 401) {
+        lista.innerHTML = '<p class="hist-vacio">Inicia sesión para ver tus contactos.</p>';
+        return;
+      }
+      if (!res.ok) throw new Error('No se pudo cargar los contactos');
+
+      const data = await res.json();
+      const contactos = data.contactos || [];
+      contactosCache = contactos; // reutilizado por los chips rápidos de Transferir
+
+      if (contactos.length === 0) {
+        lista.innerHTML = '<p class="hist-vacio">Aún no tienes contactos guardados. Toca "+" para agregar el primero.</p>';
+        return;
+      }
+
+      lista.innerHTML = contactos.map(function (c, idx) {
+        const color = colorAvatar(c.nombre);
+        const demora = Math.min(idx, 8) * 0.035;
+        return (
+          '<div class="contacto-item" style="animation-delay:' + demora + 's">' +
+            '<div class="contacto-item-avatar" style="background-color:' + color + '">' + escHtml(iniciales(c.nombre)) + '</div>' +
+            '<div class="contacto-item-info">' +
+              '<span class="contacto-item-nombre">' + escHtml(c.nombre) + '</span>' +
+              '<span class="contacto-item-rut">' + escHtml(c.rut) + '</span>' +
+            '</div>' +
+            '<div class="contacto-item-acciones">' +
+              '<button type="button" class="contacto-item-enviar" onclick="transferirAContacto(\'' + escHtml(c.rut).replace(/'/g, "\\'") + '\')" title="Transferir">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>' +
+              '</button>' +
+              '<button type="button" class="contacto-item-borrar" onclick="borrarContacto(' + c.id + ')" title="Eliminar">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
+    } catch (err) {
+      console.error('Error cargando los contactos:', err);
+      lista.innerHTML = '<p class="hist-vacio">Error al cargar los contactos.</p>';
+    }
+  }
+
+  async function agregarContacto(ev) {
+    ev.preventDefault();
+
+    const nombreInput = $('contacto-nombre');
+    const rutInput    = $('contacto-rut');
+    const msgEl       = $('contacto-msg');
+    const btn         = $('contacto-btn');
+    const btnLabel    = btn.querySelector('span');
+
+    const nombre = nombreInput.value.trim();
+    const rut    = rutInput.value.trim();
+
+    msgEl.textContent = '';
+    msgEl.className = 'transfer-msg';
+
+    if (!nombre) {
+      msgEl.textContent = 'Ingresa el nombre del contacto.';
+      msgEl.classList.add('error');
+      return;
+    }
+    if (!rut) {
+      msgEl.textContent = 'Ingresa el RUT del contacto.';
+      msgEl.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    const textoOriginal = btnLabel.textContent;
+    btnLabel.textContent = 'Agregando...';
+
+    try {
+      const res = await fetch('/api/banco?action=contacto_agregar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: nombre, rut: rut }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.error || 'No se pudo agregar el contacto.';
+        msgEl.classList.add('error');
+        return;
+      }
+
+      msgEl.textContent = 'Contacto agregado.';
+      msgEl.classList.add('exito');
+      nombreInput.value = '';
+      rutInput.value = '';
+
+      await cargarContactos();
+      setTimeout(cerrarFormContacto, 700);
+    } catch (err) {
+      console.error('Error agregando contacto:', err);
+      msgEl.textContent = 'Error de conexión. Intenta de nuevo.';
+      msgEl.classList.add('error');
+    } finally {
+      btn.disabled = false;
+      btnLabel.textContent = textoOriginal;
+    }
+  }
+
+  window.borrarContacto = async function (id) {
+    try {
+      const res = await fetch('/api/banco?action=contacto_borrar&id=' + encodeURIComponent(id), {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('No se pudo eliminar el contacto');
+      await cargarContactos();
+    } catch (err) {
+      console.error('Error eliminando contacto:', err);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    cargarCuenta();
+    const form = $('transfer-form');
+    if (form) form.addEventListener('submit', enviarTransferencia);
+    const formContacto = $('contacto-form');
+    if (formContacto) formContacto.addEventListener('submit', agregarContacto);
+    const btnAbrir = $('btn-abrir-cuenta');
+    if (btnAbrir) btnAbrir.addEventListener('click', abrirCuenta);
+
+    activarFormatoRut($('transfer-rut'));
+    activarFormatoRut($('contacto-rut'));
+
+    const montoInput = $('transfer-monto');
+    const montoPreview = $('transfer-monto-preview');
+    if (montoInput && montoPreview) {
+      montoInput.addEventListener('input', function () {
+        montoPreview.textContent = montoInput.value ? 'Son ' + formatCLP(montoInput.value) : '\u00a0';
+      });
+    }
+  });
+})();
+
+</script>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+
+  <!-- Usuario origen -->
+  <circle cx="6.5" cy="8" r="3" fill="white"></circle>
+  <path fill="white" d="M2 18c0-2.8 2-4.5 4.5-4.5S11 15.2 11 18v1H2z"></path>
+
+  <!-- Usuario destino -->
+  <circle cx="17.5" cy="8" r="3" fill="white"></circle>
+  <path fill="white" d="M13 18c0-2.8 2-4.5 4.5-4.5S22 15.2 22 18v1h-9z"></path>
+
+  <!-- Flecha transferencia -->
+  <path fill="#00ec8a" d="M8 11h8l-2-2 1.2-1.2L20.4 13l-5.2 5.2L14 17l2-2H8z"></path>
+
+</svg>
