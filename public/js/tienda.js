@@ -184,7 +184,7 @@
           const el3 = document.getElementById('landing-live-stat-text');
           if (el1) el1.textContent = txt;
           if (el2) el2.textContent = txt;
-          if (el3) el3.textContent = online.toLocaleString() + ' personas conectadas ahora · ' + total.toLocaleString() + ' miembros en la comunidad';
+          if (el3) el3.textContent = online.toLocaleString() + ' en línea ahora';
         }
       } catch(e) { /* silencioso */ }
     }
