@@ -19,9 +19,9 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=75">
-  <link rel="stylesheet" href="/page-loader.css?v=75">
-  <link rel="stylesheet" href="/clean-theme.css?v=75">
+  <link rel="stylesheet" href="/styles.css?v=76">
+  <link rel="stylesheet" href="/page-loader.css?v=76">
+  <link rel="stylesheet" href="/clean-theme.css?v=76">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -122,8 +122,8 @@
 
     <div class="dash-body">
       <div class="dash-welcome">
-        <h1>Hola, <span id="dash-welcome-name" class="dw-skel"></span><span id="dash-welcome-wave" class="dw-wave"> 👋</span></h1>
-        <p>Esto es lo que está pasando en la ciudad hoy.</p>
+        <h1><span id="dash-welcome-greeting">Hola</span>, <span id="dash-welcome-name" class="dw-skel"></span><span id="dash-welcome-wave" class="dw-wave"> 👋</span></h1>
+        <p id="dash-welcome-sub">Esto es lo que está pasando en la ciudad hoy.</p>
       </div>
       <script>
         // Copia el nombre de Discord ya cargado por app.js (goToDashboard())
@@ -151,6 +151,30 @@
           }
           sync();
           new MutationObserver(sync).observe(origen, { childList: true, characterData: true, subtree: true });
+
+          // ── Saludo dinámico: "Buenos días/tardes/noches" según la hora,
+          // y la fecha/hora actual de Santiago en el subtítulo, actualizada
+          // en vivo cada minuto para que la card se sienta "viva".
+          var elGreeting = document.getElementById('dash-welcome-greeting');
+          var elSub = document.getElementById('dash-welcome-sub');
+          var DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+          var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+          function actualizarSaludo() {
+            var ahoraStr = new Date().toLocaleString('en-US', { timeZone: 'America/Santiago' });
+            var ahora = new Date(ahoraStr);
+            var h = ahora.getHours();
+            var saludo = h < 6 ? 'Buenas noches' : h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+            if (elGreeting) elGreeting.textContent = saludo;
+            if (elSub) {
+              var dia = DIAS[ahora.getDay()];
+              var mes = MESES[ahora.getMonth()];
+              var hh = String(ahora.getHours()).padStart(2, '0');
+              var mm = String(ahora.getMinutes()).padStart(2, '0');
+              elSub.textContent = 'Hoy es ' + dia + ' ' + ahora.getDate() + ' de ' + mes + ' · ' + hh + ':' + mm + ' en Santiago';
+            }
+          }
+          actualizarSaludo();
+          setInterval(actualizarSaludo, 60000);
         });
       </script>
       <div class="profile-hero">
@@ -977,25 +1001,25 @@
   </div>
 
 
-  <script defer src="/js/app.js?v=75"></script>
-  <script defer src="/js/dashboard-fx.js?v=75"></script>
-  <script defer src="/js/notificaciones.js?v=75"></script>
-  <script defer src="/js/pull-to-refresh.js?v=75"></script>
-  <script defer src="/js/registro-civil.js?v=75"></script>
-  <script defer src="/js/banco.js?v=75"></script>
+  <script defer src="/js/app.js?v=76"></script>
+  <script defer src="/js/dashboard-fx.js?v=76"></script>
+  <script defer src="/js/notificaciones.js?v=76"></script>
+  <script defer src="/js/pull-to-refresh.js?v=76"></script>
+  <script defer src="/js/registro-civil.js?v=76"></script>
+  <script defer src="/js/banco.js?v=76"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=75"></script>
-  <script defer src="/js/mercado.js?v=75"></script>
-  <script defer src="/js/vehiculos.js?v=75"></script>
-  <script defer src="/js/concesionario.js?v=75"></script>
-  <script defer src="/js/mis-autos.js?v=75"></script>
-  <script defer src="/js/admin-tienda.js?v=75"></script>
-  <script defer src="/js/empresas.js?v=75"></script>
-  <script defer src="/js/logros.js?v=75"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=75"></script>
-  <script defer src="/js/panel-admin.js?v=75"></script>
-  <script defer src="/js/comisaria.js?v=75"></script>
-  <script defer src="/js/apuestas.js?v=75"></script>
-  <script defer src="/js/parallax-landing.js?v=75"></script>
+  <script defer src="/js/tienda.js?v=76"></script>
+  <script defer src="/js/mercado.js?v=76"></script>
+  <script defer src="/js/vehiculos.js?v=76"></script>
+  <script defer src="/js/concesionario.js?v=76"></script>
+  <script defer src="/js/mis-autos.js?v=76"></script>
+  <script defer src="/js/admin-tienda.js?v=76"></script>
+  <script defer src="/js/empresas.js?v=76"></script>
+  <script defer src="/js/logros.js?v=76"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=76"></script>
+  <script defer src="/js/panel-admin.js?v=76"></script>
+  <script defer src="/js/comisaria.js?v=76"></script>
+  <script defer src="/js/apuestas.js?v=76"></script>
+  <script defer src="/js/parallax-landing.js?v=76"></script>
 </body>
 </html>
