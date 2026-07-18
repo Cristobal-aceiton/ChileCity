@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v78"; // <--- ⚠️ ACTUALIZADO A v78 (stat en vivo del landing: solo cantidad de usuarios en línea)
+const CACHE_VERSION = "v79"; // <--- ⚠️ ACTUALIZADO A v79 (contador de en línea ahora vía /api/discord-stats, arregla bug de CSP bloqueando fetch directo a discord.com)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
