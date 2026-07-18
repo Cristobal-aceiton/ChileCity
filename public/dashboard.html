@@ -19,9 +19,9 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=74">
-  <link rel="stylesheet" href="/page-loader.css?v=74">
-  <link rel="stylesheet" href="/clean-theme.css?v=74">
+  <link rel="stylesheet" href="/styles.css?v=75">
+  <link rel="stylesheet" href="/page-loader.css?v=75">
+  <link rel="stylesheet" href="/clean-theme.css?v=75">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -102,7 +102,8 @@
         </button>
         <div class="user-pill" id="user-pill">
           <div class="user-avatar">
-            <img src="" alt="Avatar" id="discord-avatar">
+            <svg class="avatar-placeholder" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <img src="" alt="Avatar" id="discord-avatar" onload="this.previousElementSibling.style.display='none'; this.classList.add('av-listo')" onerror="this.classList.remove('av-listo')">
           </div>
           <div>
             <div class="user-name" id="discord-name">Usuario</div>
@@ -121,30 +122,44 @@
 
     <div class="dash-body">
       <div class="dash-welcome">
-        <h1>Hola, <span id="dash-welcome-name">Ciudadano</span> 👋</h1>
+        <h1>Hola, <span id="dash-welcome-name" class="dw-skel"></span><span id="dash-welcome-wave" class="dw-wave"> 👋</span></h1>
         <p>Esto es lo que está pasando en la ciudad hoy.</p>
       </div>
       <script>
-        // Copia el nombre de Discord ya cargado por app.js/dashboard-fx.js
+        // Copia el nombre de Discord ya cargado por app.js (goToDashboard())
         // en #profile-name hacia el saludo, sin duplicar lógica de sesión.
-        (function(){
+        //
+        // ⚠️ Antes esto corría de forma inmediata acá mismo en el HTML, pero
+        // en ese punto del parseo #profile-name (definido más abajo, dentro
+        // de .profile-hero) todavía no existía en el DOM — getElementById
+        // devolvía null y la función cortaba en el primer if, así que el
+        // saludo se quedaba pegado en "Ciudadano" para siempre. Envolver
+        // todo en DOMContentLoaded asegura que el documento ya esté
+        // completo antes de buscar el elemento.
+        document.addEventListener('DOMContentLoaded', function () {
           var origen = document.getElementById('profile-name');
           var destino = document.getElementById('dash-welcome-name');
+          var ola = document.getElementById('dash-welcome-wave');
           if (!origen || !destino) return;
-          function sync(){
+          function sync() {
             var txt = origen.textContent.trim();
-            if (txt && txt !== 'Usuario') destino.textContent = txt.split(' ')[0];
+            if (txt && txt !== 'Usuario') {
+              destino.textContent = txt.split(' ')[0];
+              destino.classList.add('dw-listo');
+              if (ola) ola.classList.add('dw-visible');
+            }
           }
           sync();
           new MutationObserver(sync).observe(origen, { childList: true, characterData: true, subtree: true });
-        })();
+        });
       </script>
       <div class="profile-hero">
         <div class="profile-card">
           <div class="profile-card-top">
             <div class="profile-avatar-wrap">
               <span class="profile-ring"></span>
-              <img src="" alt="Avatar" id="profile-avatar">
+              <svg class="avatar-placeholder avatar-placeholder-lg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <img src="" alt="Avatar" id="profile-avatar" onload="this.previousElementSibling.style.display='none'; this.classList.add('av-listo')" onerror="this.classList.remove('av-listo')">
               <span class="profile-status-dot"></span>
             </div>
             <div class="profile-info">
@@ -962,25 +977,25 @@
   </div>
 
 
-  <script defer src="/js/app.js?v=74"></script>
-  <script defer src="/js/dashboard-fx.js?v=74"></script>
-  <script defer src="/js/notificaciones.js?v=74"></script>
-  <script defer src="/js/pull-to-refresh.js?v=74"></script>
-  <script defer src="/js/registro-civil.js?v=74"></script>
-  <script defer src="/js/banco.js?v=74"></script>
+  <script defer src="/js/app.js?v=75"></script>
+  <script defer src="/js/dashboard-fx.js?v=75"></script>
+  <script defer src="/js/notificaciones.js?v=75"></script>
+  <script defer src="/js/pull-to-refresh.js?v=75"></script>
+  <script defer src="/js/registro-civil.js?v=75"></script>
+  <script defer src="/js/banco.js?v=75"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=74"></script>
-  <script defer src="/js/mercado.js?v=74"></script>
-  <script defer src="/js/vehiculos.js?v=74"></script>
-  <script defer src="/js/concesionario.js?v=74"></script>
-  <script defer src="/js/mis-autos.js?v=74"></script>
-  <script defer src="/js/admin-tienda.js?v=74"></script>
-  <script defer src="/js/empresas.js?v=74"></script>
-  <script defer src="/js/logros.js?v=74"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=74"></script>
-  <script defer src="/js/panel-admin.js?v=74"></script>
-  <script defer src="/js/comisaria.js?v=74"></script>
-  <script defer src="/js/apuestas.js?v=74"></script>
-  <script defer src="/js/parallax-landing.js?v=74"></script>
+  <script defer src="/js/tienda.js?v=75"></script>
+  <script defer src="/js/mercado.js?v=75"></script>
+  <script defer src="/js/vehiculos.js?v=75"></script>
+  <script defer src="/js/concesionario.js?v=75"></script>
+  <script defer src="/js/mis-autos.js?v=75"></script>
+  <script defer src="/js/admin-tienda.js?v=75"></script>
+  <script defer src="/js/empresas.js?v=75"></script>
+  <script defer src="/js/logros.js?v=75"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=75"></script>
+  <script defer src="/js/panel-admin.js?v=75"></script>
+  <script defer src="/js/comisaria.js?v=75"></script>
+  <script defer src="/js/apuestas.js?v=75"></script>
+  <script defer src="/js/parallax-landing.js?v=75"></script>
 </body>
 </html>
