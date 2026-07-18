@@ -171,13 +171,19 @@
     };
 
     // ── CONTADOR JUGADORES ─────────────────────────────────────────────────
+    // Antes esto le pegaba directo a discord.com desde el navegador, pero el
+    // Content-Security-Policy del sitio (connect-src 'self') bloquea esa
+    // petición sin importar si Discord permite CORS o no — por eso el stat
+    // se quedaba pegado en "Cargando..." para siempre. Ahora se pide a
+    // nuestro propio backend (/api/discord-stats), que hace el fetch a
+    // Discord del lado del servidor, donde no hay esa restricción.
     async function actualizarContadorJugadores() {
       try {
-        const r = await fetch('https://discord.com/api/v10/invites/NfqShRg2Xc?with_counts=true');
+        const r = await fetch('/api/discord-stats');
         if (r.ok) {
           const d = await r.json();
-          const online = d.approximate_presence_count || 0;
-          const total  = d.approximate_member_count  || 0;
+          const online = d.online || 0;
+          const total  = d.total  || 0;
           const txt = online.toLocaleString() + ' online · ' + total.toLocaleString() + ' miembros';
           const el1 = document.getElementById('footer-players');
           const el2 = document.getElementById('dash-footer-players');
