@@ -96,6 +96,15 @@
       ppQueryActual   = q;
       ppPaginaActual  = 1;
       ppSeleccionadoId = null;
+
+      // Por defecto se asume que puede no tener acceso: se oculta la barra
+      // de búsqueda y el panel denegado hasta confirmar con el servidor,
+      // para que un civil no vea ni por un instante la UI de búsqueda.
+      const toolbar = document.getElementById('pp-toolbar');
+      const denied  = document.getElementById('pp-denied');
+      if (toolbar) toolbar.style.display = 'none';
+      if (denied)  denied.style.display  = 'none';
+
       document.getElementById('pp-loading').style.display = 'flex';
       document.getElementById('pp-wrap').classList.add('pp2-hidden');
       document.getElementById('pp-lista').innerHTML = '';
@@ -106,6 +115,15 @@
       try {
         const data = await ppFetchPagina(q, 1);
         document.getElementById('pp-loading').style.display = 'none';
+
+        // Acceso denegado: civil intentando entrar a la base de datos
+        // policial. Se muestra el mensaje de restricción y nada más.
+        if (data && data.denied) {
+          if (denied) denied.style.display = 'flex';
+          return;
+        }
+
+        if (toolbar) toolbar.style.display = '';
         document.getElementById('pp-wrap').classList.remove('pp2-hidden');
         ppRegistros = data.registros || [];
         ppHasMore   = !!data.hasMore;
@@ -120,14 +138,17 @@
         }
       } catch(e) {
         document.getElementById('pp-loading').style.display = 'none';
-        document.getElementById('pp-wrap').classList.remove('pp2-hidden');
         if (e && e.sesionInvalida) {
+          if (toolbar) toolbar.style.display = '';
+          document.getElementById('pp-wrap').classList.remove('pp2-hidden');
           document.getElementById('pp-lista').innerHTML =
             '<div class="pp2-lista-vacia">Sesión no válida. Cierra sesión y vuelve a entrar.</div>';
           return;
         }
+        if (toolbar) toolbar.style.display = '';
+        document.getElementById('pp-wrap').classList.remove('pp2-hidden');
         document.getElementById('pp-lista').innerHTML =
-          '<div class="pp2-lista-vacia">Error al cargar el perfil público.</div>';
+          '<div class="pp2-lista-vacia">Error al cargar la base de datos policial.</div>';
       }
     }
 
@@ -159,7 +180,10 @@
       if (q) params.set('q', q);
       const res = await fetch(`/api/perfil-publico?${params.toString()}`, { credentials: 'same-origin' });
       if (res.status === 401) { const err = new Error('401'); err.sesionInvalida = true; throw err; }
-      if (!res.ok) throw new Error('Error ' + res.status);
+      // 403 no es un error de red: es la respuesta esperada para un civil sin
+      // acceso a la base de datos policial. Se deja pasar como JSON normal
+      // (trae { denied: true }) para que el llamador decida qué mostrar.
+      if (!res.ok && res.status !== 403) throw new Error('Error ' + res.status);
       return res.json();
     }
 
