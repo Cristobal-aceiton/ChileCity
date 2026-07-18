@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v77"; // <--- ⚠️ ACTUALIZADO A v77 (sección features landing, stat jugadores en vivo, parallax mobile, bio cristouballlll)
+const CACHE_VERSION = "v78"; // <--- ⚠️ ACTUALIZADO A v78 (stat en vivo del landing: solo cantidad de usuarios en línea)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
