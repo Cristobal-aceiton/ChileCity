@@ -46,9 +46,9 @@
         cargarUltimaTransaccion();
         document.getElementById('banco-cuenta-wrap').style.display = 'flex';
 
-        // Próximo sueldo
-        if (data.proximoSueldo) {
-          iniciarCountdown(data.proximoSueldo);
+        // Próximo sueldo (uno o varios)
+        if (data.sueldosPendientes && data.sueldosPendientes.length > 0) {
+          iniciarCountdown(data.sueldosPendientes);
         } else {
           document.getElementById('proximo-sueldo-box').style.display = 'none';
         }
@@ -153,34 +153,81 @@
     }
 
 
-    function iniciarCountdown(ps) {
+    // Formatea un ms restante como "2d 4h 10m 5s" (mismo formato que antes).
+    function formatearRestante(ms) {
+      if (ms <= 0) return 'Disponible ahora';
+      const d = Math.floor(ms / 86400000);
+      const h = Math.floor((ms % 86400000) / 3600000);
+      const m = Math.floor((ms % 3600000) / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      let txt = '';
+      if (d > 0) txt += `${d}d `;
+      if (h > 0) txt += `${h}h `;
+      if (m > 0) txt += `${m}m `;
+      txt += `${s}s`;
+      return txt;
+    }
+
+    // Acepta un solo sueldo ({nombre, msRestantes, ...}) o una lista de ellos.
+    // Con 1 sueldo mantiene el layout original (#ps-nombre / #ps-tiempo).
+    // Con 2+ sueldos, renderiza una fila por cada uno dentro del mismo box,
+    // reutilizando la estética dorada de .proximo-sueldo / .ps-icon.
+    function iniciarCountdown(sueldos) {
+      const lista = Array.isArray(sueldos) ? sueldos : [sueldos];
       const box = document.getElementById('proximo-sueldo-box');
       box.style.display = 'flex';
-      document.getElementById('ps-nombre').textContent = ps.nombre;
       if (countdownInterval) clearInterval(countdownInterval);
+      const iniciadoEn = Date.now();
 
-      function actualizar() {
-        const ms = ps.msRestantes - (Date.now() - iniciadoEn);
-        if (ms <= 0) {
-          document.getElementById('ps-tiempo').textContent = 'Disponible ahora';
-          clearInterval(countdownInterval);
-          return;
+      if (lista.length <= 1) {
+        const ps = lista[0];
+        const info = box.querySelector('.ps-info') || box;
+        info.innerHTML = `
+          <div class="ps-titulo">Próximo sueldo</div>
+          <div class="ps-tiempo" id="ps-tiempo"></div>
+          <div class="ps-nombre" id="ps-nombre">${escHtml(ps.nombre)}</div>
+        `;
+        function actualizarUno() {
+          const ms = ps.msRestantes - (Date.now() - iniciadoEn);
+          document.getElementById('ps-tiempo').textContent = formatearRestante(ms);
+          if (ms <= 0) clearInterval(countdownInterval);
         }
-        const d = Math.floor(ms / 86400000);
-        const h = Math.floor((ms % 86400000) / 3600000);
-        const m = Math.floor((ms % 3600000) / 60000);
-        const s = Math.floor((ms % 60000) / 1000);
-        let txt = '';
-        if (d > 0) txt += `${d}d `;
-        if (h > 0) txt += `${h}h `;
-        if (m > 0) txt += `${m}m `;
-        txt += `${s}s`;
-        document.getElementById('ps-tiempo').textContent = txt;
+        actualizarUno();
+        countdownInterval = setInterval(actualizarUno, 1000);
+        return;
       }
 
-      const iniciadoEn = Date.now();
-      actualizar();
-      countdownInterval = setInterval(actualizar, 1000);
+      // Varios sueldos: una fila compacta por cada uno.
+      const info = box.querySelector('.ps-info') || box;
+      info.innerHTML = `
+        <div class="ps-titulo">Tus próximos sueldos</div>
+        <div class="ps-lista-multi" id="ps-lista-multi"></div>
+      `;
+      const cont = document.getElementById('ps-lista-multi');
+      lista.forEach((ps, i) => {
+        const row = document.createElement('div');
+        row.className = 'sueldo-item';
+        row.innerHTML = `
+          <div class="si-info">
+            <div class="si-nombre">${escHtml(ps.nombre)}</div>
+            <div class="si-detalle" id="ps-tiempo-${i}"></div>
+          </div>
+        `;
+        cont.appendChild(row);
+      });
+
+      function actualizarVarios() {
+        let algunoActivo = false;
+        lista.forEach((ps, i) => {
+          const ms = ps.msRestantes - (Date.now() - iniciadoEn);
+          if (ms > 0) algunoActivo = true;
+          const el = document.getElementById(`ps-tiempo-${i}`);
+          if (el) el.textContent = formatearRestante(ms);
+        });
+        if (!algunoActivo) clearInterval(countdownInterval);
+      }
+      actualizarVarios();
+      countdownInterval = setInterval(actualizarVarios, 1000);
     }
 
     async function crearCuenta() {
