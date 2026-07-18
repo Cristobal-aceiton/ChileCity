@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v73"; // <--- ⚠️ ACTUALIZADO A v73 (se sacaron las partículas del fondo)
+const CACHE_VERSION = "v74"; // <--- ⚠️ ACTUALIZADO A v74 (rediseño del dashboard: jerarquía saldo, colores de categorías, saludo, grilla agrupada en desktop)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

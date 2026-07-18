@@ -19,9 +19,9 @@
   <meta name="twitter:title"       content="ChileCity RP" />
   <meta name="twitter:description" content="El servidor de roleplay más inmersivo de habla hispana." />
   <meta name="twitter:image"       content="https://i.imgur.com/yH4wCVJ.png" />
-  <link rel="stylesheet" href="/styles.css?v=73">
-  <link rel="stylesheet" href="/page-loader.css?v=73">
-  <link rel="stylesheet" href="/clean-theme.css?v=73">
+  <link rel="stylesheet" href="/styles.css?v=74">
+  <link rel="stylesheet" href="/page-loader.css?v=74">
+  <link rel="stylesheet" href="/clean-theme.css?v=74">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -120,6 +120,25 @@
     </nav>
 
     <div class="dash-body">
+      <div class="dash-welcome">
+        <h1>Hola, <span id="dash-welcome-name">Ciudadano</span> 👋</h1>
+        <p>Esto es lo que está pasando en la ciudad hoy.</p>
+      </div>
+      <script>
+        // Copia el nombre de Discord ya cargado por app.js/dashboard-fx.js
+        // en #profile-name hacia el saludo, sin duplicar lógica de sesión.
+        (function(){
+          var origen = document.getElementById('profile-name');
+          var destino = document.getElementById('dash-welcome-name');
+          if (!origen || !destino) return;
+          function sync(){
+            var txt = origen.textContent.trim();
+            if (txt && txt !== 'Usuario') destino.textContent = txt.split(' ')[0];
+          }
+          sync();
+          new MutationObserver(sync).observe(origen, { childList: true, characterData: true, subtree: true });
+        })();
+      </script>
       <div class="profile-hero">
         <div class="profile-card">
           <div class="profile-card-top">
@@ -154,9 +173,21 @@
           </div>
           <div class="top-hero-lista" id="top-hero-lista">
             <div class="skeleton-wrap">
-              <div class="skeleton-line" style="height:26px;border-radius:8px;"></div>
-              <div class="skeleton-line" style="height:26px;border-radius:8px;"></div>
-              <div class="skeleton-line" style="height:26px;border-radius:8px;"></div>
+              <div class="skeleton-row">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-line" style="height:12px;border-radius:6px;"></div>
+                <div class="skeleton-line skeleton-amount" style="height:12px;border-radius:6px;"></div>
+              </div>
+              <div class="skeleton-row">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-line" style="height:12px;border-radius:6px;"></div>
+                <div class="skeleton-line skeleton-amount" style="height:12px;border-radius:6px;"></div>
+              </div>
+              <div class="skeleton-row">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-line" style="height:12px;border-radius:6px;"></div>
+                <div class="skeleton-line skeleton-amount" style="height:12px;border-radius:6px;"></div>
+              </div>
             </div>
           </div>
           <button class="top-hero-btn" onclick="abrirModalTopRicos()">
@@ -171,14 +202,14 @@
         <div class="nav-section">
           <div class="nav-section-label">Identidad y comunidad</div>
           <div class="nav-grid">
-            <div class="nav-card" onclick="abrirSeccion('registro-civil')">
+            <div class="nav-card" style="--card-color:#22d3ee; --card-glow:rgba(34,211,238,0.15)" onclick="abrirSeccion('registro-civil')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.2" cy="12" r="2.4"/><path d="M13.2 9.7h6M13.2 12.3h6M13.2 14.9h3.5"/></svg>
               </div>
               <div><div class="card-title">Registro Civil</div><div class="card-sub">Tu cédula de identidad</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen')">
+            <div class="nav-card" style="--card-color:#6366f1; --card-glow:rgba(99,102,241,0.15)" onclick="abrirSeccion('perfil-publico-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 11h4M20 9v4" stroke-width="1.8"/></svg>
               </div>
@@ -198,7 +229,7 @@
         <div class="nav-section">
           <div class="nav-section-label">Finanzas y comercio</div>
           <div class="nav-grid">
-            <div class="nav-card" onclick="abrirSeccion('banco-screen')">
+            <div class="nav-card" style="--card-color:#34d399; --card-glow:rgba(52,211,153,0.15)" onclick="abrirSeccion('banco-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/><path d="M5 15h2M9 15h6"/></svg>
               </div>
@@ -246,7 +277,7 @@
               <div><div class="card-title">Tus Autos</div><div class="card-sub">Tu garage, registros y transferencias</div></div>
               <span class="card-arrow">›</span>
             </div>
-            <div class="nav-card" onclick="abrirSeccion('inventario-screen')">
+            <div class="nav-card" style="--card-color:#2dd4bf; --card-glow:rgba(45,212,191,0.15)" onclick="abrirSeccion('inventario-screen')">
               <div class="card-icon">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
               </div>
@@ -300,7 +331,7 @@
 
       <!-- Versión plana original (todas las cards del mismo tamaño, en líneas): solo desktop -->
       <div class="nav-grid nav-desktop-only">
-        <div class="nav-card" onclick="abrirSeccion('registro-civil')">
+        <div class="nav-card" style="--card-color:#22d3ee; --card-glow:rgba(34,211,238,0.15)" onclick="abrirSeccion('registro-civil')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.2" cy="12" r="2.4"/><path d="M13.2 9.7h6M13.2 12.3h6M13.2 14.9h3.5"/></svg>
           </div>
@@ -308,7 +339,7 @@
           <span class="card-arrow">›</span>
         </div>
 
-        <div class="nav-card" onclick="abrirSeccion('banco-screen')">
+        <div class="nav-card" style="--card-color:#34d399; --card-glow:rgba(52,211,153,0.15)" onclick="abrirSeccion('banco-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="3"/><path d="M1 10h22"/><path d="M5 15h2M9 15h6"/></svg>
           </div>
@@ -337,7 +368,7 @@
           <div><div class="card-title">Tus Autos</div><div class="card-sub">Tu garage, registros y transferencias</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('inventario-screen')">
+        <div class="nav-card" style="--card-color:#2dd4bf; --card-glow:rgba(45,212,191,0.15)" onclick="abrirSeccion('inventario-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
           </div>
@@ -351,7 +382,7 @@
           <div><div class="card-title">Mercado</div><div class="card-sub">Compra y vende con otros ciudadanos</div></div>
           <span class="card-arrow">›</span>
         </div>
-        <div class="nav-card" onclick="abrirSeccion('perfil-publico-screen')">
+        <div class="nav-card" style="--card-color:#6366f1; --card-glow:rgba(99,102,241,0.15)" onclick="abrirSeccion('perfil-publico-screen')">
           <div class="card-icon">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 11h4M20 9v4" stroke-width="1.8"/></svg>
           </div>
@@ -931,25 +962,25 @@
   </div>
 
 
-  <script defer src="/js/app.js?v=73"></script>
-  <script defer src="/js/dashboard-fx.js?v=73"></script>
-  <script defer src="/js/notificaciones.js?v=73"></script>
-  <script defer src="/js/pull-to-refresh.js?v=73"></script>
-  <script defer src="/js/registro-civil.js?v=73"></script>
-  <script defer src="/js/banco.js?v=73"></script>
+  <script defer src="/js/app.js?v=74"></script>
+  <script defer src="/js/dashboard-fx.js?v=74"></script>
+  <script defer src="/js/notificaciones.js?v=74"></script>
+  <script defer src="/js/pull-to-refresh.js?v=74"></script>
+  <script defer src="/js/registro-civil.js?v=74"></script>
+  <script defer src="/js/banco.js?v=74"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="/js/tienda.js?v=73"></script>
-  <script defer src="/js/mercado.js?v=73"></script>
-  <script defer src="/js/vehiculos.js?v=73"></script>
-  <script defer src="/js/concesionario.js?v=73"></script>
-  <script defer src="/js/mis-autos.js?v=73"></script>
-  <script defer src="/js/admin-tienda.js?v=73"></script>
-  <script defer src="/js/empresas.js?v=73"></script>
-  <script defer src="/js/logros.js?v=73"></script>
-  <script defer src="/js/perfil-publico-inline.js?v=73"></script>
-  <script defer src="/js/panel-admin.js?v=73"></script>
-  <script defer src="/js/comisaria.js?v=73"></script>
-  <script defer src="/js/apuestas.js?v=73"></script>
-  <script defer src="/js/parallax-landing.js?v=73"></script>
+  <script defer src="/js/tienda.js?v=74"></script>
+  <script defer src="/js/mercado.js?v=74"></script>
+  <script defer src="/js/vehiculos.js?v=74"></script>
+  <script defer src="/js/concesionario.js?v=74"></script>
+  <script defer src="/js/mis-autos.js?v=74"></script>
+  <script defer src="/js/admin-tienda.js?v=74"></script>
+  <script defer src="/js/empresas.js?v=74"></script>
+  <script defer src="/js/logros.js?v=74"></script>
+  <script defer src="/js/perfil-publico-inline.js?v=74"></script>
+  <script defer src="/js/panel-admin.js?v=74"></script>
+  <script defer src="/js/comisaria.js?v=74"></script>
+  <script defer src="/js/apuestas.js?v=74"></script>
+  <script defer src="/js/parallax-landing.js?v=74"></script>
 </body>
 </html>
