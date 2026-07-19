@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v84"; // <--- ⚠️ ACTUALIZADO A v84 (favicon en banco/casino/ruleta + fondo interactivo interactive-bg.js en landing y dashboard)
+const CACHE_VERSION = "v85"; // <--- ⚠️ ACTUALIZADO A v85 (perf-mode.js: modo rendimiento auto para navegadores sin aceleracion de hardware, blur reducido, animaciones pausables)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

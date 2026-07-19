@@ -1,6 +1,11 @@
 @import url(https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&display=swap);*,::after,::before{box-sizing:border-box;margin:0;padding:0}:root{--neon:#e02020;--neon2:#ff4444;--glow:rgba(220,30,30,0.45);--ease:cubic-bezier(0.16, 1, 0.3, 1);--discord:#5865F2;--discord2:#7289da;--discord-glow:rgba(88,101,242,0.5);--gold:#F59E0B;--green:#10B981;--font-mono:'JetBrains Mono',monospace;--font-serif:'Fraunces','Bebas Neue',serif}body,html{height:100%;font-family:Inter,sans-serif;overflow:hidden;background:#000;color:#fff}
 #bg-fx{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0d0303}
-#bg-fx::before,#bg-fx::after{content:'';position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
+#bg-fx::before,#bg-fx::after{content:'';position:absolute;border-radius:50%;filter:blur(55px);will-change:transform}
+html.perf-lite #bg-fx::before,html.perf-lite #bg-fx::after{animation:none!important;filter:blur(28px)}
+html.perf-lite [style*="backdrop-filter"],html.perf-lite .bdc-hero-logo,html.perf-lite .bdc-balance-card,html.perf-lite .bdc-balance-card-ahorro,html.perf-lite .proximo-sueldo,html.perf-lite .bdc-prod-card,html.perf-lite .rc-form,html.perf-lite .historial-item,html.perf-lite .bdc-copy-btn{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(20,10,10,.92)!important}
+html.perf-lite #cc-interactive-bg{display:none!important}
+html.cc-tab-hidden #bg-fx::before,html.cc-tab-hidden #bg-fx::after{animation-play-state:paused}
+html.cc-tab-hidden .status-dot{animation-play-state:paused}
 #bg-fx::before{width:120vmax;height:120vmax;top:-55vmax;left:-45vmax;background:radial-gradient(circle at 30% 30%,rgba(230,25,25,.68),rgba(230,25,25,0) 62%);animation:bgFloatA 14s ease-in-out infinite alternate}
 #bg-fx::after{width:110vmax;height:110vmax;bottom:-50vmax;right:-40vmax;background:radial-gradient(circle at 70% 70%,rgba(160,10,10,.6),rgba(0,0,0,0) 62%);animation:bgFloatB 16s ease-in-out infinite alternate}
 @keyframes bgFloatA{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vw,4vh) scale(1.08)}100%{transform:translate(-4vw,6vh) scale(1)}}
