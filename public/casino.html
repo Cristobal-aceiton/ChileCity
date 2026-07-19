@@ -10,13 +10,9 @@
 </head>
 <body>
 
-    <div class="casino-mantenimiento-overlay">
-        <div class="casino-mantenimiento-card">
-            <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 1.4 1.4l3.6-3.6a5 5 0 0 1-6.1 6.1L4.4 19.4a2 2 0 0 1-2.8-2.8L10.8 7.4a5 5 0 0 1 6.1-6.1l-3.6 3.6z"/></svg>
-            <h2>Casino en mantenimiento</h2>
-            <p>Estamos realizando mejoras. Vuelve a intentarlo más tarde.</p>
-            <a href="/dashboard.html" class="casino-mantenimiento-btn">Volver al Dashboard</a>
-        </div>
+    <div class="cs-banner-construccion">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
     </div>
 
     <div class="cs-wrap">
@@ -267,54 +263,23 @@ body, html {
     color: rgba(255,255,255,.7);
 }
 
-/* ── Cartel de mantenimiento ── */
-.casino-mantenimiento-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
+/* ── Banner discreto: avisa que el casino está en construcción, sin bloquear ── */
+.cs-banner-construccion {
   display: flex;
   align-items: center;
+  gap: 8px;
   justify-content: center;
-  padding: 20px;
-  background: rgba(10, 14, 20, 0.92);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.casino-mantenimiento-card {
-  max-width: 360px;
-  width: 100%;
+  padding: 10px 16px;
+  background: rgba(245, 158, 11, .1);
+  border-bottom: 1px solid rgba(245, 158, 11, .3);
+  color: #fbbf24;
+  font-size: 12.5px;
+  font-weight: 600;
   text-align: center;
-  background: #161b22;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: 16px;
-  padding: 32px 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
-.casino-mantenimiento-card h2 {
-  color: #ffffff;
-  font-size: 20px;
-  margin: 14px 0 8px;
-}
-
-.casino-mantenimiento-card p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0 0 22px;
-}
-
-.casino-mantenimiento-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #F59E0B;
-  color: #161b22;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 30px;
+.cs-banner-construccion svg {
+  flex-shrink: 0;
 }
 
 </style>
