@@ -1,6 +1,7 @@
     // Parallax sutil del fondo en el landing (mejora visual v9, no afecta lógica de la app)
     (function () {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (document.documentElement.classList.contains('perf-lite')) return;
       const bg = document.getElementById('bg-fx');
       const overlay = document.querySelector('.overlay');
       if (!bg || !overlay) return;
@@ -28,6 +29,7 @@
         let t = 0;
         function loop() {
           const landing = document.getElementById('landing');
+          if (document.hidden) { requestAnimationFrame(loop); return; }
           if (landing && landing.classList.contains('active')) {
             t += 0.002;
             const x = Math.sin(t) * 7;

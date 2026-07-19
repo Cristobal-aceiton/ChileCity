@@ -4,6 +4,7 @@
 // Solo se usa en landing (index.html) y dashboard (dashboard.html).
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (document.documentElement.classList.contains('perf-lite')) return;
 
   function init() {
     const host = document.getElementById('bg-fx');
