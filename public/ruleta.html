@@ -68,9 +68,9 @@
 <style>
 
 body, html {
-    background-color: #495d70;
+    background-color: #000;
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, Arial, Helvetica, sans-serif;
     color: #fff;
     padding-bottom: 60px;
 }
@@ -83,36 +83,48 @@ body, html {
   max-width: 350px;
   margin: 20px auto 0;
   padding: 8px 14px;
-  color: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgba(255,255,255,.8);
+  font-family: Inter, Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-  background-color: rgb(37, 37, 37);
+  background-color: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 30px;
   box-sizing: border-box;
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+}
+
+.btn-volver-dash:hover {
+    background-color: rgba(255,255,255,.12);
+    color: #fff;
 }
 
 .sueldo {
-    background-color: #00ff00ad;
+    background: rgba(16,185,129,.1);
+    border: 1px solid rgba(16,185,129,.3);
     max-width: 320px;
     margin: 20px auto 0;
-    padding: 1px;
-    border-radius: 10px;
+    padding: 12px 10px;
+    border-radius: 14px;
 }
 
 .sueldo h1 {
     text-align: center;
-    color: white;
-    font-weight: 600;
-    font-size: 20px;
+    color: rgba(255,255,255,.5);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 0 0 4px;
 }
 
 .sueldo p {
     text-align: center;
-    color: rgb(255, 255, 255);
-    font-weight: 100;
-    font-size: 20px;
+    color: #34d399;
+    font-weight: 800;
+    font-size: 22px;
+    margin: 0;
 }
 
 #rul-rueda-wrap {
@@ -131,7 +143,7 @@ body, html {
     width: 0; height: 0;
     border-left: 14px solid transparent;
     border-right: 14px solid transparent;
-    border-top: 22px solid #22c55e;
+    border-top: 22px solid #e02020;
     z-index: 3;
 }
 
@@ -186,8 +198,8 @@ body, html {
 }
 
 .rul-tab.activo {
-    background: #22c55e;
-    color: #06210f;
+    background: #e02020;
+    color: #fff;
 }
 
 #rul-opciones {
@@ -217,8 +229,8 @@ body, html {
 .rul-opcion.verde { background: #15803d; }
 
 .rul-opcion.seleccionada {
-    border-color: #22c55e;
-    box-shadow: 0 0 0 2px rgba(34,197,94,.4);
+    border-color: #e02020;
+    box-shadow: 0 0 0 2px rgba(224,32,32,.4);
 }
 
 #rul-controles {
@@ -250,8 +262,8 @@ body, html {
     padding: 12px;
     border: none;
     border-radius: 30px;
-    background: #22c55e;
-    color: #06210f;
+    background: #e02020;
+    color: #fff;
     font-weight: 700;
     font-size: 16px;
     cursor: pointer;

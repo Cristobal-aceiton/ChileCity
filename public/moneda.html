@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cara o Cruz — Casino ChileCity RP</title>
+  <link rel="icon" type="image/png" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
+  <link rel="apple-touch-icon" href="/favicon-180.png">
+</head>
+<body>
+
+    <a href="/casino.html" class="btn-volver-dash">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5"/>
+          <path d="M12 19l-7-7 7-7"/>
+        </svg>
+        Casino
+    </a>
+
+    <div class="sueldo">
+        <h1>Saldo disponible</h1>
+        <p id="saldo">$0</p>
+    </div>
+
+    <div class="mn-scene">
+        <div class="mn-moneda" id="mn-moneda">
+            <div class="mn-cara">CARA</div>
+            <div class="mn-cruz">CRUZ</div>
+        </div>
+    </div>
+
+    <div id="mn-mensaje"></div>
+
+    <div id="mn-opciones">
+        <button type="button" class="mn-opcion" data-valor="cara">Cara</button>
+        <button type="button" class="mn-opcion" data-valor="cruz">Cruz</button>
+    </div>
+
+    <div id="mn-controles">
+        <label for="mn-monto">Monto a apostar</label>
+        <input type="number" id="mn-monto" min="1000" step="1000" value="1000">
+        <button type="button" id="mn-lanzar">🪙 Lanzar</button>
+    </div>
+
+    <div id="mn-historial">
+        <h2>Historial</h2>
+        <ul id="mn-historial-lista"></ul>
+    </div>
+
+    <script src="/js/moneda.js?v=1" defer></script>
+
+</body>
+</html>
+
+<style>
+
+body, html {
+    background-color: #000;
+    margin: 0;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    color: #fff;
+    padding-bottom: 60px;
+}
+
+.btn-volver-dash {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  color: rgba(255,255,255,.8);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 30px;
+  box-sizing: border-box;
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+}
+
+.btn-volver-dash:hover {
+    background-color: rgba(255,255,255,.12);
+    color: #fff;
+}
+
+.sueldo {
+    background: rgba(16,185,129,.1);
+    border: 1px solid rgba(16,185,129,.3);
+    max-width: 320px;
+    margin: 20px auto 0;
+    padding: 12px 10px;
+    border-radius: 14px;
+}
+
+.sueldo h1 {
+    text-align: center;
+    color: rgba(255,255,255,.5);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+}
+
+.sueldo p {
+    text-align: center;
+    color: #34d399;
+    font-weight: 800;
+    font-size: 22px;
+    margin: 0;
+}
+
+.mn-scene {
+    width: 180px;
+    height: 180px;
+    margin: 40px auto 10px;
+    perspective: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mn-moneda {
+    width: 160px;
+    height: 160px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .1s;
+    border-radius: 50%;
+}
+
+.mn-moneda.girando {
+    animation: mnFlip 1.6s cubic-bezier(.45,.05,.55,.95) forwards;
+}
+
+@keyframes mnFlip {
+    0%   { transform: rotateY(0) rotateX(0); }
+    20%  { transform: rotateY(360deg) rotateX(8deg); }
+    50%  { transform: rotateY(1080deg) rotateX(-6deg); }
+    80%  { transform: rotateY(1800deg) rotateX(4deg); }
+    100% { transform: rotateY(2160deg) rotateX(0); }
+}
+
+.mn-cara, .mn-cruz {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: #fff;
+}
+
+.mn-cara {
+    background: radial-gradient(circle at 35% 35%, #ff6b6b 0%, #e02020 45%, #8f1414 100%);
+    box-shadow: 0 0 30px rgba(224,32,32,.6), inset 0 2px 8px rgba(255,255,255,.25), inset 0 -2px 6px rgba(0,0,0,.3);
+    border: 3px solid rgba(255,120,120,.5);
+}
+
+.mn-cruz {
+    background: radial-gradient(circle at 35% 35%, #444 0%, #1a1a1a 45%, #000 100%);
+    box-shadow: 0 0 30px rgba(0,0,0,.6), inset 0 2px 8px rgba(255,255,255,.1), inset 0 -2px 6px rgba(0,0,0,.4);
+    border: 3px solid rgba(255,255,255,.15);
+    transform: rotateY(180deg);
+}
+
+#mn-mensaje {
+    max-width: 340px;
+    margin: 26px auto 0;
+    text-align: center;
+    font-size: 14px;
+    min-height: 18px;
+    color: #fca5a5;
+}
+
+#mn-opciones {
+    max-width: 320px;
+    margin: 16px auto 0;
+    display: flex;
+    gap: 10px;
+    padding: 0 12px;
+}
+
+.mn-opcion {
+    flex: 1;
+    background: rgba(255,255,255,.05);
+    color: #fff;
+    border: 2px solid rgba(255,255,255,.1);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.mn-opcion:hover {
+    background: rgba(255,255,255,.08);
+}
+
+.mn-opcion.seleccionada {
+    border-color: #e02020;
+    background: rgba(224,32,32,.15);
+    box-shadow: 0 0 0 2px rgba(224,32,32,.3);
+}
+
+#mn-controles {
+    max-width: 300px;
+    margin: 24px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    padding: 0 12px;
+}
+
+#mn-controles label {
+    font-size: 13px;
+    color: rgba(255,255,255,.5);
+    align-self: flex-start;
+}
+
+#mn-monto {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    font-size: 15px;
+    text-align: center;
+}
+
+#mn-lanzar {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: #e02020;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#mn-lanzar:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+#mn-historial {
+    max-width: 400px;
+    margin: 36px auto 0;
+    padding: 0 12px;
+}
+
+#mn-historial h2 {
+    font-size: 15px;
+    color: rgba(255,255,255,.6);
+}
+
+#mn-historial-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+#mn-historial-lista li {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.07);
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+</style>

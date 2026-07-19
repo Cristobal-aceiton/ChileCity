@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v86"; // <--- ⚠️ ACTUALIZADO A v86 (dashboard.html/styles.css: se quitó el icono de mano saludando del welcome)
+const CACHE_VERSION = "v87"; // <--- ⚠️ ACTUALIZADO A v87 (casino rediseñado: se quitó tema/portadas/logo viejos, ahora solo ruleta+moneda+mines)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

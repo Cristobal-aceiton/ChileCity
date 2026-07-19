@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minas — Casino ChileCity RP</title>
+  <link rel="icon" type="image/png" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
+  <link rel="apple-touch-icon" href="/favicon-180.png">
+</head>
+<body>
+
+    <a href="/casino.html" class="btn-volver-dash">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5"/>
+          <path d="M12 19l-7-7 7-7"/>
+        </svg>
+        Casino
+    </a>
+
+    <div class="sueldo">
+        <h1>Saldo disponible</h1>
+        <p id="saldo">$0</p>
+    </div>
+
+    <div id="mi-mensaje"></div>
+
+    <!-- Configuración de la partida (visible antes de empezar) -->
+    <div id="mi-config">
+        <div class="mi-campo">
+            <label for="mi-monto">Monto a apostar</label>
+            <input type="number" id="mi-monto" min="1000" step="1000" value="1000">
+        </div>
+        <div class="mi-campo">
+            <label for="mi-minas">Cantidad de minas</label>
+            <select id="mi-minas">
+                <!-- se rellena por JS: 1 a 24 -->
+            </select>
+        </div>
+        <button type="button" id="mi-iniciar">💣 Iniciar partida</button>
+    </div>
+
+    <!-- Info de la partida en curso -->
+    <div id="mi-info" class="mi-oculto">
+        <div class="mi-info-item">
+            <span>Multiplicador actual</span>
+            <b id="mi-mult">x1.00</b>
+        </div>
+        <div class="mi-info-item">
+            <span>Premio si retiras</span>
+            <b id="mi-premio">$0</b>
+        </div>
+    </div>
+
+    <!-- Tablero 5x5 -->
+    <div id="mi-tablero" class="mi-oculto"></div>
+
+    <button type="button" id="mi-retirar" class="mi-oculto">💰 Retirar</button>
+
+    <div id="mi-historial">
+        <h2>Historial</h2>
+        <ul id="mi-historial-lista"></ul>
+    </div>
+
+    <script src="/js/mines.js?v=1" defer></script>
+
+</body>
+</html>
+
+<style>
+
+body, html {
+    background-color: #000;
+    margin: 0;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    color: #fff;
+    padding-bottom: 60px;
+}
+
+.btn-volver-dash {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  color: rgba(255,255,255,.8);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 30px;
+  box-sizing: border-box;
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+}
+
+.btn-volver-dash:hover {
+    background-color: rgba(255,255,255,.12);
+    color: #fff;
+}
+
+.sueldo {
+    background: rgba(16,185,129,.1);
+    border: 1px solid rgba(16,185,129,.3);
+    max-width: 320px;
+    margin: 20px auto 0;
+    padding: 12px 10px;
+    border-radius: 14px;
+}
+
+.sueldo h1 {
+    text-align: center;
+    color: rgba(255,255,255,.5);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+}
+
+.sueldo p {
+    text-align: center;
+    color: #34d399;
+    font-weight: 800;
+    font-size: 22px;
+    margin: 0;
+}
+
+#mi-mensaje {
+    max-width: 340px;
+    margin: 20px auto 0;
+    text-align: center;
+    font-size: 14px;
+    min-height: 18px;
+    color: #fca5a5;
+    padding: 0 12px;
+}
+
+.mi-oculto {
+    display: none !important;
+}
+
+#mi-config {
+    max-width: 320px;
+    margin: 16px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 12px;
+}
+
+.mi-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mi-campo label {
+    font-size: 12px;
+    color: rgba(255,255,255,.5);
+}
+
+.mi-campo input, .mi-campo select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    font-size: 15px;
+    text-align: center;
+}
+
+.mi-campo select option {
+    background: #111;
+}
+
+#mi-iniciar {
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: #e02020;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#mi-iniciar:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+#mi-info {
+    max-width: 320px;
+    margin: 20px auto 0;
+    display: flex;
+    gap: 10px;
+    padding: 0 12px;
+}
+
+.mi-info-item {
+    flex: 1;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+}
+
+.mi-info-item span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,.4);
+    font-weight: 700;
+}
+
+.mi-info-item b {
+    font-size: 16px;
+    color: #fbbf24;
+}
+
+#mi-tablero {
+    max-width: 340px;
+    margin: 20px auto 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 0 12px;
+}
+
+.mi-casilla {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.06);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all .15s;
+    color: transparent;
+}
+
+.mi-casilla:hover:not(.mi-revelada):not(:disabled) {
+    background: rgba(255,255,255,.12);
+    transform: scale(1.05);
+}
+
+.mi-casilla.mi-revelada {
+    background: rgba(16,185,129,.18);
+    border-color: rgba(16,185,129,.4);
+    color: #34d399;
+    cursor: default;
+}
+
+.mi-casilla.mi-mina {
+    background: rgba(239,68,68,.22);
+    border-color: rgba(239,68,68,.5);
+    color: #f87171;
+    cursor: default;
+}
+
+.mi-casilla:disabled {
+    cursor: not-allowed;
+}
+
+#mi-retirar {
+    display: block;
+    max-width: 320px;
+    margin: 20px auto 0;
+    width: calc(100% - 24px);
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: #10b981;
+    color: #06210f;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#mi-retirar:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+#mi-historial {
+    max-width: 400px;
+    margin: 36px auto 0;
+    padding: 0 12px;
+}
+
+#mi-historial h2 {
+    font-size: 15px;
+    color: rgba(255,255,255,.6);
+}
+
+#mi-historial-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+#mi-historial-lista li {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.07);
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+</style>
