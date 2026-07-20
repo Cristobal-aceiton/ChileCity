@@ -10,9 +10,12 @@
 </head>
 <body>
 
+    <div id="bg-fx" aria-hidden="true"></div>
+    <div class="rul-overlay" aria-hidden="true"></div>
+
     <div class="cs-banner-construccion">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
-        Casino en construcciÃ³n â puede que encuentres algÃºn error mientras seguimos mejorÃ¡ndolo.
+        Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
     </div>
 
     <a href="/casino.html" class="btn-volver-dash">
@@ -40,23 +43,22 @@
     <!-- Mensajes de error / feedback -->
     <div id="rul-mensaje"></div>
 
-    <!-- Tabs de tipo de apuesta -->
-    <div id="rul-tabs">
-        <button type="button" class="rul-tab activo" data-tipo="color">Color</button>
-        <button type="button" class="rul-tab" data-tipo="paridad">Par / Impar</button>
-        <button type="button" class="rul-tab" data-tipo="mitad">Mitad</button>
-        <button type="button" class="rul-tab" data-tipo="docena">Docena</button>
-        <button type="button" class="rul-tab" data-tipo="numero">Número</button>
-    </div>
-
-    <!-- Opciones de la apuesta seleccionada: se rellena por JS según el tab -->
+    <!-- Solo se puede apostar a un color: rojo, negro o verde -->
+    <div id="rul-opciones-titulo">Elige un color</div>
     <div id="rul-opciones"></div>
 
     <!-- Monto + botón de girar -->
     <div id="rul-controles">
         <label for="rul-monto">Monto a apostar</label>
         <input type="number" id="rul-monto" min="1000" step="1000" value="1000">
-        <button type="button" id="rul-girar">🎡 Girar</button>
+        <button type="button" id="rul-girar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+            </svg>
+            Girar
+        </button>
     </div>
 
     <!-- Historial de tiradas recientes -->
@@ -65,19 +67,91 @@
         <ul id="rul-historial-lista"></ul>
     </div>
 
-    <script src="/js/ruleta.js?v=1" defer></script>
+    <script src="/js/casino-sfx.js?v=1"></script>
+    <script src="/js/ruleta.js?v=2" defer></script>
 
 </body>
 </html>
 
 <style>
 
+*, *::before, *::after { box-sizing: border-box; }
+
 body, html {
-    background-color: #000;
+    background-color: #0d0303;
     margin: 0;
     font-family: Inter, Arial, Helvetica, sans-serif;
     color: #fff;
     padding-bottom: 60px;
+    min-height: 100%;
+}
+
+/* ── Fondo rojo del sitio (mismo look que el resto de ChileCity RP) ─────── */
+#bg-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #0d0303;
+    pointer-events: none;
+}
+
+#bg-fx::before, #bg-fx::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(55px);
+    will-change: transform;
+}
+
+#bg-fx::before {
+    width: 120vmax;
+    height: 120vmax;
+    top: -55vmax;
+    left: -45vmax;
+    background: radial-gradient(circle at 30% 30%, rgba(230,25,25,.55), rgba(230,25,25,0) 62%);
+    animation: rulBgFloatA 14s ease-in-out infinite alternate;
+}
+
+#bg-fx::after {
+    width: 110vmax;
+    height: 110vmax;
+    bottom: -50vmax;
+    right: -40vmax;
+    background: radial-gradient(circle at 70% 70%, rgba(160,10,10,.5), rgba(0,0,0,0) 62%);
+    animation: rulBgFloatB 16s ease-in-out infinite alternate;
+}
+
+@keyframes rulBgFloatA {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(6vw,4vh) scale(1.08); }
+    100% { transform: translate(-4vw,6vh) scale(1); }
+}
+
+@keyframes rulBgFloatB {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-5vw,-6vh) scale(1.05); }
+    100% { transform: translate(5vw,-3vh) scale(1); }
+}
+
+.rul-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 55% 45% at 78% 12%, rgba(220,30,30,.1), transparent 60%),
+        radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.65) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #bg-fx::before, #bg-fx::after { animation: none !important; }
+}
+
+/* Todo el contenido va sobre el fondo */
+body > *:not(#bg-fx):not(.rul-overlay) {
+    position: relative;
+    z-index: 2;
 }
 
 .btn-volver-dash {
@@ -130,6 +204,17 @@ body, html {
     font-weight: 800;
     font-size: 22px;
     margin: 0;
+    transition: transform .2s ease;
+}
+
+.sueldo p.rul-saldo-anim {
+    animation: rulSaldoPop .4s ease;
+}
+
+@keyframes rulSaldoPop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12); }
+    100% { transform: scale(1); }
 }
 
 #rul-rueda-wrap {
@@ -150,12 +235,17 @@ body, html {
     border-right: 14px solid transparent;
     border-top: 22px solid #e02020;
     z-index: 3;
+    filter: drop-shadow(0 0 6px rgba(224,32,32,.7));
 }
 
 #rul-canvas {
     border-radius: 50%;
     transition: transform 4.5s cubic-bezier(.15,.85,.25,1);
-    box-shadow: 0 0 0 6px #1f2937, 0 0 30px rgba(0,0,0,.4);
+    box-shadow: 0 0 0 6px #1f2937, 0 0 30px rgba(224,32,32,.35);
+}
+
+#rul-canvas.rul-girando {
+    box-shadow: 0 0 0 6px #1f2937, 0 0 46px rgba(224,32,32,.6);
 }
 
 #rul-resultado-chip {
@@ -173,6 +263,16 @@ body, html {
     display: none;
 }
 
+#rul-resultado-chip.rul-chip-anim {
+    animation: rulChipPop .45s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes rulChipPop {
+    0% { transform: translateX(-50%) scale(.6); opacity: 0; }
+    60% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
 #rul-mensaje {
     max-width: 340px;
     margin: 30px auto 0;
@@ -182,51 +282,52 @@ body, html {
     color: #fca5a5;
 }
 
-#rul-tabs {
+#rul-mensaje.rul-gano { color: #4ade80; }
+
+#rul-opciones-titulo {
     max-width: 400px;
-    margin: 16px auto 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-}
-
-.rul-tab {
-    background: #1f2937;
-    color: #cbd5e1;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.rul-tab.activo {
-    background: #e02020;
-    color: #fff;
+    margin: 22px auto 0;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.4);
 }
 
 #rul-opciones {
     max-width: 400px;
-    margin: 16px auto 0;
+    margin: 10px auto 0;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     padding: 0 12px;
 }
 
 .rul-opcion {
+    flex: 1;
+    max-width: 120px;
     background: #334155;
     color: #fff;
     border: 2px solid transparent;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 14px 10px;
+    border-radius: 12px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    min-width: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: transform .15s ease, box-shadow .2s ease;
+}
+
+.rul-opcion:active {
+    transform: scale(.95);
+}
+
+.rul-opcion svg {
+    display: block;
 }
 
 .rul-opcion.rojo { background: #b91c1c; }
@@ -234,8 +335,15 @@ body, html {
 .rul-opcion.verde { background: #15803d; }
 
 .rul-opcion.seleccionada {
-    border-color: #e02020;
-    box-shadow: 0 0 0 2px rgba(224,32,32,.4);
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 20px rgba(224,32,32,.4);
+    transform: translateY(-2px);
+}
+
+.rul-opcion-mult {
+    font-size: 10px;
+    font-weight: 700;
+    opacity: .75;
 }
 
 #rul-controles {
@@ -272,6 +380,29 @@ body, html {
     font-weight: 700;
     font-size: 16px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 0 24px rgba(224,32,32,.35);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#rul-girar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(224,32,32,.55);
+}
+
+#rul-girar:active:not(:disabled) {
+    transform: scale(.97);
+}
+
+#rul-girar svg.rul-spin {
+    animation: rulSpinIcon 1s linear infinite;
+}
+
+@keyframes rulSpinIcon {
+    to { transform: rotate(360deg); }
 }
 
 #rul-girar:disabled {
@@ -307,6 +438,12 @@ body, html {
     display: flex;
     justify-content: space-between;
     gap: 10px;
+    animation: rulHistIn .3s ease;
+}
+
+@keyframes rulHistIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 

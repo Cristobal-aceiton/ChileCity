@@ -10,6 +10,9 @@
 </head>
 <body>
 
+    <div id="bg-fx" aria-hidden="true"></div>
+    <div class="cs-overlay" aria-hidden="true"></div>
+
     <div class="cs-banner-construccion">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
         Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
@@ -93,11 +96,81 @@
 
 <style>
 
+*, *::before, *::after { box-sizing: border-box; }
+
 body, html {
-    background-color: #000;
+    background-color: #0d0303;
     margin: 0;
     font-family: Inter, sans-serif;
     color: #fff;
+    min-height: 100%;
+}
+
+/* ── Fondo rojo del sitio (mismo look que el resto de ChileCity RP) ─────── */
+#bg-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #0d0303;
+    pointer-events: none;
+}
+
+#bg-fx::before, #bg-fx::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(55px);
+    will-change: transform;
+}
+
+#bg-fx::before {
+    width: 120vmax;
+    height: 120vmax;
+    top: -55vmax;
+    left: -45vmax;
+    background: radial-gradient(circle at 30% 30%, rgba(230,25,25,.55), rgba(230,25,25,0) 62%);
+    animation: csBgFloatA 14s ease-in-out infinite alternate;
+}
+
+#bg-fx::after {
+    width: 110vmax;
+    height: 110vmax;
+    bottom: -50vmax;
+    right: -40vmax;
+    background: radial-gradient(circle at 70% 70%, rgba(160,10,10,.5), rgba(0,0,0,0) 62%);
+    animation: csBgFloatB 16s ease-in-out infinite alternate;
+}
+
+@keyframes csBgFloatA {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(6vw,4vh) scale(1.08); }
+    100% { transform: translate(-4vw,6vh) scale(1); }
+}
+
+@keyframes csBgFloatB {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-5vw,-6vh) scale(1.05); }
+    100% { transform: translate(5vw,-3vh) scale(1); }
+}
+
+.cs-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 55% 45% at 78% 12%, rgba(220,30,30,.1), transparent 60%),
+        radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.65) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #bg-fx::before, #bg-fx::after { animation: none !important; }
+}
+
+body > *:not(#bg-fx):not(.cs-overlay) {
+    position: relative;
+    z-index: 2;
 }
 
 .cs-wrap {
