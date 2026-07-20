@@ -44,6 +44,7 @@ function ruletaMultiplicador(tipo, valor, numeroGanador) {
     case "numero":
       return String(valor) === n ? 36 : 0;
     case "color":
+      if (valor === "verde") return esVerde ? 14 : 0;
       if (esVerde) return 0;
       return ruletaColor(n) === valor ? 2 : 0;
     case "paridad":
@@ -71,7 +72,7 @@ function ruletaMultiplicador(tipo, valor, numeroGanador) {
 
 function ruletaValorValido(tipo, valor) {
   if (tipo === "numero") return valor === "00" || (/^\d+$/.test(String(valor)) && Number(valor) >= 0 && Number(valor) <= 36);
-  if (tipo === "color") return valor === "rojo" || valor === "negro";
+  if (tipo === "color") return valor === "rojo" || valor === "negro" || valor === "verde";
   if (tipo === "paridad") return valor === "par" || valor === "impar";
   if (tipo === "mitad") return valor === "1-18" || valor === "19-36";
   if (tipo === "docena") return valor === "1" || valor === "2" || valor === "3";
