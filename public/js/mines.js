@@ -1,13 +1,19 @@
 // ── Juego de Minas ────────────────────────────────────────────────────────
-// Tablero 5x5 (25 casillas). El servidor decide dónde están las minas y
-// nunca las revela hasta que el jugador pisa una o termina la partida
-// (/api/casino: mines_start, mines_reveal, mines_cashout, mines_estado).
+// Tablero 5x5 (25 casillas) = la tabla de minas. El servidor decide dónde
+// están las minas y nunca las revela hasta que el jugador pisa una o termina
+// la partida (/api/casino: mines_start, mines_reveal, mines_cashout,
+// mines_estado). Este archivo solo dibuja el tablero, pinta explosiones y
+// dispara sonidos/animaciones.
 
 (function () {
   const TOTAL_CASILLAS = 25;
 
   function formatCLP(n) {
     return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
+  }
+
+  function sfx(nombre) {
+    if (window.ccSfx && typeof window.ccSfx[nombre] === 'function') window.ccSfx[nombre]();
   }
 
   const elSaldo = document.getElementById('saldo');
@@ -22,15 +28,24 @@
   const elTablero = document.getElementById('mi-tablero');
   const elRetirar = document.getElementById('mi-retirar');
   const elHistorialLista = document.getElementById('mi-historial-lista');
+  const tplDiamante = document.getElementById('mi-tpl-diamante');
+  const tplMina = document.getElementById('mi-tpl-mina');
 
   let partidaActiva = false;
   let montoActual = 0;
   let reveladas = [];
   let procesando = false;
 
+  function iconoDiamante() {
+    return tplDiamante ? tplDiamante.content.cloneNode(true) : null;
+  }
+  function iconoMina() {
+    return tplMina ? tplMina.content.cloneNode(true) : null;
+  }
+
   function mostrarMensaje(msg, esError = true) {
     elMensaje.textContent = msg || '';
-    elMensaje.style.color = esError ? '#fca5a5' : '#4ade80';
+    elMensaje.classList.toggle('mi-gano', !esError && !!msg);
   }
 
   function poblarSelectMinas() {
@@ -58,18 +73,31 @@
 
   function pintarReveladas() {
     [...elTablero.children].forEach((btn, i) => {
-      if (reveladas.includes(i)) {
+      if (reveladas.includes(i) && !btn.classList.contains('mi-revelada')) {
         btn.classList.add('mi-revelada');
-        btn.textContent = '💎';
+        btn.innerHTML = '';
+        const icono = iconoDiamante();
+        if (icono) btn.appendChild(icono);
       }
     });
   }
 
-  function pintarMinas(posiciones) {
+  // idxDetonada: la casilla exacta que el jugador pisó (recibe la animación
+  // de explosión); el resto de minas se revela de forma estática.
+  function pintarMinas(posiciones, idxDetonada) {
     [...elTablero.children].forEach((btn, i) => {
       if (posiciones.includes(i) && !reveladas.includes(i)) {
         btn.classList.add('mi-mina');
-        btn.textContent = '💣';
+        btn.innerHTML = '';
+        const icono = iconoMina();
+        if (icono) btn.appendChild(icono);
+
+        if (i === idxDetonada) {
+          btn.classList.add('mi-mina-detonada');
+          const onda = document.createElement('span');
+          onda.className = 'mi-onda mi-onda-activa';
+          btn.appendChild(onda);
+        }
       }
       btn.disabled = true;
     });
@@ -78,6 +106,9 @@
   function actualizarInfo(multiplicador) {
     elMult.textContent = 'x' + Number(multiplicador).toFixed(2);
     elPremio.textContent = formatCLP(Math.floor(montoActual * multiplicador));
+    elMult.classList.remove('mi-mult-anim');
+    void elMult.offsetWidth;
+    elMult.classList.add('mi-mult-anim');
   }
 
   function mostrarEstadoJuego(activa) {
@@ -88,13 +119,18 @@
     elRetirar.classList.toggle('mi-oculto', !activa);
   }
 
-  async function cargarSaldo() {
+  async function cargarSaldo(animar) {
     try {
       const r = await fetch('/api/banco?action=cuenta', { credentials: 'same-origin' });
       if (r.status === 401) { window.location.href = '/'; return; }
       if (!r.ok) throw new Error();
       const data = await r.json();
       elSaldo.textContent = formatCLP(data.saldo);
+      if (animar) {
+        elSaldo.classList.remove('mi-saldo-anim');
+        void elSaldo.offsetWidth;
+        elSaldo.classList.add('mi-saldo-anim');
+      }
     } catch {
       elSaldo.textContent = '—';
     }
@@ -173,6 +209,7 @@
       actualizarInfo(1);
       mostrarEstadoJuego(true);
       elSaldo.textContent = formatCLP(data.nuevoSaldo);
+      sfx('click');
       procesando = false;
       elIniciar.disabled = false;
     } catch (e) {
@@ -204,9 +241,13 @@
 
       if (data.esMina) {
         reveladas.push(idx);
-        pintarMinas(data.posiciones);
-        mostrarMensaje('💥 ¡Pisaste una mina! Perdiste la apuesta.');
-        cargarSaldo();
+        pintarMinas(data.posiciones, idx);
+        elTablero.classList.remove('mi-shake');
+        void elTablero.offsetWidth;
+        elTablero.classList.add('mi-shake');
+        sfx('explosion');
+        mostrarMensaje('¡Pisaste una mina! Perdiste la apuesta.');
+        cargarSaldo(false);
         cargarHistorial();
         setTimeout(() => mostrarEstadoJuego(false), 1400);
         procesando = false;
@@ -216,10 +257,12 @@
       reveladas = data.reveladas;
       pintarReveladas();
       actualizarInfo(data.multiplicador);
+      sfx('reveladaSegura');
 
       if (data.tableroCompleto) {
-        mostrarMensaje(`¡Tablero completo! Ganaste ${formatCLP(data.premio)} 🎉`, false);
+        mostrarMensaje(`¡Tablero completo! Ganaste ${formatCLP(data.premio)}`, false);
         elSaldo.textContent = formatCLP(data.nuevoSaldo);
+        sfx('gano');
         cargarHistorial();
         setTimeout(() => mostrarEstadoJuego(false), 1400);
       } else {
@@ -256,8 +299,9 @@
         return;
       }
 
-      mostrarMensaje(`Retiraste con x${data.multiplicador.toFixed(2)}: ganaste ${formatCLP(data.premio)} 🎉`, false);
+      mostrarMensaje(`Retiraste con x${data.multiplicador.toFixed(2)}: ganaste ${formatCLP(data.premio)}`, false);
       elSaldo.textContent = formatCLP(data.nuevoSaldo);
+      sfx('retiro');
       cargarHistorial();
       mostrarEstadoJuego(false);
       procesando = false;
@@ -270,7 +314,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     poblarSelectMinas();
-    cargarSaldo();
+    cargarSaldo(false);
     cargarHistorial();
     retomarPartida();
   });

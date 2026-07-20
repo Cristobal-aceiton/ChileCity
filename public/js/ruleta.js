@@ -1,8 +1,8 @@
 // ── Juego de Ruleta ──────────────────────────────────────────────────────
 // Ruleta americana (38 casilleros: 0, 00, 1-36). El resultado SIEMPRE lo
 // calcula el servidor (/api/banco?action=ruleta_jugar) — este archivo solo
-// dibuja la rueda, arma la apuesta que el usuario elige y anima el giro
-// hasta el número que el servidor ya decidió.
+// dibuja la rueda, arma la apuesta que el usuario elige (solo color: rojo,
+// negro o verde) y anima el giro hasta el número que el servidor decidió.
 
 (function () {
   // Orden real de los casilleros en una ruleta americana, en sentido horario
@@ -22,22 +22,34 @@
     return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
   }
 
-  // ── Estado de la apuesta actual ─────────────────────────────────────────
-  let tipoActual = "color";
+  function sfx(nombre) {
+    if (window.ccSfx && typeof window.ccSfx[nombre] === 'function') window.ccSfx[nombre]();
+  }
+
+  // ── Íconos SVG (sin emojis) para cada color de apuesta ──────────────────
+  const ICONOS = {
+    rojo: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>',
+    negro: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>',
+    verde: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>',
+  };
+
+  // ── Estado de la apuesta actual (siempre tipo "color") ──────────────────
+  const tipoActual = "color";
   let valorActual = null;
   let girando = false;
   let rotacionActual = 0; // grados acumulados del canvas (para no "rebobinar")
+  let tickInterval = null;
 
   // ── Elementos ────────────────────────────────────────────────────────────
-  const elSaldo       = document.getElementById('saldo');
-  const elCanvas       = document.getElementById('rul-canvas');
-  const elChip         = document.getElementById('rul-resultado-chip');
-  const elMensaje       = document.getElementById('rul-mensaje');
-  const elTabs         = document.getElementById('rul-tabs');
-  const elOpciones     = document.getElementById('rul-opciones');
-  const elMonto         = document.getElementById('rul-monto');
-  const elGirar         = document.getElementById('rul-girar');
-  const elHistorialLista = document.getElementById('rul-historial-lista');
+  const elSaldo         = document.getElementById('saldo');
+  const elCanvas         = document.getElementById('rul-canvas');
+  const elChip           = document.getElementById('rul-resultado-chip');
+  const elMensaje        = document.getElementById('rul-mensaje');
+  const elOpciones       = document.getElementById('rul-opciones');
+  const elMonto          = document.getElementById('rul-monto');
+  const elGirar           = document.getElementById('rul-girar');
+  const elGirarLabel      = elGirar ? elGirar.childNodes[elGirar.childNodes.length - 1] : null;
+  const elHistorialLista  = document.getElementById('rul-historial-lista');
 
   // ── Dibujo de la rueda (una sola vez, después solo se rota con CSS) ─────
   function dibujarRueda() {
@@ -82,7 +94,7 @@
     ctx.arc(cx, cy, radio * 0.14, 0, Math.PI * 2);
     ctx.fillStyle = '#1f2937';
     ctx.fill();
-    ctx.strokeStyle = '#22c55e';
+    ctx.strokeStyle = '#e02020';
     ctx.lineWidth = 2;
     ctx.stroke();
   }
@@ -92,75 +104,58 @@
     const n = ORDEN_RUEDA.length;
     const idx = ORDEN_RUEDA.indexOf(numeroGanador);
     const anguloSector = 360 / n;
-    // Ángulo (en grados) al que hay que rotar para que el sector "idx"
-    // quede arriba, bajo el puntero. Sumamos varias vueltas completas para
-    // que el giro se vea bien.
     const anguloObjetivo = -(idx * anguloSector);
     const vueltas = 6 * 360;
-    // Siempre giramos "hacia adelante" respecto a la rotación acumulada
     const base = Math.floor(rotacionActual / 360) * 360;
     let destino = base + vueltas + anguloObjetivo;
     if (destino <= rotacionActual) destino += 360;
 
     rotacionActual = destino;
+    elCanvas.classList.add('rul-girando');
     elCanvas.style.transform = `rotate(${rotacionActual}deg)`;
+
+    // Pequeños "tics" sonoros mientras gira, cada vez más espaciados.
+    let intervalo = 60;
+    let acumulado = 0;
+    clearInterval(tickInterval);
+    function tick() {
+      sfx('girarTick');
+      acumulado += intervalo;
+      intervalo *= 1.12;
+      if (acumulado < 4300) {
+        tickInterval = setTimeout(tick, intervalo);
+      }
+    }
+    tick();
   }
 
-  // ── UI: tabs de tipo de apuesta ──────────────────────────────────────────
-  const OPCIONES_POR_TIPO = {
-    color: [
-      { valor: 'rojo', label: 'Rojo', clase: 'rojo' },
-      { valor: 'negro', label: 'Negro', clase: 'negro' },
-    ],
-    paridad: [
-      { valor: 'par', label: 'Par' },
-      { valor: 'impar', label: 'Impar' },
-    ],
-    mitad: [
-      { valor: '1-18', label: '1 a 18' },
-      { valor: '19-36', label: '19 a 36' },
-    ],
-    docena: [
-      { valor: '1', label: '1ª docena (1-12)' },
-      { valor: '2', label: '2ª docena (13-24)' },
-      { valor: '3', label: '3ª docena (25-36)' },
-    ],
-    numero: (() => {
-      const arr = [{ valor: '0', label: '0', clase: 'verde' }, { valor: '00', label: '00', clase: 'verde' }];
-      for (let i = 1; i <= 36; i++) arr.push({ valor: String(i), label: String(i), clase: colorDe(String(i)) });
-      return arr;
-    })(),
-  };
+  // ── Opciones de apuesta: solo color (rojo / negro / verde) ──────────────
+  const OPCIONES_COLOR = [
+    { valor: 'rojo', label: 'Rojo', clase: 'rojo', mult: 'x2' },
+    { valor: 'negro', label: 'Negro', clase: 'negro', mult: 'x2' },
+    { valor: 'verde', label: 'Verde', clase: 'verde', mult: 'x14' },
+  ];
 
   function renderOpciones() {
     elOpciones.innerHTML = '';
-    valorActual = null;
-    actualizarBotonGirar();
-
-    OPCIONES_POR_TIPO[tipoActual].forEach(op => {
+    OPCIONES_COLOR.forEach(op => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'rul-opcion' + (op.clase ? ' ' + op.clase : '');
-      btn.textContent = op.label;
       btn.dataset.valor = op.valor;
+      btn.innerHTML = (ICONOS[op.valor] || '') +
+        `<span>${op.label}</span><span class="rul-opcion-mult">${op.mult}</span>`;
       btn.addEventListener('click', () => {
+        if (girando) return;
         valorActual = op.valor;
         [...elOpciones.children].forEach(c => c.classList.remove('seleccionada'));
         btn.classList.add('seleccionada');
+        sfx('seleccion');
         actualizarBotonGirar();
       });
       elOpciones.appendChild(btn);
     });
   }
-
-  elTabs.addEventListener('click', (e) => {
-    const btn = e.target.closest('.rul-tab');
-    if (!btn || girando) return;
-    tipoActual = btn.dataset.tipo;
-    [...elTabs.children].forEach(c => c.classList.remove('activo'));
-    btn.classList.add('activo');
-    renderOpciones();
-  });
 
   function actualizarBotonGirar() {
     elGirar.disabled = girando || !valorActual || !elMonto.value || Number(elMonto.value) <= 0;
@@ -168,13 +163,18 @@
   elMonto.addEventListener('input', actualizarBotonGirar);
 
   // ── Saldo ─────────────────────────────────────────────────────────────
-  async function cargarSaldo() {
+  async function cargarSaldo(animar) {
     try {
       const r = await fetch('/api/banco?action=cuenta', { credentials: 'same-origin' });
       if (r.status === 401) { window.location.href = '/'; return; }
       if (!r.ok) throw new Error();
       const data = await r.json();
       elSaldo.textContent = formatCLP(data.saldo);
+      if (animar) {
+        elSaldo.classList.remove('rul-saldo-anim');
+        void elSaldo.offsetWidth;
+        elSaldo.classList.add('rul-saldo-anim');
+      }
     } catch {
       elSaldo.textContent = '—';
     }
@@ -206,7 +206,13 @@
   // ── Girar ─────────────────────────────────────────────────────────────
   function mostrarMensaje(msg, esError = true) {
     elMensaje.textContent = msg || '';
-    elMensaje.style.color = esError ? '#fca5a5' : '#4ade80';
+    elMensaje.classList.toggle('rul-gano', !esError && !!msg);
+  }
+
+  function setGirarUI(activo) {
+    if (!elGirar) return;
+    const svg = elGirar.querySelector('svg');
+    if (svg) svg.classList.toggle('rul-spin', activo);
   }
 
   async function girar() {
@@ -216,9 +222,10 @@
 
     girando = true;
     elGirar.disabled = true;
-    elTabs.querySelectorAll('.rul-tab').forEach(b => b.disabled = true);
+    setGirarUI(true);
     mostrarMensaje('');
     elChip.style.display = 'none';
+    elChip.classList.remove('rul-chip-anim');
 
     try {
       const r = await fetch('/api/banco?action=ruleta_jugar', {
@@ -231,7 +238,7 @@
       if (!r.ok) {
         mostrarMensaje(data.error || 'Ocurrió un error. Intenta de nuevo.');
         girando = false;
-        elTabs.querySelectorAll('.rul-tab').forEach(b => b.disabled = false);
+        setGirarUI(false);
         actualizarBotonGirar();
         return;
       }
@@ -240,28 +247,34 @@
 
       // Esperamos a que termine la animación (coincide con la transición CSS)
       setTimeout(() => {
+        elCanvas.classList.remove('rul-girando');
+        clearInterval(tickInterval);
+
         const color = data.color;
         elChip.textContent = data.numeroGanador + ' · ' + color;
         elChip.style.background = color === 'rojo' ? '#b91c1c' : color === 'negro' ? '#111827' : '#15803d';
         elChip.style.display = 'block';
+        elChip.classList.add('rul-chip-anim');
 
         if (data.gano) {
-          mostrarMensaje(`¡Ganaste ${formatCLP(data.pago)}! 🎉`, false);
+          mostrarMensaje(`¡Ganaste ${formatCLP(data.pago)}!`, false);
+          sfx('gano');
         } else {
           mostrarMensaje('Perdiste esta ronda. ¡Suerte la próxima!');
+          sfx('perdio');
         }
 
         elSaldo.textContent = formatCLP(data.nuevoSaldo);
         cargarHistorial();
 
         girando = false;
-        elTabs.querySelectorAll('.rul-tab').forEach(b => b.disabled = false);
+        setGirarUI(false);
         actualizarBotonGirar();
       }, 4600);
     } catch (e) {
       mostrarMensaje('Error de conexión. Intenta de nuevo.');
       girando = false;
-      elTabs.querySelectorAll('.rul-tab').forEach(b => b.disabled = false);
+      setGirarUI(false);
       actualizarBotonGirar();
     }
   }
@@ -272,7 +285,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     dibujarRueda();
     renderOpciones();
-    cargarSaldo();
+    cargarSaldo(false);
     cargarHistorial();
   });
 })();
