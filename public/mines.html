@@ -26,6 +26,11 @@
         Casino
     </a>
 
+    <div class="gm-header">
+        <h1>Minas</h1>
+        <p>Descubre casillas, retira cuando quieras</p>
+    </div>
+
     <div class="sueldo">
         <h1>Saldo disponible</h1>
         <p id="saldo">$0</p>
@@ -197,6 +202,29 @@ body > *:not(#bg-fx):not(.mi-overlay) {
 .btn-volver-dash:hover {
     background-color: rgba(255,255,255,.12);
     color: #fff;
+}
+
+.gm-header {
+    text-align: center;
+    margin: 20px auto 0;
+    max-width: 340px;
+}
+
+.gm-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #fff 50%, #ff4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.gm-header p {
+    color: rgba(255,255,255,.45);
+    font-size: 12.5px;
+    margin: 2px 0 0;
 }
 
 .sueldo {
@@ -383,7 +411,8 @@ body > *:not(#bg-fx):not(.mi-overlay) {
     aspect-ratio: 1;
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.06);
+    background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
     cursor: pointer;
     display: flex;
     align-items: center;

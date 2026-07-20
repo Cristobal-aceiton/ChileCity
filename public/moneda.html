@@ -10,9 +10,12 @@
 </head>
 <body>
 
+    <div id="bg-fx" aria-hidden="true"></div>
+    <div class="mn-overlay" aria-hidden="true"></div>
+
     <div class="cs-banner-construccion">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
-        Casino en construcciÃ³n â puede que encuentres algÃºn error mientras seguimos mejorÃ¡ndolo.
+        Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
     </div>
 
     <a href="/casino.html" class="btn-volver-dash">
@@ -22,6 +25,11 @@
         </svg>
         Casino
     </a>
+
+    <div class="gm-header">
+        <h1>Cara o Cruz</h1>
+        <p>50/50 — paga el doble al ganar</p>
+    </div>
 
     <div class="sueldo">
         <h1>Saldo disponible</h1>
@@ -60,12 +68,105 @@
 
 <style>
 
+*, *::before, *::after { box-sizing: border-box; }
+
 body, html {
-    background-color: #000;
+    background-color: #0d0303;
     margin: 0;
     font-family: Inter, Arial, Helvetica, sans-serif;
     color: #fff;
     padding-bottom: 60px;
+    min-height: 100%;
+}
+
+/* ── Fondo rojo del sitio (mismo look que el resto de ChileCity RP) ─────── */
+#bg-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #0d0303;
+    pointer-events: none;
+}
+
+#bg-fx::before, #bg-fx::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(55px);
+    will-change: transform;
+}
+
+#bg-fx::before {
+    width: 120vmax;
+    height: 120vmax;
+    top: -55vmax;
+    left: -45vmax;
+    background: radial-gradient(circle at 30% 30%, rgba(230,25,25,.55), rgba(230,25,25,0) 62%);
+    animation: mnBgFloatA 14s ease-in-out infinite alternate;
+}
+
+#bg-fx::after {
+    width: 110vmax;
+    height: 110vmax;
+    bottom: -50vmax;
+    right: -40vmax;
+    background: radial-gradient(circle at 70% 70%, rgba(160,10,10,.5), rgba(0,0,0,0) 62%);
+    animation: mnBgFloatB 16s ease-in-out infinite alternate;
+}
+
+@keyframes mnBgFloatA {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(6vw,4vh) scale(1.08); }
+    100% { transform: translate(-4vw,6vh) scale(1); }
+}
+
+@keyframes mnBgFloatB {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-5vw,-6vh) scale(1.05); }
+    100% { transform: translate(5vw,-3vh) scale(1); }
+}
+
+.mn-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 55% 45% at 78% 12%, rgba(220,30,30,.1), transparent 60%),
+        radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.65) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #bg-fx::before, #bg-fx::after { animation: none !important; }
+}
+
+body > *:not(#bg-fx):not(.mn-overlay) {
+    position: relative;
+    z-index: 2;
+}
+
+.gm-header {
+    text-align: center;
+    margin: 24px auto 0;
+    max-width: 340px;
+}
+
+.gm-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #fff 50%, #ff4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.gm-header p {
+    color: rgba(255,255,255,.45);
+    font-size: 12.5px;
+    margin: 2px 0 0;
 }
 
 .btn-volver-dash {
@@ -197,25 +298,27 @@ body, html {
 
 .mn-opcion {
     flex: 1;
-    background: rgba(255,255,255,.05);
+    background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
     color: #fff;
     border: 2px solid rgba(255,255,255,.1);
-    padding: 12px;
+    padding: 14px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all .2s;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
+    transition: all .2s cubic-bezier(.16,1,.3,1);
 }
 
 .mn-opcion:hover {
-    background: rgba(255,255,255,.08);
+    transform: translateY(-2px);
+    background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.03));
 }
 
 .mn-opcion.seleccionada {
     border-color: #e02020;
-    background: rgba(224,32,32,.15);
-    box-shadow: 0 0 0 2px rgba(224,32,32,.3);
+    background: linear-gradient(160deg, rgba(224,32,32,.22), rgba(224,32,32,.08));
+    box-shadow: 0 0 0 2px rgba(224,32,32,.3), 0 6px 20px rgba(224,32,32,.25);
 }
 
 #mn-controles {

@@ -26,6 +26,11 @@
         Casino
     </a>
 
+    <div class="gm-header">
+        <h1>Ruleta</h1>
+        <p>Apuesta a color, número o docena</p>
+    </div>
+
     <div class="sueldo">
         <h1>Saldo disponible</h1>
         <p id="saldo">$0</p>
@@ -179,6 +184,29 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     color: #fff;
 }
 
+.gm-header {
+    text-align: center;
+    margin: 20px auto 0;
+    max-width: 340px;
+}
+
+.gm-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #fff 50%, #ff4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.gm-header p {
+    color: rgba(255,255,255,.45);
+    font-size: 12.5px;
+    margin: 2px 0 0;
+}
+
 .sueldo {
     background: rgba(16,185,129,.1);
     border: 1px solid rgba(16,185,129,.3);
@@ -307,7 +335,7 @@ body > *:not(#bg-fx):not(.rul-overlay) {
 .rul-opcion {
     flex: 1;
     max-width: 120px;
-    background: #334155;
+    background: linear-gradient(160deg, #475569, #334155);
     color: #fff;
     border: 2px solid transparent;
     padding: 14px 10px;
@@ -319,7 +347,12 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     flex-direction: column;
     align-items: center;
     gap: 6px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.3);
     transition: transform .15s ease, box-shadow .2s ease;
+}
+
+.rul-opcion:hover {
+    transform: translateY(-2px);
 }
 
 .rul-opcion:active {
@@ -330,9 +363,9 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     display: block;
 }
 
-.rul-opcion.rojo { background: #b91c1c; }
-.rul-opcion.negro { background: #111827; }
-.rul-opcion.verde { background: #15803d; }
+.rul-opcion.rojo { background: linear-gradient(160deg, #ef4444, #b91c1c); }
+.rul-opcion.negro { background: linear-gradient(160deg, #1f2937, #0a0e14); }
+.rul-opcion.verde { background: linear-gradient(160deg, #22c55e, #15803d); }
 
 .rul-opcion.seleccionada {
     border-color: #fff;

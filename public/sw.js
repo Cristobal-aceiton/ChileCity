@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v88"; // <--- ⚠️ ACTUALIZADO A v88 (casino: se quitó el overlay de mantenimiento bloqueante, ahora hay un banner discreto "en construcción")
+const CACHE_VERSION = "v89"; // <--- ⚠️ ACTUALIZADO A v89 (casino: rediseño del lobby con portadas + limpieza de CSS muerto en styles.css)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

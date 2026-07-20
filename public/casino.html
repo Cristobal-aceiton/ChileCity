@@ -33,63 +33,73 @@
             <p>Elige tu juego y prueba tu suerte.</p>
         </div>
 
-        <div class="sueldo">
-            <h1>Saldo disponible</h1>
-            <p id="saldo">$0</p>
+        <div class="cs-saldo">
+            <div class="cs-saldo-info">
+                <span class="cs-saldo-label">Saldo disponible</span>
+                <span class="cs-saldo-valor" id="saldo">$0</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="6" width="20" height="12" rx="2.5"/>
+                <path d="M2 10h20"/>
+                <circle cx="17.5" cy="14.3" r="1.4" fill="currentColor" stroke="none"/>
+            </svg>
         </div>
 
-        <div class="juegos-c">
+        <div class="cs-lobby">
 
-            <a href="/ruleta.html" class="cs-juego-card">
-                <div class="cs-juego-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <circle cx="12" cy="12" r="10"/>
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-                    </svg>
-                </div>
-                <div class="cs-juego-info">
+            <a href="/ruleta.html" class="cs-card" style="--cs-img:url('/casino-cover-ruleta.webp')">
+                <span class="cs-card-badge cs-badge-live">Disponible</span>
+                <div class="cs-card-shade">
                     <h3>Ruleta</h3>
                     <p>Apuesta a color, número o docena</p>
                 </div>
-                <span class="cs-juego-arrow">→</span>
             </a>
 
-            <a href="/moneda.html" class="cs-juego-card">
-                <div class="cs-juego-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path d="M9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/>
-                    </svg>
-                </div>
-                <div class="cs-juego-info">
+            <a href="/moneda.html" class="cs-card" style="--cs-img:url('/casino-cover-moneda.webp')">
+                <span class="cs-card-badge cs-badge-live">Disponible</span>
+                <div class="cs-card-shade">
                     <h3>Cara o Cruz</h3>
                     <p>50/50, paga el doble al ganar</p>
                 </div>
-                <span class="cs-juego-arrow">→</span>
             </a>
 
-            <a href="/mines.html" class="cs-juego-card">
-                <div class="cs-juego-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-                        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-                        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-                        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-                    </svg>
-                </div>
-                <div class="cs-juego-info">
+            <a href="/mines.html" class="cs-card" style="--cs-img:url('/casino-cover-mines.webp')">
+                <span class="cs-card-badge cs-badge-live">Disponible</span>
+                <div class="cs-card-shade">
                     <h3>Minas</h3>
                     <p>Descubre casillas, retira cuando quieras</p>
                 </div>
-                <span class="cs-juego-arrow">→</span>
             </a>
+
+            <div class="cs-card cs-card-soon" style="--cs-img:url('/casino-cover-plinko.webp')">
+                <span class="cs-card-badge cs-badge-soon">Próximamente</span>
+                <div class="cs-card-shade">
+                    <h3>Plinko</h3>
+                    <p>Suelta la ficha y multiplica</p>
+                </div>
+            </div>
+
+            <div class="cs-card cs-card-soon" style="--cs-img:url('/casino-cover-limbo.webp')">
+                <span class="cs-card-badge cs-badge-soon">Próximamente</span>
+                <div class="cs-card-shade">
+                    <h3>Limbo</h3>
+                    <p>Elige tu objetivo y apuesta</p>
+                </div>
+            </div>
+
+            <div class="cs-card cs-card-soon" style="--cs-img:url('/casino-cover-avion.webp')">
+                <span class="cs-card-badge cs-badge-soon">Próximamente</span>
+                <div class="cs-card-shade">
+                    <h3>Avión</h3>
+                    <p>Retira antes de que despegue</p>
+                </div>
+            </div>
 
         </div>
 
     </div>
 
-    <script src="/js/casino.js?v=2" defer></script>
+    <script src="/js/casino.js?v=3" defer></script>
 
 </body>
 </html>
@@ -174,7 +184,7 @@ body > *:not(#bg-fx):not(.cs-overlay) {
 }
 
 .cs-wrap {
-    max-width: 460px;
+    max-width: 520px;
     margin: 0 auto;
     padding: 20px 20px 60px;
     box-sizing: border-box;
@@ -225,115 +235,133 @@ body > *:not(#bg-fx):not(.cs-overlay) {
     margin: 4px 0 0;
 }
 
-.sueldo {
-    background: rgba(16,185,129,.1);
-    border: 1px solid rgba(16,185,129,.3);
-    max-width: 320px;
-    margin: 0 auto 32px;
-    padding: 14px 10px;
+/* ── Saldo: banner horizontal, mismo lenguaje visual que banco/apuestas ── */
+.cs-saldo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    max-width: 380px;
+    margin: 0 auto 28px;
+    padding: 16px 20px;
     border-radius: 14px;
+    background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(16,185,129,.04));
+    border: 1px solid rgba(16,185,129,.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
 }
 
-.sueldo h1 {
-    text-align: center;
-    color: rgba(255,255,255,.5);
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin: 0 0 4px;
-}
-
-.sueldo p {
-    text-align: center;
-    color: #34d399;
-    font-weight: 800;
-    font-size: 24px;
-    margin: 0;
-}
-
-.juegos-c {
+.cs-saldo-info {
     display: flex;
     flex-direction: column;
+    gap: 3px;
+}
+
+.cs-saldo-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.45);
+}
+
+.cs-saldo-valor {
+    font-size: 24px;
+    font-weight: 800;
+    color: #34d399;
+}
+
+.cs-saldo svg {
+    color: rgba(52,211,153,.6);
+    flex-shrink: 0;
+}
+
+/* ── Lobby: grid de portadas tipo vitrina ────────────────────────────── */
+.cs-lobby {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
 }
 
-.cs-juego-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.cs-card {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 4;
+    border-radius: 16px;
+    overflow: hidden;
     text-decoration: none;
     color: #fff;
-    background: linear-gradient(150deg, rgba(24,10,10,.72) 0%, rgba(10,9,12,.8) 100%);
+    background: var(--cs-img) center / cover no-repeat, #16100c;
     border: 1px solid rgba(255,255,255,.1);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    transition: transform .3s cubic-bezier(.16,1,.3,1), border-color .3s cubic-bezier(.16,1,.3,1);
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    transition: transform .3s cubic-bezier(.16,1,.3,1), border-color .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
 }
 
-.cs-juego-card::before {
-    content: '';
+.cs-card:hover {
+    transform: translateY(-4px) scale(1.015);
+    border-color: rgba(224,32,32,.5);
+    box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(224,32,32,.25);
+}
+
+.cs-card-shade {
     position: absolute;
-    left: 0; top: 20%; bottom: 20%;
-    width: 3px;
-    border-radius: 0 3px 3px 0;
-    background: #e02020;
-    opacity: .45;
-    transition: opacity .35s;
+    left: 0; right: 0; bottom: 0;
+    padding: 30px 14px 14px;
+    background: linear-gradient(0deg, rgba(4,2,2,.95) 10%, rgba(4,2,2,.55) 55%, transparent 100%);
 }
 
-.cs-juego-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(224,32,32,.4);
-}
-
-.cs-juego-card:hover::before {
-    opacity: 1;
-}
-
-.cs-juego-icon {
-    flex-shrink: 0;
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    color: #ff4444;
-    background: rgba(224,32,32,.12);
-    border: 1px solid rgba(224,32,32,.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cs-juego-info {
-    flex: 1;
-}
-
-.cs-juego-info h3 {
-    font-size: 15px;
-    font-weight: 700;
+.cs-card-shade h3 {
     margin: 0 0 2px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: .2px;
 }
 
-.cs-juego-info p {
-    font-size: 12px;
-    color: rgba(255,255,255,.5);
+.cs-card-shade p {
     margin: 0;
+    font-size: 11px;
+    line-height: 1.35;
+    color: rgba(255,255,255,.65);
 }
 
-.cs-juego-arrow {
-    font-size: 20px;
-    color: rgba(255,255,255,.3);
-    flex-shrink: 0;
-    transition: transform .25s, opacity .25s;
+.cs-card-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 99px;
+    backdrop-filter: blur(4px);
 }
 
-.cs-juego-card:hover .cs-juego-arrow {
-    transform: translateX(4px);
-    opacity: 1;
+.cs-badge-live {
+    background: rgba(16,185,129,.22);
+    color: #6ee7b7;
+    border: 1px solid rgba(16,185,129,.4);
+}
+
+.cs-badge-soon {
+    background: rgba(255,255,255,.1);
     color: rgba(255,255,255,.7);
+    border: 1px solid rgba(255,255,255,.18);
+}
+
+.cs-card-soon {
+    cursor: default;
+    filter: grayscale(.55) brightness(.7);
+}
+
+.cs-card-soon:hover {
+    transform: none;
+    border-color: rgba(255,255,255,.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+@media (min-width: 420px) {
+    .cs-lobby { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ── Banner discreto: avisa que el casino está en construcción, sin bloquear ── */
