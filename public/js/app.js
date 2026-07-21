@@ -235,7 +235,7 @@
       if (!btn) return;
       if (currentUser) {
         btn.href = '#';
-        txt.textContent = 'Ir al Panel';
+        txt.textContent = 'Ir al Dashboard';
         btn.onclick = (e) => {
           e.preventDefault();
           mostrarPantalla('dashboard');
