@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v90"; // <--- ⚠️ ACTUALIZADO A v90 (concesionario: .conc-img ahora se adapta al tamaño real de la imagen en vez de recortar 16:10)
+const CACHE_VERSION = "v91"; // <--- ⚠️ ACTUALIZADO A v91 (favicon: se unificó a /logo.webp en todo el sitio)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
@@ -56,7 +56,7 @@ const PRECACHE_URLS = [
   `/page-loader.css?v=${CACHE_VERSION.replace("v", "")}`,
   `/clean-theme.css?v=${CACHE_VERSION.replace("v", "")}`,
   `/banco-theme.css?v=${CACHE_VERSION.replace("v", "")}`, // <--- ⚠️ CSS DEL BANCO ACTUALIZADO
-  "/favicon.svg",
+  "/logo.webp",
 ];
 
 self.addEventListener("install", (event) => {
