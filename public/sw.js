@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v89"; // <--- ⚠️ ACTUALIZADO A v89 (casino: rediseño del lobby con portadas + limpieza de CSS muerto en styles.css)
+const CACHE_VERSION = "v90"; // <--- ⚠️ ACTUALIZADO A v90 (concesionario: .conc-img ahora se adapta al tamaño real de la imagen en vez de recortar 16:10)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
