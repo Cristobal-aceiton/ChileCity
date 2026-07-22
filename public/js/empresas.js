@@ -61,6 +61,10 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
             Ir al Discord
           </a>
+          <button class="btn-ver-mas-empresa" onclick="abrirVerMasEmpresa(${e.id}, '${escHtml(e.nombre).replace(/'/g, "\\'")}')">
+            Ver más
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>`).join('');
     }
 
@@ -145,6 +149,7 @@
             ${e.dueno_nombre ? `<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;">Dueño: ${escHtml(e.dueno_nombre)}</div>` : ''}
           </div>
           <div class="ur-acciones">
+            <button class="btn-small orange" onclick="abrirModalPublicacionesEmpresa(${e.id})">Publicaciones</button>
             <button class="btn-small purple" onclick="abrirModalEditarEmpresa(${e.id})">Editar</button>
             <button class="btn-small red" onclick="adminEliminarEmpresa(${e.id})">Eliminar</button>
           </div>
@@ -265,4 +270,129 @@
     // Cerrar modal de edición al hacer click fuera
     document.getElementById('modal-editar-empresa').addEventListener('click', function(e) {
       if (e.target === this) cerrarModal('modal-editar-empresa');
+    });
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // PUBLICACIONES DE EMPRESA — botón "Ver más"
+    // ══════════════════════════════════════════════════════════════════════════
+    // Contenido extra (imágenes, anuncios, texto libre) que Admin/Staff puede
+    // sumarle a una empresa desde su panel, sin tocar los campos base
+    // (nombre, logo, bio, discord). Se muestra en un modal al hacer click en
+    // "Ver más" de la card pública.
+
+    function empPubFecha(iso) {
+      return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    function empPubRenderLista(containerId, publicaciones, { admin } = {}) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      if (!publicaciones.length) {
+        el.innerHTML = '<div class="tienda-empty" style="padding:24px 0;">Todavía no hay publicaciones.</div>';
+        return;
+      }
+      el.innerHTML = publicaciones.map(p => `
+        <div class="emp-pub-item">
+          ${p.imagen_url ? `<div class="emp-pub-img"><img src="${escHtml(p.imagen_url)}" alt="" loading="lazy" onerror="this.parentElement.style.display='none';"></div>` : ''}
+          <div class="emp-pub-body">
+            ${p.titulo ? `<div class="emp-pub-titulo">${escHtml(p.titulo)}</div>` : ''}
+            ${p.texto ? `<div class="emp-pub-texto">${escHtml(p.texto)}</div>` : ''}
+            <div class="emp-pub-fecha">${empPubFecha(p.created_at)}</div>
+          </div>
+          ${admin ? `<button class="btn-small red" onclick="adminEliminarPublicacionEmpresa(${p.id}, ${p.empresa_id_ref})">Eliminar</button>` : ''}
+        </div>`).join('');
+    }
+
+    // ── Vista pública: "Ver más" en la card ──────────────────────────────────
+    async function abrirVerMasEmpresa(empresaId, nombre) {
+      document.getElementById('ver-empresa-nombre').textContent = nombre;
+      document.getElementById('ver-empresa-lista').innerHTML = '<div class="rc-loading" style="position:static;"><div class="spinner"></div><span>Cargando...</span></div>';
+      document.getElementById('modal-ver-empresa').classList.add('visible');
+      try {
+        const res = await fetch(`/api/admin?action=empresas_publicaciones&empresa_id=${empresaId}`);
+        const data = await res.json();
+        empPubRenderLista('ver-empresa-lista', data.publicaciones || []);
+      } catch (e) {
+        document.getElementById('ver-empresa-lista').innerHTML = '<div class="tienda-empty">Error al cargar.</div>';
+      }
+    }
+
+    document.getElementById('modal-ver-empresa')?.addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal('modal-ver-empresa');
+    });
+
+    // ── Panel admin/staff: gestionar publicaciones de una empresa ──────────
+    let aePubEmpresaActual = null;
+
+    function abrirModalPublicacionesEmpresa(id) {
+      const e = empresasAdminCache[id];
+      if (!e) return;
+      aePubEmpresaActual = id;
+      document.getElementById('aep-empresa-nombre').textContent = e.nombre;
+      document.getElementById('aep-titulo').value = '';
+      document.getElementById('aep-texto').value = '';
+      document.getElementById('aep-imagen').value = '';
+      document.getElementById('aep-error').classList.remove('visible');
+      document.getElementById('modal-publicaciones-empresa').classList.add('visible');
+      aeCargarPublicaciones();
+    }
+
+    async function aeCargarPublicaciones() {
+      const lista = document.getElementById('aep-lista');
+      lista.innerHTML = '<div class="rc-loading" style="position:static;"><div class="spinner"></div><span>Cargando...</span></div>';
+      try {
+        const res = await fetch(`/api/admin?action=empresas_admin_publicaciones&empresa_id=${aePubEmpresaActual}`);
+        const data = await res.json();
+        const publicaciones = (data.publicaciones || []).map(p => ({ ...p, empresa_id_ref: aePubEmpresaActual }));
+        empPubRenderLista('aep-lista', publicaciones, { admin: true });
+      } catch (e) {
+        lista.innerHTML = '<div class="tienda-empty">Error al cargar.</div>';
+      }
+    }
+
+    async function adminCrearPublicacionEmpresa() {
+      const titulo     = document.getElementById('aep-titulo').value.trim();
+      const texto      = document.getElementById('aep-texto').value.trim();
+      const imagen_url = document.getElementById('aep-imagen').value.trim();
+      const errEl = document.getElementById('aep-error');
+      errEl.classList.remove('visible');
+
+      if (!titulo && !texto && !imagen_url) {
+        errEl.textContent = 'Agregá al menos un título, texto o imagen.';
+        errEl.classList.add('visible');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin?action=empresas_admin_publicacion_crear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ empresa_id: aePubEmpresaActual, titulo, texto, imagen_url }),
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Error.'; errEl.classList.add('visible'); return; }
+
+        document.getElementById('aep-titulo').value = '';
+        document.getElementById('aep-texto').value = '';
+        document.getElementById('aep-imagen').value = '';
+        mostrarToast('Publicación agregada.');
+        aeCargarPublicaciones();
+      } catch (e) {
+        errEl.textContent = 'Error de conexión.'; errEl.classList.add('visible');
+      }
+    }
+
+    async function adminEliminarPublicacionEmpresa(id) {
+      if (!confirm('¿Eliminar esta publicación?')) return;
+      try {
+        await fetch(`/api/admin?action=empresas_admin_publicacion_eliminar&id=${id}`, { method: 'DELETE' });
+        mostrarToast('Publicación eliminada.');
+        aeCargarPublicaciones();
+      } catch (e) {
+        mostrarToast('Error al eliminar.', true);
+      }
+    }
+
+    document.getElementById('modal-publicaciones-empresa')?.addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal('modal-publicaciones-empresa');
     });

@@ -114,7 +114,7 @@
       document.body.classList.toggle('oculta-logo-corner', id !== 'landing' && id !== 'dashboard');
     }
 
-    function volverDashboard() { mostrarPantalla('dashboard'); _navegandoProgramaticamente = true; window.history.pushState({ screen: 'dashboard' }, '', '/'); setTimeout(() => { _navegandoProgramaticamente = false; }, 50); }
+    function volverDashboard() { mostrarPantalla('dashboard'); if (typeof notifIniciar === 'function') notifIniciar(); _navegandoProgramaticamente = true; window.history.pushState({ screen: 'dashboard' }, '', '/'); setTimeout(() => { _navegandoProgramaticamente = false; }, 50); }
 
     // ── Compatibilidad multi-página: auto-carga de cada sección ─────────────
     // Antes (SPA de una sola página) los nav-cards del dashboard hacían
@@ -219,6 +219,11 @@
       const pill = document.getElementById('user-pill');
       if (pill) pill.classList.remove('open');
       actualizarBotonLogin();
+      // La campanita vive fuera de los .screen (ver comentario en
+      // notifIniciar/notifDetener), así que aunque la nav bar del dashboard
+      // desaparezca al volver a la landing, ella sola no se ocultaba. Se
+      // apaga acá igual que en goToLanding(), pero sin tocar la sesión.
+      if (typeof notifDetener === 'function') notifDetener();
       try { sessionStorage.setItem('cc_ir_portal', '1'); } catch {}
       mostrarPantalla('landing');
       _navegandoProgramaticamente = true;
@@ -239,6 +244,7 @@
         btn.onclick = (e) => {
           e.preventDefault();
           mostrarPantalla('dashboard');
+          if (typeof notifIniciar === 'function') notifIniciar();
           _navegandoProgramaticamente = true;
           window.history.pushState({ screen: 'dashboard' }, '', '/');
           setTimeout(() => { _navegandoProgramaticamente = false; }, 50);
@@ -415,6 +421,7 @@
       if (_navegandoProgramaticamente) return;
       if (currentUser) {
         mostrarPantalla('dashboard');
+        if (typeof notifIniciar === 'function') notifIniciar();
         _navegandoProgramaticamente = true;
         window.history.pushState({ screen: 'dashboard' }, '', '/');
         setTimeout(() => { _navegandoProgramaticamente = false; }, 50);
