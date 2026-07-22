@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v95"; // <--- ⚠️ ACTUALIZADO A v95 (fix: la campanita de notificaciones ya no aparece en secciones que no son el dashboard)
+const CACHE_VERSION = "v96"; // <--- ⚠️ ACTUALIZADO A v96 (fix: la campanita ya no aparece en la landing, se chequea la screen activa en tiempo real)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de
