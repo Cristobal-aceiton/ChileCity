@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v91"; // <--- ⚠️ ACTUALIZADO A v91 (favicon: se unificó a /logo.webp en todo el sitio)
+const CACHE_VERSION = "v93"; // <--- ⚠️ ACTUALIZADO A v93 (nuevo: publicaciones de empresa "Ver más" desde Admin/Staff)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

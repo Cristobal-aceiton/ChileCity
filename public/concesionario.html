@@ -143,6 +143,49 @@
   </section>
 
   <!-- ── Elementos globales compartidos (modales, notificaciones, etc.) ── -->
+  <!-- MODAL: Ver más (publicaciones públicas de una empresa) -->
+  <div class="admin-modal-overlay" id="modal-ver-empresa">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-ver-empresa')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        <span id="ver-empresa-nombre">Empresa</span>
+      </h3>
+      <div class="emp-pub-lista" id="ver-empresa-lista"></div>
+    </div>
+  </div>
+  <!-- MODAL: Publicaciones de Empresa (imágenes, anuncios, texto libre) -->
+  <div class="admin-modal-overlay" id="modal-publicaciones-empresa">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-publicaciones-empresa')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+        Publicaciones — <span id="aep-empresa-nombre">Empresa</span>
+      </h3>
+      <p style="font-size:12.5px;color:rgba(255,255,255,0.4);margin-top:-10px;">Imágenes, anuncios o texto libre que se muestran al público cuando toca "Ver más" en la card de esta empresa.</p>
+
+      <div class="form-group">
+        <label>Título (opcional)</label>
+        <input type="text" id="aep-titulo" placeholder="Ej: ¡Nueva sucursal abierta!">
+      </div>
+      <div class="form-group">
+        <label>Texto (opcional)</label>
+        <textarea id="aep-texto" rows="3" placeholder="Contá la novedad, anuncio o lo que quieras publicar..." style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:'Inter',sans-serif;resize:vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>URL de imagen (opcional)</label>
+        <input type="text" id="aep-imagen" placeholder="https://imagen.com/foto.png">
+      </div>
+      <div class="rc-error" id="aep-error"></div>
+      <button class="btn-green" onclick="adminCrearPublicacionEmpresa()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Publicar
+      </button>
+
+      <div style="height:1px;background:rgba(255,255,255,0.08);margin:20px 0 14px;"></div>
+      <div class="emp-pub-lista" id="aep-lista"></div>
+    </div>
+  </div>
 
   <!-- DASHBOARD -->
 

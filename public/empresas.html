@@ -115,6 +115,18 @@
 
   <!-- ── Elementos globales compartidos (modales, notificaciones, etc.) ── -->
 
+  <!-- MODAL: Ver más (publicaciones públicas de una empresa) -->
+  <div class="admin-modal-overlay" id="modal-ver-empresa">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-ver-empresa')">✕</button>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        <span id="ver-empresa-nombre">Empresa</span>
+      </h3>
+      <div class="emp-pub-lista" id="ver-empresa-lista"></div>
+    </div>
+  </div>
+
   <!-- DASHBOARD -->
 
 
