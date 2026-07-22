@@ -47,6 +47,23 @@ async function initTable(sql) {
   await sql`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS dueno_avatar_url TEXT`;
   await sql`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS dueno_discord_id TEXT`;
 
+  // ── Publicaciones de empresas ("Ver más" en la card pública) ────────────
+  // Contenido extra que Admin/Staff puede sumarle a una empresa desde el
+  // panel (imágenes, anuncios, texto libre) sin tocar los campos base
+  // (nombre, logo, bio, discord). Se muestra en la card pública al abrir
+  // el botón "Ver más".
+  await sql`
+    CREATE TABLE IF NOT EXISTS empresa_publicaciones (
+      id           SERIAL PRIMARY KEY,
+      empresa_id   INTEGER NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+      titulo       TEXT,
+      texto        TEXT,
+      imagen_url   TEXT,
+      creado_por   TEXT,
+      created_at   TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // ── Staff ──────────────────────────────────────────────────────────────
   // Rol independiente de "admins": solo da acceso al Panel Staff (apartado
   // "Staff" del dashboard). No tiene acceso al Panel Admin ni a ninguna de
@@ -192,6 +209,20 @@ export default async function handler(req, res) {
       });
     }
 
+    // ── GET: publicaciones de una empresa (botón "Ver más", cualquier sesión) ──
+    if (req.method === "GET" && action === "empresas_publicaciones") {
+      const { empresa_id } = req.query;
+      if (!empresa_id) return res.status(400).json({ error: "Falta empresa_id" });
+
+      const publicaciones = await sql`
+        SELECT id, titulo, texto, imagen_url, created_at
+        FROM empresa_publicaciones
+        WHERE empresa_id = ${empresa_id}
+        ORDER BY created_at DESC
+      `;
+      return res.status(200).json({ publicaciones });
+    }
+
     // A partir de acá todas las acciones de empresas requieren ser admin
     // o staff (Staff tiene acceso a Administrar Empresas desde su panel).
     if (action && action.startsWith("empresas_admin_")) {
@@ -307,6 +338,63 @@ export default async function handler(req, res) {
 
         await registrarStaffLog(sql, discord_id, discord_name, "EMPRESA_ELIMINAR",
           `Eliminó la empresa "${existente[0]?.nombre || '—'}" (ID ${empresa_id})`);
+
+        return res.status(200).json({ ok: true });
+      }
+
+      // ── GET: publicaciones de una empresa, vista admin (mismas que la
+      //    pública, vive acá para no duplicar el chequeo de admin/staff) ──
+      if (req.method === "GET" && action === "empresas_admin_publicaciones") {
+        const { empresa_id } = req.query;
+        if (!empresa_id) return res.status(400).json({ error: "Falta empresa_id" });
+
+        const publicaciones = await sql`
+          SELECT id, titulo, texto, imagen_url, created_at
+          FROM empresa_publicaciones
+          WHERE empresa_id = ${empresa_id}
+          ORDER BY created_at DESC
+        `;
+        return res.status(200).json({ publicaciones });
+      }
+
+      // ── POST: crear publicación (imagen/texto/anuncio) para una empresa ──
+      if (req.method === "POST" && action === "empresas_admin_publicacion_crear") {
+        const { empresa_id, titulo, texto, imagen_url } = req.body || {};
+        if (!empresa_id) return res.status(400).json({ error: "Falta empresa_id" });
+        if (!titulo?.trim() && !texto?.trim() && !imagen_url?.trim())
+          return res.status(400).json({ error: "Agregá al menos un título, texto o imagen" });
+
+        const existe = await sql`SELECT nombre FROM empresas WHERE id = ${empresa_id}`;
+        if (existe.length === 0)
+          return res.status(404).json({ error: "Empresa no encontrada" });
+
+        const rows = await sql`
+          INSERT INTO empresa_publicaciones (empresa_id, titulo, texto, imagen_url, creado_por)
+          VALUES (
+            ${empresa_id},
+            ${titulo?.trim() || null},
+            ${texto?.trim() || null},
+            ${imagen_url?.trim() || null},
+            ${discord_name || discord_id}
+          )
+          RETURNING *
+        `;
+
+        await registrarStaffLog(sql, discord_id, discord_name, "EMPRESA_PUBLICACION_CREAR",
+          `Publicó contenido en la empresa "${existe[0].nombre}" (ID ${empresa_id})`);
+
+        return res.status(201).json({ publicacion: rows[0] });
+      }
+
+      // ── DELETE: eliminar una publicación de empresa ──────────────────────
+      if (req.method === "DELETE" && action === "empresas_admin_publicacion_eliminar") {
+        const { id } = req.query;
+        if (!id) return res.status(400).json({ error: "Falta id" });
+
+        await sql`DELETE FROM empresa_publicaciones WHERE id = ${id}`;
+
+        await registrarStaffLog(sql, discord_id, discord_name, "EMPRESA_PUBLICACION_ELIMINAR",
+          `Eliminó una publicación de empresa (ID ${id})`);
 
         return res.status(200).json({ ok: true });
       }
