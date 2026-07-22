@@ -10,6 +10,11 @@
     let notifPrimeraCarga = true;
 
     function notifIniciar() {
+      // La campanita solo debe verse en el dashboard (junto a su nav bar),
+      // no en el resto de secciones (banco, tienda, etc.) aunque la sesión
+      // siga activa ahí. CC_CURRENT_SCREEN lo setea cada página (ver
+      // CC_PAGE_MAP más arriba en el <head> de cada .html).
+      if (window.CC_CURRENT_SCREEN !== 'dashboard') { notifDetener(); return; }
       const wrap = document.getElementById('notif-bell-wrap');
       if (wrap) wrap.classList.add('nb-activo');
       notifPrimeraCarga = true;
