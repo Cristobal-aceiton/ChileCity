@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v97"; // <--- ⚠️ ACTUALIZADO A v97 (footer del dashboard igualado al de la landing: mismo orden y links funcionando)
+const CACHE_VERSION = "v98"; // <--- ⚠️ ACTUALIZADO A v98 (ruleta.html reconstruido: apuesta rojo/negro/verde, engancha con el backend y js/ruleta.js ya existentes; saldo real en casino.html)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

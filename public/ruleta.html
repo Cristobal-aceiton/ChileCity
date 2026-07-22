@@ -27,7 +27,7 @@
 
     <div class="gm-header">
         <h1>Ruleta</h1>
-        <p>Apuesta a color, número o docena</p>
+        <p>Apuesta a rojo, negro o verde — el verde paga x14</p>
     </div>
 
     <div class="sueldo">
@@ -35,44 +35,35 @@
         <p id="saldo">$0</p>
     </div>
 
-    <!-- Contenedor de la ruleta: el <canvas> se dibuja por JS, el puntero es un
-         triángulo fijo arriba. #rul-canvas es lo único que necesita existir
-         con ese id; puedes envolverlo/decorarlo como quieras. -->
-    <div id="rul-rueda-wrap">
-        <div id="rul-puntero"></div>
-        <canvas id="rul-canvas" width="320" height="320"></canvas>
-        <div id="rul-resultado-chip"></div>
+    <!-- Rueda -->
+    <div class="rul-scene">
+        <div class="rul-puntero"></div>
+        <div class="rul-aro">
+            <canvas id="rul-canvas" width="260" height="260"></canvas>
+        </div>
+        <div id="rul-resultado-chip" class="rul-chip"></div>
     </div>
 
-    <!-- Mensajes de error / feedback -->
     <div id="rul-mensaje"></div>
 
-    <!-- Solo se puede apostar a un color: rojo, negro o verde -->
-    <div id="rul-opciones-titulo">Elige un color</div>
     <div id="rul-opciones"></div>
 
-    <!-- Monto + botón de girar -->
     <div id="rul-controles">
         <label for="rul-monto">Monto a apostar</label>
         <input type="number" id="rul-monto" min="1000" step="1000" value="1000">
         <button type="button" id="rul-girar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-            </svg>
-            Girar
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+            Girar ruleta
         </button>
     </div>
 
-    <!-- Historial de tiradas recientes -->
     <div id="rul-historial">
         <h2>Historial</h2>
         <ul id="rul-historial-lista"></ul>
     </div>
 
     <script src="/js/casino-sfx.js?v=1"></script>
-    <script src="/js/ruleta.js?v=2" defer></script>
+    <script src="/js/ruleta.js?v=1" defer></script>
 
 </body>
 </html>
@@ -152,40 +143,14 @@ body, html {
     #bg-fx::before, #bg-fx::after { animation: none !important; }
 }
 
-/* Todo el contenido va sobre el fondo */
 body > *:not(#bg-fx):not(.rul-overlay) {
     position: relative;
     z-index: 2;
 }
 
-.btn-volver-dash {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  max-width: 350px;
-  margin: 20px auto 0;
-  padding: 8px 14px;
-  color: rgba(255,255,255,.8);
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  background-color: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 30px;
-  box-sizing: border-box;
-  transition: all .25s cubic-bezier(.16,1,.3,1);
-}
-
-.btn-volver-dash:hover {
-    background-color: rgba(255,255,255,.12);
-    color: #fff;
-}
-
 .gm-header {
     text-align: center;
-    margin: 20px auto 0;
+    margin: 24px auto 0;
     max-width: 340px;
 }
 
@@ -204,6 +169,30 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     color: rgba(255,255,255,.45);
     font-size: 12.5px;
     margin: 2px 0 0;
+}
+
+.btn-volver-dash {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  color: rgba(255,255,255,.8);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 30px;
+  box-sizing: border-box;
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+}
+
+.btn-volver-dash:hover {
+    background-color: rgba(255,255,255,.12);
+    color: #fff;
 }
 
 .sueldo {
@@ -231,72 +220,92 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     font-weight: 800;
     font-size: 22px;
     margin: 0;
-    transition: transform .2s ease;
 }
 
 .sueldo p.rul-saldo-anim {
-    animation: rulSaldoPop .4s ease;
+    animation: rulSaldoPulso .5s ease;
 }
 
-@keyframes rulSaldoPop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.12); }
+@keyframes rulSaldoPulso {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.12); color: #fff; }
     100% { transform: scale(1); }
 }
 
-#rul-rueda-wrap {
+/* ── La rueda ─────────────────────────────────────────────────────────── */
+.rul-scene {
+    width: 280px;
+    height: 280px;
+    margin: 36px auto 6px;
     position: relative;
-    width: 320px;
-    margin: 40px auto 10px;
     display: flex;
+    align-items: center;
     justify-content: center;
 }
 
-#rul-puntero {
+.rul-puntero {
     position: absolute;
     top: -6px;
     left: 50%;
     transform: translateX(-50%);
-    width: 0; height: 0;
-    border-left: 14px solid transparent;
-    border-right: 14px solid transparent;
-    border-top: 22px solid #e02020;
-    z-index: 3;
-    filter: drop-shadow(0 0 6px rgba(224,32,32,.7));
+    width: 0;
+    height: 0;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 18px solid #f5d06b;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.5));
+    z-index: 4;
+}
+
+.rul-aro {
+    width: 272px;
+    height: 272px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+    border: 6px solid;
+    border-image: linear-gradient(135deg, #f5d06b, #b8860b 40%, #f5d06b 70%, #8a6d1a) 1;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 18px 50px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
 #rul-canvas {
+    display: block;
     border-radius: 50%;
-    transition: transform 4.5s cubic-bezier(.15,.85,.25,1);
-    box-shadow: 0 0 0 6px #1f2937, 0 0 30px rgba(224,32,32,.35);
+    box-shadow: inset 0 0 24px rgba(0,0,0,.6);
 }
 
 #rul-canvas.rul-girando {
-    box-shadow: 0 0 0 6px #1f2937, 0 0 46px rgba(224,32,32,.6);
+    transition: transform 4.6s cubic-bezier(.15,.65,.2,1);
 }
 
-#rul-resultado-chip {
+.rul-chip {
     position: absolute;
-    bottom: -18px;
+    bottom: -14px;
     left: 50%;
-    transform: translateX(-50%);
-    background: #111827;
+    transform: translateX(-50%) scale(.8);
     padding: 6px 16px;
     border-radius: 20px;
-    font-weight: bold;
-    font-size: 15px;
-    min-width: 40px;
-    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,.5);
     display: none;
+    z-index: 5;
 }
 
-#rul-resultado-chip.rul-chip-anim {
-    animation: rulChipPop .45s cubic-bezier(.16,1,.3,1);
+.rul-chip.rul-chip-anim {
+    animation: rulChipPop .35s cubic-bezier(.16,1,.3,1);
 }
 
 @keyframes rulChipPop {
-    0% { transform: translateX(-50%) scale(.6); opacity: 0; }
-    60% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+    0%   { transform: translateX(-50%) scale(.5); opacity: 0; }
+    70%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
     100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
@@ -309,87 +318,81 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     color: #fca5a5;
 }
 
-#rul-mensaje.rul-gano { color: #4ade80; }
-
-#rul-opciones-titulo {
-    max-width: 400px;
-    margin: 22px auto 0;
-    text-align: center;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,.4);
+#rul-mensaje.rul-gano {
+    color: #4ade80;
 }
 
+/* ── Opciones de apuesta (rellenadas por JS) ─────────────────────────────── */
 #rul-opciones {
-    max-width: 400px;
-    margin: 10px auto 0;
+    max-width: 380px;
+    margin: 16px auto 0;
     display: flex;
-    justify-content: center;
     gap: 10px;
     padding: 0 12px;
 }
 
 .rul-opcion {
     flex: 1;
-    max-width: 120px;
-    background: linear-gradient(160deg, #475569, #334155);
-    color: #fff;
-    border: 2px solid transparent;
-    padding: 14px 10px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.3);
-    transition: transform .15s ease, box-shadow .2s ease;
-}
-
-.rul-opcion:hover {
-    transform: translateY(-2px);
-}
-
-.rul-opcion:active {
-    transform: scale(.95);
-}
-
-.rul-opcion svg {
-    display: block;
-}
-
-.rul-opcion.rojo { background: linear-gradient(160deg, #ef4444, #b91c1c); }
-.rul-opcion.negro { background: linear-gradient(160deg, #1f2937, #0a0e14); }
-.rul-opcion.verde { background: linear-gradient(160deg, #22c55e, #15803d); }
-
-.rul-opcion.seleccionada {
-    border-color: #fff;
-    box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 20px rgba(224,32,32,.4);
-    transform: translateY(-2px);
+    gap: 4px;
+    background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    color: #fff;
+    border: 2px solid rgba(255,255,255,.1);
+    padding: 14px 8px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
+    transition: all .2s cubic-bezier(.16,1,.3,1);
 }
 
 .rul-opcion-mult {
-    font-size: 10px;
-    font-weight: 700;
-    opacity: .75;
+    font-weight: 600;
+    font-size: 10.5px;
+    color: rgba(255,255,255,.4);
 }
 
+.rul-opcion.rojo svg { color: #ff4d4d; }
+.rul-opcion.negro svg { color: #ddd; }
+.rul-opcion.verde svg { color: #34d399; }
+
+.rul-opcion:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.03));
+}
+
+.rul-opcion.seleccionada {
+    box-shadow: 0 0 0 2px currentColor, 0 6px 20px rgba(0,0,0,.35);
+}
+
+.rul-opcion.rojo.seleccionada { border-color: #e02020; color: #ff6b6b; background: linear-gradient(160deg, rgba(224,32,32,.22), rgba(224,32,32,.08)); }
+.rul-opcion.negro.seleccionada { border-color: rgba(255,255,255,.6); color: #eee; background: linear-gradient(160deg, rgba(255,255,255,.15), rgba(255,255,255,.04)); }
+.rul-opcion.verde.seleccionada { border-color: #10b981; color: #34d399; background: linear-gradient(160deg, rgba(16,185,129,.22), rgba(16,185,129,.08)); }
+
+.rul-opcion:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Controles (monto + girar) ────────────────────────────────────────── */
 #rul-controles {
     max-width: 300px;
-    margin: 24px auto 0;
+    margin: 22px auto 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
     align-items: center;
+    padding: 0 12px;
 }
 
 #rul-controles label {
     font-size: 13px;
-    color: #cbd5e1;
+    color: rgba(255,255,255,.5);
+    align-self: flex-start;
 }
 
 #rul-monto {
@@ -397,36 +400,39 @@ body > *:not(#bg-fx):not(.rul-overlay) {
     box-sizing: border-box;
     padding: 10px;
     border-radius: 8px;
-    border: none;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.06);
+    color: #fff;
     font-size: 15px;
     text-align: center;
 }
 
 #rul-girar {
     width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 30px;
-    background: #e02020;
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 0 24px rgba(224,32,32,.35);
-    transition: transform .2s ease, box-shadow .2s ease;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #f5d06b, #b8860b);
+    color: #241a02;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(184,134,11,.35);
+    transition: transform .2s cubic-bezier(.16,1,.3,1);
 }
 
 #rul-girar:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 0 32px rgba(224,32,32,.55);
 }
 
-#rul-girar:active:not(:disabled) {
-    transform: scale(.97);
+#rul-girar:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
 }
 
 #rul-girar svg.rul-spin {
@@ -434,14 +440,11 @@ body > *:not(#bg-fx):not(.rul-overlay) {
 }
 
 @keyframes rulSpinIcon {
-    to { transform: rotate(360deg); }
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
-#rul-girar:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
+/* ── Historial ────────────────────────────────────────────────────────── */
 #rul-historial {
     max-width: 400px;
     margin: 36px auto 0;
@@ -450,7 +453,7 @@ body > *:not(#bg-fx):not(.rul-overlay) {
 
 #rul-historial h2 {
     font-size: 15px;
-    color: #cbd5e1;
+    color: rgba(255,255,255,.6);
 }
 
 #rul-historial-lista {
@@ -464,20 +467,15 @@ body > *:not(#bg-fx):not(.rul-overlay) {
 }
 
 #rul-historial-lista li {
-    background: rgba(255,255,255,.06);
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.07);
     padding: 8px 10px;
     border-radius: 8px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 10px;
-    animation: rulHistIn .3s ease;
 }
-
-@keyframes rulHistIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 
 .cs-banner-construccion {
   display: flex;
@@ -495,6 +493,12 @@ body > *:not(#bg-fx):not(.rul-overlay) {
 
 .cs-banner-construccion svg {
   flex-shrink: 0;
+}
+
+@media (max-width: 420px) {
+    .rul-scene { width: 240px; height: 240px; }
+    .rul-aro { width: 232px; height: 232px; }
+    #rul-canvas { width: 220px !important; height: 220px !important; }
 }
 
 </style>
