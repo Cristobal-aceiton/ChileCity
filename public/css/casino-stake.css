@@ -145,15 +145,14 @@ body.cs-body > *:not(#bg-fx):not(.cs-overlay) { position: relative; z-index: 2; 
 }
 
 .cs-grid {
-  max-width: 1100px; margin: 0 auto; padding: 0 16px 10px;
+  max-width: 720px; margin: 0 auto; padding: 0 16px 10px;
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
 }
 @media (min-width: 560px) { .cs-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 860px) { .cs-grid { grid-template-columns: repeat(5, 1fr); } }
 
 .cs-card {
   position: relative;
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   border-radius: 14px;
   overflow: hidden;
   background: var(--cs-panel);
@@ -170,13 +169,6 @@ body.cs-body > *:not(#bg-fx):not(.cs-overlay) { position: relative; z-index: 2; 
   background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
 }
 .cs-card .cs-card-tag.activo { color: var(--cs-green); border: 1px solid rgba(18,224,138,.4); }
-.cs-card .cs-card-tag.pronto { color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.2); }
-.cs-card.cs-card-disabled { pointer-events: none; filter: grayscale(.5) brightness(.55); }
-.cs-card.cs-card-disabled::before {
-  content: 'PRÓXIMAMENTE'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #fff;
-  background: rgba(0,0,0,.35);
-}
 
 /* ══════════════════ PÁGINAS DE JUEGO ══════════════════ */
 .cs-game-header { text-align: center; margin: 22px auto 0; max-width: 340px; }
