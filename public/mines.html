@@ -4,83 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minas — Casino ChileCity RP</title>
-  <link rel="icon" type="image/webp" href="/logo.webp">
-<link rel="apple-touch-icon" href="/logo.webp">
+    <link rel="icon" type="image/webp" href="/logo.webp">
+    <link rel="apple-touch-icon" href="/logo.webp">
+    <link rel="stylesheet" href="/css/casino-stake.css?v=1">
 </head>
-<body>
+<body class="cs-body">
 
     <div id="bg-fx" aria-hidden="true"></div>
-    <div class="mi-overlay" aria-hidden="true"></div>
+    <div class="cs-overlay" aria-hidden="true"></div>
 
     <div class="cs-banner-construccion">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
         Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
     </div>
 
-    <a href="/casino.html" class="btn-volver-dash">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5"/>
-          <path d="M12 19l-7-7 7-7"/>
-        </svg>
-        Casino
-    </a>
+    <div class="cs-topbar">
+        <a href="/casino.html" class="btn-volver-dash" style="margin:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+            </svg>
+            Casino
+        </a>
+        <div class="cs-saldo-chip">
+            <span class="lbl">Saldo</span>
+            <strong id="saldo">$0</strong>
+        </div>
+    </div>
 
-    <div class="gm-header">
+    <div class="cs-game-header">
         <h1>Minas</h1>
         <p>Descubre casillas, retira cuando quieras</p>
     </div>
 
-    <div class="sueldo">
-        <h1>Saldo disponible</h1>
-        <p id="saldo">$0</p>
+    <div class="cs-wrap">
+
+        <!-- Panel de apuesta -->
+        <div class="cs-panel">
+            <div class="cs-panel-card">
+                <div class="cs-tabs">
+                    <div class="cs-tab activa">Manual</div>
+                    <div class="cs-tab">Automático</div>
+                </div>
+
+                <div id="mi-mensaje" class="cs-mensaje"></div>
+
+                <!-- Configuración de la partida (visible antes de empezar) -->
+                <div id="mi-config" style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="cs-campo">
+                        <label for="mi-monto">Monto de apuesta</label>
+                        <div class="cs-monto-row">
+                            <input type="number" id="mi-monto" min="1000" step="1000" value="1000">
+                            <div class="cs-quick">
+                                <button type="button" data-mult="0.5">½</button>
+                                <button type="button" data-mult="2">2×</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cs-campo">
+                        <label for="mi-minas">Cantidad de minas</label>
+                        <select id="mi-minas" class="cs-select"></select>
+                    </div>
+                    <button type="button" id="mi-iniciar" class="cs-btn cs-btn-red">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>
+                        </svg>
+                        Iniciar partida
+                    </button>
+                </div>
+
+                <!-- Info de la partida en curso -->
+                <div id="mi-info" class="mi-oculto" style="flex-direction:column; gap:14px;">
+                    <div class="cs-stat-row">
+                        <div class="cs-stat">
+                            <span>Multiplicador</span>
+                            <b id="mi-mult">x1.00</b>
+                        </div>
+                        <div class="cs-stat">
+                            <span>Si retiras</span>
+                            <b id="mi-premio">$0</b>
+                        </div>
+                    </div>
+                    <button type="button" id="mi-retirar" class="mi-oculto cs-btn cs-btn-green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 19V5M5 12l7-7 7 7"/>
+                        </svg>
+                        Retirar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tablero -->
+        <div class="cs-stage">
+            <div class="cs-stage-card">
+                <div id="mi-tablero" class="mi-oculto"></div>
+                <div id="mi-tablero-vacio" style="color:rgba(255,255,255,.35); font-size:13px; text-align:center; max-width:260px;">
+                    Configura tu apuesta y presiona <b>Iniciar partida</b> para ver el tablero.
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div id="mi-mensaje"></div>
-
-    <!-- Configuración de la partida (visible antes de empezar) -->
-    <div id="mi-config">
-        <div class="mi-campo">
-            <label for="mi-monto">Monto a apostar</label>
-            <input type="number" id="mi-monto" min="1000" step="1000" value="1000">
-        </div>
-        <div class="mi-campo">
-            <label for="mi-minas">Cantidad de minas</label>
-            <select id="mi-minas">
-                <!-- se rellena por JS: 1 a 24 -->
-            </select>
-        </div>
-        <button type="button" id="mi-iniciar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="9"/>
-                <path d="M12 8v4l3 3"/>
-            </svg>
-            Iniciar partida
-        </button>
-    </div>
-
-    <!-- Info de la partida en curso -->
-    <div id="mi-info" class="mi-oculto">
-        <div class="mi-info-item">
-            <span>Multiplicador actual</span>
-            <b id="mi-mult">x1.00</b>
-        </div>
-        <div class="mi-info-item">
-            <span>Premio si retiras</span>
-            <b id="mi-premio">$0</b>
-        </div>
-    </div>
-
-    <!-- Tablero 5x5: la tabla de minas -->
-    <div id="mi-tablero" class="mi-oculto"></div>
-
-    <button type="button" id="mi-retirar" class="mi-oculto">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 19V5M5 12l7-7 7 7"/>
-        </svg>
-        Retirar
-    </button>
-
-    <div id="mi-historial">
+    <div id="mi-historial" class="cs-historial">
         <h2>Historial</h2>
         <ul id="mi-historial-lista"></ul>
     </div>
@@ -95,477 +121,79 @@
 
     <script src="/js/casino-sfx.js?v=1"></script>
     <script src="/js/mines.js?v=2" defer></script>
+    <script>
+        // Botones rápidos ½ / 2× del monto de apuesta + mostrar/ocultar placeholder del tablero
+        (function () {
+            const elMonto = document.getElementById('mi-monto');
+            document.querySelectorAll('#mi-config .cs-quick button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mult = Number(btn.dataset.mult);
+                    const actual = Number(elMonto.value) || 0;
+                    let nuevo = Math.max(1000, Math.round((actual * mult) / 1000) * 1000);
+                    elMonto.value = nuevo;
+                    elMonto.dispatchEvent(new Event('input'));
+                });
+            });
+
+            const elTablero = document.getElementById('mi-tablero');
+            const elVacio = document.getElementById('mi-tablero-vacio');
+            const obs = new MutationObserver(() => {
+                elVacio.style.display = elTablero.classList.contains('mi-oculto') ? '' : 'none';
+            });
+            obs.observe(elTablero, { attributes: true, attributeFilter: ['class'] });
+        })();
+    </script>
 
 </body>
 </html>
 
 <style>
+.mi-oculto { display: none !important; }
+.mi-gano { color: #4ade80; }
+#mi-info { display: flex; }
+.mi-mult-anim { animation: miMultPop .3s ease; }
+@keyframes miMultPop { 0%{transform:scale(1);} 50%{transform:scale(1.18); color:#4ade80;} 100%{transform:scale(1);} }
+.mi-saldo-anim { animation: csPulse .4s ease; }
 
-*, *::before, *::after { box-sizing: border-box; }
-
-body, html {
-    background-color: #0d0303;
-    margin: 0;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    color: #fff;
-    padding-bottom: 60px;
-    min-height: 100%;
-}
-
-/* ── Fondo rojo del sitio (mismo look que el resto de ChileCity RP) ─────── */
-#bg-fx {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    background: #0d0303;
-    pointer-events: none;
-}
-
-#bg-fx::before, #bg-fx::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(55px);
-    will-change: transform;
-}
-
-#bg-fx::before {
-    width: 120vmax;
-    height: 120vmax;
-    top: -55vmax;
-    left: -45vmax;
-    background: radial-gradient(circle at 30% 30%, rgba(230,25,25,.55), rgba(230,25,25,0) 62%);
-    animation: miBgFloatA 14s ease-in-out infinite alternate;
-}
-
-#bg-fx::after {
-    width: 110vmax;
-    height: 110vmax;
-    bottom: -50vmax;
-    right: -40vmax;
-    background: radial-gradient(circle at 70% 70%, rgba(160,10,10,.5), rgba(0,0,0,0) 62%);
-    animation: miBgFloatB 16s ease-in-out infinite alternate;
-}
-
-@keyframes miBgFloatA {
-    0% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(6vw,4vh) scale(1.08); }
-    100% { transform: translate(-4vw,6vh) scale(1); }
-}
-
-@keyframes miBgFloatB {
-    0% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(-5vw,-6vh) scale(1.05); }
-    100% { transform: translate(5vw,-3vh) scale(1); }
-}
-
-.mi-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-        radial-gradient(ellipse 55% 45% at 78% 12%, rgba(220,30,30,.1), transparent 60%),
-        radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.65) 100%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #bg-fx::before, #bg-fx::after { animation: none !important; }
-}
-
-body > *:not(#bg-fx):not(.mi-overlay) {
-    position: relative;
-    z-index: 2;
-}
-
-.btn-volver-dash {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  max-width: 350px;
-  margin: 20px auto 0;
-  padding: 8px 14px;
-  color: rgba(255,255,255,.8);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  background-color: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 30px;
-  box-sizing: border-box;
-  transition: all .25s cubic-bezier(.16,1,.3,1);
-}
-
-.btn-volver-dash:hover {
-    background-color: rgba(255,255,255,.12);
-    color: #fff;
-}
-
-.gm-header {
-    text-align: center;
-    margin: 20px auto 0;
-    max-width: 340px;
-}
-
-.gm-header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 1px;
-    background: linear-gradient(135deg, #fff 50%, #ff4444);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0;
-}
-
-.gm-header p {
-    color: rgba(255,255,255,.45);
-    font-size: 12.5px;
-    margin: 2px 0 0;
-}
-
-.sueldo {
-    background: rgba(16,185,129,.1);
-    border: 1px solid rgba(16,185,129,.3);
-    max-width: 320px;
-    margin: 20px auto 0;
-    padding: 12px 10px;
-    border-radius: 14px;
-}
-
-.sueldo h1 {
-    text-align: center;
-    color: rgba(255,255,255,.5);
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin: 0 0 4px;
-}
-
-.sueldo p {
-    text-align: center;
-    color: #34d399;
-    font-weight: 800;
-    font-size: 22px;
-    margin: 0;
-}
-
-.sueldo p.mi-saldo-anim {
-    animation: miSaldoPop .4s ease;
-}
-
-@keyframes miSaldoPop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.12); }
-    100% { transform: scale(1); }
-}
-
-#mi-mensaje {
-    max-width: 340px;
-    margin: 20px auto 0;
-    text-align: center;
-    font-size: 14px;
-    min-height: 18px;
-    color: #fca5a5;
-    padding: 0 12px;
-}
-
-#mi-mensaje.mi-gano { color: #4ade80; }
-
-.mi-oculto {
-    display: none !important;
-}
-
-#mi-config {
-    max-width: 320px;
-    margin: 16px auto 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 0 12px;
-}
-
-.mi-campo {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.mi-campo label {
-    font-size: 12px;
-    color: rgba(255,255,255,.5);
-}
-
-.mi-campo input, .mi-campo select {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.06);
-    color: #fff;
-    font-size: 15px;
-    text-align: center;
-}
-
-.mi-campo select option {
-    background: #111;
-}
-
-#mi-iniciar {
-    padding: 12px;
-    border: none;
-    border-radius: 30px;
-    background: #e02020;
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 0 24px rgba(224,32,32,.35);
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-
-#mi-iniciar:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 0 32px rgba(224,32,32,.55);
-}
-
-#mi-iniciar:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
-#mi-info {
-    max-width: 320px;
-    margin: 20px auto 0;
-    display: flex;
-    gap: 10px;
-    padding: 0 12px;
-}
-
-.mi-info-item {
-    flex: 1;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px;
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    text-align: center;
-}
-
-.mi-info-item span {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: rgba(255,255,255,.4);
-    font-weight: 700;
-}
-
-.mi-info-item b {
-    font-size: 16px;
-    color: #fbbf24;
-    transition: transform .2s ease;
-}
-
-.mi-info-item b.mi-mult-anim {
-    animation: miMultPop .3s ease;
-}
-
-@keyframes miMultPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.18); color: #4ade80; }
-    100% { transform: scale(1); }
-}
-
-/* ── La tabla de minas (tablero 5x5) ─────────────────────────────────── */
+/* ── Tablero de minas (5x5) ────────────────────────────────────────────── */
 #mi-tablero {
+    width: 100%;
     max-width: 340px;
-    margin: 20px auto 0;
+    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    padding: 0 12px;
 }
-
-#mi-tablero.mi-shake {
-    animation: miTableroShake .4s ease;
-}
-
+#mi-tablero.mi-shake { animation: miTableroShake .4s ease; }
 @keyframes miTableroShake {
     0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(5px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(3px); }
+    20% { transform: translateX(-6px); } 40% { transform: translateX(5px); }
+    60% { transform: translateX(-4px); } 80% { transform: translateX(3px); }
 }
-
 .mi-casilla {
-    aspect-ratio: 1;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,.1);
+    aspect-ratio: 1; border-radius: 10px; border: 1px solid rgba(255,255,255,.1);
     background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-    box-shadow: 0 4px 12px rgba(0,0,0,.25);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all .15s;
-    color: transparent;
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+    color: transparent; position: relative; overflow: hidden;
 }
-
 .mi-casilla:hover:not(.mi-revelada):not(.mi-mina):not(:disabled) {
-    background: rgba(255,255,255,.12);
-    transform: scale(1.05);
+    background: rgba(255,255,255,.14); transform: scale(1.05);
 }
-
 .mi-casilla.mi-revelada {
-    background: rgba(16,185,129,.18);
-    border-color: rgba(16,185,129,.4);
-    color: #34d399;
-    cursor: default;
-    animation: miRevelar .3s cubic-bezier(.16,1,.3,1);
+    background: rgba(18,224,138,.16); border-color: rgba(18,224,138,.4); color: #12e08a;
+    cursor: default; animation: miRevelar .3s cubic-bezier(.16,1,.3,1);
 }
-
-@keyframes miRevelar {
-    0% { transform: scale(.6); opacity: 0; }
-    60% { transform: scale(1.15); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.mi-casilla.mi-mina {
-    background: rgba(239,68,68,.22);
-    border-color: rgba(239,68,68,.5);
-    color: #f87171;
-    cursor: default;
-}
-
-.mi-casilla.mi-mina.mi-mina-detonada {
-    animation: miExplotar .5s ease;
-}
-
+@keyframes miRevelar { 0%{transform:scale(.6); opacity:0;} 60%{transform:scale(1.15); opacity:1;} 100%{transform:scale(1); opacity:1;} }
+.mi-casilla.mi-mina { background: rgba(239,68,68,.22); border-color: rgba(239,68,68,.5); color: #f87171; cursor: default; }
+.mi-casilla.mi-mina.mi-mina-detonada { animation: miExplotar .5s ease; }
 @keyframes miExplotar {
     0% { transform: scale(1); background: rgba(239,68,68,.22); }
     25% { transform: scale(1.35); background: rgba(239,68,68,.65); box-shadow: 0 0 30px rgba(239,68,68,.9); }
-    55% { transform: scale(.92); }
-    100% { transform: scale(1); background: rgba(239,68,68,.22); }
+    55% { transform: scale(.92); } 100% { transform: scale(1); background: rgba(239,68,68,.22); }
 }
-
-/* Ondas de la explosión */
-.mi-onda {
-    position: absolute;
-    inset: 0;
-    border-radius: 10px;
-    border: 2px solid rgba(239,68,68,.85);
-    opacity: 0;
-    pointer-events: none;
-}
-
-.mi-onda.mi-onda-activa {
-    animation: miOnda .55s ease-out forwards;
-}
-
-@keyframes miOnda {
-    0% { transform: scale(.6); opacity: .9; }
-    100% { transform: scale(2.4); opacity: 0; }
-}
-
-.mi-casilla:disabled {
-    cursor: not-allowed;
-}
-
-#mi-retirar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    max-width: 320px;
-    margin: 20px auto 0;
-    width: calc(100% - 24px);
-    padding: 12px;
-    border: none;
-    border-radius: 30px;
-    background: #10b981;
-    color: #06210f;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 0 24px rgba(16,185,129,.3);
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-
-#mi-retirar:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 0 32px rgba(16,185,129,.5);
-}
-
-#mi-retirar:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
-#mi-historial {
-    max-width: 400px;
-    margin: 36px auto 0;
-    padding: 0 12px;
-}
-
-#mi-historial h2 {
-    font-size: 15px;
-    color: rgba(255,255,255,.6);
-}
-
-#mi-historial-lista {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 13px;
-}
-
-#mi-historial-lista li {
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.07);
-    padding: 8px 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    animation: miHistIn .3s ease;
-}
-
-@keyframes miHistIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-
-.cs-banner-construccion {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  padding: 10px 16px;
-  background: rgba(245, 158, 11, .1);
-  border-bottom: 1px solid rgba(245, 158, 11, .3);
-  color: #fbbf24;
-  font-size: 12.5px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.cs-banner-construccion svg {
-  flex-shrink: 0;
-}
-
+.mi-onda { position: absolute; inset: 0; border-radius: 10px; border: 2px solid rgba(239,68,68,.85); opacity: 0; pointer-events: none; }
+.mi-onda.mi-onda-activa { animation: miOnda .55s ease-out forwards; }
+@keyframes miOnda { 0%{transform:scale(.6); opacity:.9;} 100%{transform:scale(2.4); opacity:0;} }
+.mi-casilla:disabled { cursor: not-allowed; }
 </style>

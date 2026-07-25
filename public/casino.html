@@ -1,128 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casino - ChileCity RP</title>
+    <title>Casino — ChileCity RP</title>
     <link rel="icon" type="image/webp" href="/logo.webp">
     <link rel="apple-touch-icon" href="/logo.webp">
+    <link rel="stylesheet" href="/css/casino-stake.css?v=1">
 </head>
-<body>
-    
-<a href="/dashboard.html" class="btn-volver-dash">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M19 12H5"/>
-      <path d="M12 19l-7-7 7-7"/>
-    </svg>
-    Volver
-  </a>
+<body class="cs-body">
 
-  <div class="casino-container">
-    <h1>Saldo disponible</h1>
-    <p id="saldo">Cargando...</p>
-  </div>
+    <div id="bg-fx" aria-hidden="true"></div>
+    <div class="cs-overlay" aria-hidden="true"></div>
 
-  <div class="portadas-casino">
+    <div class="cs-banner-construccion">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
+    </div>
 
-    <a href="ruleta.html">
-        <img src="1.png" alt="Casino 1">
-    </a>
+    <div class="cs-topbar">
+        <a href="/dashboard.html" class="btn-volver-dash" style="margin:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+            </svg>
+            Volver
+        </a>
+        <div class="cs-saldo-chip">
+            <span class="lbl">Saldo</span>
+            <strong id="saldo">$0</strong>
+        </div>
+    </div>
 
-    <a href="">
-        <img src="2.png" alt="Casino 2">
-    </a>
+    <div class="cs-hero">
+        <div class="cs-hero-card">
+            <h1>Casino ChileCity RP</h1>
+            <p>Juega con tu saldo del banco: ruleta, minas, cara o cruz y más. Cada partida se decide en el servidor — resultados justos y verificables.</p>
+        </div>
+    </div>
 
-    <a href="">
-        <img src="3.png" alt="Casino 3">
-    </a>
+    <div class="cs-search">
+        <input type="text" id="cs-buscador" placeholder="Buscar un juego...">
+    </div>
 
-  </div>
+    <div class="cs-section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+        Juegos disponibles
+    </div>
 
-  <script>
-    (function () {
-      function formatCLP(n) {
-        return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
-      }
-      async function cargarSaldo() {
-        const el = document.getElementById('saldo');
-        try {
-          const r = await fetch('/api/banco?action=cuenta', { credentials: 'same-origin' });
-          if (r.status === 401) { window.location.href = '/'; return; }
-          if (!r.ok) throw new Error();
-          const data = await r.json();
-          el.textContent = formatCLP(data.saldo);
-        } catch {
-          el.textContent = '—';
-        }
-      }
-      document.addEventListener('DOMContentLoaded', cargarSaldo);
-    })();
-  </script>
+    <div class="cs-grid" id="cs-grid-activos">
+        <a href="/mines.html" class="cs-card" data-nombre="minas mines">
+            <span class="cs-card-tag activo">Jugar</span>
+            <img src="/casino-cover-mines.webp" alt="Minas" loading="lazy">
+        </a>
+        <a href="/ruleta.html" class="cs-card" data-nombre="ruleta roulette">
+            <span class="cs-card-tag activo">Jugar</span>
+            <img src="/casino-cover-ruleta.webp" alt="Ruleta" loading="lazy">
+        </a>
+        <a href="/moneda.html" class="cs-card" data-nombre="cara cruz moneda flip coinflip">
+            <span class="cs-card-tag activo">Jugar</span>
+            <img src="/casino-cover-moneda.webp" alt="Cara o Cruz" loading="lazy">
+        </a>
+    </div>
+
+    <div class="cs-section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Próximamente
+    </div>
+
+    <div class="cs-grid" id="cs-grid-pronto">
+        <a href="javascript:void(0)" class="cs-card cs-card-disabled" data-nombre="plinko">
+            <span class="cs-card-tag pronto">Pronto</span>
+            <img src="/casino-cover-plinko.webp" alt="Plinko" loading="lazy">
+        </a>
+        <a href="javascript:void(0)" class="cs-card cs-card-disabled" data-nombre="limbo">
+            <span class="cs-card-tag pronto">Pronto</span>
+            <img src="/casino-cover-limbo.webp" alt="Limbo" loading="lazy">
+        </a>
+        <a href="javascript:void(0)" class="cs-card cs-card-disabled" data-nombre="avion crash">
+            <span class="cs-card-tag pronto">Pronto</span>
+            <img src="/casino-cover-avion.webp" alt="Avión" loading="lazy">
+        </a>
+    </div>
+
+    <script src="/js/casino.js?v=2"></script>
+    <script>
+        (function () {
+            const buscador = document.getElementById('cs-buscador');
+            const tarjetas = [...document.querySelectorAll('.cs-card')];
+            buscador.addEventListener('input', () => {
+                const q = buscador.value.trim().toLowerCase();
+                tarjetas.forEach(t => {
+                    const coincide = !q || (t.dataset.nombre || '').includes(q);
+                    t.style.display = coincide ? '' : 'none';
+                });
+            });
+        })();
+    </script>
 
 </body>
 </html>
 
 <style>
-    body, html {
-        background-color: rgb(255, 136, 0);
-    }
-
-
-    .btn-volver-dash {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  max-width: 350px;
-  margin: 20px auto 0;
-  padding: 8px 14px;
-  color: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  background-color: rgb(65, 60, 60);
-  border-radius: 30px;
-  box-sizing: border-box;
-}
-
-.casino-container {
-  max-width: 300px;
-  margin: 0 auto;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.575);
-  font-family: Arial, Helvetica, sans-serif;
-  padding: 10px;
-  margin-top: 20px;
-  border-radius: 10px;
-}
-
-.casino-container h1 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.portadas-casino {
-    display: grid;
-    grid-template-columns: repeat(2, 200px);
-    gap: 20px;
-    justify-content: center;
-    margin-top: 30px;
-}
-
-.portadas-casino a {
-    display: block;
-}
-
-.portadas-casino img {
-    width: 200px;
-    display: block;
-    border-radius: 10px;
-}
-
-.portadas-casino a:nth-child(3) {
-    grid-column: 1 / 3;
-    justify-self: center;
-}
-
+.cs-grid { margin-bottom: 26px; }
 </style>

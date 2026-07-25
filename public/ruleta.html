@@ -4,501 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ruleta — Casino ChileCity RP</title>
-  <link rel="icon" type="image/webp" href="/logo.webp">
-<link rel="apple-touch-icon" href="/logo.webp">
+    <link rel="icon" type="image/webp" href="/logo.webp">
+    <link rel="apple-touch-icon" href="/logo.webp">
+    <link rel="stylesheet" href="/css/casino-stake.css?v=1">
 </head>
-<body>
+<body class="cs-body">
 
     <div id="bg-fx" aria-hidden="true"></div>
-    <div class="rul-overlay" aria-hidden="true"></div>
+    <div class="cs-overlay" aria-hidden="true"></div>
 
     <div class="cs-banner-construccion">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
         Casino en construcción — puede que encuentres algún error mientras seguimos mejorándolo.
     </div>
 
-    <a href="/casino.html" class="btn-volver-dash">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5"/>
-          <path d="M12 19l-7-7 7-7"/>
-        </svg>
-        Casino
-    </a>
+    <div class="cs-topbar">
+        <a href="/casino.html" class="btn-volver-dash" style="margin:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+            </svg>
+            Casino
+        </a>
+        <div class="cs-saldo-chip">
+            <span class="lbl">Saldo</span>
+            <strong id="saldo">$0</strong>
+        </div>
+    </div>
 
-    <div class="gm-header">
+    <div class="cs-game-header">
         <h1>Ruleta</h1>
         <p>Apuesta a rojo, negro o verde — el verde paga x14</p>
     </div>
 
-    <div class="sueldo">
-        <h1>Saldo disponible</h1>
-        <p id="saldo">$0</p>
-    </div>
+    <div class="cs-wrap">
 
-    <!-- Rueda -->
-    <div class="rul-scene">
-        <div class="rul-puntero"></div>
-        <div class="rul-aro">
-            <canvas id="rul-canvas" width="260" height="260"></canvas>
+        <!-- Panel de apuesta -->
+        <div class="cs-panel">
+            <div class="cs-panel-card">
+                <div class="cs-tabs">
+                    <div class="cs-tab activa">Manual</div>
+                    <div class="cs-tab">Automático</div>
+                </div>
+
+                <div id="rul-mensaje" class="cs-mensaje"></div>
+
+                <div class="cs-campo">
+                    <label>Elige un color</label>
+                    <div id="rul-opciones" class="cs-opciones"></div>
+                </div>
+
+                <div class="cs-campo">
+                    <label for="rul-monto">Monto a apostar</label>
+                    <div class="cs-monto-row">
+                        <input type="number" id="rul-monto" min="1000" step="1000" value="1000">
+                        <div class="cs-quick">
+                            <button type="button" data-mult="0.5">½</button>
+                            <button type="button" data-mult="2">2×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="rul-girar" class="cs-btn cs-btn-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+                    Girar ruleta
+                </button>
+            </div>
         </div>
-        <div id="rul-resultado-chip" class="rul-chip"></div>
+
+        <!-- Rueda -->
+        <div class="cs-stage">
+            <div class="cs-stage-card">
+                <div class="rul-scene">
+                    <div class="rul-puntero"></div>
+                    <div class="rul-aro">
+                        <canvas id="rul-canvas" width="260" height="260"></canvas>
+                    </div>
+                    <div id="rul-resultado-chip" class="rul-chip"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div id="rul-mensaje"></div>
-
-    <div id="rul-opciones"></div>
-
-    <div id="rul-controles">
-        <label for="rul-monto">Monto a apostar</label>
-        <input type="number" id="rul-monto" min="1000" step="1000" value="1000">
-        <button type="button" id="rul-girar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
-            Girar ruleta
-        </button>
-    </div>
-
-    <div id="rul-historial">
+    <div id="rul-historial" class="cs-historial">
         <h2>Historial</h2>
         <ul id="rul-historial-lista"></ul>
     </div>
 
     <script src="/js/casino-sfx.js?v=1"></script>
     <script src="/js/ruleta.js?v=1" defer></script>
+    <script>
+        // Botones rápidos ½ / 2× del monto de apuesta
+        (function () {
+            const elMonto = document.getElementById('rul-monto');
+            document.querySelectorAll('.cs-quick button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mult = Number(btn.dataset.mult);
+                    const actual = Number(elMonto.value) || 0;
+                    let nuevo = Math.max(1000, Math.round((actual * mult) / 1000) * 1000);
+                    elMonto.value = nuevo;
+                    elMonto.dispatchEvent(new Event('input'));
+                });
+            });
+        })();
+    </script>
 
 </body>
 </html>
 
 <style>
+.rul-gano { color: #4ade80; }
+.rul-saldo-anim { animation: csPulse .4s ease; }
 
-*, *::before, *::after { box-sizing: border-box; }
-
-body, html {
-    background-color: #0d0303;
-    margin: 0;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    color: #fff;
-    padding-bottom: 60px;
-    min-height: 100%;
-}
-
-/* ── Fondo rojo del sitio (mismo look que el resto de ChileCity RP) ─────── */
-#bg-fx {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    background: #0d0303;
-    pointer-events: none;
-}
-
-#bg-fx::before, #bg-fx::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(55px);
-    will-change: transform;
-}
-
-#bg-fx::before {
-    width: 120vmax;
-    height: 120vmax;
-    top: -55vmax;
-    left: -45vmax;
-    background: radial-gradient(circle at 30% 30%, rgba(230,25,25,.55), rgba(230,25,25,0) 62%);
-    animation: rulBgFloatA 14s ease-in-out infinite alternate;
-}
-
-#bg-fx::after {
-    width: 110vmax;
-    height: 110vmax;
-    bottom: -50vmax;
-    right: -40vmax;
-    background: radial-gradient(circle at 70% 70%, rgba(160,10,10,.5), rgba(0,0,0,0) 62%);
-    animation: rulBgFloatB 16s ease-in-out infinite alternate;
-}
-
-@keyframes rulBgFloatA {
-    0% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(6vw,4vh) scale(1.08); }
-    100% { transform: translate(-4vw,6vh) scale(1); }
-}
-
-@keyframes rulBgFloatB {
-    0% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(-5vw,-6vh) scale(1.05); }
-    100% { transform: translate(5vw,-3vh) scale(1); }
-}
-
-.rul-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-        radial-gradient(ellipse 55% 45% at 78% 12%, rgba(220,30,30,.1), transparent 60%),
-        radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.65) 100%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #bg-fx::before, #bg-fx::after { animation: none !important; }
-}
-
-body > *:not(#bg-fx):not(.rul-overlay) {
-    position: relative;
-    z-index: 2;
-}
-
-.gm-header {
-    text-align: center;
-    margin: 24px auto 0;
-    max-width: 340px;
-}
-
-.gm-header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 1px;
-    background: linear-gradient(135deg, #fff 50%, #ff4444);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0;
-}
-
-.gm-header p {
-    color: rgba(255,255,255,.45);
-    font-size: 12.5px;
-    margin: 2px 0 0;
-}
-
-.btn-volver-dash {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  max-width: 350px;
-  margin: 20px auto 0;
-  padding: 8px 14px;
-  color: rgba(255,255,255,.8);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  background-color: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 30px;
-  box-sizing: border-box;
-  transition: all .25s cubic-bezier(.16,1,.3,1);
-}
-
-.btn-volver-dash:hover {
-    background-color: rgba(255,255,255,.12);
-    color: #fff;
-}
-
-.sueldo {
-    background: rgba(16,185,129,.1);
-    border: 1px solid rgba(16,185,129,.3);
-    max-width: 320px;
-    margin: 20px auto 0;
-    padding: 12px 10px;
-    border-radius: 14px;
-}
-
-.sueldo h1 {
-    text-align: center;
-    color: rgba(255,255,255,.5);
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin: 0 0 4px;
-}
-
-.sueldo p {
-    text-align: center;
-    color: #34d399;
-    font-weight: 800;
-    font-size: 22px;
-    margin: 0;
-}
-
-.sueldo p.rul-saldo-anim {
-    animation: rulSaldoPulso .5s ease;
-}
-
-@keyframes rulSaldoPulso {
-    0%   { transform: scale(1); }
-    35%  { transform: scale(1.12); color: #fff; }
-    100% { transform: scale(1); }
-}
-
-/* ── La rueda ─────────────────────────────────────────────────────────── */
-.rul-scene {
-    width: 280px;
-    height: 280px;
-    margin: 36px auto 6px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.rul-puntero {
-    position: absolute;
-    top: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 11px solid transparent;
-    border-right: 11px solid transparent;
-    border-top: 18px solid #f5d06b;
-    filter: drop-shadow(0 2px 6px rgba(0,0,0,.5));
-    z-index: 4;
-}
-
-.rul-aro {
-    width: 272px;
-    height: 272px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
-    border: 6px solid;
-    border-image: linear-gradient(135deg, #f5d06b, #b8860b 40%, #f5d06b 70%, #8a6d1a) 1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 18px 50px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-}
-
-#rul-canvas {
-    display: block;
-    border-radius: 50%;
-    box-shadow: inset 0 0 24px rgba(0,0,0,.6);
-}
-
-#rul-canvas.rul-girando {
-    transition: transform 4.6s cubic-bezier(.15,.65,.2,1);
-}
-
-.rul-chip {
-    position: absolute;
-    bottom: -14px;
-    left: 50%;
-    transform: translateX(-50%) scale(.8);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(0,0,0,.5);
-    display: none;
-    z-index: 5;
-}
-
-.rul-chip.rul-chip-anim {
-    animation: rulChipPop .35s cubic-bezier(.16,1,.3,1);
-}
-
-@keyframes rulChipPop {
-    0%   { transform: translateX(-50%) scale(.5); opacity: 0; }
-    70%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
-    100% { transform: translateX(-50%) scale(1); opacity: 1; }
-}
-
-#rul-mensaje {
-    max-width: 340px;
-    margin: 30px auto 0;
-    text-align: center;
-    font-size: 14px;
-    min-height: 18px;
-    color: #fca5a5;
-}
-
-#rul-mensaje.rul-gano {
-    color: #4ade80;
-}
-
-/* ── Opciones de apuesta (rellenadas por JS) ─────────────────────────────── */
-#rul-opciones {
-    max-width: 380px;
-    margin: 16px auto 0;
-    display: flex;
-    gap: 10px;
-    padding: 0 12px;
-}
-
+/* Botones de color generados por ruleta.js */
+#rul-opciones { display: flex; gap: 8px; }
 .rul-opcion {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-    color: #fff;
-    border: 2px solid rgba(255,255,255,.1);
-    padding: 14px 8px;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0,0,0,.25);
-    transition: all .2s cubic-bezier(.16,1,.3,1);
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.015));
+    color: #fff; border: 2px solid var(--cs-border); padding: 11px 6px; border-radius: 12px;
+    font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .18s cubic-bezier(.16,1,.3,1);
 }
-
-.rul-opcion-mult {
-    font-weight: 600;
-    font-size: 10.5px;
-    color: rgba(255,255,255,.4);
-}
-
+.rul-opcion-mult { font-weight: 700; font-size: 10px; color: rgba(255,255,255,.4); }
 .rul-opcion.rojo svg { color: #ff4d4d; }
 .rul-opcion.negro svg { color: #ddd; }
-.rul-opcion.verde svg { color: #34d399; }
-
-.rul-opcion:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.03));
-}
-
-.rul-opcion.seleccionada {
-    box-shadow: 0 0 0 2px currentColor, 0 6px 20px rgba(0,0,0,.35);
-}
-
+.rul-opcion.verde svg { color: var(--cs-green); }
+.rul-opcion:hover { transform: translateY(-2px); background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.03)); }
+.rul-opcion.seleccionada { box-shadow: 0 0 0 2px currentColor; }
 .rul-opcion.rojo.seleccionada { border-color: #e02020; color: #ff6b6b; background: linear-gradient(160deg, rgba(224,32,32,.22), rgba(224,32,32,.08)); }
 .rul-opcion.negro.seleccionada { border-color: rgba(255,255,255,.6); color: #eee; background: linear-gradient(160deg, rgba(255,255,255,.15), rgba(255,255,255,.04)); }
-.rul-opcion.verde.seleccionada { border-color: #10b981; color: #34d399; background: linear-gradient(160deg, rgba(16,185,129,.22), rgba(16,185,129,.08)); }
+.rul-opcion.verde.seleccionada { border-color: var(--cs-green); color: var(--cs-green); background: linear-gradient(160deg, rgba(18,224,138,.22), rgba(18,224,138,.08)); }
+.rul-opcion:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-.rul-opcion:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-    transform: none;
+.rul-scene {
+    width: 260px; height: 260px; margin: 0 auto;
+    position: relative; display: flex; align-items: center; justify-content: center;
 }
-
-/* ── Controles (monto + girar) ────────────────────────────────────────── */
-#rul-controles {
-    max-width: 300px;
-    margin: 22px auto 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-    padding: 0 12px;
+.rul-puntero {
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent;
+    border-top: 18px solid var(--cs-gold); filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); z-index: 4;
 }
-
-#rul-controles label {
-    font-size: 13px;
-    color: rgba(255,255,255,.5);
-    align-self: flex-start;
+.rul-aro {
+    width: 254px; height: 254px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+    border: 6px solid; border-image: linear-gradient(135deg, #f5d06b, #b8860b 40%, #f5d06b 70%, #8a6d1a) 1;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 18px 50px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.7);
+    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
 }
-
-#rul-monto {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.06);
-    color: #fff;
-    font-size: 15px;
-    text-align: center;
+#rul-canvas { display: block; border-radius: 50%; box-shadow: inset 0 0 24px rgba(0,0,0,.6); }
+#rul-canvas.rul-girando { transition: transform 4.6s cubic-bezier(.15,.65,.2,1); }
+.rul-chip {
+    position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%) scale(.8);
+    padding: 6px 16px; border-radius: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+    letter-spacing: 1px; text-transform: uppercase; color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.5);
+    display: none; z-index: 5;
 }
-
-#rul-girar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: none;
-    border-radius: 30px;
-    background: linear-gradient(135deg, #f5d06b, #b8860b);
-    color: #241a02;
-    font-weight: 800;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(184,134,11,.35);
-    transition: transform .2s cubic-bezier(.16,1,.3,1);
-}
-
-#rul-girar:hover:not(:disabled) {
-    transform: translateY(-2px);
-}
-
-#rul-girar:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-#rul-girar svg.rul-spin {
-    animation: rulSpinIcon 1s linear infinite;
-}
-
-@keyframes rulSpinIcon {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-
-/* ── Historial ────────────────────────────────────────────────────────── */
-#rul-historial {
-    max-width: 400px;
-    margin: 36px auto 0;
-    padding: 0 12px;
-}
-
-#rul-historial h2 {
-    font-size: 15px;
-    color: rgba(255,255,255,.6);
-}
-
-#rul-historial-lista {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 13px;
-}
-
-#rul-historial-lista li {
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.07);
-    padding: 8px 10px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.cs-banner-construccion {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  padding: 10px 16px;
-  background: rgba(245, 158, 11, .1);
-  border-bottom: 1px solid rgba(245, 158, 11, .3);
-  color: #fbbf24;
-  font-size: 12.5px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.cs-banner-construccion svg {
-  flex-shrink: 0;
-}
+.rul-chip.rul-chip-anim { animation: rulChipPop .35s cubic-bezier(.16,1,.3,1); }
+@keyframes rulChipPop { 0%{transform:translateX(-50%) scale(.5); opacity:0;} 70%{transform:translateX(-50%) scale(1.08); opacity:1;} 100%{transform:translateX(-50%) scale(1); opacity:1;} }
+#rul-girar svg.rul-spin { animation: rulSpinIcon 1s linear infinite; }
+@keyframes rulSpinIcon { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
 @media (max-width: 420px) {
-    .rul-scene { width: 240px; height: 240px; }
-    .rul-aro { width: 232px; height: 232px; }
-    #rul-canvas { width: 220px !important; height: 220px !important; }
+    .rul-scene { width: 230px; height: 230px; }
+    .rul-aro { width: 224px; height: 224px; }
+    #rul-canvas { width: 214px !important; height: 214px !important; }
 }
-
 </style>
