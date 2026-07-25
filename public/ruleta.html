@@ -144,14 +144,24 @@
     width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent;
     border-top: 18px solid var(--cs-gold); filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); z-index: 4;
 }
+/* Anillo dorado: se logra con un padding + gradiente de fondo en vez de
+   border-image, porque border-image IGNORA border-radius y dibuja un marco
+   cuadrado por fuera del círculo (el "cuadro" que no se veía bien). */
 .rul-aro {
     width: 254px; height: 254px; border-radius: 50%;
-    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
-    border: 6px solid; border-image: linear-gradient(135deg, #f5d06b, #b8860b 40%, #f5d06b 70%, #8a6d1a) 1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 18px 50px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.7);
-    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+    padding: 5px;
+    background: conic-gradient(from 0deg, #f5d06b, #b8860b 25%, #f5d06b 50%, #8a6d1a 75%, #f5d06b 100%);
+    box-shadow: 0 18px 50px rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center; position: relative;
+    overflow: hidden;
 }
-#rul-canvas { display: block; border-radius: 50%; box-shadow: inset 0 0 24px rgba(0,0,0,.6); }
+.rul-aro::before {
+    content: '';
+    position: absolute; inset: 5px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.7);
+}
+#rul-canvas { position: relative; display: block; border-radius: 50%; box-shadow: inset 0 0 24px rgba(0,0,0,.6); }
 #rul-canvas.rul-girando { transition: transform 4.6s cubic-bezier(.15,.65,.2,1); }
 .rul-chip {
     position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%) scale(.8);
