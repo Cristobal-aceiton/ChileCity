@@ -1074,6 +1074,20 @@ body.oculta-logo-corner .logo-corner{opacity:0;pointer-events:none;transform:sca
   .hist-donut-legend{width:100%;}
 }
 .mercado-card .mercado-desc{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;max-height:52px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}.mercado-card .mercado-vendedor{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}.mercado-mias-lista{display:flex;flex-direction:column;gap:12px;width:100%}.mercado-mia-card{display:flex;align-items:flex-start;gap:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;flex-wrap:wrap}.mercado-pub-items-lista{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin-top:8px;padding-right:4px}.mercado-pub-item-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;cursor:pointer;transition:.2s}.mercado-pub-item-row:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}.mercado-pub-item-row.selected{background:rgba(251,146,60,.14);border-color:rgba(251,146,60,.45)}
+.mercado-orden-bar{display:flex;gap:10px;flex-wrap:wrap;margin:-8px 0 20px}
+.mercado-orden-select{width:auto;min-width:170px;flex:1;padding:9px 12px;font-size:12.5px}
+.mercado-precio-range{display:flex;align-items:center;gap:8px;flex:1;min-width:180px}
+.mercado-precio-range input{width:100%;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:12.5px;outline:0}
+.mercado-precio-range span{color:rgba(255,255,255,.3);font-size:12px;flex-shrink:0}
+.mercado-card .mercado-fecha{font-size:10.5px;color:rgba(255,255,255,.3);margin-top:2px}
+.mercado-pub-item-row{position:relative}
+.mercado-pub-item-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:#fb923c;cursor:pointer}
+.mercado-pub-item-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.mercado-pub-item-form .mpif-nombre{font-size:13px;font-weight:700;color:#fff}
+.mercado-pub-item-form textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;font-family:Inter,sans-serif;resize:vertical;width:100%;outline:0}
+.mercado-pub-item-form input[type=number]{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;width:100%;outline:0}
+.mercado-confirmar-resumen{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:14px 16px;font-size:13px;color:rgba(255,255,255,.7);line-height:1.7}
+.mercado-confirmar-resumen b{color:#fff}
 
 /* ── Panel Admin — hub de botones (Fase 3) ──────────────────────────────── */
 .pa-hub-heading{font-family:"Bebas Neue",sans-serif;font-size:19px;color:rgba(255,255,255,.55);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 14px 0}

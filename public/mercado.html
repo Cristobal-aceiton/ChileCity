@@ -126,6 +126,20 @@
             <button class="filtro-btn" onclick="mercadoFiltrarCategoria('otros', this)">Otros</button>
           </div>
 
+          <div class="mercado-orden-bar">
+            <select id="mercado-orden" class="cat-select mercado-orden-select" onchange="mercadoAplicarFiltros()">
+              <option value="reciente">Más recientes</option>
+              <option value="antiguo">Más antiguas</option>
+              <option value="precio_asc">Precio: menor a mayor</option>
+              <option value="precio_desc">Precio: mayor a menor</option>
+            </select>
+            <div class="mercado-precio-range">
+              <input type="number" id="mercado-precio-min" placeholder="Precio mín." min="0" oninput="mercadoAplicarFiltros()">
+              <span>—</span>
+              <input type="number" id="mercado-precio-max" placeholder="Precio máx." min="0" oninput="mercadoAplicarFiltros()">
+            </div>
+          </div>
+
           <div class="rc-loading" id="mercado-loading">
             <div class="spinner"></div><span>Cargando publicaciones...</span>
           </div>
@@ -146,6 +160,46 @@
       </div>
     </div>
   </section>
+
+  <div class="admin-modal-overlay" id="modal-mercado-confirmar-compra">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-mercado-confirmar-compra')">✕</button>
+      <h3 style="color:#fdba74;">Confirmar compra</h3>
+      <div class="mercado-confirmar-resumen" id="mercado-confirmar-resumen"></div>
+      <div class="rc-error" id="mercado-confirmar-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="mercado-confirmar-btn" onclick="mercadoConfirmarCompra()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar compra
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-mercado-confirmar-compra')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-modal-overlay" id="modal-mercado-editar">
+    <div class="admin-modal" style="position:relative;">
+      <button class="admin-modal-close" onclick="cerrarModal('modal-mercado-editar')">✕</button>
+      <h3 style="color:#fdba74;">Editar publicación</h3>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px;">Editando: <b id="mercado-editar-nombre" style="color:#fff;"></b></p>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea id="mercado-editar-descripcion" maxlength="300" rows="3" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:Inter,sans-serif;resize:vertical;width:100%;outline:0;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Precio ($)</label>
+        <input type="number" id="mercado-editar-precio" min="1">
+      </div>
+      <div class="rc-error" id="mercado-editar-error"></div>
+      <div class="modal-actions">
+        <button class="btn-green" id="mercado-editar-btn" onclick="mercadoGuardarEdicion()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardar cambios
+        </button>
+        <button class="sec-back" onclick="cerrarModal('modal-mercado-editar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Elementos globales compartidos (modales, notificaciones, etc.) ── -->
   <!-- MODAL: Ver más (publicaciones públicas de una empresa) -->
@@ -354,26 +408,16 @@
   <div class="admin-modal-overlay" id="modal-mercado-publicar">
     <div class="admin-modal" style="position:relative;">
       <button class="admin-modal-close" onclick="cerrarModal('modal-mercado-publicar')">✕</button>
-      <h3 style="color:#fdba74;">Vender un Ítem</h3>
+      <h3 style="color:#fdba74;">Vender Ítems</h3>
 
       <div class="form-group">
-        <label>Elige un ítem de tu inventario</label>
+        <label>Elige uno o varios ítems de tu inventario (máx. 10)</label>
         <div id="mercado-pub-items-loading" style="color:rgba(255,255,255,0.4);font-size:13px;">Cargando tu inventario...</div>
         <div id="mercado-pub-items-lista" class="mercado-pub-items-lista" style="display:none;"></div>
         <div id="mercado-pub-items-empty" class="tienda-empty" style="display:none;padding:20px 0;">No tienes ítems disponibles para vender.</div>
       </div>
 
-      <div id="mercado-pub-form" style="display:none;flex-direction:column;gap:18px;">
-        <p style="color:rgba(255,255,255,0.5);font-size:13px;">Vendiendo: <b id="mercado-pub-nombre" style="color:#fff;"></b></p>
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea id="mercado-pub-descripcion" maxlength="300" rows="3" placeholder="Describe el estado, detalles o condiciones de la venta..." style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:Inter,sans-serif;resize:vertical;width:100%;outline:0;"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Precio ($)</label>
-          <input type="number" id="mercado-pub-precio" placeholder="Ej: 250000" min="1">
-        </div>
-      </div>
+      <div id="mercado-pub-form" style="display:none;flex-direction:column;gap:12px;"></div>
 
       <div class="rc-error" id="mercado-pub-error"></div>
       <div class="modal-actions">
