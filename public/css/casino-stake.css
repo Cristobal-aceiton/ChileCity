@@ -16,6 +16,7 @@
   --cs-green: #12e08a;
   --cs-green-dark: #0aa869;
   --cs-red: #ff4d5e;
+  --cs-green-2: #3ddc97;
   --cs-gold: #f5c451;
   --cs-radius: 16px;
   --cs-radius-sm: 10px;
@@ -174,7 +175,7 @@ body.cs-body > *:not(#bg-fx):not(.cs-overlay) { position: relative; z-index: 2; 
 .cs-game-header { text-align: center; margin: 22px auto 0; max-width: 340px; }
 .cs-game-header h1 {
   font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; margin: 0;
-  background: linear-gradient(135deg, #fff 50%, var(--cs-red));
+  background: linear-gradient(135deg, #fff 50%, var(--cs-green));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .cs-game-header p { color: rgba(255,255,255,.45); font-size: 12.5px; margin: 2px 0 0; }
@@ -259,8 +260,8 @@ body.cs-body > *:not(#bg-fx):not(.cs-overlay) { position: relative; z-index: 2; 
 }
 .cs-btn-green:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 .cs-btn-red {
-  background: linear-gradient(135deg, #ff6b6b, #c81f2f); color: #fff;
-  box-shadow: 0 0 22px rgba(200,31,47,.3);
+  background: linear-gradient(135deg, var(--cs-green-2), var(--cs-green-dark)); color: #063620;
+  box-shadow: 0 0 22px rgba(18,224,138,.28);
 }
 .cs-btn-red:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 .cs-btn svg.cs-spin { animation: csSpinIcon 1s linear infinite; }
