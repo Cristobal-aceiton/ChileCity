@@ -6,7 +6,7 @@
     <title>Minas — Casino ChileCity RP</title>
     <link rel="icon" type="image/webp" href="/logo.webp">
     <link rel="apple-touch-icon" href="/logo.webp">
-    <link rel="stylesheet" href="/css/casino-stake.css?v=1">
+    <link rel="stylesheet" href="/css/casino-stake.css?v=2">
 </head>
 <body class="cs-body">
 
@@ -97,10 +97,7 @@
         <!-- Tablero -->
         <div class="cs-stage">
             <div class="cs-stage-card">
-                <div id="mi-tablero" class="mi-oculto"></div>
-                <div id="mi-tablero-vacio" style="color:rgba(255,255,255,.35); font-size:13px; text-align:center; max-width:260px;">
-                    Configura tu apuesta y presiona <b>Iniciar partida</b> para ver el tablero.
-                </div>
+                <div id="mi-tablero"></div>
             </div>
         </div>
 
@@ -120,9 +117,9 @@
     </template>
 
     <script src="/js/casino-sfx.js?v=1"></script>
-    <script src="/js/mines.js?v=2" defer></script>
+    <script src="/js/mines.js?v=3" defer></script>
     <script>
-        // Botones rápidos ½ / 2× del monto de apuesta + mostrar/ocultar placeholder del tablero
+        // Botones rápidos ½ / 2× del monto de apuesta
         (function () {
             const elMonto = document.getElementById('mi-monto');
             document.querySelectorAll('#mi-config .cs-quick button').forEach(btn => {
@@ -134,13 +131,6 @@
                     elMonto.dispatchEvent(new Event('input'));
                 });
             });
-
-            const elTablero = document.getElementById('mi-tablero');
-            const elVacio = document.getElementById('mi-tablero-vacio');
-            const obs = new MutationObserver(() => {
-                elVacio.style.display = elTablero.classList.contains('mi-oculto') ? '' : 'none';
-            });
-            obs.observe(elTablero, { attributes: true, attributeFilter: ['class'] });
         })();
     </script>
 
@@ -180,6 +170,8 @@
 .mi-casilla:hover:not(.mi-revelada):not(.mi-mina):not(:disabled) {
     background: rgba(255,255,255,.14); transform: scale(1.05);
 }
+#mi-tablero.mi-inactiva .mi-casilla { cursor: default; }
+#mi-tablero.mi-inactiva .mi-casilla:hover { background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03)); transform: none; }
 .mi-casilla.mi-revelada {
     background: rgba(18,224,138,.16); border-color: rgba(18,224,138,.4); color: #12e08a;
     cursor: default; animation: miRevelar .3s cubic-bezier(.16,1,.3,1);

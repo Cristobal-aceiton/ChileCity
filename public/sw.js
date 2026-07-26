@@ -43,7 +43,7 @@
 //                              favicon: cambian poco y no es crítico que se
 //                              vean "al toque" tras un deploy).
 
-const CACHE_VERSION = "v99"; // <--- ⚠️ ACTUALIZADO A v99 (rediseño estilo Stake del casino: casino.html, mines.html, ruleta.html y moneda.html reescritos + nuevo /css/casino-stake.css; se corrigió el marco cuadrado de la ruleta y se simplificó la moneda; portadas de mines/ruleta/moneda restauradas a las originales; se sacó la sección "Próximamente")
+const CACHE_VERSION = "v100"; // <--- ⚠️ ACTUALIZADO A v100 (mercado: se corrige formulario de publicar que quedaba oculto tras seleccionar ítems; casino: acentos verdes estilo Stake en vez de rojo; mines: tablero visible desde el inicio, inerte hasta apostar; moneda: moneda 3D con canto real en vez de disco plano con texto)
 const CACHE_NAME = `chilecity-${CACHE_VERSION}`;
 
 // Cuánto esperamos a la red para HTML/estáticos versionados nuevos antes de

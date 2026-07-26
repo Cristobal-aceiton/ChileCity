@@ -6,7 +6,7 @@
     <title>Cara o Cruz — Casino ChileCity RP</title>
     <link rel="icon" type="image/webp" href="/logo.webp">
     <link rel="apple-touch-icon" href="/logo.webp">
-    <link rel="stylesheet" href="/css/casino-stake.css?v=1">
+    <link rel="stylesheet" href="/css/casino-stake.css?v=2">
 </head>
 <body class="cs-body">
 
@@ -78,9 +78,18 @@
         <div class="cs-stage">
             <div class="cs-stage-card">
                 <div class="mn-scene">
+                    <div class="mn-sombra"></div>
                     <div class="mn-moneda" id="mn-moneda">
-                        <div class="mn-cara">CARA</div>
-                        <div class="mn-cruz">CRUZ</div>
+                        <div class="mn-cara">
+                            <div class="mn-anillo"></div>
+                            <div class="mn-simbolo">$</div>
+                            <div class="mn-etiqueta">CARA</div>
+                        </div>
+                        <div class="mn-cruz">
+                            <div class="mn-anillo"></div>
+                            <div class="mn-simbolo">C</div>
+                            <div class="mn-etiqueta">CRUZ</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,17 +124,23 @@
 
 <style>
 .mn-opcion.seleccionada {
-    border-color: #e02020; color: #ff6b6b;
-    background: linear-gradient(160deg, rgba(224,32,32,.22), rgba(224,32,32,.08));
-    box-shadow: 0 0 0 2px rgba(224,32,32,.3);
+    border-color: var(--cs-green); color: var(--cs-green);
+    background: linear-gradient(160deg, rgba(18,224,138,.22), rgba(18,224,138,.08));
+    box-shadow: 0 0 0 2px rgba(18,224,138,.3);
 }
 
 .mn-scene {
-    width: 200px; height: 200px; margin: 0 auto; perspective: 700px;
-    display: flex; align-items: center; justify-content: center;
+    width: 220px; height: 220px; margin: 0 auto; perspective: 900px;
+    display: flex; align-items: center; justify-content: center; position: relative;
+}
+.mn-sombra {
+    position: absolute; bottom: 6px; left: 50%; width: 130px; height: 22px;
+    transform: translateX(-50%); border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.45), rgba(0,0,0,0) 72%);
+    filter: blur(1px);
 }
 .mn-moneda {
-    width: 170px; height: 170px; position: relative; transform-style: preserve-3d;
+    width: 180px; height: 180px; position: relative; transform-style: preserve-3d;
     transition: transform .1s; border-radius: 50%;
 }
 .mn-moneda.girando { animation: mnFlip 1.6s cubic-bezier(.45,.05,.55,.95) forwards; }
@@ -136,19 +151,61 @@
     80%  { transform: rotateY(1800deg) rotateX(4deg); }
     100% { transform: rotateY(2160deg) rotateX(0); }
 }
+
+/* ── Caras de la moneda (relieve dorado, sin texto plano) ───────────────── */
 .mn-cara, .mn-cruz {
-    position: absolute; inset: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    position: absolute; inset: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 2px;
     backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    font-family: 'Bebas Neue', Arial, sans-serif; font-size: 17px; letter-spacing: 2px; color: #fff;
-    font-weight: 700;
+    background:
+        radial-gradient(circle at 35% 28%, rgba(255,255,255,.55), rgba(255,255,255,0) 30%),
+        radial-gradient(circle at 50% 50%, #f5d982 0%, #e0ac3d 45%, #b1791f 78%, #8a5c15 100%);
+    box-shadow:
+        inset 0 0 0 5px rgba(255,244,214,.55),
+        inset 0 0 0 7px rgba(120,80,10,.5),
+        inset 0 8px 16px rgba(255,255,255,.35),
+        inset 0 -10px 18px rgba(0,0,0,.35);
 }
-.mn-cara {
-    background: radial-gradient(circle at 42% 38%, #ff5c5c 0%, #e02020 55%, #c81620 100%);
-    box-shadow: 0 0 34px rgba(224,32,32,.45);
+.mn-cara { transform: translateZ(8px); }
+.mn-cruz { transform: rotateY(180deg) translateZ(8px); }
+
+.mn-anillo {
+    position: absolute; inset: 12px; border-radius: 50%;
+    border: 2px dashed rgba(120,80,10,.45);
 }
-.mn-cruz {
-    background: radial-gradient(circle at 42% 38%, #3a3a3a 0%, #1c1c1c 55%, #0d0d0d 100%);
-    box-shadow: 0 0 34px rgba(0,0,0,.5);
-    transform: rotateY(180deg);
+.mn-simbolo {
+    font-family: 'Bebas Neue', Arial, sans-serif; font-size: 56px; line-height: 1;
+    color: #7c5410; text-shadow: 0 1px 0 rgba(255,244,214,.7), 0 -1px 1px rgba(90,58,6,.6);
 }
+.mn-etiqueta {
+    font-family: 'Bebas Neue', Arial, sans-serif; font-size: 12px; letter-spacing: 3px;
+    color: rgba(124,84,16,.85);
+}
+
+/* ── Canto (borde) de la moneda: le da el volumen 3D real ───────────────── */
+.mn-canto-seg {
+    position: absolute; left: 50%; top: 50%; width: 13px; height: 16px;
+    margin-left: -6.5px; margin-top: -8px;
+    background: linear-gradient(180deg, #f6d97e 0%, #b1791f 50%, #6e470f 100%);
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.mn-canto-seg.mn-canto-alt { filter: brightness(.78); }
 </style>
+<script>
+    // Genera el canto (borde cilíndrico) de la moneda con divs en 3D,
+    // para que la moneda se vea como un disco real y no una imagen plana.
+    (function () {
+        const moneda = document.getElementById('mn-moneda');
+        if (!moneda) return;
+        const SEGMENTOS = 48;
+        const RADIO = 89;
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < SEGMENTOS; i++) {
+            const seg = document.createElement('div');
+            seg.className = 'mn-canto-seg' + (i % 2 === 0 ? ' mn-canto-alt' : '');
+            seg.style.transform = `rotateY(${(360 / SEGMENTOS) * i}deg) translateZ(${RADIO}px)`;
+            frag.appendChild(seg);
+        }
+        moneda.appendChild(frag);
+    })();
+</script>
