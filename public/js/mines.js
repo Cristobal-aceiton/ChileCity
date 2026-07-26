@@ -115,7 +115,7 @@
     partidaActiva = activa;
     elConfig.classList.toggle('mi-oculto', activa);
     elInfo.classList.toggle('mi-oculto', !activa);
-    elTablero.classList.toggle('mi-oculto', !activa);
+    elTablero.classList.toggle('mi-inactiva', !activa);
     elRetirar.classList.toggle('mi-oculto', !activa);
   }
 
@@ -314,6 +314,8 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     poblarSelectMinas();
+    crearTablero();
+    elTablero.classList.add('mi-inactiva');
     cargarSaldo(false);
     cargarHistorial();
     retomarPartida();

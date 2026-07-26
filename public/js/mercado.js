@@ -286,7 +286,9 @@
       if (!currentUser?.id) { mostrarToast('Debes iniciar sesión.', true); return; }
       document.getElementById('modal-mercado-publicar').classList.add('visible');
       mercadoIdsSeleccionados = [];
-      document.getElementById('mercado-pub-form').innerHTML = '';
+      const formWrapInit = document.getElementById('mercado-pub-form');
+      formWrapInit.innerHTML = '';
+      formWrapInit.style.display = 'none';
       document.getElementById('mercado-pub-btn').disabled = true;
       document.getElementById('mercado-pub-error').classList.remove('visible');
 
@@ -364,10 +366,12 @@
 
       if (!mercadoIdsSeleccionados.length) {
         formWrap.innerHTML = '';
+        formWrap.style.display = 'none';
         btn.disabled = true;
         return;
       }
       btn.disabled = false;
+      formWrap.style.display = 'flex';
       formWrap.innerHTML = mercadoIdsSeleccionados.map(id => {
         const item = mercadoInventarioCache.find(it => it.id === id);
         if (!item) return '';
