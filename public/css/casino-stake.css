@@ -17,6 +17,7 @@
   --cs-green-dark: #0aa869;
   --cs-red: #ff4d5e;
   --cs-green-2: #3ddc97;
+  --cs-green-glow: #1fd67c;
   --cs-gold: #f5c451;
   --cs-radius: 16px;
   --cs-radius-sm: 10px;
@@ -33,7 +34,7 @@ body.cs-body {
   padding-bottom: 60px;
 }
 
-/* ── Fondo ambiental (mantiene la identidad roja de ChileCity, más oscuro) ── */
+/* ── Fondo ambiental (estilo Stake: acentos verdes en vez de rojo) ── */
 #bg-fx {
   position: fixed;
   inset: 0;
@@ -51,7 +52,7 @@ body.cs-body {
 }
 #bg-fx::before {
   width: 100vmax; height: 100vmax; top: -50vmax; left: -40vmax;
-  background: radial-gradient(circle at 30% 30%, rgba(200,25,45,.28), rgba(200,25,45,0) 62%);
+  background: radial-gradient(circle at 30% 30%, rgba(31,214,124,.24), rgba(31,214,124,0) 62%);
   animation: csFloatA 16s ease-in-out infinite alternate;
 }
 #bg-fx::after {
@@ -111,7 +112,7 @@ body.cs-body > *:not(#bg-fx):not(.cs-overlay) { position: relative; z-index: 2; 
   max-width: 1100px; margin: 22px auto 0; padding: 0 16px;
 }
 .cs-hero-card {
-  background: linear-gradient(120deg, #171018 0%, #241318 55%, #1a1214 100%);
+  background: linear-gradient(120deg, #0f1a15 0%, #12241c 55%, #101a15 100%);
   border: 1px solid var(--cs-border-2);
   border-radius: 20px;
   padding: 26px 24px;
