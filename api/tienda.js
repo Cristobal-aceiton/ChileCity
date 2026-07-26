@@ -532,6 +532,93 @@ export default async function handler(req, res) {
       });
     }
 
+    // ── POST: publicar VARIOS ítems del inventario de una sola vez ────────────
+    if (req.method === "POST" && action === "mercado_publicar_multiple") {
+      const { items } = req.body;
+      if (!Array.isArray(items) || items.length === 0)
+        return res.status(400).json({ error: "Debes enviar al menos un ítem." });
+      if (items.length > 10)
+        return res.status(400).json({ error: "Puedes publicar hasta 10 ítems a la vez." });
+
+      // Validamos todos antes de insertar nada, para no dejar publicaciones a medias.
+      const limpios = [];
+      for (const it of items) {
+        const { item_id, descripcion, precio } = it || {};
+        if (!item_id || !descripcion || !String(descripcion).trim())
+          return res.status(400).json({ error: "Cada ítem necesita descripción y precio." });
+        const descTrim = String(descripcion).trim();
+        if (descTrim.length > 300)
+          return res.status(400).json({ error: "La descripción no puede superar los 300 caracteres." });
+        const precioNum = parseMonto(precio);
+        if (precioNum === null || precioNum <= 0)
+          return res.status(400).json({ error: "El precio debe ser un número entero mayor a 0." });
+
+        const invRows = await sql`SELECT * FROM inventario WHERE id = ${item_id} AND discord_id = ${discord_id}`;
+        if (invRows.length === 0)
+          return res.status(404).json({ error: `Uno de los ítems ya no está en tu inventario.` });
+
+        const yaPublicado = await sql`
+          SELECT id FROM mercado_publicaciones WHERE inventario_id = ${item_id} AND activa = TRUE
+        `;
+        if (yaPublicado.length > 0)
+          return res.status(409).json({ error: `"${invRows[0].nombre}" ya está publicado en el mercado.` });
+
+        limpios.push({ item: invRows[0], descripcion: descTrim, precio: precioNum });
+      }
+
+      // Evitar que el mismo item_id se repita dentro del mismo request.
+      const idsUnicos = new Set(limpios.map(l => l.item.id));
+      if (idsUnicos.size !== limpios.length)
+        return res.status(400).json({ error: "No puedes seleccionar el mismo ítem dos veces." });
+
+      const creadas = [];
+      for (const { item, descripcion, precio } of limpios) {
+        const rows = await sql`
+          INSERT INTO mercado_publicaciones
+            (vendedor_id, vendedor_nombre, inventario_id, nombre, categoria, imagen_url, descripcion, precio)
+          VALUES
+            (${discord_id}, ${discord_name}, ${item.id}, ${item.nombre}, ${item.categoria}, ${item.imagen_url}, ${descripcion}, ${precio})
+          RETURNING *
+        `;
+        creadas.push({ ...rows[0], precio: toNumber(rows[0].precio) });
+      }
+
+      return res.status(201).json({ publicaciones: creadas });
+    }
+
+    // ── POST: editar precio/descripción de una publicación activa propia ─────
+    if (req.method === "POST" && action === "mercado_editar") {
+      const { publicacion_id, descripcion, precio } = req.body;
+      if (!publicacion_id)
+        return res.status(400).json({ error: "Falta publicacion_id" });
+
+      const descTrim = String(descripcion || "").trim();
+      if (!descTrim)
+        return res.status(400).json({ error: "Debes escribir una descripción." });
+      if (descTrim.length > 300)
+        return res.status(400).json({ error: "La descripción no puede superar los 300 caracteres." });
+
+      const precioNum = parseMonto(precio);
+      if (precioNum === null || precioNum <= 0)
+        return res.status(400).json({ error: "El precio debe ser un número entero mayor a 0." });
+
+      const pubs = await sql`SELECT * FROM mercado_publicaciones WHERE id = ${publicacion_id}`;
+      if (pubs.length === 0)
+        return res.status(404).json({ error: "Publicación no encontrada." });
+      if (pubs[0].vendedor_id !== discord_id)
+        return res.status(403).json({ error: "No puedes editar una publicación que no es tuya." });
+      if (!pubs[0].activa)
+        return res.status(409).json({ error: "Solo puedes editar publicaciones activas." });
+
+      const rows = await sql`
+        UPDATE mercado_publicaciones
+        SET descripcion = ${descTrim}, precio = ${precioNum}
+        WHERE id = ${publicacion_id}
+        RETURNING *
+      `;
+      return res.status(200).json({ publicacion: { ...rows[0], precio: toNumber(rows[0].precio) } });
+    }
+
     // ── POST: bajar (despublicar) una publicación propia ──────────────────────
     if (req.method === "POST" && action === "mercado_despublicar") {
       const { publicacion_id } = req.body;
@@ -556,39 +643,66 @@ export default async function handler(req, res) {
       if (!publicacion_id)
         return res.status(400).json({ error: "Falta publicacion_id" });
 
-      const pubs = await sql`SELECT * FROM mercado_publicaciones WHERE id = ${publicacion_id}`;
-      if (pubs.length === 0)
+      // Lectura simple primero, solo para dar mensajes de error claros
+      // (esto todavía no reserva nada).
+      const pubsCheck = await sql`SELECT vendedor_id, activa FROM mercado_publicaciones WHERE id = ${publicacion_id}`;
+      if (pubsCheck.length === 0)
         return res.status(404).json({ error: "Publicación no encontrada." });
-      const pub = pubs[0];
-
-      if (!pub.activa)
-        return res.status(409).json({ error: "Esa publicación ya no está disponible." });
-      if (pub.vendedor_id === discord_id)
+      if (pubsCheck[0].vendedor_id === discord_id)
         return res.status(400).json({ error: "No puedes comprar tu propia publicación." });
+      if (!pubsCheck[0].activa)
+        return res.status(409).json({ error: "Esa publicación ya no está disponible." });
 
+      // Reclamo atómico: solo una request puede pasar de activa=TRUE a FALSE
+      // para este id. Si dos personas compran a la vez, la base de datos
+      // garantiza que solo una gane esta carrera; la otra recibe 0 filas.
+      const claimed = await sql`
+        UPDATE mercado_publicaciones
+        SET activa = FALSE, comprador_id = ${discord_id}, vendida_at = NOW()
+        WHERE id = ${publicacion_id} AND activa = TRUE
+        RETURNING *
+      `;
+      if (claimed.length === 0)
+        return res.status(409).json({ error: "Esa publicación ya no está disponible (alguien más la compró primero)." });
+
+      const pub = claimed[0];
       const precio = toNumber(pub.precio);
 
+      // De acá en adelante la publicación ya quedó marcada como vendida. Si
+      // algo falla más abajo, hay que revertir (reactivarla) antes de responder error.
+      const revertirClaim = () => sql`
+        UPDATE mercado_publicaciones
+        SET activa = TRUE, comprador_id = NULL, vendida_at = NULL
+        WHERE id = ${publicacion_id}
+      `;
+
       const cuentasComprador = await sql`SELECT * FROM banco WHERE discord_id = ${discord_id}`;
-      if (cuentasComprador.length === 0)
+      if (cuentasComprador.length === 0) {
+        await revertirClaim();
         return res.status(403).json({ error: "Necesitas una cuenta bancaria para comprar." });
+      }
       const saldoComprador = toNumber(cuentasComprador[0].saldo);
-      if (saldoComprador < precio)
+      if (saldoComprador < precio) {
+        await revertirClaim();
         return res.status(400).json({
           error: "Fondos insuficientes",
           saldo: saldoComprador,
           precio,
           faltante: precio - saldoComprador,
         });
+      }
 
       const cuentasVendedor = await sql`SELECT * FROM banco WHERE discord_id = ${pub.vendedor_id}`;
-      if (cuentasVendedor.length === 0)
+      if (cuentasVendedor.length === 0) {
+        await revertirClaim();
         return res.status(409).json({ error: "El vendedor ya no tiene una cuenta bancaria activa." });
+      }
       const saldoVendedor = toNumber(cuentasVendedor[0].saldo);
 
-      // El ítem podría haber sido movido/eliminado desde que se publicó
+      // El ítem podría haber sido movido/eliminado desde que se publicó.
+      // Acá sí lo dejamos definitivamente inactivo: el ítem ya no está disponible de verdad.
       const itemRows = await sql`SELECT * FROM inventario WHERE id = ${pub.inventario_id}`;
       if (itemRows.length === 0 || itemRows[0].discord_id !== pub.vendedor_id) {
-        await sql`UPDATE mercado_publicaciones SET activa = FALSE WHERE id = ${publicacion_id}`;
         return res.status(409).json({ error: "Ese ítem ya no está disponible." });
       }
 
@@ -633,12 +747,6 @@ export default async function handler(req, res) {
           WHERE id = ${veh.id}
         `;
       }
-
-      await sql`
-        UPDATE mercado_publicaciones
-        SET activa = FALSE, comprador_id = ${discord_id}, vendida_at = NOW()
-        WHERE id = ${publicacion_id}
-      `;
 
       return res.status(200).json({ ok: true, nuevoSaldo: nuevoSaldoComprador });
     }
